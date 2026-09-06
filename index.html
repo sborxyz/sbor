@@ -388,7 +388,7 @@ en:{
     "<strong>Protocol yield excluded.</strong> Some assets carry yield from the asset itself rather than from lending. sBTC carries Bitcoin protocol yield through dual stacking, and stSTX carries PoX staking yield managed by StackingDAO. That yield belongs to the asset, not the loan, so it never enters the fixing.",
     "<strong>Phase-in.</strong> A newly eligible market enters at zero weight and ramps to full weight linearly over 30 days, so adding a venue cannot step the rate.",
     "<strong>Moving averages.</strong> An average is published only once the full window exists. A 200-day average appears on day 200, not before.",
-    "<strong>Stale data.</strong> If a market's state cannot be read, its weight is zero for that fixing and the omission is recorded.",
+    "<strong>Stale or implausible data.</strong> If a market's state cannot be read, its weight is zero for that fixing and the omission is recorded. A funded market whose borrow and supply rates both read below 0.05% is treated the same way, because a market with real depth does not price money at nothing on both sides at once.",
     "<strong>Revisions.</strong> Published fixings are never rewritten. Corrections appear as a new fixing with a note."
   ],
   signupH:"Weekly rate report",
@@ -446,7 +446,7 @@ pt:{
     "<strong>Rendimento do protocolo fica de fora.</strong> Alguns ativos rendem por si mesmos, e não pelo empréstimo. O sBTC carrega rendimento do protocolo Bitcoin via dual stacking, e o stSTX carrega rendimento de staking PoX administrado pela StackingDAO. Esse rendimento pertence ao ativo, não ao empréstimo, então nunca entra no fixing.",
     "<strong>Entrada gradual.</strong> Um mercado recém-elegível entra com peso zero e sobe linearmente até o peso cheio ao longo de 30 dias, de modo que incluir uma plataforma nunca provoca um salto na taxa.",
     "<strong>Médias móveis.</strong> Uma média só é publicada quando existe a janela completa de dados. Uma média de 200 dias aparece no dia 200, não antes.",
-    "<strong>Dados indisponíveis.</strong> Se o estado de um mercado não puder ser lido, seu peso é zero naquele fixing e a omissão fica registrada.",
+    "<strong>Dados indisponíveis ou implausíveis.</strong> Se o estado de um mercado não puder ser lido, seu peso é zero naquele fixing e a omissão fica registrada. Um mercado com liquidez cujas taxas de empréstimo e de depósito ficam ambas abaixo de 0,05% recebe o mesmo tratamento, porque um mercado com profundidade real não precifica o dinheiro a zero dos dois lados ao mesmo tempo.",
     "<strong>Revisões.</strong> Fixings publicados nunca são reescritos. Correções aparecem como um novo fixing, com nota."
   ],
   signupH:"Relatório semanal de taxas",
