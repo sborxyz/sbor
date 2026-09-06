@@ -46,7 +46,10 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.0.0";
+const METHODOLOGY_VERSION = "1.1.0";
+
+/* Below this, on both sides at once, a funded market is not reporting. */
+const RATE_FLOOR = 0.05;
 
 /* DefiLlama symbol -> our symbol, for matching depth */
 const DEPTH_ALIAS = { SBTC:"sBTC", USDC:"USDCx", USDH:"USDh", STX:"STX", STSTX:"stSTX", STSTXBTC:"stSTXbtc" };
@@ -175,8 +178,12 @@ const main = async () => {
       log(`  ${a.symbol}: supply=${round(supply)}% borrow=${round(borrow)}% depth=${d}`);
       if (!a.currency){ log(`    (collateral only, excluded from fixings)`); continue; }
       if (d <= 0){ log(`    (no depth, skipped)`); continue; }
-      if (borrow === 0 && supply === 0){
-        log(`    (both rates read zero, treated as unreadable and excluded)`);
+      /* Plausibility floor. A funded lending market does not price money at
+         effectively nothing on both sides. When it reads that way the venue is
+         not reporting, so the market is treated as unreadable rather than as
+         a real rate of zero. */
+      if (borrow < RATE_FLOOR && supply < RATE_FLOOR){
+        log(`    (both rates below the ${RATE_FLOOR}% plausibility floor, treated as unreadable and excluded)`);
         continue;
       }
       markets.push({
@@ -261,6 +268,7 @@ const main = async () => {
       "stSTXbtc is collateral only and is excluded from all fixings.",
       "Rates are quoted on the instrument actually lent. SBOR-BTC measures sBTC, not native bitcoin. SBOR-USD measures USDCx and USDh, not bank dollars.",
       "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
+      "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
       "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives today. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market."
     ]
   };
