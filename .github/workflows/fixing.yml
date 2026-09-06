@@ -2,7 +2,7 @@ name: SBOR daily fixing
 
 on:
   schedule:
-    - cron: "0 11 * * *"     # 11:00 UTC, noon in London, the hour LIBOR fixed for decades
+    - cron: "0 9 * * *"      # target 11:00 UTC; scheduled early because GitHub runs late under load
   workflow_dispatch:
 
 permissions:
