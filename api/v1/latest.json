@@ -7,8 +7,8 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-05T13:37:10Z",
-  "methodologyVersion": "1.0.0",
+  "fixing": "2026-09-06T12:49:34Z",
+  "methodologyVersion": "1.1.0",
   "isDailyFixing": true,
   "basis": "APY, annually compounded",
   "method": "https://sbor.xyz/llms.txt",
@@ -19,8 +19,8 @@
       "currency": "USD",
       "headline": "What money costs in dollars on Stacks.",
       "borrow": 2.29,
-      "supply": 0.57,
-      "allInSupply": 0.57,
+      "supply": 0.58,
+      "allInSupply": 0.58,
       "allInSupplyDiffers": false,
       "venues": [
         "Zest V2",
@@ -31,9 +31,9 @@
         {
           "venue": "Zest V2",
           "asset": "USDCx",
-          "borrow": 2.68,
-          "supply": 0.76,
-          "depthUsd": 10136787,
+          "borrow": 2.69,
+          "supply": 0.77,
+          "depthUsd": 10137202,
           "phaseIn": 1,
           "weight": 0.6505
         },
@@ -42,7 +42,7 @@
           "asset": "USDCx",
           "borrow": 1.45,
           "supply": 0.25,
-          "depthUsd": 5006438,
+          "depthUsd": 5006495,
           "phaseIn": 1,
           "weight": 0.3213
         },
@@ -51,34 +51,9 @@
           "asset": "USDh",
           "borrow": 2.74,
           "supply": 0,
-          "depthUsd": 439776,
+          "depthUsd": 439620,
           "phaseIn": 1,
           "weight": 0.0282
-        }
-      ]
-    },
-    "SBOR-BTC": {
-      "label": "SBOR-BTC",
-      "currency": "BTC",
-      "headline": "What it costs to borrow sBTC on Stacks.",
-      "borrow": 0.01,
-      "supply": 0,
-      "allInSupply": 0,
-      "allInSupplyDiffers": false,
-      "venues": [
-        "Zest V2"
-      ],
-      "largestConstituentWeight": 1,
-      "markets": [
-        {
-          "venue": "Zest V2",
-          "asset": "sBTC",
-          "borrow": 0.01,
-          "supply": 0,
-          "protocolYieldSource": "Bitcoin protocol yield via dual stacking, paid on enrolment",
-          "depthUsd": 53079867,
-          "phaseIn": 1,
-          "weight": 1
         }
       ]
     },
@@ -87,32 +62,32 @@
       "currency": "STX",
       "headline": "What money costs in STX on Stacks.",
       "borrow": 1.75,
-      "supply": 0.64,
-      "allInSupply": 0.64,
+      "supply": 0.65,
+      "allInSupply": 0.65,
       "allInSupplyDiffers": false,
       "venues": [
         "Zest V2"
       ],
-      "largestConstituentWeight": 0.5144,
+      "largestConstituentWeight": 0.5143,
       "markets": [
         {
           "venue": "Zest V2",
           "asset": "stSTX",
-          "borrow": 1.13,
-          "supply": 0.06,
+          "borrow": 1.14,
+          "supply": 0.07,
           "protocolYieldSource": "PoX staking yield on the underlying, managed by StackingDAO",
-          "depthUsd": 2757163,
+          "depthUsd": 2851573,
           "phaseIn": 1,
-          "weight": 0.5144
+          "weight": 0.5143
         },
         {
           "venue": "Zest V2",
           "asset": "STX",
           "borrow": 2.4,
           "supply": 1.26,
-          "depthUsd": 2603273,
+          "depthUsd": 2692741,
           "phaseIn": 1,
-          "weight": 0.4856
+          "weight": 0.4857
         }
       ]
     }
@@ -121,12 +96,12 @@
     "label": "SBOR-POX",
     "headline": "The native Bitcoin yield paid to STX stakers.",
     "kind": "staking yield",
-    "apy": 5.45,
+    "apy": 5.31,
     "cycle": 141,
-    "cycleYieldPct": 0.2121,
+    "cycleYieldPct": 0.2068,
     "btcPaid": 2.928688,
     "stxLocked": 421543815,
-    "stxPerBtc": 305312.38,
+    "stxPerBtc": 297631.95,
     "rateSource": "Bitflow",
     "rateQuoteImpactBps": 14,
     "note": "Paid in bitcoin against a position locked in STX, so the figure depends on the BTC/STX exchange rate rather than on either dollar price. It is a staking yield, not a lending rate, and is never blended into the lending indices."
@@ -139,6 +114,7 @@
     "stSTXbtc is collateral only and is excluded from all fixings.",
     "Rates are quoted on the instrument actually lent. SBOR-BTC measures sBTC, not native bitcoin. SBOR-USD measures USDCx and USDh, not bank dollars.",
     "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
+    "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
     "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives today. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market."
   ]
 }
