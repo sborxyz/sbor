@@ -46,7 +46,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.2.0";
+const METHODOLOGY_VERSION = "1.2.1";
 
 /* Below this, on both sides at once, a funded market is not reporting. */
 const RATE_FLOOR = 0.05;
@@ -250,6 +250,10 @@ const main = async () => {
       supply: round(supplyOnly),
       allInSupply: round(allIn),
       allInSupplyDiffers: round(allIn - supplyOnly) > 0,
+      ...(ms.some(m => m.protocolYieldSource && !m.protocolYield) && {
+        allInSupplyIncomplete: true,
+        allInSupplyNote: "One or more constituents carry protocol yield that has no programmatic source today, so it is not included in this figure. allInSupply therefore equals the lending rate and understates what a supplier receives. See the market entries for which assets are affected."
+      }),
       venues,
       largestConstituentWeight: round(Math.max(...ms.map(m => m.weight)), 4),
       markets: ms.map(({ currency, ...rest }) => rest)
@@ -288,7 +292,8 @@ const main = async () => {
       "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
       "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
       "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
-      "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives today. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market."
+      "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
+      "Protocol yield is not currently readable from contract state or from DefiLlama for the assets that carry it. Where an index is marked allInSupplyIncomplete, that yield is known to exist but is not quantified here, so allInSupply understates what a supplier receives. It will be included once a source exists, rather than estimated."
     ]
   };
 
