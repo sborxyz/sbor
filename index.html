@@ -89,6 +89,8 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .bar{position:relative;display:block;width:100%;max-width:150px;height:7px;background:var(--paper-2);margin-left:auto}
 .bar i{position:absolute;inset:0 auto 0 0;background:var(--accent);display:block}
 .bar.phase i{background:repeating-linear-gradient(45deg,var(--accent) 0 3px,transparent 3px 6px)}
+.terms td,.terms th{white-space:nowrap}
+.terms .pend{color:var(--ink-soft)}
 .poxbox{border:1px solid var(--rule);padding:24px 26px 22px;
   background:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule-soft) 31px 32px)}
 .poxk{font-size:13.5px;color:var(--ink-soft)}
@@ -199,6 +201,19 @@ a{color:var(--accent)}
         </div>
       </div>
     </div>
+
+    <section id="terms-sec">
+      <div class="sec-h">
+        <div>
+          <h2 id="t-termsH"></h2>
+          <p id="t-termsP"></p>
+        </div>
+      </div>
+      <table class="terms">
+        <thead><tr id="termsHead"></tr></thead>
+        <tbody id="termsBody"></tbody>
+      </table>
+    </section>
 
     <section id="pox-sec" hidden>
       <div class="sec-h">
@@ -349,6 +364,11 @@ en:{
   stamp:d=>`Rate as of <span class="num">${d}</span> · read from Zest contract state · updated daily`,
   borrowK:"Borrow APY", supplyK:"Supply APY",
   allIn:v=>`${v.toFixed(2)}% all in, with protocol yield`,
+  termsH:"Term averages",
+  termsP:"Compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window of fixings exists.",
+  termCol:d=>`${d}-day`,
+  termFrom:d=>`from ${d}`,
+  termPending:"not yet",
   deltaBorrow:"", deltaSupply:"",
   poxH:"Bitcoin staking yield",
   poxP:"What PoX currently pays STX stakers, in bitcoin, from what miners commit. This is a staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
@@ -387,7 +407,7 @@ en:{
     "<strong>Instruments, not native assets.</strong> Every rate is quoted on the asset actually lent on Stacks. SBOR-BTC measures sBTC, not native bitcoin, and SBOR-USD measures USDCx and USDh, not bank dollars. Each carries issuance, peg or bridge risk that the underlying asset does not.",
     "<strong>Protocol yield excluded.</strong> Some assets carry yield from the asset itself rather than from lending. sBTC carries Bitcoin protocol yield through dual stacking, and stSTX carries PoX staking yield managed by StackingDAO. That yield belongs to the asset, not the loan, so it never enters the fixing.",
     "<strong>Phase-in.</strong> A newly eligible market enters at zero weight and ramps to full weight linearly over 30 days, so adding a venue cannot step the rate.",
-    "<strong>Moving averages.</strong> An average is published only once the full window exists. A 200-day average appears on day 200, not before.",
+    "<strong>Term averages.</strong> The 30, 90 and 180 day figures are compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window exists. A 180 day average appears on day 180, not before.",
     "<strong>Stale or implausible data.</strong> If a market's state cannot be read, its weight is zero for that fixing and the omission is recorded. A funded market whose borrow and supply rates both read below 0.05% is treated the same way, because a market with real depth does not price money at nothing on both sides at once.",
     "<strong>Revisions.</strong> Published fixings are never rewritten. Corrections appear as a new fixing with a note."
   ],
@@ -407,6 +427,11 @@ pt:{
   stamp:d=>`Taxa em <span class="num">${d}</span> · lida do estado dos contratos da Zest · atualizada diariamente`,
   borrowK:"APY de empréstimo", supplyK:"APY de depósito",
   allIn:v=>`${v.toFixed(2)}% no total, com o rendimento do protocolo`,
+  termsH:"Médias de prazo",
+  termsP:"Médias compostas dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa de fixings.",
+  termCol:d=>`${d} dias`,
+  termFrom:d=>`a partir de ${d}`,
+  termPending:"ainda não",
   deltaBorrow:"", deltaSupply:"",
   poxH:"Rendimento do staking de bitcoin",
   poxP:"O que o PoX paga hoje a quem faz staking de STX, em bitcoin, a partir do que os mineradores comprometem. É um rendimento de staking sobre uma posição travada, não uma taxa de crédito, por isso fica ao lado dos índices e nunca dentro deles.",
@@ -445,7 +470,7 @@ pt:{
     "<strong>Instrumentos, não ativos nativos.</strong> Cada taxa se refere ao ativo que é de fato emprestado na Stacks. O SBOR-BTC mede o sBTC, não o bitcoin nativo, e o SBOR-USD mede USDCx e USDh, não dólares bancários. Cada um carrega risco de emissão, paridade ou ponte que o ativo original não tem.",
     "<strong>Rendimento do protocolo fica de fora.</strong> Alguns ativos rendem por si mesmos, e não pelo empréstimo. O sBTC carrega rendimento do protocolo Bitcoin via dual stacking, e o stSTX carrega rendimento de staking PoX administrado pela StackingDAO. Esse rendimento pertence ao ativo, não ao empréstimo, então nunca entra no fixing.",
     "<strong>Entrada gradual.</strong> Um mercado recém-elegível entra com peso zero e sobe linearmente até o peso cheio ao longo de 30 dias, de modo que incluir uma plataforma nunca provoca um salto na taxa.",
-    "<strong>Médias móveis.</strong> Uma média só é publicada quando existe a janela completa de dados. Uma média de 200 dias aparece no dia 200, não antes.",
+    "<strong>Médias de prazo.</strong> As médias de 30, 90 e 180 dias são compostas a partir dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa. Uma média de 180 dias aparece no dia 180, não antes.",
     "<strong>Dados indisponíveis ou implausíveis.</strong> Se o estado de um mercado não puder ser lido, seu peso é zero naquele fixing e a omissão fica registrada. Um mercado com liquidez cujas taxas de empréstimo e de depósito ficam ambas abaixo de 0,05% recebe o mesmo tratamento, porque um mercado com profundidade real não precifica o dinheiro a zero dos dois lados ao mesmo tempo.",
     "<strong>Revisões.</strong> Fixings publicados nunca são reescritos. Correções aparecem como um novo fixing, com nota."
   ],
@@ -591,6 +616,8 @@ function renderChrome(){
   set("t-introH", t.introH); set("t-introP", t.introP); set("t-introUse", t.introUse);
   set("t-borrow-k", t.borrowK); set("t-supply-k", t.supplyK);
   set("t-hist-h", t.histH); set("t-hist-p", t.histP);
+  set("t-termsH", t.termsH); set("t-termsP", t.termsP);
+  renderTerms();
   set("t-poxH", t.poxH); set("t-poxP", t.poxP);
   const psec = document.getElementById("pox-sec");
   if (POX){
@@ -640,6 +667,30 @@ function renderChrome(){
     </button>`;}).join(""));
   document.querySelectorAll("#lang button").forEach(b =>
     b.setAttribute("aria-pressed", b.dataset.lang === lang));
+}
+
+let TERM_DATA = {};   /* label -> { termAverages, seriesBegan } from latest.json */
+
+function renderTerms(){
+  const t = T();
+  const labels = Object.keys(INDICES).map(k => INDICES[k].label);
+  set("termsHead", `<th></th>` +
+    [30,90,180].map(d => `<th class="r">${t.termCol(d)}</th>`).join(""));
+  set("termsBody", labels.map(label => {
+    const d = TERM_DATA[label] || {};
+    const av = d.termAverages || {};
+    const cells = [30,90,180].map(n => {
+      const v = av[`d${n}`];
+      if (v && typeof v.borrow === "number")
+        return `<td class="r num">${v.borrow.toFixed(2)}% <span class="pend">/ ${
+          typeof v.supply === "number" ? v.supply.toFixed(2)+"%" : ""}</span></td>`;
+      const from = d.seriesBegan
+        ? new Date(Date.parse(d.seriesBegan) + (n-1)*864e5).toISOString().slice(0,10)
+        : null;
+      return `<td class="r pend">${from ? t.termFrom(from) : t.termPending}</td>`;
+    }).join("");
+    return `<tr><td><span class="venue">${label}</span></td>${cells}</tr>`;
+  }).join(""));
 }
 
 function render(){
@@ -734,6 +785,8 @@ async function boot(){
     if (d.fixing) fixingDate = d.fixing.slice(0,10);
     if (d.poxReference) POX = d.poxReference;
     if (d.methodologyVersion) METHOD_VERSION = d.methodologyVersion;
+    for (const [label, ix] of Object.entries(d.indices || {}))
+      TERM_DATA[label] = { termAverages: ix.termAverages, seriesBegan: ix.seriesBegan };
   }catch(e){ console.warn("Live fixing unavailable, showing bundled snapshot.", e); }
   try{
     const h = await fetch("/api/v1/history.json", { cache:"no-store" });
