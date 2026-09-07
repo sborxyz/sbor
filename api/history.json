@@ -140,8 +140,8 @@
   },
   {
     "date": "2026-09-07",
-    "fixedAt": "2026-09-07T17:38:39Z",
-    "methodologyVersion": "1.2.0",
+    "fixedAt": "2026-09-07T17:47:59Z",
+    "methodologyVersion": "1.2.1",
     "SBOR-POX": {
       "apy": 4.93,
       "cycle": 141
@@ -154,8 +154,8 @@
       "depthUsd": 15533519
     },
     "SBOR-STX": {
-      "borrow": 2.04,
-      "supply": 1.03,
+      "borrow": 2.06,
+      "supply": 1.06,
       "venues": 1,
       "largestConstituentWeight": 0.5967,
       "depthUsd": 5083943

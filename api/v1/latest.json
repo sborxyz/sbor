@@ -7,8 +7,8 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-07T17:38:39Z",
-  "methodologyVersion": "1.2.0",
+  "fixing": "2026-09-07T17:47:59Z",
+  "methodologyVersion": "1.2.1",
   "isDailyFixing": true,
   "basis": "APY, annually compounded",
   "method": "https://sbor.xyz/llms.txt",
@@ -67,10 +67,12 @@
       "label": "SBOR-STX",
       "currency": "STX",
       "headline": "What money costs in STX on Stacks.",
-      "borrow": 2.04,
-      "supply": 1.03,
-      "allInSupply": 1.03,
+      "borrow": 2.06,
+      "supply": 1.06,
+      "allInSupply": 1.06,
       "allInSupplyDiffers": false,
+      "allInSupplyIncomplete": true,
+      "allInSupplyNote": "One or more constituents carry protocol yield that has no programmatic source today, so it is not included in this figure. allInSupply therefore equals the lending rate and understates what a supplier receives. See the market entries for which assets are affected.",
       "venues": [
         "Zest V2"
       ],
@@ -89,8 +91,8 @@
         {
           "venue": "Zest V2",
           "asset": "STX",
-          "borrow": 3.36,
-          "supply": 2.46,
+          "borrow": 3.41,
+          "supply": 2.53,
           "depthUsd": 2050159,
           "phaseIn": 1,
           "weight": 0.4033
@@ -128,6 +130,7 @@
     "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
     "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
     "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
-    "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives today. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market."
+    "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
+    "Protocol yield is not currently readable from contract state or from DefiLlama for the assets that carry it. Where an index is marked allInSupplyIncomplete, that yield is known to exist but is not quantified here, so allInSupply understates what a supplier receives. It will be included once a source exists, rather than estimated."
   ]
 }
