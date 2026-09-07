@@ -46,10 +46,28 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.1.0";
+const METHODOLOGY_VERSION = "1.2.0";
 
 /* Below this, on both sides at once, a funded market is not reporting. */
 const RATE_FLOOR = 0.05;
+
+/* Term averages, in days. Published only once the full window exists. */
+const TERMS = [30, 90, 180];
+
+/* Compounded average of daily fixings over a window, actual/365, the same
+   construction SOFR uses for its 30, 90 and 180 day averages. Returns null
+   until the window is complete, so an average is never published on partial
+   data. */
+function termAverage(history, label, side, days, today){
+  const start = new Date(Date.parse(today) - (days - 1) * 864e5)
+                  .toISOString().slice(0, 10);
+  const rows = history.filter(r =>
+    r.date >= start && r.date <= today &&
+    r[label] && !r[label].withdrawn && typeof r[label][side] === "number");
+  if (rows.length < days) return null;          // window not yet complete
+  const growth = rows.reduce((a, r) => a * (1 + r[label][side] / 100 / 365), 1);
+  return Number((((growth - 1) * 365 / days) * 100).toFixed(2));
+}
 
 /* DefiLlama symbol -> our symbol, for matching depth */
 const DEPTH_ALIAS = { SBTC:"sBTC", USDC:"USDCx", USDH:"USDh", STX:"STX", STSTX:"stSTX", STSTXBTC:"stSTXbtc" };
@@ -269,6 +287,7 @@ const main = async () => {
       "Rates are quoted on the instrument actually lent. SBOR-BTC measures sBTC, not native bitcoin. SBOR-USD measures USDCx and USDh, not bank dollars.",
       "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
       "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
+      "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
       "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives today. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market."
     ]
   };
@@ -305,6 +324,23 @@ const main = async () => {
       }]))
     });
     history.sort((a,b) => a.date.localeCompare(b.date));
+
+    /* Term averages, computed from the record including today's fixing. */
+    for (const [label, ix] of Object.entries(indices)){
+      const avg = {};
+      for (const d of TERMS){
+        const b = termAverage(history, label, "borrow", d, day);
+        const sup = termAverage(history, label, "supply", d, day);
+        avg[`d${d}`] = (b === null && sup === null) ? null : { borrow: b, supply: sup };
+      }
+      ix.termAverages = avg;
+      const first = history.find(r => r[label] && !r[label].withdrawn);
+      if (first) ix.seriesBegan = first.date;
+    }
+    const withAverages = { schema:"sbor.v1", ...latest, indices };
+    writeFileSync("api/v1/latest.json", JSON.stringify(withAverages, null, 2) + "\n");
+    writeFileSync("api/latest.json", JSON.stringify(withAverages, null, 2) + "\n");
+
     const hist = JSON.stringify(history, null, 2) + "\n";
     writeFileSync("api/v1/history.json", hist);
     writeFileSync("api/history.json", hist);
@@ -312,7 +348,7 @@ const main = async () => {
     /* Full immutable snapshot of the day, so any past fixing can be audited
        down to its individual constituents rather than just its headline. */
     mkdirSync("api/v1/archive", { recursive:true });
-    writeFileSync(`api/v1/archive/${day}.json`, JSON.stringify(payload, null, 2) + "\n");
+    writeFileSync(`api/v1/archive/${day}.json`, JSON.stringify(withAverages, null, 2) + "\n");
     console.log(`archived api/v1/archive/${day}.json`);
     console.log(`daily fixing recorded, history rows: ${history.length}`);
   } else {
