@@ -7,8 +7,8 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-07T14:31:20Z",
-  "methodologyVersion": "1.1.0",
+  "fixing": "2026-09-07T17:38:39Z",
+  "methodologyVersion": "1.2.0",
   "isDailyFixing": true,
   "basis": "APY, annually compounded",
   "method": "https://sbor.xyz/llms.txt",
@@ -33,7 +33,7 @@
           "asset": "USDCx",
           "borrow": 2.71,
           "supply": 0.78,
-          "depthUsd": 10086540,
+          "depthUsd": 10087147,
           "phaseIn": 1,
           "weight": 0.6494
         },
@@ -51,24 +51,30 @@
           "asset": "USDh",
           "borrow": 2.73,
           "supply": 0,
-          "depthUsd": 439841,
+          "depthUsd": 439877,
           "phaseIn": 1,
           "weight": 0.0283
         }
-      ]
+      ],
+      "termAverages": {
+        "d30": null,
+        "d90": null,
+        "d180": null
+      },
+      "seriesBegan": "2026-09-01"
     },
     "SBOR-STX": {
       "label": "SBOR-STX",
       "currency": "STX",
       "headline": "What money costs in STX on Stacks.",
       "borrow": 2.04,
-      "supply": 1.05,
-      "allInSupply": 1.05,
+      "supply": 1.03,
+      "allInSupply": 1.03,
       "allInSupplyDiffers": false,
       "venues": [
         "Zest V2"
       ],
-      "largestConstituentWeight": 0.5974,
+      "largestConstituentWeight": 0.5967,
       "markets": [
         {
           "venue": "Zest V2",
@@ -76,32 +82,38 @@
           "borrow": 1.14,
           "supply": 0.07,
           "protocolYieldSource": "PoX staking yield on the underlying, managed by StackingDAO",
-          "depthUsd": 2981869,
+          "depthUsd": 3033784,
           "phaseIn": 1,
-          "weight": 0.5974
+          "weight": 0.5967
         },
         {
           "venue": "Zest V2",
           "asset": "STX",
-          "borrow": 3.38,
-          "supply": 2.5,
-          "depthUsd": 2009829,
+          "borrow": 3.36,
+          "supply": 2.46,
+          "depthUsd": 2050159,
           "phaseIn": 1,
-          "weight": 0.4026
+          "weight": 0.4033
         }
-      ]
+      ],
+      "termAverages": {
+        "d30": null,
+        "d90": null,
+        "d180": null
+      },
+      "seriesBegan": "2026-09-01"
     }
   },
   "poxReference": {
     "label": "SBOR-POX",
     "headline": "The native Bitcoin yield paid to STX stakers.",
     "kind": "staking yield",
-    "apy": 4.97,
+    "apy": 4.93,
     "cycle": 141,
-    "cycleYieldPct": 0.1938,
+    "cycleYieldPct": 0.1924,
     "btcPaid": 2.928688,
     "stxLocked": 421543815,
-    "stxPerBtc": 279008.47,
+    "stxPerBtc": 276927.36,
     "rateSource": "Bitflow",
     "rateQuoteImpactBps": 0,
     "note": "Paid in bitcoin against a position locked in STX, so the figure depends on the BTC/STX exchange rate rather than on either dollar price. It is a staking yield, not a lending rate, and is never blended into the lending indices."
@@ -115,6 +127,7 @@
     "Rates are quoted on the instrument actually lent. SBOR-BTC measures sBTC, not native bitcoin. SBOR-USD measures USDCx and USDh, not bank dollars.",
     "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
     "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
+    "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
     "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives today. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market."
   ]
 }
