@@ -16,9 +16,9 @@ const BORROW_URLS = [
 
 /* What we compare against, and which SBOR index it sits beside. */
 const WANTED = [
-  { project:"aave-v3", chain:"Ethereum", symbol:"USDC",  against:"SBOR-USD", label:"Aave V3, Ethereum" },
-  { project:"aave-v3", chain:"Ethereum", symbol:"WBTC",  against:"SBOR-BTC", label:"Aave V3, Ethereum" },
-  { project:"aave-v3", chain:"Ethereum", symbol:"CBBTC", against:"SBOR-BTC", label:"Aave V3, Ethereum" }
+  { project:"aave-v3", chain:"Ethereum", symbol:"USDC",  display:"USDC",  against:"SBOR-USD", label:"Aave V3, Ethereum" },
+  { project:"aave-v3", chain:"Ethereum", symbol:"WBTC",  display:"WBTC",  against:"SBOR-BTC", label:"Aave V3, Ethereum" },
+  { project:"aave-v3", chain:"Ethereum", symbol:"CBBTC", display:"cbBTC", against:"SBOR-BTC", label:"Aave V3, Ethereum" }
 ];
 
 /* Aave keys its reserve pages on the underlying token address, which the pool
@@ -73,7 +73,7 @@ export async function externalReference(){
       ? round(bor / sup * 100) : null;
     const underlying = Array.isArray(p.underlyingTokens) ? p.underlyingTokens[0] : null;
     const entry = {
-      asset: p.symbol,
+      asset: w.display || p.symbol,
       venue: w.label,
       comparableTo: w.against,
       supply: round(p.apyBase ?? 0),
@@ -84,7 +84,7 @@ export async function externalReference(){
       url: aaveUrl(underlying),
       dataUrl: `https://defillama.com/yields/pool/${p.pool}`
     };
-    log(`  external ${p.symbol} @ ${w.label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% util=${entry.utilization ?? "n/a"}% depth=${entry.depthUsd}`);
+    log(`  external ${entry.asset} @ ${w.label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% util=${entry.utilization ?? "n/a"}% depth=${entry.depthUsd}`);
     out.push(entry);
   }
   if (!out.length) throw new Error("no external reference pools resolved");
