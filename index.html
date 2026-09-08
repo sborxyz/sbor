@@ -16,7 +16,8 @@
   --maxw:1120px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{overflow-x:hidden}
 body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:16px;line-height:1.55;font-feature-settings:"tnum" 1}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
 .num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
@@ -39,6 +40,7 @@ header{border-bottom:1px solid var(--rule)}
 
 .intro{border-bottom:1px solid var(--rule);background:var(--paper-2)}
 .intro-in{padding:24px 28px 26px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 40px;align-items:start}
+.intro-in > *{min-width:0}
 .intro h2{grid-column:1 / -1;font-size:clamp(18px,2.2vw,22px);font-weight:500;letter-spacing:-.01em;margin-bottom:4px}
 .intro p{font-size:14.5px;color:var(--ink-soft);max-width:52ch;line-height:1.5}
 @media (max-width:720px){.intro-in{grid-template-columns:1fr;padding:20px 20px 22px;gap:8px}}
@@ -77,6 +79,7 @@ section{padding:44px 0;border-bottom:1px solid var(--rule)}
 .legend{display:flex;gap:22px;margin-top:12px;font-size:13.5px;color:var(--ink-soft);flex-wrap:wrap}
 .swatch{display:inline-block;width:16px;height:2px;vertical-align:middle;margin-right:7px}
 
+.tscroll{width:100%;overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:15px}
 th{text-align:left;font-weight:500;font-size:13.5px;color:var(--ink-soft);padding:0 12px 9px 0;border-bottom:1px solid var(--rule);white-space:nowrap}
 th.r,td.r{text-align:right;padding-right:0}
@@ -101,20 +104,26 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .foot-note{margin-top:16px;color:var(--ink-soft);font-size:13.5px;max-width:70ch}
 
 .method{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.method > div{min-width:0}
 .method p{max-width:58ch;color:var(--ink-soft);margin-bottom:14px}
 .method p strong{color:var(--ink);font-weight:500}
 .formula{font-family:"IBM Plex Mono",monospace;font-size:13.5px;background:var(--paper-2);border-left:2px solid var(--accent);padding:14px 16px;color:var(--ink);margin:6px 0 18px}
 
 .dev{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.dev > div{min-width:0}
 .devk{font-size:13.5px;color:var(--ink-soft);margin-bottom:8px}
 .code{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.55;background:var(--paper-2);border-left:2px solid var(--accent);padding:14px 16px;color:var(--ink);overflow-x:auto;white-space:pre}
 .code a{color:var(--accent);text-decoration:none}
 .code a:hover{text-decoration:underline}
 .contracts{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;font-size:13.5px}
+.contracts > *{min-width:0}
 .contracts a{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--accent);text-decoration:none;word-break:break-all}
 .contracts a:hover{text-decoration:underline}
 .contracts span{color:var(--ink-soft)}
-@media (max-width:720px){.dev,.contracts{grid-template-columns:1fr}}
+@media (max-width:720px){
+  .dev,.contracts{grid-template-columns:1fr}
+  .code{white-space:pre-wrap;word-break:break-word;font-size:12px}
+}
 .signup{display:flex;gap:10px;flex-wrap:wrap;max-width:520px}
 .signup input[type=email]{flex:1 1 260px;font:inherit;font-size:15px;padding:11px 13px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:2px}
 .signup input[type=email]:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
@@ -209,10 +218,12 @@ a{color:var(--accent)}
           <p id="t-termsP"></p>
         </div>
       </div>
-      <table class="terms">
-        <thead><tr id="termsHead"></tr></thead>
-        <tbody id="termsBody"></tbody>
-      </table>
+      <div class="tscroll">
+        <table class="terms">
+          <thead><tr id="termsHead"></tr></thead>
+          <tbody id="termsBody"></tbody>
+        </table>
+      </div>
     </section>
 
     <section id="pox-sec" hidden>
@@ -255,10 +266,12 @@ a{color:var(--accent)}
         </div>
       </div>
       <p class="coverage" id="coverage"></p>
-      <table>
-        <thead><tr id="thead"></tr></thead>
-        <tbody id="rows"></tbody>
-      </table>
+      <div class="tscroll">
+        <table>
+          <thead><tr id="thead"></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
       <p class="foot-note" id="t-cons-foot"></p>
     </section>
 
