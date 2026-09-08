@@ -160,5 +160,28 @@
       "largestConstituentWeight": 0.5967,
       "depthUsd": 5083943
     }
+  },
+  {
+    "date": "2026-09-08",
+    "fixedAt": "2026-09-08T13:06:52Z",
+    "methodologyVersion": "1.2.1",
+    "SBOR-POX": {
+      "apy": 5.18,
+      "cycle": 141
+    },
+    "SBOR-USD": {
+      "borrow": 2.3,
+      "supply": 0.58,
+      "venues": 2,
+      "largestConstituentWeight": 0.6505,
+      "depthUsd": 15582298
+    },
+    "SBOR-STX": {
+      "borrow": 2.32,
+      "supply": 1.21,
+      "venues": 1,
+      "largestConstituentWeight": 0.5431,
+      "depthUsd": 4126438
+    }
   }
 ]
