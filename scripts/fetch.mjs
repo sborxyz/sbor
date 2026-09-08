@@ -80,7 +80,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.4.0";
+const METHODOLOGY_VERSION = "1.5.0";
 
 /* Below this, on both sides at once, a funded market is not reporting. */
 const RATE_FLOOR = 0.05;
@@ -160,9 +160,12 @@ async function apysFor(asset){
   log(`    ${asset.symbol} via ${used}: ${JSON.stringify(v).slice(0,300)}`);
   const supply = Number(t["supply-apy"]?.value ?? t["supply-apy"]) / 100;
   const borrow = Number(t["borrow-apy"]?.value ?? t["borrow-apy"]) / 100;
+  /* utilisation is published in the same tuple, in basis points */
+  const utilRaw = Number(t["utilization"]?.value ?? t["utilization"]);
+  const utilization = Number.isFinite(utilRaw) ? utilRaw / 100 : null;
   if (!Number.isFinite(supply) || !Number.isFinite(borrow))
     throw new Error(`unexpected shape: ${JSON.stringify(v).slice(0,200)}`);
-  return { supply, borrow };
+  return { supply, borrow, utilization };
 }
 
 /* Read a read-only function and return the plain JS value. */
@@ -223,7 +226,7 @@ async function graniteMarket(){
   log(`  granite derived: ur=${(ur*100).toFixed(2)}% apr=${(apr*100).toFixed(2)}% ` +
       `borrow=${borrow.toFixed(2)}% supply=${supply.toFixed(2)}% reservePct=${(reservePct*100).toFixed(2)}%`);
 
-  return { borrow, supply, totalAssetsRaw: totalAssets };
+  return { borrow, supply, utilization: ur * 100, totalAssetsRaw: totalAssets };
 }
 
 const main = async () => {
@@ -234,9 +237,9 @@ const main = async () => {
   const markets = [];
   for (const a of ZEST.assets){
     try {
-      const { supply, borrow } = await apysFor(a);
+      const { supply, borrow, utilization } = await apysFor(a);
       const d = depth[a.symbol] ?? 0;
-      log(`  ${a.symbol}: supply=${round(supply)}% borrow=${round(borrow)}% depth=${d}`);
+      log(`  ${a.symbol}: supply=${round(supply)}% borrow=${round(borrow)}% util=${utilization == null ? "n/a" : round(utilization)+"%"} depth=${d}`);
       if (!a.currency){ log(`    (collateral only, excluded from fixings)`); continue; }
       if (d <= 0){ log(`    (no depth, skipped)`); continue; }
       /* Plausibility floor. A funded lending market does not price money at
@@ -250,6 +253,7 @@ const main = async () => {
       markets.push({
         venue: ZEST.venue, asset: a.symbol, currency: a.currency,
         borrow: round(borrow), supply: round(supply),
+        ...(utilization != null && { utilization: round(utilization) }),
         ...(protoYield[a.symbol] != null && { protocolYield: protoYield[a.symbol] }),
         ...(YIELD_SOURCE[a.symbol] && { protocolYieldSource: YIELD_SOURCE[a.symbol] }),
         depthUsd: d, phaseIn: 1
@@ -267,6 +271,7 @@ const main = async () => {
       markets.push({
         venue: GRANITE.venue, asset: GRANITE.asset, currency: GRANITE.currency,
         borrow: round(g.borrow), supply: round(g.supply),
+        utilization: round(g.utilization),
         depthUsd, phaseIn: 1
       });
     } else {
@@ -343,6 +348,7 @@ const main = async () => {
       "Rates are quoted on the instrument actually lent. SBOR-BTC measures sBTC, not native bitcoin. SBOR-USD measures USDCx and USDh, not bank dollars.",
       "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
       "externalReference shows the same asset class on the largest lending market outside Stacks. It is context for a reader, never a constituent, and never affects a fixing.",
+      "utilization is the share of supplied capital currently borrowed. It is the reason a rate is where it is: a market with little borrowing pays its suppliers little, however large it is.",
       "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
       "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
       "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
