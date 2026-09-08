@@ -117,6 +117,8 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .code a:hover{text-decoration:underline}
 .contracts{display:grid;grid-template-columns:1fr 1fr;gap:6px 28px;font-size:13.5px}
 .contracts > *{min-width:0}
+td a[href*="defillama"]{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--rule)}
+td a[href*="defillama"]:hover{border-bottom-color:var(--accent)}
 .contracts a{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--accent);text-decoration:none;word-break:break-all}
 .contracts a:hover{text-decoration:underline}
 .contracts span{color:var(--ink-soft)}
@@ -668,10 +670,14 @@ function renderChrome(){
       i === 0 ? `<th>${c}</th>` : `<th class="r">${c}</th>`).join(""));
     set("extBody", EXTERNAL.markets.map(m => `
       <tr>
-        <td><span class="venue">${m.venue}</span><span class="asset">${m.asset}</span></td>
-        <td class="r num">${m.borrow == null ? "&mdash;" : m.borrow.toFixed(2)+"%"}</td>
+        <td>${m.url
+            ? `<a class="venue" href="${m.url}" target="_blank" rel="noopener">${m.venue}</a>`
+            : `<span class="venue">${m.venue}</span>`}<span class="asset">${m.asset}</span></td>
+        <td class="r num">${m.borrow == null ? "n/a" : m.borrow.toFixed(2)+"%"}</td>
         <td class="r num">${m.supply.toFixed(2)}%</td>
-        <td class="r num">$${(m.depthUsd/1e6).toFixed(1)}M</td>
+        <td class="r num">${m.dataUrl
+            ? `<a href="${m.dataUrl}" target="_blank" rel="noopener">$${(m.depthUsd/1e6).toFixed(1)}M</a>`
+            : `$${(m.depthUsd/1e6).toFixed(1)}M`}</td>
         <td class="r"><span class="asset">${m.comparableTo}</span></td>
       </tr>`).join(""));
   } else { esec.hidden = true; }
