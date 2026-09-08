@@ -10,12 +10,45 @@ import { fetchCallReadOnlyFunction, contractPrincipalCV, cvToValue } from "@stac
 import { poxReference } from "./pox.mjs";
 
 const POOLS_URL = "https://yields.llama.fi/pools";
+const STACKINGDAO_APY = "https://app.stackingdao.com/api/apy?v=2";
+
+/* Protocol yield carried by the asset itself, not by the loan. StackingDAO
+   derives it from PoX reward claims, net of pool commission, over stSTX
+   supply. Published beside the lending rate, never inside the fixing. */
+async function protocolYields(){
+  try {
+    const r = await fetch(STACKINGDAO_APY, { headers:{ accept:"application/json" } });
+    if(!r.ok) throw new Error(`responded ${r.status}`);
+    const d = await r.json();
+    log(`  stackingdao apy payload: ${JSON.stringify(d).slice(0,400)}`);
+    /* Shape is not contractually stable, so pull the first plausible number
+       for each asset rather than assuming a key. */
+    const pick = (...keys) => {
+      for (const k of keys){
+        const v = k.split(".").reduce((o,part) => o?.[part], d);
+        const n = Number(v);
+        if (Number.isFinite(n) && n > 0 && n < 100) return Number(n.toFixed(2));
+      }
+      return null;
+    };
+    const out = {};
+    const st = pick("ststx","stStx","stSTX","apy","stx","ststx.apy","data.ststx");
+    if (st !== null) out.stSTX = st;
+    const sb = pick("ststxbtc","stStxBtc","stSTXbtc","btc","ststxbtc.apy","data.ststxbtc");
+    if (sb !== null) out.stSTXbtc = sb;
+    log(`  protocol yields resolved: ${JSON.stringify(out)}`);
+    return out;
+  } catch(e){
+    log(`  protocol yield source unavailable, omitted. ${e.message}`);
+    return {};
+  }
+}
 
 /* Zest V2. Deployer, data contract, and the asset principals it keys on. */
 const ZEST = {
   venue: "Zest V2",
   deployer: "SP1A27KFY4XERQCCRCARCYD1CC5N7M6688BSYADJ7",
-  dataContract: "v0-1-data",
+  dataContracts: ["v0-5-data", "v0-1-data"],   // current first, previous as fallback
   assets: [
     { symbol:"sBTC",     currency:"BTC", address:"SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4", contract:"sbtc-token" },
     { symbol:"USDCx",    currency:"USD", address:"SP120SBRBQJ00MCWS7TM5R8WJNTTKD5K0HFRC2CNE", contract:"usdcx" },
@@ -46,7 +79,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.2.1";
+const METHODOLOGY_VERSION = "1.3.0";
 
 /* Below this, on both sides at once, a funded market is not reporting. */
 const RATE_FLOOR = 0.05;
@@ -83,7 +116,7 @@ const META = {
 
 const YIELD_SOURCE = {
   sBTC:  "Bitcoin protocol yield via dual stacking, paid on enrolment",
-  stSTX: "PoX staking yield on the underlying, managed by StackingDAO"
+  stSTX: "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission"
 };
 
 const round = (n, d = 2) => Number(Number(n).toFixed(d));
@@ -105,17 +138,23 @@ async function depthBySymbol(){
 }
 
 async function apysFor(asset){
-  const res = await fetchCallReadOnlyFunction({
-    contractAddress: ZEST.deployer,
-    contractName: ZEST.dataContract,
-    functionName: "get-asset-apys",
-    functionArgs: [contractPrincipalCV(asset.address, asset.contract)],
-    senderAddress: ZEST.deployer,
-    network: "mainnet"
-  });
-  const v = cvToValue(res, true);
+  let v = null, used = null, errs = [];
+  for (const c of ZEST.dataContracts){
+    try {
+      const res = await fetchCallReadOnlyFunction({
+        contractAddress: ZEST.deployer,
+        contractName: c,
+        functionName: "get-asset-apys",
+        functionArgs: [contractPrincipalCV(asset.address, asset.contract)],
+        senderAddress: ZEST.deployer,
+        network: "mainnet"
+      });
+      v = cvToValue(res, true); used = c; break;
+    } catch(e){ errs.push(`${c}: ${e.message}`); }
+  }
+  if (v === null) throw new Error(`no data contract answered. ${errs.join(" | ")}`);
   const t = v?.value ?? v;                       // unwrap (ok ...) if present
-  log(`    raw ${asset.symbol}: ${JSON.stringify(v).slice(0,300)}`);
+  log(`    ${asset.symbol} via ${used}: ${JSON.stringify(v).slice(0,300)}`);
   const supply = Number(t["supply-apy"]?.value ?? t["supply-apy"]) / 100;
   const borrow = Number(t["borrow-apy"]?.value ?? t["borrow-apy"]) / 100;
   if (!Number.isFinite(supply) || !Number.isFinite(borrow))
@@ -187,6 +226,7 @@ async function graniteMarket(){
 const main = async () => {
   const depth = await depthBySymbol();
   log("depth from DefiLlama:", JSON.stringify(depth));
+  const protoYield = await protocolYields();
 
   const markets = [];
   for (const a of ZEST.assets){
@@ -207,6 +247,7 @@ const main = async () => {
       markets.push({
         venue: ZEST.venue, asset: a.symbol, currency: a.currency,
         borrow: round(borrow), supply: round(supply),
+        ...(protoYield[a.symbol] != null && { protocolYield: protoYield[a.symbol] }),
         ...(YIELD_SOURCE[a.symbol] && { protocolYieldSource: YIELD_SOURCE[a.symbol] }),
         depthUsd: d, phaseIn: 1
       });
@@ -279,7 +320,7 @@ const main = async () => {
     isDailyFixing: IS_FIXING,
     basis:"APY, annually compounded",
     method:"https://sbor.xyz/llms.txt",
-    source:"Rates read from lending contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain.",
+    source:"Rates read from lending contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain, protocol yield from StackingDAO.",
     indices,
     ...(pox && { poxReference: pox }),
     notes:[
