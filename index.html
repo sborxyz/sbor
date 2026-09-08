@@ -226,6 +226,21 @@ a{color:var(--accent)}
       </div>
     </section>
 
+    <section id="ext-sec" hidden>
+      <div class="sec-h">
+        <div>
+          <h2 id="t-extH"></h2>
+          <p id="t-extP"></p>
+        </div>
+      </div>
+      <div class="tscroll">
+        <table>
+          <thead><tr id="extHead"></tr></thead>
+          <tbody id="extBody"></tbody>
+        </table>
+      </div>
+    </section>
+
     <section id="pox-sec" hidden>
       <div class="sec-h">
         <div>
@@ -382,6 +397,9 @@ en:{
   stamp:d=>`Rate as of <span class="num">${d}</span> · read from Zest contract state · updated daily`,
   borrowK:"Borrow APY", supplyK:"Supply APY",
   allIn:v=>`${v.toFixed(2)}% all in, with protocol yield`,
+  extH:"Outside Stacks",
+  extP:"The same asset class on the largest lending market elsewhere, shown for comparison. These are not constituents of any SBOR index and never enter a fixing.",
+  extCols:["Market","Borrow","Supply","Depth","Compare with"],
   termsH:"Term averages",
   termsP:"Compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window of fixings exists.",
   termCol:d=>`${d}-day`,
@@ -426,6 +444,7 @@ en:{
     "<strong>Protocol yield is sourced, not estimated.</strong> For stSTX and stSTXbtc it comes from StackingDAO, derived from PoX reward claims net of pool commission over stSTX supply. If a source cannot be reached the yield is left out and the figure is marked incomplete, rather than filled in with an estimate.",
     "<strong>Protocol yield excluded.</strong> Some assets carry yield from the asset itself rather than from lending. sBTC carries Bitcoin protocol yield through dual stacking, and stSTX carries PoX staking yield managed by StackingDAO. That yield belongs to the asset, not the loan, so it never enters the fixing.",
     "<strong>Phase-in.</strong> A newly eligible market enters at zero weight and ramps to full weight linearly over 30 days, so adding a venue cannot step the rate.",
+    "<strong>Outside Stacks is context, not a constituent.</strong> Reference rates from the largest lending market elsewhere are published beside the indices so a reader can see what the same asset class costs off this chain. They are never weighted into a fixing and never move an SBOR number.",
     "<strong>Term averages.</strong> The 30, 90 and 180 day figures are compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window exists. A 180 day average appears on day 180, not before.",
     "<strong>Stale or implausible data.</strong> If a market's state cannot be read, its weight is zero for that fixing and the omission is recorded. A funded market whose borrow and supply rates both read below 0.05% is treated the same way, because a market with real depth does not price money at nothing on both sides at once.",
     "<strong>Revisions.</strong> Published fixings are never rewritten. Corrections appear as a new fixing with a note."
@@ -446,6 +465,9 @@ pt:{
   stamp:d=>`Taxa em <span class="num">${d}</span> · lida do estado dos contratos da Zest · atualizada diariamente`,
   borrowK:"APY de empréstimo", supplyK:"APY de depósito",
   allIn:v=>`${v.toFixed(2)}% no total, com o rendimento do protocolo`,
+  extH:"Fora da Stacks",
+  extP:"A mesma classe de ativo no maior mercado de crédito fora da Stacks, mostrada para comparação. Não são componentes de nenhum índice SBOR e nunca entram em um fixing.",
+  extCols:["Mercado","Empréstimo","Depósito","Profundidade","Comparar com"],
   termsH:"Médias de prazo",
   termsP:"Médias compostas dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa de fixings.",
   termCol:d=>`${d} dias`,
@@ -490,6 +512,7 @@ pt:{
     "<strong>O rendimento do protocolo tem fonte, não é estimado.</strong> Para stSTX e stSTXbtc ele vem da StackingDAO, derivado dos resgates de recompensa do PoX, líquidos da comissão do pool, sobre o supply de stSTX. Se a fonte não puder ser consultada, o rendimento fica de fora e o número é marcado como incompleto, em vez de ser preenchido com uma estimativa.",
     "<strong>Rendimento do protocolo fica de fora.</strong> Alguns ativos rendem por si mesmos, e não pelo empréstimo. O sBTC carrega rendimento do protocolo Bitcoin via dual stacking, e o stSTX carrega rendimento de staking PoX administrado pela StackingDAO. Esse rendimento pertence ao ativo, não ao empréstimo, então nunca entra no fixing.",
     "<strong>Entrada gradual.</strong> Um mercado recém-elegível entra com peso zero e sobe linearmente até o peso cheio ao longo de 30 dias, de modo que incluir uma plataforma nunca provoca um salto na taxa.",
+    "<strong>Fora da Stacks é contexto, não componente.</strong> Taxas de referência do maior mercado de crédito fora daqui são publicadas ao lado dos índices para que o leitor veja quanto custa a mesma classe de ativo em outra rede. Elas nunca entram no cálculo de um fixing e nunca movem um número do SBOR.",
     "<strong>Médias de prazo.</strong> As médias de 30, 90 e 180 dias são compostas a partir dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa. Uma média de 180 dias aparece no dia 180, não antes.",
     "<strong>Dados indisponíveis ou implausíveis.</strong> Se o estado de um mercado não puder ser lido, seu peso é zero naquele fixing e a omissão fica registrada. Um mercado com liquidez cujas taxas de empréstimo e de depósito ficam ambas abaixo de 0,05% recebe o mesmo tratamento, porque um mercado com profundidade real não precifica o dinheiro a zero dos dois lados ao mesmo tempo.",
     "<strong>Revisões.</strong> Fixings publicados nunca são reescritos. Correções aparecem como um novo fixing, com nota."
@@ -551,6 +574,7 @@ function computed(key){
 let HISTORY = [];   /* filled by boot() from api/v1/history.json */
 let POX = null;     /* filled by boot() from api/v1/latest.json */
 let METHOD_VERSION = "1.0.0";
+let EXTERNAL = null;   /* filled by boot() from api/v1/latest.json */
 
 const movingAvg = (arr,w) => arr.map((_,i)=>{
   const win = arr.slice(Math.max(0,i-w+1), i+1);
@@ -636,6 +660,21 @@ function renderChrome(){
   set("t-introH", t.introH); set("t-introP", t.introP); set("t-introUse", t.introUse);
   set("t-borrow-k", t.borrowK); set("t-supply-k", t.supplyK);
   set("t-hist-h", t.histH); set("t-hist-p", t.histP);
+  set("t-extH", t.extH); set("t-extP", t.extP);
+  const esec = document.getElementById("ext-sec");
+  if (EXTERNAL && EXTERNAL.markets && EXTERNAL.markets.length){
+    esec.hidden = false;
+    set("extHead", t.extCols.map((c,i) =>
+      i === 0 ? `<th>${c}</th>` : `<th class="r">${c}</th>`).join(""));
+    set("extBody", EXTERNAL.markets.map(m => `
+      <tr>
+        <td><span class="venue">${m.venue}</span><span class="asset">${m.asset}</span></td>
+        <td class="r num">${m.borrow == null ? "&mdash;" : m.borrow.toFixed(2)+"%"}</td>
+        <td class="r num">${m.supply.toFixed(2)}%</td>
+        <td class="r num">$${(m.depthUsd/1e6).toFixed(1)}M</td>
+        <td class="r"><span class="asset">${m.comparableTo}</span></td>
+      </tr>`).join(""));
+  } else { esec.hidden = true; }
   set("t-termsH", t.termsH); set("t-termsP", t.termsP);
   renderTerms();
   set("t-poxH", t.poxH); set("t-poxP", t.poxP);
@@ -806,6 +845,7 @@ async function boot(){
     }
     if (d.fixing) fixingDate = d.fixing.slice(0,10);
     if (d.poxReference) POX = d.poxReference;
+    if (d.externalReference) EXTERNAL = d.externalReference;
     if (d.methodologyVersion) METHOD_VERSION = d.methodologyVersion;
     for (const [label, ix] of Object.entries(d.indices || {}))
       TERM_DATA[label] = { termAverages: ix.termAverages, seriesBegan: ix.seriesBegan };
