@@ -79,7 +79,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.3.0";
+const METHODOLOGY_VERSION = "1.3.1";
 
 /* Below this, on both sides at once, a funded market is not reporting. */
 const RATE_FLOOR = 0.05;
@@ -124,6 +124,7 @@ const round = (n, d = 2) => Number(Number(n).toFixed(d));
    history. Other runs refresh the current reading only. */
 const IS_FIXING = process.env.SBOR_FIXING === "1";
 const log = (...a) => console.error(...a);
+let LAST_READER = null;   // which Zest data contract answered most recently
 
 async function depthBySymbol(){
   const r = await fetch(POOLS_URL, { headers:{ accept:"application/json" } });
@@ -153,6 +154,7 @@ async function apysFor(asset){
     } catch(e){ errs.push(`${c}: ${e.message}`); }
   }
   if (v === null) throw new Error(`no data contract answered. ${errs.join(" | ")}`);
+  LAST_READER = used;
   const t = v?.value ?? v;                       // unwrap (ok ...) if present
   log(`    ${asset.symbol} via ${used}: ${JSON.stringify(v).slice(0,300)}`);
   const supply = Number(t["supply-apy"]?.value ?? t["supply-apy"]) / 100;
@@ -319,8 +321,9 @@ const main = async () => {
     methodologyVersion: METHODOLOGY_VERSION,
     isDailyFixing: IS_FIXING,
     basis:"APY, annually compounded",
+    ...(LAST_READER && { zestDataContract: LAST_READER }),
     method:"https://sbor.xyz/llms.txt",
-    source:"Rates read from lending contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain, protocol yield from StackingDAO.",
+    source:"Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
     indices,
     ...(pox && { poxReference: pox }),
     notes:[
@@ -334,7 +337,8 @@ const main = async () => {
       "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
       "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
       "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
-      "Protocol yield is not currently readable from contract state or from DefiLlama for the assets that carry it. Where an index is marked allInSupplyIncomplete, that yield is known to exist but is not quantified here, so allInSupply understates what a supplier receives. It will be included once a source exists, rather than estimated."
+      "Protocol yield for stSTX and stSTXbtc is sourced from StackingDAO, which derives it from PoX reward claims net of pool commission over stSTX supply. Where a source cannot be reached, the index is marked allInSupplyIncomplete and the yield is left out rather than estimated.",
+      "The stBTC figure published by StackingDAO is a placeholder until bond rewards begin streaming, so it is deliberately not read here."
     ]
   };
 
