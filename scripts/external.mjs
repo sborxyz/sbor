@@ -65,7 +65,12 @@ export async function externalReference(){
     if (!matches.length){ log(`  external: no pool for ${w.symbol} on ${w.label}`); continue; }
     const p = matches.sort((a,b) => (b.tvlUsd||0) - (a.tvlUsd||0))[0];
 
-    const apr = borrowAprOf(borrowBy[p.pool]);
+    const bRec = borrowBy[p.pool];
+    const apr = borrowAprOf(bRec);
+    /* utilisation: borrowed over supplied, from the same borrow dataset */
+    const sup = Number(bRec?.totalSupplyUsd), bor = Number(bRec?.totalBorrowUsd);
+    const utilization = (Number.isFinite(sup) && Number.isFinite(bor) && sup > 0)
+      ? round(bor / sup * 100) : null;
     const underlying = Array.isArray(p.underlyingTokens) ? p.underlyingTokens[0] : null;
     const entry = {
       asset: p.symbol,
@@ -73,12 +78,13 @@ export async function externalReference(){
       comparableTo: w.against,
       supply: round(p.apyBase ?? 0),
       borrow: apr == null ? null : round(apr),
+      ...(utilization != null && { utilization }),
       depthUsd: Math.round(p.tvlUsd),
       pool: p.pool,
       url: aaveUrl(underlying),
       dataUrl: `https://defillama.com/yields/pool/${p.pool}`
     };
-    log(`  external ${p.symbol} @ ${w.label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% depth=${entry.depthUsd} url=${entry.url}`);
+    log(`  external ${p.symbol} @ ${w.label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% util=${entry.utilization ?? "n/a"}% depth=${entry.depthUsd}`);
     out.push(entry);
   }
   if (!out.length) throw new Error("no external reference pools resolved");
