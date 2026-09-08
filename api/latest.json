@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-08T20:36:56Z",
+  "fixing": "2026-09-08T20:46:03Z",
   "methodologyVersion": "1.5.0",
   "isDailyFixing": true,
   "basis": "APY, annually compounded",
@@ -73,7 +73,7 @@
       "headline": "What money costs in STX on Stacks.",
       "borrow": 2.31,
       "supply": 1.2,
-      "allInSupply": 3.76,
+      "allInSupply": 3.75,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
@@ -86,7 +86,7 @@
           "borrow": 1.41,
           "supply": 0.1,
           "utilization": 8.83,
-          "protocolYield": 4.76,
+          "protocolYield": 4.74,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
           "depthUsd": 2269893,
           "phaseIn": 1,
@@ -154,7 +154,7 @@
         "dataUrl": "https://defillama.com/yields/pool/7e382157-b1bc-406d-b17b-facba43b716e"
       },
       {
-        "asset": "CBBTC",
+        "asset": "cbBTC",
         "venue": "Aave V3, Ethereum",
         "comparableTo": "SBOR-BTC",
         "supply": 0,
