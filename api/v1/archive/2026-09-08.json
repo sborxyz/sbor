@@ -7,8 +7,8 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-08T19:59:31Z",
-  "methodologyVersion": "1.3.1",
+  "fixing": "2026-09-08T20:23:47Z",
+  "methodologyVersion": "1.4.0",
   "isDailyFixing": true,
   "basis": "APY, annually compounded",
   "zestDataContract": "v0-5-data",
@@ -34,7 +34,7 @@
           "asset": "USDCx",
           "borrow": 2.72,
           "supply": 0.78,
-          "depthUsd": 10087584,
+          "depthUsd": 10087781,
           "phaseIn": 1,
           "weight": 0.6494
         },
@@ -52,7 +52,7 @@
           "asset": "USDh",
           "borrow": 2.65,
           "supply": 0,
-          "depthUsd": 439899,
+          "depthUsd": 439906,
           "phaseIn": 1,
           "weight": 0.0283
         }
@@ -70,32 +70,32 @@
       "headline": "What money costs in STX on Stacks.",
       "borrow": 2.31,
       "supply": 1.2,
-      "allInSupply": 3.74,
+      "allInSupply": 3.75,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
       ],
-      "largestConstituentWeight": 0.5396,
+      "largestConstituentWeight": 0.5392,
       "markets": [
         {
           "venue": "Zest V2",
           "asset": "stSTX",
           "borrow": 1.41,
           "supply": 0.1,
-          "protocolYield": 4.72,
+          "protocolYield": 4.74,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
-          "depthUsd": 2281090,
+          "depthUsd": 2269893,
           "phaseIn": 1,
-          "weight": 0.5396
+          "weight": 0.5392
         },
         {
           "venue": "Zest V2",
           "asset": "STX",
           "borrow": 3.37,
           "supply": 2.48,
-          "depthUsd": 1945992,
+          "depthUsd": 1939760,
           "phaseIn": 1,
-          "weight": 0.4604
+          "weight": 0.4608
         }
       ],
       "termAverages": {
@@ -120,6 +120,39 @@
     "rateQuoteImpactBps": 0,
     "note": "Paid in bitcoin against a position locked in STX, so the figure depends on the BTC/STX exchange rate rather than on either dollar price. It is a staking yield, not a lending rate, and is never blended into the lending indices."
   },
+  "externalReference": {
+    "note": "Reference rates from the largest lending market outside Stacks, published for comparison only. These are not constituents of any SBOR index and never enter a fixing. Borrow rates are published as APR by the source and shown as read.",
+    "source": "DefiLlama",
+    "markets": [
+      {
+        "asset": "USDC",
+        "venue": "Aave V3, Ethereum",
+        "comparableTo": "SBOR-USD",
+        "supply": 3.61,
+        "borrow": 4.29,
+        "depthUsd": 145791888,
+        "pool": "aa70268e-4b52-42bf-a116-608b370f9501"
+      },
+      {
+        "asset": "WBTC",
+        "venue": "Aave V3, Ethereum",
+        "comparableTo": "SBOR-BTC",
+        "supply": 0,
+        "borrow": 0.33,
+        "depthUsd": 2589490469,
+        "pool": "7e382157-b1bc-406d-b17b-facba43b716e"
+      },
+      {
+        "asset": "CBBTC",
+        "venue": "Aave V3, Ethereum",
+        "comparableTo": "SBOR-BTC",
+        "supply": 0,
+        "borrow": 0.28,
+        "depthUsd": 1443404754,
+        "pool": "b1986007-81f3-4150-9565-94d5a4066ce4"
+      }
+    ]
+  },
   "notes": [
     "The fixing is published once daily at 11:00 UTC.",
     "Rates are read from contract state, not from any venue's published figure.",
@@ -128,6 +161,7 @@
     "stSTXbtc is collateral only and is excluded from all fixings.",
     "Rates are quoted on the instrument actually lent. SBOR-BTC measures sBTC, not native bitcoin. SBOR-USD measures USDCx and USDh, not bank dollars.",
     "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
+    "externalReference shows the same asset class on the largest lending market outside Stacks. It is context for a reader, never a constituent, and never affects a fixing.",
     "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
     "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
     "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
