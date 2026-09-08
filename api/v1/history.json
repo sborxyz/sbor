@@ -163,8 +163,8 @@
   },
   {
     "date": "2026-09-08",
-    "fixedAt": "2026-09-08T20:30:05Z",
-    "methodologyVersion": "1.4.0",
+    "fixedAt": "2026-09-08T20:36:56Z",
+    "methodologyVersion": "1.5.0",
     "SBOR-POX": {
       "apy": 5.11,
       "cycle": 141

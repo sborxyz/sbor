@@ -7,8 +7,8 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-08T20:30:05Z",
-  "methodologyVersion": "1.4.0",
+  "fixing": "2026-09-08T20:36:56Z",
+  "methodologyVersion": "1.5.0",
   "isDailyFixing": true,
   "basis": "APY, annually compounded",
   "zestDataContract": "v0-5-data",
@@ -34,6 +34,7 @@
           "asset": "USDCx",
           "borrow": 2.72,
           "supply": 0.78,
+          "utilization": 57.93,
           "depthUsd": 10087781,
           "phaseIn": 1,
           "weight": 0.6494
@@ -43,6 +44,7 @@
           "asset": "USDCx",
           "borrow": 1.45,
           "supply": 0.25,
+          "utilization": 23.54,
           "depthUsd": 5006585,
           "phaseIn": 1,
           "weight": 0.3223
@@ -52,6 +54,7 @@
           "asset": "USDh",
           "borrow": 2.65,
           "supply": 0,
+          "utilization": 45.17,
           "depthUsd": 439906,
           "phaseIn": 1,
           "weight": 0.0283
@@ -70,7 +73,7 @@
       "headline": "What money costs in STX on Stacks.",
       "borrow": 2.31,
       "supply": 1.2,
-      "allInSupply": 3.74,
+      "allInSupply": 3.76,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
@@ -82,7 +85,8 @@
           "asset": "stSTX",
           "borrow": 1.41,
           "supply": 0.1,
-          "protocolYield": 4.72,
+          "utilization": 8.83,
+          "protocolYield": 4.76,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
           "depthUsd": 2269893,
           "phaseIn": 1,
@@ -93,6 +97,7 @@
           "asset": "STX",
           "borrow": 3.37,
           "supply": 2.48,
+          "utilization": 81.91,
           "depthUsd": 1939760,
           "phaseIn": 1,
           "weight": 0.4608
@@ -130,6 +135,7 @@
         "comparableTo": "SBOR-USD",
         "supply": 3.61,
         "borrow": 4.29,
+        "utilization": 93.68,
         "depthUsd": 145791888,
         "pool": "aa70268e-4b52-42bf-a116-608b370f9501",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&marketName=proto_mainnet_v3",
@@ -141,6 +147,7 @@
         "comparableTo": "SBOR-BTC",
         "supply": 0,
         "borrow": 0.33,
+        "utilization": 2.56,
         "depthUsd": 2589490469,
         "pool": "7e382157-b1bc-406d-b17b-facba43b716e",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0x2260fac5e5542a773aa44fbcfedf7c193bc2c599&marketName=proto_mainnet_v3",
@@ -152,6 +159,7 @@
         "comparableTo": "SBOR-BTC",
         "supply": 0,
         "borrow": 0.28,
+        "utilization": 0.64,
         "depthUsd": 1443404754,
         "pool": "b1986007-81f3-4150-9565-94d5a4066ce4",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf&marketName=proto_mainnet_v3",
@@ -168,6 +176,7 @@
     "Rates are quoted on the instrument actually lent. SBOR-BTC measures sBTC, not native bitcoin. SBOR-USD measures USDCx and USDh, not bank dollars.",
     "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
     "externalReference shows the same asset class on the largest lending market outside Stacks. It is context for a reader, never a constituent, and never affects a fixing.",
+    "utilization is the share of supplied capital currently borrowed. It is the reason a rate is where it is: a market with little borrowing pays its suppliers little, however large it is.",
     "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
     "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
     "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
