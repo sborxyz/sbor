@@ -401,7 +401,7 @@ en:{
   allIn:v=>`${v.toFixed(2)}% all in, with protocol yield`,
   extH:"Outside Stacks",
   extP:"The same asset class on the largest lending market elsewhere, shown for comparison. These are not constituents of any SBOR index and never enter a fixing.",
-  extCols:["Market","Borrow","Supply","Depth","Compare with"],
+  extCols:["Market","Borrow","Supply","Utilisation","Depth","Compare with"],
   termsH:"Term averages",
   termsP:"Compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window of fixings exists.",
   termCol:d=>`${d}-day`,
@@ -428,7 +428,7 @@ en:{
   legend:["Borrow APY","Supply APY","Borrow, 30-day average"],
   ago:d=>d===30?"30 days ago":d===90?"90 days ago":"1 year ago", today:"today",
   consH:"Constituents",
-  thead:["Market","Borrow APY","Supply APY","Protocol yield","Depth","Weight",""],
+  thead:["Market","Borrow APY","Supply APY","Utilisation","Protocol yield","Depth","Weight",""],
   coverage:(n,pct)=>`${n} ${n===1?"venue":"venues"} in this index · largest constituent ${pct}% of depth`,
   sources:"Lending rates are read from Zest and Granite contract state on Stacks mainnet. Depth is read on-chain where available and from DefiLlama otherwise. Protocol yield comes from StackingDAO. The BTC to STX rate used for the staking yield is quoted from Bitflow.",
   consFoot:"Hatched weights are phasing in. A market becomes eligible once its lending depth stays above the inclusion floor for 30 consecutive days. Protocol yield is yield carried by the asset itself rather than by the loan. It is displayed but excluded from the fixing.",
@@ -446,6 +446,7 @@ en:{
     "<strong>Protocol yield is sourced, not estimated.</strong> For stSTX and stSTXbtc it comes from StackingDAO, derived from PoX reward claims net of pool commission over stSTX supply. If a source cannot be reached the yield is left out and the figure is marked incomplete, rather than filled in with an estimate.",
     "<strong>Protocol yield excluded.</strong> Some assets carry yield from the asset itself rather than from lending. sBTC carries Bitcoin protocol yield through dual stacking, and stSTX carries PoX staking yield managed by StackingDAO. That yield belongs to the asset, not the loan, so it never enters the fixing.",
     "<strong>Phase-in.</strong> A newly eligible market enters at zero weight and ramps to full weight linearly over 30 days, so adding a venue cannot step the rate.",
+    "<strong>Utilisation explains the rate.</strong> Utilisation is the share of supplied capital currently borrowed. It is the reason a rate sits where it does: a market with little borrowing pays its suppliers little, however large that market is. It is published beside every rate so no figure has to be taken on trust.",
     "<strong>Outside Stacks is context, not a constituent.</strong> Reference rates from the largest lending market elsewhere are published beside the indices so a reader can see what the same asset class costs off this chain. They are never weighted into a fixing and never move an SBOR number.",
     "<strong>Term averages.</strong> The 30, 90 and 180 day figures are compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window exists. A 180 day average appears on day 180, not before.",
     "<strong>Stale or implausible data.</strong> If a market's state cannot be read, its weight is zero for that fixing and the omission is recorded. A funded market whose borrow and supply rates both read below 0.05% is treated the same way, because a market with real depth does not price money at nothing on both sides at once.",
@@ -469,7 +470,7 @@ pt:{
   allIn:v=>`${v.toFixed(2)}% no total, com o rendimento do protocolo`,
   extH:"Fora da Stacks",
   extP:"A mesma classe de ativo no maior mercado de crédito fora da Stacks, mostrada para comparação. Não são componentes de nenhum índice SBOR e nunca entram em um fixing.",
-  extCols:["Mercado","Empréstimo","Depósito","Profundidade","Comparar com"],
+  extCols:["Mercado","Empréstimo","Depósito","Utilização","Profundidade","Comparar com"],
   termsH:"Médias de prazo",
   termsP:"Médias compostas dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa de fixings.",
   termCol:d=>`${d} dias`,
@@ -496,7 +497,7 @@ pt:{
   legend:["APY de empréstimo","APY de depósito","Empréstimo, média de 30 dias"],
   ago:d=>d===30?"30 dias atrás":d===90?"90 dias atrás":"1 ano atrás", today:"hoje",
   consH:"Componentes",
-  thead:["Mercado","APY de empréstimo","APY de depósito","Rendimento do protocolo","Profundidade","Peso",""],
+  thead:["Mercado","APY de empréstimo","APY de depósito","Utilização","Rendimento do protocolo","Profundidade","Peso",""],
   coverage:(n,pct)=>`${n} ${n===1?"plataforma":"plataformas"} neste índice · maior componente com ${pct}% da profundidade`,
   sources:"As taxas de crédito são lidas do estado dos contratos da Zest e da Granite na mainnet da Stacks. A profundidade é lida on-chain quando disponível e vem da DefiLlama nos demais casos. O rendimento do protocolo vem da StackingDAO. A relação BTC para STX usada no rendimento do staking é cotada na Bitflow.",
   consFoot:"Pesos hachurados estão em entrada gradual. Um mercado se torna elegível quando sua profundidade de crédito permanece acima do piso de inclusão por 30 dias consecutivos. Rendimento do protocolo é o rendimento gerado pelo próprio ativo, e não pelo empréstimo. Ele é exibido, mas fica fora do fixing.",
@@ -514,6 +515,7 @@ pt:{
     "<strong>O rendimento do protocolo tem fonte, não é estimado.</strong> Para stSTX e stSTXbtc ele vem da StackingDAO, derivado dos resgates de recompensa do PoX, líquidos da comissão do pool, sobre o supply de stSTX. Se a fonte não puder ser consultada, o rendimento fica de fora e o número é marcado como incompleto, em vez de ser preenchido com uma estimativa.",
     "<strong>Rendimento do protocolo fica de fora.</strong> Alguns ativos rendem por si mesmos, e não pelo empréstimo. O sBTC carrega rendimento do protocolo Bitcoin via dual stacking, e o stSTX carrega rendimento de staking PoX administrado pela StackingDAO. Esse rendimento pertence ao ativo, não ao empréstimo, então nunca entra no fixing.",
     "<strong>Entrada gradual.</strong> Um mercado recém-elegível entra com peso zero e sobe linearmente até o peso cheio ao longo de 30 dias, de modo que incluir uma plataforma nunca provoca um salto na taxa.",
+    "<strong>A utilização explica a taxa.</strong> Utilização é a parcela do capital depositado que está emprestada. É a razão de uma taxa estar onde está: um mercado com pouco crédito tomado paga pouco a quem deposita, por maior que ele seja. Ela é publicada ao lado de cada taxa para que nenhum número precise ser aceito sem explicação.",
     "<strong>Fora da Stacks é contexto, não componente.</strong> Taxas de referência do maior mercado de crédito fora daqui são publicadas ao lado dos índices para que o leitor veja quanto custa a mesma classe de ativo em outra rede. Elas nunca entram no cálculo de um fixing e nunca movem um número do SBOR.",
     "<strong>Médias de prazo.</strong> As médias de 30, 90 e 180 dias são compostas a partir dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa. Uma média de 180 dias aparece no dia 180, não antes.",
     "<strong>Dados indisponíveis ou implausíveis.</strong> Se o estado de um mercado não puder ser lido, seu peso é zero naquele fixing e a omissão fica registrada. Um mercado com liquidez cujas taxas de empréstimo e de depósito ficam ambas abaixo de 0,05% recebe o mesmo tratamento, porque um mercado com profundidade real não precifica o dinheiro a zero dos dois lados ao mesmo tempo.",
@@ -675,6 +677,7 @@ function renderChrome(){
             : `<span class="venue">${m.venue}</span>`}<span class="asset">${m.asset}</span></td>
         <td class="r num">${m.borrow == null ? "n/a" : m.borrow.toFixed(2)+"%"}</td>
         <td class="r num">${m.supply.toFixed(2)}%</td>
+        <td class="r num">${m.utilization == null ? "n/a" : m.utilization.toFixed(2)+"%"}</td>
         <td class="r num">${m.dataUrl
             ? `<a href="${m.dataUrl}" target="_blank" rel="noopener">$${(m.depthUsd/1e6).toFixed(1)}M</a>`
             : `$${(m.depthUsd/1e6).toFixed(1)}M`}</td>
@@ -719,8 +722,8 @@ function renderChrome(){
     `<span><i class="swatch" style="background:#A2452F"></i>${t.legend[2]}</span>`].join(""));
   set("thead", t.thead.map((h,i)=>
     i===0 ? `<th>${h}</th>`
-    : i===3||i===4 ? `<th class="r hide-sm">${h}</th>`
-    : i===6 ? `<th class="r hide-sm" style="width:170px"></th>`
+    : i===3||i===4||i===5 ? `<th class="r hide-sm">${h}</th>`
+    : i===7 ? `<th class="r hide-sm" style="width:170px"></th>`
     : `<th class="r">${h}</th>`).join(""));
   const F = '<div class="formula">SBOR(borrow) = Σ wᵢ·rᵢ / Σ wᵢ<br>SBOR(supply) = Σ wᵢ·sᵢ / Σ wᵢ</div>';
   set("method-a", t.methodA.map(p => p==="FORMULA" ? F : `<p>${p}</p>`).join(""));
@@ -777,7 +780,8 @@ function render(){
           : `<span class="venue">${m.venue}</span>`}<span class="asset">${m.asset}</span></td>
       <td class="r num">${fmt(m.borrow)}%</td>
       <td class="r num">${fmt(m.supply)}%</td>
-      <td class="r num hide-sm">${m.incentive ? "+"+fmt(m.incentive)+"%" : "&mdash;"}</td>
+      <td class="r num hide-sm">${m.utilization == null ? "n/a" : fmt(m.utilization)+"%"}</td>
+      <td class="r num hide-sm">${m.incentive ? "+"+fmt(m.incentive)+"%" : "n/a"}</td>
       <td class="r num hide-sm">$${m.depth.toFixed(2)}M</td>
       <td class="r num">${(m.weight*100).toFixed(1)}%</td>
       <td class="r hide-sm"><span class="bar${m.phaseIn<1?" phase":""}"><i style="width:${(m.weight*100).toFixed(1)}%"></i></span></td>
@@ -846,7 +850,8 @@ async function boot(){
       const k = map[label]; if(!k || !INDICES[k]) continue;
       INDICES[k].markets = ix.markets.map(m => ({
         venue:m.venue, asset:m.asset, borrow:m.borrow, supply:m.supply,
-        incentive:m.protocolYield || 0, depth:(m.depthUsd||0)/1e6, phaseIn:m.phaseIn ?? 1
+        incentive:m.protocolYield || 0, utilization:m.utilization ?? null,
+        depth:(m.depthUsd||0)/1e6, phaseIn:m.phaseIn ?? 1
       }));
     }
     if (d.fixing) fixingDate = d.fixing.slice(0,10);
