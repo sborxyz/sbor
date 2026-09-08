@@ -4,8 +4,10 @@
 > markets on Stacks, a Bitcoin layer. It is published as a public good. Anyone
 > may reference it without permission.
 
-Rates are read directly from lending contract state on Stacks mainnet, currently
-Zest and Granite. Depth is read on-chain where available and from DefiLlama
+Lending rates are read directly from contract state on Stacks mainnet, currently
+Zest (v0-5-data) and Granite. Protocol yield carried by an asset rather than by
+the loan comes from StackingDAO. The BTC to STX rate used for the staking
+reference is quoted from Bitflow. Depth is read on-chain where available and from DefiLlama
 otherwise. Each index publishes the number of venues it covers and the weight of
 its largest constituent, so concentration is visible rather than implied.
 
