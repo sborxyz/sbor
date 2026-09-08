@@ -8,6 +8,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { fetchCallReadOnlyFunction, contractPrincipalCV, cvToValue } from "@stacks/transactions";
 import { poxReference } from "./pox.mjs";
+import { externalReference } from "./external.mjs";
 
 const POOLS_URL = "https://yields.llama.fi/pools";
 const STACKINGDAO_APY = "https://app.stackingdao.com/api/apy?v=2";
@@ -79,7 +80,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.3.1";
+const METHODOLOGY_VERSION = "1.4.0";
 
 /* Below this, on both sides at once, a funded market is not reporting. */
 const RATE_FLOOR = 0.05;
@@ -309,6 +310,12 @@ const main = async () => {
   try { pox = await poxReference(); log(`  PoX reference: ${pox.apy}% APY (cycle ${pox.cycle})`); }
   catch(e){ log(`  PoX reference unavailable, omitted. ${e.message}`); }
 
+  /* Reference rates from outside Stacks. Context only, never a constituent.
+     A failure here must not stop the fixing. */
+  let external = null;
+  try { external = await externalReference(); }
+  catch(e){ log(`  external reference unavailable, omitted. ${e.message}`); }
+
   const stamp = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
   const day = stamp.slice(0,10);
 
@@ -326,6 +333,7 @@ const main = async () => {
     source:"Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
     indices,
     ...(pox && { poxReference: pox }),
+    ...(external && { externalReference: external }),
     notes:[
       "The fixing is published once daily at 11:00 UTC.",
       "Rates are read from contract state, not from any venue's published figure.",
@@ -334,6 +342,7 @@ const main = async () => {
       "stSTXbtc is collateral only and is excluded from all fixings.",
       "Rates are quoted on the instrument actually lent. SBOR-BTC measures sBTC, not native bitcoin. SBOR-USD measures USDCx and USDh, not bank dollars.",
       "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
+      "externalReference shows the same asset class on the largest lending market outside Stacks. It is context for a reader, never a constituent, and never affects a fixing.",
       "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
       "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
       "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
