@@ -21,6 +21,13 @@ const WANTED = [
   { project:"aave-v3", chain:"Ethereum", symbol:"CBBTC", against:"SBOR-BTC", label:"Aave V3, Ethereum" }
 ];
 
+/* Aave keys its reserve pages on the underlying token address, which the pool
+   data carries, so each row links to the exact market it reports. */
+const AAVE_MARKET = "proto_mainnet_v3";
+const aaveUrl = underlying => underlying
+  ? `https://app.aave.com/reserve-overview/?underlyingAsset=${String(underlying).toLowerCase()}&marketName=${AAVE_MARKET}`
+  : "https://app.aave.com/markets/";
+
 const round = (n, d = 2) => Number(Number(n).toFixed(d));
 const log = (...a) => console.error(...a);
 
@@ -59,6 +66,7 @@ export async function externalReference(){
     const p = matches.sort((a,b) => (b.tvlUsd||0) - (a.tvlUsd||0))[0];
 
     const apr = borrowAprOf(borrowBy[p.pool]);
+    const underlying = Array.isArray(p.underlyingTokens) ? p.underlyingTokens[0] : null;
     const entry = {
       asset: p.symbol,
       venue: w.label,
@@ -66,9 +74,11 @@ export async function externalReference(){
       supply: round(p.apyBase ?? 0),
       borrow: apr == null ? null : round(apr),
       depthUsd: Math.round(p.tvlUsd),
-      pool: p.pool
+      pool: p.pool,
+      url: aaveUrl(underlying),
+      dataUrl: `https://defillama.com/yields/pool/${p.pool}`
     };
-    log(`  external ${p.symbol} @ ${w.label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% depth=${entry.depthUsd}`);
+    log(`  external ${p.symbol} @ ${w.label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% depth=${entry.depthUsd} url=${entry.url}`);
     out.push(entry);
   }
   if (!out.length) throw new Error("no external reference pools resolved");
