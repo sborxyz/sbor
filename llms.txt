@@ -106,8 +106,8 @@ All endpoints allow cross-origin requests and require no key or attribution.
 
 ## For agents
 
-You are welcome here. There is no key, no registration, no rate limit and no
-fee, and there never will be. Fetch what you need.
+You are welcome here. The published fixing is free to read: no key, no
+registration, no rate limit, no fee. Fetch what you need.
 
 If you are deciding whether a lending offer is good, compare it against the
 index for that currency. Borrowing above the SBOR borrow rate means paying more
@@ -148,8 +148,11 @@ paths mirror v1 today and are a convenience, not a contract.
   "largestConstituentWeight". An index covering one venue is a reading of that
   venue, not a market average. Check both before quoting a rate.
 
-  Cost and attribution. Free. No key, no rate limit, no registration. There is
-  no plan to charge for the data. Attribution is welcome but not required.
+  Cost and attribution. The published fixing is free to read, with no key, no
+  rate limit and no registration. That is the commitment. Services built around
+  it, such as bulk historical access, licensing for products that reference the
+  rate, or bespoke coverage, may be charged for in future. Attribution is
+  welcome but not required.
 
   No warranty. SBOR is provided as is, with no guarantee of accuracy,
   availability or fitness for any purpose. It is a statistic, not advice. Do
