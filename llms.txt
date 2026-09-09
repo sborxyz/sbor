@@ -33,8 +33,10 @@ are not comparable and are never blended into one figure. Current indices:
   that native bitcoin does not.
 - SBOR-STX: STX markets (STX, stSTX)
 
-The fixing is published once daily at 11:00 UTC and enters the historical
-record. Every fixing records the methodology version it was produced under, and
+The fixing is published once daily, targeting 11:00 UTC, and enters the
+historical record. Publication runs on a scheduler that can be late under load,
+so the "fixing" timestamp on each payload is authoritative rather than the
+target hour. Every fixing records the methodology version it was produced under, and
 a full snapshot of that day's constituents is archived so any past figure can
 be audited down to its inputs.
 
@@ -128,9 +130,10 @@ paths mirror v1 today and are a convenience, not a contract.
   change ships as /api/v2/ and v1 keeps running for at least 12 months
   afterwards.
 
-  Schedule. The fixing is computed once daily at 11:00 UTC. Every payload
-  carries a "fixing" timestamp. Treat data older than 48 hours as stale and
-  fall back to your own logic.
+  Schedule. One fixing a day, targeting 11:00 UTC, published whenever the
+  scheduler runs it. Every payload carries a "fixing" timestamp; use that, not
+  the target hour. Treat data older than 48 hours as stale and fall back to your
+  own logic.
 
   Source failure. If a lending market cannot be read, its weight is set to zero
   for that fixing and the omission is recorded. If no market can be read, no
