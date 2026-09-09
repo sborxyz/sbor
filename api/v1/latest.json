@@ -7,10 +7,10 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-09T14:14:34Z",
+  "fixing": "2026-09-09T14:53:07Z",
   "methodologyVersion": "1.5.0",
   "isDailyFixing": true,
-  "basis": "APY, annually compounded",
+  "basis": "Granite rates compounded to APY. Zest rates as the contract returns them, basis under confirmation with the venue.",
   "zestDataContract": "v0-5-data",
   "method": "https://sbor.xyz/llms.txt",
   "source": "Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
@@ -35,7 +35,7 @@
           "borrow": 2.71,
           "supply": 0.78,
           "utilization": 57.69,
-          "depthUsd": 10087385,
+          "depthUsd": 10087519,
           "phaseIn": 1,
           "weight": 0.6494
         },
@@ -55,7 +55,7 @@
           "borrow": 2.65,
           "supply": 0,
           "utilization": 45.17,
-          "depthUsd": 439682,
+          "depthUsd": 439674,
           "phaseIn": 1,
           "weight": 0.0283
         }
@@ -71,14 +71,14 @@
       "label": "SBOR-STX",
       "currency": "STX",
       "headline": "What money costs in STX on Stacks.",
-      "borrow": 2.33,
+      "borrow": 2.32,
       "supply": 1.21,
       "allInSupply": 3.76,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
       ],
-      "largestConstituentWeight": 0.5374,
+      "largestConstituentWeight": 0.5402,
       "markets": [
         {
           "venue": "Zest V2",
@@ -88,9 +88,9 @@
           "utilization": 8.82,
           "protocolYield": 4.73,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
-          "depthUsd": 2347041,
+          "depthUsd": 2316036,
           "phaseIn": 1,
-          "weight": 0.5374
+          "weight": 0.5402
         },
         {
           "venue": "Zest V2",
@@ -98,9 +98,9 @@
           "borrow": 3.39,
           "supply": 2.51,
           "utilization": 82.51,
-          "depthUsd": 2020582,
+          "depthUsd": 1971549,
           "phaseIn": 1,
-          "weight": 0.4626
+          "weight": 0.4598
         }
       ],
       "termAverages": {
@@ -120,9 +120,9 @@
     "cycleYieldPct": 0.1983,
     "btcPaid": 2.928688,
     "stxLocked": 421543815,
-    "stxPerBtc": 285484.88,
+    "stxPerBtc": 285405.42,
     "rateSource": "Bitflow",
-    "rateQuoteImpactBps": 56,
+    "rateQuoteImpactBps": 14,
     "note": "Paid in bitcoin against a position locked in STX, so the figure depends on the BTC/STX exchange rate rather than on either dollar price. It is a staking yield, not a lending rate, and is never blended into the lending indices."
   },
   "externalReference": {
@@ -135,8 +135,8 @@
         "comparableTo": "SBOR-USD",
         "supply": 3.64,
         "borrow": 4.3,
-        "utilization": 93.98,
-        "depthUsd": 138810253,
+        "utilization": 93.99,
+        "depthUsd": 138617590,
         "pool": "aa70268e-4b52-42bf-a116-608b370f9501",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/aa70268e-4b52-42bf-a116-608b370f9501"
@@ -148,7 +148,7 @@
         "supply": 0,
         "borrow": 0.33,
         "utilization": 2.5,
-        "depthUsd": 2628976060,
+        "depthUsd": 2619295215,
         "pool": "7e382157-b1bc-406d-b17b-facba43b716e",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0x2260fac5e5542a773aa44fbcfedf7c193bc2c599&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/7e382157-b1bc-406d-b17b-facba43b716e"
@@ -160,7 +160,7 @@
         "supply": 0,
         "borrow": 0.28,
         "utilization": 0.64,
-        "depthUsd": 1465987918,
+        "depthUsd": 1459528308,
         "pool": "b1986007-81f3-4150-9565-94d5a4066ce4",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/b1986007-81f3-4150-9565-94d5a4066ce4"
@@ -168,7 +168,7 @@
     ]
   },
   "notes": [
-    "The fixing is published once daily at 11:00 UTC.",
+    "One fixing a day, targeting 11:00 UTC. Publication runs on a scheduler that can be late, so the fixing timestamp is authoritative rather than the target hour.",
     "Rates are read from contract state, not from any venue's published figure.",
     "Protocol yield belongs to the asset, not the loan, and is excluded from every fixing.",
     "Currencies are never blended into a single figure.",

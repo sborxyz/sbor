@@ -186,7 +186,7 @@
   },
   {
     "date": "2026-09-09",
-    "fixedAt": "2026-09-09T14:14:34Z",
+    "fixedAt": "2026-09-09T14:53:07Z",
     "methodologyVersion": "1.5.0",
     "SBOR-POX": {
       "apy": 5.08,
@@ -197,14 +197,14 @@
       "supply": 0.59,
       "venues": 2,
       "largestConstituentWeight": 0.6494,
-      "depthUsd": 15533701
+      "depthUsd": 15533827
     },
     "SBOR-STX": {
-      "borrow": 2.33,
+      "borrow": 2.32,
       "supply": 1.21,
       "venues": 1,
-      "largestConstituentWeight": 0.5374,
-      "depthUsd": 4367623
+      "largestConstituentWeight": 0.5402,
+      "depthUsd": 4287585
     }
   }
 ]
