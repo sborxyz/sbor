@@ -100,6 +100,9 @@ reference it for.
   note, or as a visible withdrawal record.
 - **Term averages** are compounded, actual/365, and publish only once the full
   window of fixings exists.
+- **Rate basis is disclosed, not assumed.** Granite rates are compounded to APY.
+  Zest rates are published as the contract returns them, and whether those are
+  nominal or compounded is under confirmation with the venue.
 
 Every fixing records the methodology version it was produced under. Full
 methodology at [sbor.xyz](https://sbor.xyz) and in
