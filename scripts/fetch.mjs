@@ -332,7 +332,7 @@ const main = async () => {
     fixing: stamp,
     methodologyVersion: METHODOLOGY_VERSION,
     isDailyFixing: IS_FIXING,
-    basis:"APY, annually compounded",
+    basis:"Granite rates compounded to APY. Zest rates as the contract returns them, basis under confirmation with the venue.",
     ...(LAST_READER && { zestDataContract: LAST_READER }),
     method:"https://sbor.xyz/llms.txt",
     source:"Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
@@ -340,7 +340,7 @@ const main = async () => {
     ...(pox && { poxReference: pox }),
     ...(external && { externalReference: external }),
     notes:[
-      "The fixing is published once daily at 11:00 UTC.",
+      "One fixing a day, targeting 11:00 UTC. Publication runs on a scheduler that can be late, so the fixing timestamp is authoritative rather than the target hour.",
       "Rates are read from contract state, not from any venue's published figure.",
       "Protocol yield belongs to the asset, not the loan, and is excluded from every fixing.",
       "Currencies are never blended into a single figure.",
@@ -417,7 +417,7 @@ const main = async () => {
     console.log(`archived api/v1/archive/${day}.json`);
     console.log(`daily fixing recorded, history rows: ${history.length}`);
   } else {
-    console.log("intraday refresh, history unchanged");
+    console.log("not a recorded fixing, history unchanged");
   }
 
   console.log(lines.join("\n"));
