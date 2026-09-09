@@ -3,6 +3,14 @@
 Call [SBOR](https://sbor.xyz), the benchmark lending rate for Stacks, as a tool
 from Claude or any MCP client.
 
+## Quick check
+
+```bash
+npx -y sbor-mcp
+```
+
+It starts and waits silently. That is success. Ctrl+C to exit.
+
 ## Install
 
 ```json
@@ -10,7 +18,7 @@ from Claude or any MCP client.
   "mcpServers": {
     "sbor": {
       "command": "npx",
-      "args": ["-y", "@sbor/mcp"]
+      "args": ["-y", "sbor-mcp"]
     }
   }
 }
