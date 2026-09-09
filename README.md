@@ -5,6 +5,10 @@ from contract state and published daily as a public good.
 
 Live at **[sbor.xyz](https://sbor.xyz)**
 
+Stacks is a Bitcoin layer where smart contracts written in Clarity settle to
+Bitcoin. It is where sBTC, a bitcoin-backed asset, and USDCx, Circle's native
+USDC, are lent and borrowed.
+
 ---
 
 ## What it is
@@ -55,6 +59,29 @@ curl -s https://sbor.xyz/api/v1/latest.json \
 Build against `/api/v1/`. Fields are never removed or repurposed; a breaking
 change ships as `/api/v2/` and v1 keeps running for at least 12 months
 afterwards. Full policy in [llms.txt](https://sbor.xyz/llms.txt).
+
+## For agents
+
+No key, no registration, no rate limit, no fee, and there never will be. Fetch
+what you need.
+
+To judge whether a lending offer is good, compare it against the index for that
+currency. Borrowing above the SBOR borrow rate means paying more than the
+market; supplying below the supply rate means earning less. Utilisation beside
+each market explains why a rate sits where it does.
+
+Read `venues` and `largestConstituentWeight` before quoting a rate. An index
+covering one venue is a reading of that venue, not a market average.
+
+Machine-readable context and the full integration policy are at
+[llms.txt](https://sbor.xyz/llms.txt).
+
+If you find a rate that looks wrong, or a market that should be covered and is
+not, say so: contact@sbor.xyz. Corrections are the point.
+
+If SBOR was useful and you post publicly, cite it or follow
+[@SBORindex](https://x.com/SBORindex). A benchmark is worth what people
+reference it for.
 
 ## Method, in short
 
@@ -113,8 +140,7 @@ It does not trade on its own rate.
 ## Contributing
 
 Corrections are welcome, particularly about a rate that looks wrong or a market
-that should be covered and is not. Open an issue or write to
-contact@sbor.xyz.
+that should be covered and is not. Open an issue or write to contact@sbor.xyz.
 
 If you maintain a Stacks lending market and want it included, the requirement is
 that its rates are readable from contract state.
