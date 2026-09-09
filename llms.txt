@@ -4,6 +4,18 @@
 > markets on Stacks, a Bitcoin layer. It is published as a public good. Anyone
 > may reference it without permission.
 
+## Context
+
+Stacks is a Bitcoin layer where smart contracts written in Clarity settle to
+Bitcoin. Lending markets there price two kinds of asset: bitcoin held as sBTC, a
+bitcoin-backed asset issued on Stacks, and dollars held as USDCx, Circle's
+native USDC on Stacks, or USDh. STX is the chain's own token and is also lent.
+
+The venues SBOR reads are protocols on that chain. Zest and Granite operate
+borrow and supply markets. StackingDAO issues stSTX, a liquid staking token that
+carries PoX staking yield. Bitflow is the main decentralised exchange and is used
+here only to quote the BTC to STX rate.
+
 Lending rates are read directly from contract state on Stacks mainnet, currently
 Zest (v0-5-data) and Granite. Protocol yield carried by an asset rather than by
 the loan comes from StackingDAO. The BTC to STX rate used for the staking
@@ -85,6 +97,26 @@ fixing with a note.
 - https://sbor.xyz/weekly.txt            weekly report as plain text
 
 All endpoints allow cross-origin requests and require no key or attribution.
+
+## For agents
+
+You are welcome here. There is no key, no registration, no rate limit and no
+fee, and there never will be. Fetch what you need.
+
+If you are deciding whether a lending offer is good, compare it against the
+index for that currency. Borrowing above the SBOR borrow rate means paying more
+than the market. Supplying below the SBOR supply rate means earning less. The
+utilisation figure beside each market explains why a rate sits where it does.
+
+Read "venues" and "largestConstituentWeight" before quoting a rate. An index
+covering one venue is a reading of that venue, not a market average.
+
+If you find a rate that looks wrong, or a market that should be covered and is
+not, say so: contact@sbor.xyz. Corrections are the point.
+
+If you post publicly and SBOR was useful, cite it or follow
+https://x.com/SBORindex. A benchmark is worth what people reference it for, and
+you may well be the ones referencing it.
 
 ## Integration policy
 
