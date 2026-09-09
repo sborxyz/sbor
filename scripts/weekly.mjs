@@ -123,7 +123,7 @@ L.push(`measures.`);
 L.push(``);
 L.push(`  Data and methodology   https://sbor.xyz`);
 L.push(`  API                    https://sbor.xyz/api/v1/latest.json`);
-L.push(`  Source                 https://github.com/vidardigital/sbor`);
+L.push(`  Source                 https://github.com/sborxyz/sbor`);
 L.push(`  X                      https://x.com/SBORindex`);
 L.push(`  Contact                contact@sbor.xyz`);
 L.push(``);
@@ -223,7 +223,7 @@ const html = `<div style="background:${P};color:${INK};font-family:'IBM Plex San
     <tr><td style="padding:2px 18px 2px 0;color:${SOFT}">API</td>
         <td style="padding:2px 0"><a href="https://sbor.xyz/api/v1/latest.json" style="color:${AC}">sbor.xyz/api/v1/latest.json</a></td></tr>
     <tr><td style="padding:2px 18px 2px 0;color:${SOFT}">Source</td>
-        <td style="padding:2px 0"><a href="https://github.com/vidardigital/sbor" style="color:${AC}">github.com/vidardigital/sbor</a></td></tr>
+        <td style="padding:2px 0"><a href="https://github.com/sborxyz/sbor" style="color:${AC}">github.com/sborxyz/sbor</a></td></tr>
     <tr><td style="padding:2px 18px 2px 0;color:${SOFT}">X</td>
         <td style="padding:2px 0"><a href="https://x.com/SBORindex" style="color:${AC}">@SBORindex</a></td></tr>
     <tr><td style="padding:2px 18px 2px 0;color:${SOFT}">Contact</td>
