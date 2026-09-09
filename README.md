@@ -40,7 +40,7 @@ reference rates from Aave V3 on Ethereum for comparison.
 
 ## Data
 
-No key, no registration, no rate limit, no fee. CORS open.
+The published fixing is free to read. No key, no registration, no rate limit, no fee. CORS open.
 
 | Endpoint | What |
 |---|---|
@@ -62,8 +62,8 @@ afterwards. Full policy in [llms.txt](https://sbor.xyz/llms.txt).
 
 ## For agents
 
-No key, no registration, no rate limit, no fee, and there never will be. Fetch
-what you need.
+The published fixing is free to read: no key, no registration, no rate limit,
+no fee. Fetch what you need.
 
 To judge whether a lending offer is good, compare it against the index for that
 currency. Borrowing above the SBOR borrow rate means paying more than the
