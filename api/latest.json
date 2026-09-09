@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-09T14:53:07Z",
+  "fixing": "2026-09-09T15:19:52Z",
   "methodologyVersion": "1.5.0",
   "isDailyFixing": true,
   "basis": "Granite rates compounded to APY. Zest rates as the contract returns them, basis under confirmation with the venue.",
@@ -115,14 +115,14 @@
     "label": "SBOR-POX",
     "headline": "The native Bitcoin yield paid to STX stakers.",
     "kind": "staking yield",
-    "apy": 5.08,
+    "apy": 5.07,
     "cycle": 141,
-    "cycleYieldPct": 0.1983,
+    "cycleYieldPct": 0.198,
     "btcPaid": 2.928688,
     "stxLocked": 421543815,
-    "stxPerBtc": 285405.42,
+    "stxPerBtc": 284928.84,
     "rateSource": "Bitflow",
-    "rateQuoteImpactBps": 14,
+    "rateQuoteImpactBps": 0,
     "note": "Paid in bitcoin against a position locked in STX, so the figure depends on the BTC/STX exchange rate rather than on either dollar price. It is a staking yield, not a lending rate, and is never blended into the lending indices."
   },
   "externalReference": {
