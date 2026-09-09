@@ -68,8 +68,12 @@ supply rates across eligible lending markets:
 
 Weight is the lending depth of that market in that currency.
 
-Rate basis: markets publish on different bases, some APR and some APY. Every
-rate is converted to an annually compounded APY before weighting.
+Rate basis: venues publish on different bases and do not always label them
+consistently. Granite rates are compounded to APY from the annualised rate its
+curve returns. Zest rates are published as the contract returns them, and
+whether those values are nominal or compounded is under confirmation with the
+venue. The difference at current levels is a few basis points and is stated here
+rather than papered over.
 
 Protocol yield excluded: some assets carry yield from the asset itself rather
 than from lending. sBTC carries Bitcoin protocol yield through dual stacking.
