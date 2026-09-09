@@ -1,17 +1,32 @@
 {
-  "name": "@sbor/mcp",
-  "version": "1.0.0",
+  "name": "sbor-mcp",
+  "version": "1.0.1",
   "description": "MCP server for SBOR, the benchmark lending rate for Stacks",
   "type": "module",
-  "bin": { "sbor-mcp": "./server.mjs" },
+  "bin": {
+    "sbor-mcp": "./server.mjs"
+  },
   "main": "./server.mjs",
   "license": "MIT",
   "homepage": "https://sbor.xyz",
-  "repository": { "type": "git", "url": "https://github.com/sborxyz/sbor" },
-  "keywords": ["mcp", "stacks", "bitcoin", "defi", "interest-rates", "benchmark", "sbor"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sborxyz/sbor.git"
+  },
+  "keywords": [
+    "mcp",
+    "stacks",
+    "bitcoin",
+    "defi",
+    "interest-rates",
+    "benchmark",
+    "sbor"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "zod": "^3.23.8"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }
