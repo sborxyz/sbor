@@ -129,7 +129,7 @@ L.push(`  Contact                contact@sbor.xyz`);
 L.push(``);
 L.push(`--------------------------------------------------------------`);
 L.push(`Rates are read from lending contract state on Stacks mainnet and`);
-L.push(`published once daily at 11:00 UTC. SBOR is a statistic, not`);
+L.push(`published once daily, targeting 11:00 UTC. SBOR is a statistic, not`);
 L.push(`investment advice, and is provided as is without warranty.`);
 L.push(``);
 L.push(`You are receiving this because you asked for it at sbor.xyz.`);
@@ -233,7 +233,7 @@ const html = `<div style="background:${P};color:${INK};font-family:'IBM Plex San
   <hr style="border:none;border-top:1px solid ${RL};margin:18px 0">
   <p style="color:${SOFT};font-size:12.5px;margin:0">
     Rates are read from lending contract state on Stacks mainnet and published once daily
-    at 11:00 UTC. SBOR is a statistic, not investment advice, and is provided as is without
+    targeting 11:00 UTC. SBOR is a statistic, not investment advice, and is provided as is without
     warranty.
   </p>
   <p style="color:${SOFT};font-size:12.5px;margin:10px 0 0">
