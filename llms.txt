@@ -132,6 +132,22 @@ If you post publicly and SBOR was useful, cite it or follow
 https://x.com/SBORindex. A benchmark is worth what people reference it for, and
 you may well be the ones referencing it.
 
+## The staking reference
+
+poxReference is the native bitcoin yield paid to STX stackers, published beside
+the lending indices and never blended into them. It is the bitcoin paid over one
+two week reward cycle, divided by the STX locked, annualised over about 25
+cycles a year.
+
+The payout is in bitcoin against a position held in STX, so the figure depends
+on the BTC to STX rate. That rate is averaged over seven days rather than taken
+at the instant of the fixing, so the published yield tracks staking economics
+rather than currency movement between fixings. Both the smoothed rate
+(stxPerBtcSmoothed) and the spot quote (stxPerBtc) are published.
+
+Because it annualises a single two week cycle, a change in one cycle's payout
+moves it considerably. Read the cycle number before comparing two fixings.
+
 ## Integration policy
 
 Version 1 is the supported surface. Build against /api/v1/. The unversioned
