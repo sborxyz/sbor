@@ -2,15 +2,22 @@
  * SBOR-PoX: the native Bitcoin staking yield on Stacks.
  *
  * PoX pays stackers in BTC from what miners commit. The rate is therefore
- *   cycle yield = BTC paid to stackers over one cycle, in USD
- *                 / STX locked over that cycle, in USD
- * annualised over the number of reward cycles in a year.
+ *   cycle yield = BTC paid over one cycle x BTC/STX rate / STX locked
+ * annualised over the number of reward cycles in a year. Dollar prices cancel,
+ * so only the BTC to STX rate is needed, quoted from Bitflow.
+ *
+ * That cross is averaged over a short window. Staking economics change once a
+ * fortnight when a cycle settles; the currency moves every minute. Without the
+ * average the published yield wanders on FX between fixings, which would make
+ * it describe the wrong thing.
  *
  * This is a staking yield, not a lending rate. It is published beside the
  * lending indices, never blended into them.
  *
  * Run standalone to check the figure:  node scripts/pox.mjs
  */
+import { readFileSync } from "node:fs";
+
 const HIRO   = "https://api.hiro.so";
 const PRICES  = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,blockstack&vs_currencies=usd";
 const BITFLOW = "https://bff.bitflowapis.finance/api/quotes/v1";
@@ -49,6 +56,30 @@ async function stxPerBtcFromBitflow(){
 }
 
 const round = (n,d=2) => Number(Number(n).toFixed(d));
+
+/* Days of BTC/STX quotes to average over. The staking economics change once a
+   fortnight when a cycle settles, but the cross moves every minute. Averaging
+   the cross stops a rate that is meant to describe staking from wandering on
+   currency alone. */
+const CROSS_WINDOW_DAYS = 7;
+
+/* Prior quotes, newest first, from the published record. */
+function priorCrossQuotes(){
+  for (const f of ["api/v1/history.json", "api/history.json"]){
+    try {
+      const h = JSON.parse(readFileSync(f, "utf8"));
+      return h
+        .map(r => r["SBOR-PoX"] || r["SBOR-POX"])
+        .filter(e => e && typeof e.stxPerBtc === "number")
+        .slice(-(CROSS_WINDOW_DAYS - 1))
+        .map(e => e.stxPerBtc);
+    } catch(e){
+      if (!/ENOENT/.test(e.message)) log(`  cross history unreadable in ${f}: ${e.message}`);
+    }
+  }
+  log("  no prior cross quotes on record, using the spot quote alone");
+  return [];
+}
 const log = (...a) => console.error(...a);
 
 async function getJson(u){
@@ -108,14 +139,21 @@ export async function poxReference(){
     log(`coingecko: BTC $${btcUsd}, STX $${stxUsd} => ${rate.toFixed(0)} STX per BTC`);
   }
 
+  /* Smooth the cross over a short window. The spot quote is kept and published
+     so the smoothing is visible rather than hidden. */
+  const priorQuotes = priorCrossQuotes();
+  const window = [...priorQuotes, rate];
+  const smoothed = window.reduce((a,b) => a + b, 0) / window.length;
+  log(`cross: spot ${Math.round(rate)}, ${window.length} day mean ${Math.round(smoothed)} STX per BTC`);
+
   const btcPaid    = sats/1e8;
   const stxLocked  = stackedUstx/1e6;
-  const cycleYield = (btcPaid * rate) / stxLocked;
+  const cycleYield = (btcPaid * smoothed) / stxLocked;
   const cyclesPerYear = 52560 / cycleLen;   // ~52560 bitcoin blocks a year
   const apy = ((1 + cycleYield) ** cyclesPerYear - 1) * 100;
 
   log(`${btcPaid.toFixed(4)} BTC paid on ${stxLocked.toFixed(0)} STX locked at ` +
-      `${rate.toFixed(0)} STX/BTC = ${(cycleYield*100).toFixed(4)}% per cycle, ` +
+      `${smoothed.toFixed(0)} STX/BTC smoothed = ${(cycleYield*100).toFixed(4)}% per cycle, ` +
       `${cyclesPerYear.toFixed(2)} cycles a year`);
 
   return {
@@ -131,9 +169,11 @@ export async function poxReference(){
     btcPaid: round(btcPaid, 6),
     stxLocked: Math.round(stxLocked),
     stxPerBtc: round(rate, 2),
+    stxPerBtcSmoothed: round(smoothed, 2),
+    crossWindowDays: window.length,
     rateSource,
     ...(priceImpactBps != null && { rateQuoteImpactBps: priceImpactBps }),
-    note: "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualised. Because the payout is in bitcoin against a position held in STX, the figure moves with the BTC to STX rate as well as with the payout itself. It is a staking yield, not a lending rate, and is never blended into the lending indices."
+    note: "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualised. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over a short window rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. It is a staking yield, not a lending rate, and is never blended into the lending indices."
   };
 }
 
