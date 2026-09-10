@@ -28,14 +28,53 @@ jobs:
           SBOR_FIXING: "1"
         run: node scripts/fetch.mjs
 
+      - name: Draft a post if something moved
+        id: draft
+        run: node scripts/post.mjs
+        continue-on-error: true
+
       - name: Commit if changed
         run: |
           git config user.name  "sbor-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A api latest.txt
+          git add -A api latest.txt post.txt
           if git diff --staged --quiet; then
             echo "No change, nothing to commit."
           else
             git commit -m "fixing $(date -u +%Y-%m-%d) [skip netlify]"
             git push
           fi
+
+      # Only pings when something actually moved. A quiet day stays quiet.
+      - name: Notify if there is something to post
+        if: steps.draft.outputs.has_drafts == 'true'
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          COUNT: ${{ steps.draft.outputs.draft_count }}
+        run: |
+          if [ -z "$TG_TOKEN" ]; then
+            echo "No Telegram token set, skipping notification."
+            exit 0
+          fi
+          BODY=$(head -c 3200 post.txt)
+          MSG=$(printf 'SBOR: %s thing(s) worth posting today.\n\n%s\n\nsbor.xyz/post.txt' "$COUNT" "$BODY")
+          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TG_CHAT" \
+            --data-urlencode "disable_web_page_preview=true" \
+            --data-urlencode "text=$MSG" > /dev/null
+          echo "Notified."
+
+      # Silence is not success. If the fixing breaks, say so.
+      - name: Notify on failure
+        if: failure()
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ]; then exit 0; fi
+          MSG=$(printf 'SBOR fixing FAILED on %s.\n\nNo fixing was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
+          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TG_CHAT" \
+            --data-urlencode "disable_web_page_preview=true" \
+            --data-urlencode "text=$MSG" > /dev/null
