@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-09T15:19:52Z",
+  "fixing": "2026-09-10T13:09:36Z",
   "methodologyVersion": "1.5.0",
   "isDailyFixing": true,
   "basis": "Granite rates compounded to APY. Zest rates as the contract returns them, basis under confirmation with the venue.",
@@ -19,7 +19,7 @@
       "label": "SBOR-USD",
       "currency": "USD",
       "headline": "What money costs in dollars on Stacks.",
-      "borrow": 2.3,
+      "borrow": 2.31,
       "supply": 0.59,
       "allInSupply": 0.59,
       "allInSupplyDiffers": false,
@@ -27,17 +27,17 @@
         "Zest V2",
         "Granite"
       ],
-      "largestConstituentWeight": 0.6494,
+      "largestConstituentWeight": 0.6505,
       "markets": [
         {
           "venue": "Zest V2",
           "asset": "USDCx",
-          "borrow": 2.71,
+          "borrow": 2.72,
           "supply": 0.78,
-          "utilization": 57.69,
-          "depthUsd": 10087519,
+          "utilization": 57.95,
+          "depthUsd": 10137886,
           "phaseIn": 1,
-          "weight": 0.6494
+          "weight": 0.6505
         },
         {
           "venue": "Granite",
@@ -45,9 +45,9 @@
           "borrow": 1.45,
           "supply": 0.25,
           "utilization": 23.54,
-          "depthUsd": 5006634,
+          "depthUsd": 5006662,
           "phaseIn": 1,
-          "weight": 0.3223
+          "weight": 0.3213
         },
         {
           "venue": "Zest V2",
@@ -55,9 +55,9 @@
           "borrow": 2.65,
           "supply": 0,
           "utilization": 45.17,
-          "depthUsd": 439674,
+          "depthUsd": 439939,
           "phaseIn": 1,
-          "weight": 0.0283
+          "weight": 0.0282
         }
       ],
       "termAverages": {
@@ -71,36 +71,36 @@
       "label": "SBOR-STX",
       "currency": "STX",
       "headline": "What money costs in STX on Stacks.",
-      "borrow": 2.32,
-      "supply": 1.21,
-      "allInSupply": 3.76,
+      "borrow": 2.33,
+      "supply": 1.23,
+      "allInSupply": 4.26,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
       ],
-      "largestConstituentWeight": 0.5402,
+      "largestConstituentWeight": 0.543,
       "markets": [
         {
           "venue": "Zest V2",
           "asset": "stSTX",
           "borrow": 1.41,
           "supply": 0.1,
-          "utilization": 8.82,
-          "protocolYield": 4.73,
+          "utilization": 8.81,
+          "protocolYield": 5.59,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
-          "depthUsd": 2316036,
+          "depthUsd": 2243070,
           "phaseIn": 1,
-          "weight": 0.5402
+          "weight": 0.543
         },
         {
           "venue": "Zest V2",
           "asset": "STX",
-          "borrow": 3.39,
-          "supply": 2.51,
-          "utilization": 82.51,
-          "depthUsd": 1971549,
+          "borrow": 3.43,
+          "supply": 2.57,
+          "utilization": 83.57,
+          "depthUsd": 1887974,
           "phaseIn": 1,
-          "weight": 0.4598
+          "weight": 0.457
         }
       ],
       "termAverages": {
@@ -115,12 +115,12 @@
     "label": "SBOR-POX",
     "headline": "The native Bitcoin yield paid to STX stakers.",
     "kind": "staking yield",
-    "apy": 5.07,
-    "cycle": 141,
-    "cycleYieldPct": 0.198,
-    "btcPaid": 2.928688,
-    "stxLocked": 421543815,
-    "stxPerBtc": 284928.84,
+    "apy": 7.55,
+    "cycle": 142,
+    "cycleYieldPct": 0.2912,
+    "btcPaid": 4.4333,
+    "stxLocked": 441576024,
+    "stxPerBtc": 290095.92,
     "rateSource": "Bitflow",
     "rateQuoteImpactBps": 0,
     "note": "Paid in bitcoin against a position locked in STX, so the figure depends on the BTC/STX exchange rate rather than on either dollar price. It is a staking yield, not a lending rate, and is never blended into the lending indices."
@@ -133,10 +133,10 @@
         "asset": "USDC",
         "venue": "Aave V3, Ethereum",
         "comparableTo": "SBOR-USD",
-        "supply": 3.64,
-        "borrow": 4.3,
-        "utilization": 93.99,
-        "depthUsd": 138617590,
+        "supply": 3.71,
+        "borrow": 4.39,
+        "utilization": 93.87,
+        "depthUsd": 141961990,
         "pool": "aa70268e-4b52-42bf-a116-608b370f9501",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/aa70268e-4b52-42bf-a116-608b370f9501"
@@ -146,9 +146,9 @@
         "venue": "Aave V3, Ethereum",
         "comparableTo": "SBOR-BTC",
         "supply": 0,
-        "borrow": 0.33,
-        "utilization": 2.5,
-        "depthUsd": 2619295215,
+        "borrow": 0.32,
+        "utilization": 2.37,
+        "depthUsd": 2576532469,
         "pool": "7e382157-b1bc-406d-b17b-facba43b716e",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0x2260fac5e5542a773aa44fbcfedf7c193bc2c599&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/7e382157-b1bc-406d-b17b-facba43b716e"
@@ -159,8 +159,8 @@
         "comparableTo": "SBOR-BTC",
         "supply": 0,
         "borrow": 0.28,
-        "utilization": 0.64,
-        "depthUsd": 1459528308,
+        "utilization": 0.65,
+        "depthUsd": 1405279398,
         "pool": "b1986007-81f3-4150-9565-94d5a4066ce4",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/b1986007-81f3-4150-9565-94d5a4066ce4"
