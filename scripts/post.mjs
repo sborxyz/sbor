@@ -61,6 +61,7 @@ if (prior){
       moved.key === "borrow" ? a.borrow - b.borrow : b.supply - a.supply)[0];
 
     drafts.push({
+      rank: 50,
       why: `${label} ${moved.key} moved ${sign(moved.d)} bps`,
       text:
 `${label} ${moved.key} rate: ${pct(moved.then)} to ${pct(moved.now)}.
@@ -79,6 +80,7 @@ if (prior){
   const nowSet = new Set(Object.keys(latest.indices));
   const wasSet = new Set(Object.keys(prior).filter(k => k.startsWith("SBOR-") && k !== "SBOR-PoX" && k !== "SBOR-POX"));
   for (const label of nowSet) if (!wasSet.has(label)) drafts.push({
+    rank: 20,
     why: `${label} returned`,
     text:
 `${label} is publishing again.
@@ -90,6 +92,7 @@ It was omitted while the market could not be read. SBOR leaves an index out rath
 ${LINK}`
   });
   for (const label of wasSet) if (!nowSet.has(label)) drafts.push({
+    rank: 20,
     why: `${label} dropped out`,
     text:
 `${label} is not published today.
@@ -110,6 +113,7 @@ ${LINK}`
     const cycleChanged = was.cycle && now.cycle !== was.cycle;
     if (Math.abs(d) >= POX_MOVE_BPS || cycleChanged){
       drafts.push({
+        rank: cycleChanged ? 30 : 60,
         why: cycleChanged ? `PoX cycle ${was.cycle} to ${now.cycle}` : `PoX moved ${sign(d)} bps`,
         text: cycleChanged
 ? `Reward cycle ${now.cycle} settled.
@@ -139,6 +143,7 @@ if (prior){
       /* history rows do not carry per market utilisation, so only flag the
          extremes as a standing condition rather than a crossing */
       if (m.utilization >= UTIL_HIGH) drafts.push({
+        rank: 70,
         why: `${m.venue} ${m.asset} utilisation ${m.utilization}%`,
         text:
 `${m.venue} ${m.asset} is ${pct(m.utilization)} utilised.
@@ -150,13 +155,14 @@ Above 80% a lending market prices steeply, and withdrawals get harder.
 ${LINK}`
       });
       else if (m.utilization <= UTIL_LOW && m.depthUsd > 1e6) drafts.push({
+        rank: 80,
         why: `${m.venue} ${m.asset} utilisation ${m.utilization}%`,
         text:
 `${m.venue} ${m.asset}: $${(m.depthUsd/1e6).toFixed(1)}M supplied, ${pct(m.utilization)} of it borrowed.
 
 Borrow ${pct(m.borrow)}, supply ${pct(m.supply)}.
 
-Cheap money with capacity behind it.
+Low utilisation, so the rate is low and the capacity is unused.
 
 ${LINK}`
       });
@@ -190,6 +196,7 @@ ${LINK}`
     if (!best) continue;
 
     drafts.push({
+      rank: 10,
       why: `INVERSION on ${asset}: supply ${best.supplyAt.venue} ${best.supplyAt.supply}% vs borrow ${best.borrowAt.venue} ${best.borrowAt.borrow}%`,
       text:
 `${asset} is inverted across venues.
@@ -211,6 +218,7 @@ for (const [label, ix] of Object.entries(latest.indices)){
     const wasIx = prior && prior[label];
     if (wasIx && wasIx[`avg${days}`]) continue;   // only announce once
     drafts.push({
+      rank: 40,
       why: `${label} ${days}-day average first published`,
       text:
 `${label} now has a ${days} day average.
@@ -223,6 +231,12 @@ ${LINK}`
     });
   }
 }
+
+/* ---------- rank them ----------
+   Lowest number first. An inversion beats an index appearing, which beats a
+   cycle settling, which beats an ordinary rate move. Only the top one is
+   notified; the rest sit in post.txt if you want them. */
+drafts.sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
 
 /* ---------- write it out ---------- */
 const len = t => t.replace(/https?:\/\/\S+|sbor\.xyz/g, "").length + LINK_COST;
@@ -260,6 +274,8 @@ console.log(text);
 writeFileSync("post.json", JSON.stringify({
   fixing: latest.fixing,
   comparedWith: prior ? prior.date : null,
+  top: drafts.length ? { why: drafts[0].why, chars: len(drafts[0].text), text: drafts[0].text } : null,
+  otherCount: Math.max(0, drafts.length - 1),
   drafts: drafts.map(d => ({ why: d.why, chars: len(d.text), text: d.text }))
 }, null, 2) + "\n");
 
