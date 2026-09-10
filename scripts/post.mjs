@@ -255,6 +255,14 @@ const text = out.join("\n") + "\n";
 writeFileSync("post.txt", text);
 console.log(text);
 
+/* A JSON copy so a notifier can send one clean message per draft rather than
+   one wall of text. Not published, working file only. */
+writeFileSync("post.json", JSON.stringify({
+  fixing: latest.fixing,
+  comparedWith: prior ? prior.date : null,
+  drafts: drafts.map(d => ({ why: d.why, chars: len(d.text), text: d.text }))
+}, null, 2) + "\n");
+
 /* Tell the workflow whether there is anything worth a notification, so a quiet
    day stays quiet. */
 if (process.env.GITHUB_OUTPUT){
