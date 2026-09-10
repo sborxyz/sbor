@@ -68,12 +68,20 @@ supply rates across eligible lending markets:
 
 Weight is the lending depth of that market in that currency.
 
-Rate basis: venues publish on different bases and do not always label them
-consistently. Granite rates are compounded to APY from the annualised rate its
-curve returns. Zest rates are published as the contract returns them, and
-whether those values are nominal or compounded is under confirmation with the
-venue. The difference at current levels is a few basis points and is stated here
-rather than papered over.
+Rate basis: every published rate is an effective APY, continuously compounded.
+Both venues return nominal annual rates from their contracts, despite Zest
+naming its fields apy, which the venue has confirmed. Each is converted the same
+way, e^r - 1, so constituents are comparable. Every market also carries
+nominalBorrow and nominalSupply so the raw contract value stays visible.
+
+At current levels the conversion is worth a few basis points. On a market above
+its utilisation kink it is very large, which is why it is applied rather than
+ignored.
+
+Fixings published before methodology 1.6.0 used Zest's nominal figures
+unconverted, and are therefore slightly lower on the Zest-weighted portion. Past
+fixings are not rewritten. The methodology version recorded on each fixing
+identifies the basis it used.
 
 Protocol yield excluded: some assets carry yield from the asset itself rather
 than from lending. sBTC carries Bitcoin protocol yield through dual stacking.
