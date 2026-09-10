@@ -677,7 +677,6 @@ function renderChrome(){
   set("t-fullname", t.fullname);
   set("t-introH", t.introH); set("t-introP", t.introP); set("t-introUse", t.introUse);
   set("t-borrow-k", t.borrowK); set("t-supply-k", t.supplyK);
-  set("t-hist-h", t.histH + `<span class="secidx">${t.histFor(INDICES[current].label)}</span>`);
   set("t-hist-p", t.histP);
   set("t-extH", t.extH); set("t-extP", t.extP);
   const esec = document.getElementById("ext-sec");
@@ -710,7 +709,7 @@ function renderChrome(){
         POX.stxLocked.toLocaleString(lang === "pt" ? "pt-BR" : "en-US")));
     drawPox();
   } else { psec.hidden = true; }
-  set("t-cons-h", t.consH + `<span class="secidx">${t.histFor(INDICES[current].label)}</span>`); set("t-cons-foot", t.consFoot);
+  set("t-cons-foot", t.consFoot);
   set("t-method-h", t.methodH);
   set("t-signup-h", t.signupH); set("t-signup-p", t.signupP);
   set("t-devH", t.devH); set("t-devP", t.devP);
@@ -821,6 +820,10 @@ function renderTerms(){
 
 function render(){
   const ix = computed(current), t = T(), c = INDEX_COPY[current][lang];
+  /* These name the index being shown, so they belong here rather than in
+     renderChrome, which only runs on load and on a language change. */
+  set("t-hist-h", t.histH + `<span class="secidx">${t.histFor(ix.label)}</span>`);
+  set("t-cons-h", t.consH + `<span class="secidx">${t.histFor(ix.label)}</span>`);
   set("hl", c.headline);
   set("stamp", t.stamp(fixingDate));
   set("consNote", c.note);
