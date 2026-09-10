@@ -80,7 +80,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.6.0";
+const METHODOLOGY_VERSION = "1.7.0";
 
 /* Below this, on both sides at once, a funded market is not reporting. */
 const RATE_FLOOR = 0.05;
@@ -379,7 +379,7 @@ const main = async () => {
       "Currencies are never blended into a single figure.",
       "stSTXbtc is collateral only and is excluded from all fixings.",
       "Rates are quoted on the instrument actually lent. SBOR-BTC measures sBTC, not native bitcoin. SBOR-USD measures USDCx and USDh, not bank dollars.",
-      "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them. It is annualised from a single two week reward cycle, so a change in one cycle's payout moves it considerably.",
+      "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them. It is annualised from a single two week reward cycle, so a change in one cycle's payout moves it considerably. The BTC to STX rate used to convert it is averaged over seven days, with the spot quote published alongside, so the figure tracks staking economics rather than currency movement between fixings.",
       "externalReference shows the same asset class on the largest lending market outside Stacks. It is context for a reader, never a constituent, and never affects a fixing.",
       "utilization is the share of supplied capital currently borrowed. It is the reason a rate is where it is: a market with little borrowing pays its suppliers little, however large it is.",
       "Zest returns nominal annual rates despite its field names, confirmed with the venue. They are converted here to effective APY, e^r - 1, the same basis Granite's per-second compounding produces. Every market also carries nominalBorrow and nominalSupply so the raw figure is visible.",
