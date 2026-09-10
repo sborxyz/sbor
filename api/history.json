@@ -209,18 +209,25 @@
   },
   {
     "date": "2026-09-10",
-    "fixedAt": "2026-09-10T21:22:30Z",
+    "fixedAt": "2026-09-10T21:27:21Z",
     "methodologyVersion": "1.6.0",
     "SBOR-POX": {
-      "apy": 7.62,
+      "apy": 7.64,
       "cycle": 142
     },
     "SBOR-USD": {
-      "borrow": 1.45,
-      "supply": 0.26,
+      "borrow": 2.34,
+      "supply": 0.59,
+      "venues": 2,
+      "largestConstituentWeight": 0.6505,
+      "depthUsd": 15584120
+    },
+    "SBOR-STX": {
+      "borrow": 2.36,
+      "supply": 1.24,
       "venues": 1,
-      "largestConstituentWeight": 1,
-      "depthUsd": 5006674
+      "largestConstituentWeight": 0.5448,
+      "depthUsd": 4063723
     }
   }
 ]
