@@ -80,7 +80,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.5.0";
+const METHODOLOGY_VERSION = "1.6.0";
 
 /* Below this, on both sides at once, a funded market is not reporting. */
 const RATE_FLOOR = 0.05;
@@ -158,14 +158,23 @@ async function apysFor(asset){
   LAST_READER = used;
   const t = v?.value ?? v;                       // unwrap (ok ...) if present
   log(`    ${asset.symbol} via ${used}: ${JSON.stringify(v).slice(0,300)}`);
-  const supply = Number(t["supply-apy"]?.value ?? t["supply-apy"]) / 100;
-  const borrow = Number(t["borrow-apy"]?.value ?? t["borrow-apy"]) / 100;
+  /* Despite the field names, Zest returns nominal annual rates in basis points.
+     Confirmed with the venue: accrual is linear per interval, but the index
+     compounds on every interest-touching transaction, so realised yield sits
+     between the nominal figure and its continuous limit. We publish the
+     continuous limit, e^r - 1, which is the same basis Granite's per-second
+     compounding produces. Consistency between constituents matters more than
+     shaving a basis point off one of them. */
+  const supplyNominal = Number(t["supply-apy"]?.value ?? t["supply-apy"]) / 100;
+  const borrowNominal = Number(t["borrow-apy"]?.value ?? t["borrow-apy"]) / 100;
+  const supply = nominalToApy(supplyNominal);
+  const borrow = nominalToApy(borrowNominal);
   /* utilisation is published in the same tuple, in basis points */
   const utilRaw = Number(t["utilization"]?.value ?? t["utilization"]);
   const utilization = Number.isFinite(utilRaw) ? utilRaw / 100 : null;
   if (!Number.isFinite(supply) || !Number.isFinite(borrow))
     throw new Error(`unexpected shape: ${JSON.stringify(v).slice(0,200)}`);
-  return { supply, borrow, utilization };
+  return { supply, borrow, utilization, supplyNominal, borrowNominal };
 }
 
 /* Read a read-only function and return the plain JS value. */
@@ -237,9 +246,9 @@ const main = async () => {
   const markets = [];
   for (const a of ZEST.assets){
     try {
-      const { supply, borrow, utilization } = await apysFor(a);
+      const { supply, borrow, utilization, supplyNominal, borrowNominal } = await apysFor(a);
       const d = depth[a.symbol] ?? 0;
-      log(`  ${a.symbol}: supply=${round(supply)}% borrow=${round(borrow)}% util=${utilization == null ? "n/a" : round(utilization)+"%"} depth=${d}`);
+      log(`  ${a.symbol}: supply=${round(supply)}% borrow=${round(borrow)}% (nominal ${round(supplyNominal)}/${round(borrowNominal)}) util=${utilization == null ? "n/a" : round(utilization)+"%"} depth=${d}`);
       if (!a.currency){ log(`    (collateral only, excluded from fixings)`); continue; }
       if (d <= 0){ log(`    (no depth, skipped)`); continue; }
       /* Plausibility floor. A funded lending market does not price money at
@@ -254,6 +263,8 @@ const main = async () => {
         venue: ZEST.venue, asset: a.symbol, currency: a.currency,
         borrow: round(borrow), supply: round(supply),
         ...(utilization != null && { utilization: round(utilization) }),
+        nominalBorrow: round(borrowNominal),
+        nominalSupply: round(supplyNominal),
         ...(protoYield[a.symbol] != null && { protocolYield: protoYield[a.symbol] }),
         ...(YIELD_SOURCE[a.symbol] && { protocolYieldSource: YIELD_SOURCE[a.symbol] }),
         depthUsd: d, phaseIn: 1
@@ -332,7 +343,7 @@ const main = async () => {
     fixing: stamp,
     methodologyVersion: METHODOLOGY_VERSION,
     isDailyFixing: IS_FIXING,
-    basis:"Granite rates compounded to APY. Zest rates as the contract returns them, basis under confirmation with the venue.",
+    basis:"APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
     ...(LAST_READER && { zestDataContract: LAST_READER }),
     method:"https://sbor.xyz/llms.txt",
     source:"Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
@@ -349,6 +360,8 @@ const main = async () => {
       "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
       "externalReference shows the same asset class on the largest lending market outside Stacks. It is context for a reader, never a constituent, and never affects a fixing.",
       "utilization is the share of supplied capital currently borrowed. It is the reason a rate is where it is: a market with little borrowing pays its suppliers little, however large it is.",
+      "Zest returns nominal annual rates despite its field names, confirmed with the venue. They are converted here to effective APY, e^r - 1, the same basis Granite's per-second compounding produces. Every market also carries nominalBorrow and nominalSupply so the raw figure is visible.",
+      "Fixings before methodology 1.6.0 used Zest's nominal figures unconverted and are therefore a few basis points lower on the Zest-weighted portion. Past fixings are not rewritten; the version recorded on each one identifies the basis it used.",
       "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
       "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
       "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
