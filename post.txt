@@ -1,4 +1,4 @@
-SBOR post drafts, fixing 2026-09-10T23:28:26Z
+SBOR post drafts, fixing 2026-09-10T23:33:38Z
 Compared with 2026-09-09
 
 3 things worth saying. Pick one. Do not post more than one a day.
@@ -9,7 +9,7 @@ Reward cycle 142 settled.
 
 4.44 BTC paid to STX stackers, against 441,576,024 STX locked.
 
-SBOR-PoX: 5.07% to 7.81%.
+SBOR-PoX: 5.07% to 7.79%.
 
 sbor.xyz
 
