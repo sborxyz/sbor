@@ -379,7 +379,7 @@ const main = async () => {
       "Currencies are never blended into a single figure.",
       "stSTXbtc is collateral only and is excluded from all fixings.",
       "Rates are quoted on the instrument actually lent. SBOR-BTC measures sBTC, not native bitcoin. SBOR-USD measures USDCx and USDh, not bank dollars.",
-      "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them.",
+      "poxReference is a staking yield, not a lending rate. It is published beside the indices and never blended into them. It is annualised from a single two week reward cycle, so a change in one cycle's payout moves it considerably.",
       "externalReference shows the same asset class on the largest lending market outside Stacks. It is context for a reader, never a constituent, and never affects a fixing.",
       "utilization is the share of supplied capital currently borrowed. It is the reason a rate is where it is: a market with little borrowing pays its suppliers little, however large it is.",
       "Zest returns nominal annual rates despite its field names, confirmed with the venue. They are converted here to effective APY, e^r - 1, the same basis Granite's per-second compounding produces. Every market also carries nominalBorrow and nominalSupply so the raw figure is visible.",
@@ -415,7 +415,7 @@ const main = async () => {
       date: day,
       fixedAt: stamp,
       methodologyVersion: METHODOLOGY_VERSION,
-      ...(pox && { "SBOR-POX": { apy: pox.apy, cycle: pox.cycle } }),
+      ...(pox && { "SBOR-PoX": { apy: pox.apy, cycle: pox.cycle } }),
       ...Object.fromEntries(Object.entries(indices).map(([k,v]) => [k, {
         borrow: v.borrow, supply: v.supply,
         venues: v.venues.length,
