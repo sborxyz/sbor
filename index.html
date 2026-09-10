@@ -94,6 +94,7 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .bar.phase i{background:repeating-linear-gradient(45deg,var(--accent) 0 3px,transparent 3px 6px)}
 .terms td,.terms th{white-space:nowrap}
 .terms .pend{color:var(--ink-soft)}
+.poxchart{height:200px;margin-top:18px}
 .poxbox{border:1px solid var(--rule);padding:24px 26px 22px;
   background:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule-soft) 31px 32px)}
 .poxk{font-size:13.5px;color:var(--ink-soft)}
@@ -251,10 +252,12 @@ a{color:var(--accent)}
         </div>
       </div>
       <div class="poxbox">
-        <div class="poxk">SBOR-POX</div>
+        <div class="poxk">SBOR-PoX</div>
         <div class="poxv"><span class="num" id="poxVal">0.00</span><span class="pct">%</span></div>
         <div class="coverage" id="poxMeta" style="margin:10px 0 0"></div>
       </div>
+      <svg class="chart poxchart" id="poxChart" viewBox="0 0 1120 200" preserveAspectRatio="none" role="img" aria-label="PoX staking yield history"></svg>
+      <p class="coverage" id="poxChartNote" style="margin:10px 0 0"></p>
     </section>
 
     <section>
@@ -409,8 +412,10 @@ en:{
   termPending:"not yet",
   deltaBorrow:"", deltaSupply:"",
   poxH:"Bitcoin staking yield",
-  poxP:"What PoX currently pays STX stakers, in bitcoin, from what miners commit. This is a staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
-  poxMeta:(c,btc,stx)=>`Cycle ${c} · ${btc} BTC paid to stakers · ${stx} STX locked`,
+  poxP:"What PoX currently pays STX stakers, in bitcoin, from what miners commit. It is the bitcoin paid over one two week reward cycle, divided by the STX locked, annualised over the roughly 25 cycles in a year. Because the payout is in bitcoin against a position held in STX, the figure moves with the BTC to STX rate as well as with the payout itself. This is a staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
+  poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. The figure is annualised from one two week cycle, so it steps when a cycle settles and drifts in between with the BTC to STX rate.`,
+  poxChartThin:"Not enough history yet to draw this.",
+  poxMeta:(c,btc,stx)=>`Annualised from reward cycle ${c}, a two week period · ${btc} BTC paid to stakers · ${stx} STX locked · about 25 cycles a year`,
   csv:"Download CSV",
   devH:"Use the data",
   devP:"Everything on this page is available as JSON and plain text. The published fixing is free to read: no key, no rate limit, no registration. Build against v1 and it will not change shape under you.",
@@ -479,8 +484,12 @@ pt:{
   termPending:"ainda não",
   deltaBorrow:"", deltaSupply:"",
   poxH:"Rendimento do staking de bitcoin",
-  poxP:"O que o PoX paga hoje a quem faz staking de STX, em bitcoin, a partir do que os mineradores comprometem. É um rendimento de staking sobre uma posição travada, não uma taxa de crédito, por isso fica ao lado dos índices e nunca dentro deles.",
-  poxMeta:(c,btc,stx)=>`Ciclo ${c} · ${btc} BTC pagos a stakers · ${stx} STX travados`,
+  poxP:"O que o PoX paga hoje a quem faz staking de STX, em bitcoin, a partir do que os mineradores comprometem. É o bitcoin pago em um ciclo de recompensa de duas semanas, dividido pelo STX travado, anualizado sobre os cerca de 25 ciclos do ano. Como o pagamento é em bitcoin sobre uma posição mantida em STX, o número se move tanto com a relação BTC para STX quanto com o próprio pagamento. É um rendimento de staking sobre uma posição travada, não uma taxa de crédito, por isso fica ao lado dos índices e nunca dentro deles.",
+  poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. The figure is annualised from one two week cycle, so it steps when a cycle settles and drifts in between with the BTC to STX rate.`,
+  poxChartThin:"Not enough history yet to draw this.",
+  poxChartNote:(n,first,last)=>`${n} leituras diárias, de ${first} a ${last}. O número é anualizado a partir de um ciclo de duas semanas, então ele dá saltos quando um ciclo fecha e oscila entre eles junto com a relação BTC para STX.`,
+  poxChartThin:"Ainda não há histórico suficiente para desenhar isso.",
+  poxMeta:(c,btc,stx)=>`Anualizado a partir do ciclo de recompensa ${c}, um período de duas semanas · ${btc} BTC pagos a stakers · ${stx} STX travados · cerca de 25 ciclos por ano`,
   csv:"Baixar CSV",
   devH:"Use os dados",
   devP:"Tudo nesta página está disponível em JSON e texto puro. O fixing publicado é livre para leitura: sem chave, sem limite de requisições, sem cadastro. Construa sobre a v1 e o formato não muda embaixo de você.",
@@ -695,6 +704,7 @@ function renderChrome(){
     document.getElementById("poxVal").textContent = POX.apy.toFixed(2);
     set("poxMeta", t.poxMeta(POX.cycle, POX.btcPaid.toFixed(3),
         POX.stxLocked.toLocaleString(lang === "pt" ? "pt-BR" : "en-US")));
+    drawPox();
   } else { psec.hidden = true; }
   set("t-cons-h", t.consH); set("t-cons-foot", t.consFoot);
   set("t-method-h", t.methodH);
@@ -742,6 +752,46 @@ function renderChrome(){
 }
 
 let TERM_DATA = {};   /* label -> { termAverages, seriesBegan } from latest.json */
+
+/* PoX is charted on its own, never in the lending index chart, because a
+   staking yield and a lending rate are different instruments. */
+function drawPox(){
+  const el = document.getElementById("poxChart");
+  const note = document.getElementById("poxChartNote");
+  const t = T();
+  if (!el) return;
+  const rows = HISTORY
+    .map(r => ({ date:r.date, e: r["SBOR-PoX"] || r["SBOR-POX"] }))
+    .filter(r => r.e && typeof r.e.apy === "number");
+  if (rows.length < 2){
+    el.innerHTML = `<text x="560" y="100" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" fill="#5C646B">${t.poxChartThin}</text>`;
+    set("poxChartNote",""); return;
+  }
+  const v = rows.map(r => r.e.apy);
+  const span = (Math.max(...v) - Math.min(...v)) || 1;
+  const lo = Math.min(...v) - span*0.3, hi = Math.max(...v) + span*0.3;
+  const W=1120,H=200,PL=58,PR=14,PT=16,PB=24;
+  const x = i => PL + i*(W-PL-PR)/(rows.length-1);
+  const y = n => PT + (hi-n)*(H-PT-PB)/(hi-lo);
+  let g = "";
+  for (let k=0;k<=3;k++){
+    const n = lo+(hi-lo)*k/3, yy = y(n);
+    g += `<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="#DEE1D8"/>`;
+    g += `<text x="${PL-10}" y="${yy+4}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" fill="#5C646B">${n.toFixed(1)}%</text>`;
+  }
+  /* mark where the reward cycle changed, since that is what steps the rate */
+  rows.forEach((r,i) => {
+    if (i && r.e.cycle && rows[i-1].e.cycle && r.e.cycle !== rows[i-1].e.cycle){
+      g += `<line x1="${x(i).toFixed(1)}" y1="${PT}" x2="${x(i).toFixed(1)}" y2="${H-PB}" stroke="#A2452F" stroke-width="1" stroke-dasharray="4 4"/>`;
+      g += `<text x="${(x(i)+6).toFixed(1)}" y="${PT+13}" font-family="IBM Plex Mono" font-size="11" fill="#A2452F">cycle ${r.e.cycle}</text>`;
+    }
+  });
+  g += `<text x="${PL}" y="${H-7}" font-family="IBM Plex Mono" font-size="11" fill="#5C646B">${rows[0].date}</text>`;
+  g += `<text x="${W-PR}" y="${H-7}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" fill="#5C646B">${rows[rows.length-1].date}</text>`;
+  g += `<path d="${v.map((n,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(n).toFixed(1)).join(" ")}" fill="none" stroke="#1D4E6B" stroke-width="2"/>`;
+  el.innerHTML = g;
+  set("poxChartNote", t.poxChartNote(rows.length, rows[0].date, rows[rows.length-1].date));
+}
 
 function renderTerms(){
   const t = T();
@@ -809,10 +859,10 @@ document.getElementById("signupForm").addEventListener("submit", async e=>{
 });
 
 document.getElementById("csvBtn").addEventListener("click", ()=>{
-  const labels = ["SBOR-USD","SBOR-BTC","SBOR-STX","SBOR-POX"];
-  const head = ["date", ...labels.flatMap(l => l==="SBOR-POX" ? [`${l}_apy`] : [`${l}_borrow`,`${l}_supply`])];
+  const labels = ["SBOR-USD","SBOR-BTC","SBOR-STX","SBOR-PoX"];
+  const head = ["date", ...labels.flatMap(l => l==="SBOR-PoX" ? [`${l}_apy`] : [`${l}_borrow`,`${l}_supply`])];
   const rows = HISTORY.map(r => [r.date, ...labels.flatMap(l =>
-    l==="SBOR-POX" ? [r[l]?.apy ?? ""] : [r[l]?.borrow ?? "", r[l]?.supply ?? ""])]);
+    l==="SBOR-PoX" ? [r[l]?.apy ?? ""] : [r[l]?.borrow ?? "", r[l]?.supply ?? ""])]);
   const csv = [head, ...rows].map(x => x.join(",")).join("\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type:"text/csv" }));
