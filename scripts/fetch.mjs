@@ -121,6 +121,9 @@ const YIELD_SOURCE = {
 };
 
 const round = (n, d = 2) => Number(Number(n).toFixed(d));
+/* Nominal annual rate to effective APY, continuously compounded. Both venues
+   return nominal figures, so both are converted the same way. */
+const nominalToApy = pct => (Math.exp(pct / 100) - 1) * 100;
 /* One run per day is the official fixing and is the only run written to
    history. Other runs refresh the current reading only. */
 const IS_FIXING = process.env.SBOR_FIXING === "1";
@@ -238,7 +241,20 @@ async function graniteMarket(){
   return { borrow, supply, utilization: ur * 100, totalAssetsRaw: totalAssets };
 }
 
+/* Fail fast if a helper is missing or wrong, rather than discovering it one
+   market at a time as an exclusion. */
+function selfCheck(){
+  const cases = [[0, 0], [2.72, 2.757], [80, 122.554]];
+  for (const [nominal, expected] of cases){
+    const got = nominalToApy(nominal);
+    if (!Number.isFinite(got) || Math.abs(got - expected) > 0.01)
+      throw new Error(`nominalToApy(${nominal}) returned ${got}, expected about ${expected}`);
+  }
+  log("self-check passed: rate conversion");
+}
+
 const main = async () => {
+  selfCheck();
   const depth = await depthBySymbol();
   log("depth from DefiLlama:", JSON.stringify(depth));
   const protoYield = await protocolYields();
@@ -273,6 +289,12 @@ const main = async () => {
       log(`  ${a.symbol}: read failed, excluded. ${e.message}`);
     }
   }
+  /* If every market at a venue fails, that is a fault on our side or a
+     migration at theirs, not a market that stopped reporting. Publishing a
+     fixing without it would silently redefine the index. Abort instead. */
+  if (!markets.length)
+    throw new Error("No Zest market could be read. Aborting rather than publishing a fixing without the largest venue.");
+
   /* Granite, USDCx market. Depth read on-chain, USDCx is dollar denominated. */
   try {
     const g = await graniteMarket();
