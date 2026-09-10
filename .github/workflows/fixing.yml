@@ -37,7 +37,7 @@ jobs:
         run: |
           git config user.name  "sbor-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A api latest.txt post.txt
+          git add -A api latest.txt post.txt post.json
           if git diff --staged --quiet; then
             echo "No change, nothing to commit."
           else
@@ -46,23 +46,43 @@ jobs:
           fi
 
       # Only pings when something actually moved. A quiet day stays quiet.
+      # One message per draft, so each arrives ready to copy and paste.
       - name: Notify if there is something to post
         if: steps.draft.outputs.has_drafts == 'true'
         env:
           TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
-          COUNT: ${{ steps.draft.outputs.draft_count }}
         run: |
           if [ -z "$TG_TOKEN" ]; then
             echo "No Telegram token set, skipping notification."
             exit 0
           fi
-          BODY=$(head -c 3200 post.txt)
-          MSG=$(printf 'SBOR: %s thing(s) worth posting today.\n\n%s\n\nsbor.xyz/post.txt' "$COUNT" "$BODY")
-          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
-            --data-urlencode "chat_id=$TG_CHAT" \
-            --data-urlencode "disable_web_page_preview=true" \
-            --data-urlencode "text=$MSG" > /dev/null
+          node -e '
+            const fs = require("fs");
+            const d = JSON.parse(fs.readFileSync("post.json", "utf8"));
+            const token = process.env.TG_TOKEN, chat = process.env.TG_CHAT;
+            const send = async text => {
+              const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                  chat_id: chat, text,
+                  disable_web_page_preview: true,
+                  link_preview_options: { is_disabled: true }
+                })
+              });
+              if (!r.ok) console.error("telegram", r.status, await r.text());
+            };
+            (async () => {
+              const n = d.drafts.length;
+              await send(`SBOR ${d.fixing.slice(0,10)}: ${n} thing${n>1?"s":""} worth posting.\nEach one below is ready to paste. Post at most one.`);
+              for (const x of d.drafts){
+                await send(x.text);
+                await new Promise(r => setTimeout(r, 400));
+              }
+              await send("Check the numbers against the site before posting. Never state a cause.");
+            })();
+          '
           echo "Notified."
 
       # Silence is not success. If the fixing breaks, say so.
