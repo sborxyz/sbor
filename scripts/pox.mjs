@@ -1,5 +1,5 @@
 /**
- * SBOR-POX: the native Bitcoin staking yield on Stacks.
+ * SBOR-PoX: the native Bitcoin staking yield on Stacks.
  *
  * PoX pays stackers in BTC from what miners commit. The rate is therefore
  *   cycle yield = BTC paid to stackers over one cycle, in USD
@@ -119,9 +119,12 @@ export async function poxReference(){
       `${cyclesPerYear.toFixed(2)} cycles a year`);
 
   return {
-    label: "SBOR-POX",
+    label: "SBOR-PoX",
     headline: "The native Bitcoin yield paid to STX stakers.",
     kind: "staking yield",
+    period: "one reward cycle, about two weeks",
+    cyclesPerYear: round(cyclesPerYear, 2),
+    annualisation: "Bitcoin paid over one reward cycle divided by STX locked, annualised over the cycles in a year.",
     apy: round(apy),
     cycle: target,
     cycleYieldPct: round(cycleYield*100, 4),
@@ -130,7 +133,7 @@ export async function poxReference(){
     stxPerBtc: round(rate, 2),
     rateSource,
     ...(priceImpactBps != null && { rateQuoteImpactBps: priceImpactBps }),
-    note: "Paid in bitcoin against a position locked in STX, so the figure depends on the BTC/STX exchange rate rather than on either dollar price. It is a staking yield, not a lending rate, and is never blended into the lending indices."
+    note: "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualised. Because the payout is in bitcoin against a position held in STX, the figure moves with the BTC to STX rate as well as with the payout itself. It is a staking yield, not a lending rate, and is never blended into the lending indices."
   };
 }
 
