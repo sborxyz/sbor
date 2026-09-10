@@ -69,6 +69,7 @@ header{border-bottom:1px solid var(--rule)}
 section{padding:44px 0;border-bottom:1px solid var(--rule)}
 .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
 .sec-h h2{font-size:17px;font-weight:600}
+.secidx{color:var(--accent);font-weight:500}
 .sec-h p{color:var(--ink-soft);font-size:13.5px;max-width:56ch}
 .ranges{display:flex;gap:4px}
 .ranges button{font:inherit;font-size:13px;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:4px 11px;border-radius:2px;cursor:pointer}
@@ -427,6 +428,7 @@ en:{
   footSource:"Source on GitHub",
   footContact:"contact@sbor.xyz",
   histH:"History",
+  histFor:l=>` · ${l}`,
   histP:"Daily closes since the index began. A moving average is shown only once the full window exists.",
   notEnough:"Not enough history yet to draw this range.",
   backfillNote:(n,total)=>`Shaded span: ${n} of ${total} days reconstructed from DefiLlama daily records. Reconstructed days carry a supply rate only, since no borrow history exists for these markets. Unshaded days are the live record.`,
@@ -501,6 +503,7 @@ pt:{
   footSource:"Código no GitHub",
   footContact:"contact@sbor.xyz",
   histH:"Histórico",
+  histFor:l=>` · ${l}`,
   histP:"Fechamentos diários desde o início do índice. A média móvel só aparece quando existe janela completa de dados.",
   notEnough:"Ainda não há histórico suficiente para desenhar este período.",
   backfillNote:(n,total)=>`Faixa sombreada: ${n} de ${total} dias reconstruídos a partir dos registros diários da DefiLlama. Dias reconstruídos têm apenas a taxa de depósito, já que não existe histórico de empréstimo para esses mercados. Os dias sem sombra são o registro ao vivo.`,
@@ -674,7 +677,8 @@ function renderChrome(){
   set("t-fullname", t.fullname);
   set("t-introH", t.introH); set("t-introP", t.introP); set("t-introUse", t.introUse);
   set("t-borrow-k", t.borrowK); set("t-supply-k", t.supplyK);
-  set("t-hist-h", t.histH); set("t-hist-p", t.histP);
+  set("t-hist-h", t.histH + `<span class="secidx">${t.histFor(INDICES[current].label)}</span>`);
+  set("t-hist-p", t.histP);
   set("t-extH", t.extH); set("t-extP", t.extP);
   const esec = document.getElementById("ext-sec");
   if (EXTERNAL && EXTERNAL.markets && EXTERNAL.markets.length){
@@ -706,7 +710,7 @@ function renderChrome(){
         POX.stxLocked.toLocaleString(lang === "pt" ? "pt-BR" : "en-US")));
     drawPox();
   } else { psec.hidden = true; }
-  set("t-cons-h", t.consH); set("t-cons-foot", t.consFoot);
+  set("t-cons-h", t.consH + `<span class="secidx">${t.histFor(INDICES[current].label)}</span>`); set("t-cons-foot", t.consFoot);
   set("t-method-h", t.methodH);
   set("t-signup-h", t.signupH); set("t-signup-p", t.signupP);
   set("t-devH", t.devH); set("t-devP", t.devP);
