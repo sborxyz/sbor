@@ -413,10 +413,10 @@ en:{
   termPending:"not yet",
   deltaBorrow:"", deltaSupply:"",
   poxH:"Bitcoin staking yield",
-  poxP:"What PoX currently pays STX stakers, in bitcoin, from what miners commit. It is the bitcoin paid over one two week reward cycle, divided by the STX locked, annualised over the roughly 25 cycles in a year. Because the payout is in bitcoin against a position held in STX, the figure moves with the BTC to STX rate as well as with the payout itself. This is a staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
+  poxP:"What PoX currently pays STX stakers, in bitcoin, from what miners commit. It is the bitcoin paid over one two week reward cycle, divided by the STX locked, annualised over the roughly 25 cycles in a year. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over seven days rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. This is a staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
   poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. The figure is annualised from one two week cycle, so it steps when a cycle settles and drifts in between with the BTC to STX rate.`,
   poxChartThin:"Not enough history yet to draw this.",
-  poxMeta:(c,btc,stx)=>`Annualised from reward cycle ${c}, a two week period · ${btc} BTC paid to stakers · ${stx} STX locked · about 25 cycles a year`,
+  poxMeta:(c,btc,stx,x)=>`Annualised from reward cycle ${c}, a two week period · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over ${"7"} days`,
   csv:"Download CSV",
   devH:"Use the data",
   devP:"Everything on this page is available as JSON and plain text. The published fixing is free to read: no key, no rate limit, no registration. Build against v1 and it will not change shape under you.",
@@ -486,12 +486,12 @@ pt:{
   termPending:"ainda não",
   deltaBorrow:"", deltaSupply:"",
   poxH:"Rendimento do staking de bitcoin",
-  poxP:"O que o PoX paga hoje a quem faz staking de STX, em bitcoin, a partir do que os mineradores comprometem. É o bitcoin pago em um ciclo de recompensa de duas semanas, dividido pelo STX travado, anualizado sobre os cerca de 25 ciclos do ano. Como o pagamento é em bitcoin sobre uma posição mantida em STX, o número se move tanto com a relação BTC para STX quanto com o próprio pagamento. É um rendimento de staking sobre uma posição travada, não uma taxa de crédito, por isso fica ao lado dos índices e nunca dentro deles.",
+  poxP:"O que o PoX paga hoje a quem faz staking de STX, em bitcoin, a partir do que os mineradores comprometem. É o bitcoin pago em um ciclo de recompensa de duas semanas, dividido pelo STX travado, anualizado sobre os cerca de 25 ciclos do ano. O pagamento é em bitcoin sobre uma posição mantida em STX, então o número depende da relação BTC para STX. Essa relação é a média de sete dias, e não a cotação do instante do fixing, para que o rendimento publicado descreva a economia do staking e não a oscilação da moeda entre um fixing e outro. A cotação à vista é publicada ao lado. É um rendimento de staking sobre uma posição travada, não uma taxa de crédito, por isso fica ao lado dos índices e nunca dentro deles.",
   poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. The figure is annualised from one two week cycle, so it steps when a cycle settles and drifts in between with the BTC to STX rate.`,
   poxChartThin:"Not enough history yet to draw this.",
   poxChartNote:(n,first,last)=>`${n} leituras diárias, de ${first} a ${last}. O número é anualizado a partir de um ciclo de duas semanas, então ele dá saltos quando um ciclo fecha e oscila entre eles junto com a relação BTC para STX.`,
   poxChartThin:"Ainda não há histórico suficiente para desenhar isso.",
-  poxMeta:(c,btc,stx)=>`Anualizado a partir do ciclo de recompensa ${c}, um período de duas semanas · ${btc} BTC pagos a stakers · ${stx} STX travados · cerca de 25 ciclos por ano`,
+  poxMeta:(c,btc,stx,x)=>`Anualizado a partir do ciclo de recompensa ${c}, um período de duas semanas · ${btc} BTC pagos a stakers · ${stx} STX travados · convertido a ${x} STX por BTC, média de ${"7"} dias`,
   csv:"Baixar CSV",
   devH:"Use os dados",
   devP:"Tudo nesta página está disponível em JSON e texto puro. O fixing publicado é livre para leitura: sem chave, sem limite de requisições, sem cadastro. Construa sobre a v1 e o formato não muda embaixo de você.",
@@ -705,8 +705,10 @@ function renderChrome(){
   if (POX){
     psec.hidden = false;
     document.getElementById("poxVal").textContent = POX.apy.toFixed(2);
+    const loc = lang === "pt" ? "pt-BR" : "en-US";
     set("poxMeta", t.poxMeta(POX.cycle, POX.btcPaid.toFixed(3),
-        POX.stxLocked.toLocaleString(lang === "pt" ? "pt-BR" : "en-US")));
+        POX.stxLocked.toLocaleString(loc),
+        Math.round(POX.stxPerBtcSmoothed ?? POX.stxPerBtc).toLocaleString(loc)));
     drawPox();
   } else { psec.hidden = true; }
   set("t-cons-foot", t.consFoot);
