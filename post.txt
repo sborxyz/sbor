@@ -1,4 +1,4 @@
-SBOR post drafts, fixing 2026-09-10T23:33:38Z
+SBOR post drafts, fixing 2026-09-10T23:39:08Z
 Compared with 2026-09-09
 
 3 things worth saying. Pick one. Do not post more than one a day.
@@ -9,27 +9,27 @@ Reward cycle 142 settled.
 
 4.44 BTC paid to STX stackers, against 441,576,024 STX locked.
 
-SBOR-PoX: 5.07% to 7.79%.
+SBOR-PoX: 5.07% to 7.83%.
 
 sbor.xyz
 
---- 2. Zest V2 stSTX utilisation 8.7% (144 chars)
+--- 2. Zest V2 STX utilisation 83.44% (157 chars)
+
+Zest V2 STX is 83.44% utilised.
+
+Borrow 3.49%, supply 2.60%.
+
+Above 80% a lending market prices steeply, and withdrawals get harder.
+
+sbor.xyz
+
+--- 3. Zest V2 stSTX utilisation 8.7% (171 chars)
 
 Zest V2 stSTX: $2.2M supplied, 8.70% of it borrowed.
 
 Borrow 1.40%, supply 0.10%.
 
-Cheap money with capacity behind it.
-
-sbor.xyz
-
---- 3. Zest V2 STX utilisation 83.33% (157 chars)
-
-Zest V2 STX is 83.33% utilised.
-
-Borrow 3.48%, supply 2.58%.
-
-Above 80% a lending market prices steeply, and withdrawals get harder.
+Low utilisation, so the rate is low and the capacity is unused.
 
 sbor.xyz
 
