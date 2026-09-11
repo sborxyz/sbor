@@ -64,7 +64,7 @@ header{border-bottom:1px solid var(--rule)}
 .rate-v{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
   font-size:clamp(50px,9.4vw,98px);line-height:.98;font-weight:500;letter-spacing:-.03em;margin-top:6px;color:var(--accent)}
 .rate-v .pct{font-size:.42em;font-weight:400;letter-spacing:0;margin-left:.08em;color:var(--ink-soft)}
-.delta{margin-top:10px;font-size:14px;font-family:"IBM Plex Mono",monospace;color:var(--ink-soft)}
+.delta{margin-top:10px;font-size:14px;font-family:"IBM Plex Mono",monospace;color:var(--up)}
 
 section{padding:44px 0;border-bottom:1px solid var(--rule)}
 .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
@@ -95,6 +95,8 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .bar.phase i{background:repeating-linear-gradient(45deg,var(--accent) 0 3px,transparent 3px 6px)}
 .terms td,.terms th{white-space:nowrap}
 .terms .pend{color:var(--ink-soft)}
+.invbox{border:1px solid var(--rule);border-left:2px solid var(--down);padding:16px 18px;margin-bottom:8px;font-size:15px}
+.invnone{color:var(--ink-soft);font-size:15px}
 .poxchart{height:200px;margin-top:18px}
 .poxbox{border:1px solid var(--rule);padding:24px 26px 22px;
   background:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule-soft) 31px 32px)}
@@ -228,6 +230,17 @@ a{color:var(--accent)}
           <tbody id="termsBody"></tbody>
         </table>
       </div>
+    </section>
+
+    <section id="inv-sec" hidden>
+      <div class="sec-h">
+        <div>
+          <h2 id="t-invH"></h2>
+          <p id="t-invP"></p>
+        </div>
+      </div>
+      <div id="invBody"></div>
+      <p class="coverage" id="invMeta" style="margin:12px 0 0"></p>
     </section>
 
     <section id="ext-sec" hidden>
@@ -364,6 +377,7 @@ a{color:var(--accent)}
       <div class="footlinks">
         <span id="t-footMethod"></span>
         <a href="https://github.com/sborxyz/sbor" id="ghLink" target="_blank" rel="noopener"></a>
+        <a href="https://github.com/sborxyz/sbor/blob/main/LICENCE-DATA.md" id="licLink" target="_blank" rel="noopener"></a>
         <a href="mailto:contact@sbor.xyz" id="mailLink"></a>
         <a href="https://x.com/SBORindex" target="_blank" rel="noopener">@SBORindex</a>
         <span>sbor.xyz · sbor.btc · sbor.stx</span>
@@ -403,6 +417,12 @@ en:{
   stamp:d=>`Rate as of <span class="num">${d}</span> · read from Zest contract state · updated daily`,
   borrowK:"Borrow APY", supplyK:"Supply APY",
   allIn:v=>`${v.toFixed(2)}% all in, with protocol yield`,
+  invH:"Inversions",
+  invP:"An inversion is the same asset costing less to borrow at one venue than it pays to supply at another. It should not happen, because that spread is how a lending protocol earns. Incentives can cause it. SBOR publishes any it finds to everyone at once, never to a private channel, and does not trade on its own rate.",
+  invNone:"No inversion found.",
+  invValidating:"This monitor is being validated. Detections are published so the validation period is visible, but they have not yet been proven over a long enough run to be relied on.",
+  invRow:(a,sv,sr,bv,br,e)=>`${a}: supplying at ${sv} pays ${sr}, borrowing the same asset at ${bv} costs ${br}. ${e} bps, before fees, gas and liquidation risk.`,
+  invChecked:t=>`Checked ${t}, hourly.`,
   extH:"Outside Stacks",
   extP:"The same asset class on the largest lending markets off this chain, shown for comparison. The deepest pool on each chain is used, so the venue can change. These are not constituents of any SBOR index and never enter a fixing.",
   extCols:["Market","Borrow","Supply","Utilisation","Depth","Compare with"],
@@ -426,6 +446,7 @@ en:{
   indep:'SBOR is an independent benchmark for the <a href="https://www.stacks.co" target="_blank" rel="noopener">Stacks</a> ecosystem. It is not affiliated with Stacks, the Stacks Foundation, or any venue it measures.',
   footMethod:v=>`Methodology ${v}`,
   footSource:"Source on GitHub",
+  footLicence:"Data licence",
   footContact:"contact@sbor.xyz",
   histH:"History",
   histFor:l=>` · ${l}`,
@@ -466,7 +487,7 @@ en:{
   signupSending:"Sending...",
   signupOk:"You are subscribed. The first report lands on Monday.",
   signupErr:"That did not go through. Try again, or email contact@sbor.xyz",
-  disclaimer:"SBOR is published as a public good and is provided as is, without warranty. It is a statistic, not investment advice, and nobody earns SBOR. It is a tool for making better decisions, not a recommendation to make any. Rates are read from contract state on Stacks mainnet."
+  disclaimer:"The published fixings are free to use, including commercially, with no permission required and no licence to negotiate. Agents are explicitly welcome. SBOR is provided as is, without warranty. It is a statistic, not investment advice, and nobody earns SBOR. It is a tool for making better decisions, not a recommendation to make any. Rates are read from contract state on Stacks mainnet."
 },
 pt:{
   fullname:"Taxa de Referência de Bitcoin da Stacks",
@@ -476,6 +497,12 @@ pt:{
   stamp:d=>`Taxa em <span class="num">${d}</span> · lida do estado dos contratos da Zest · atualizada diariamente`,
   borrowK:"APY de empréstimo", supplyK:"APY de depósito",
   allIn:v=>`${v.toFixed(2)}% no total, com o rendimento do protocolo`,
+  invH:"Inversões",
+  invP:"Uma inversão é o mesmo ativo custando menos para tomar emprestado em uma plataforma do que ele paga para depositar em outra. Não deveria acontecer, porque esse spread é como um protocolo de crédito ganha. Incentivos podem provocar isso. O SBOR publica qualquer inversão que encontrar para todos ao mesmo tempo, nunca em canal privado, e não opera em cima da própria taxa.",
+  invNone:"Nenhuma inversão encontrada.",
+  invValidating:"Este monitor está em validação. As detecções são publicadas para que o período de validação fique visível, mas ainda não foram comprovadas por tempo suficiente para servirem de base.",
+  invRow:(a,sv,sr,bv,br,e)=>`${a}: depositar na ${sv} paga ${sr}, tomar o mesmo ativo emprestado na ${bv} custa ${br}. ${e} pontos-base, antes de taxas, gas e risco de liquidação.`,
+  invChecked:t=>`Verificado ${t}, de hora em hora.`,
   extH:"Fora da Stacks",
   extP:"A mesma classe de ativo nos maiores mercados de crédito fora desta rede, mostrada para comparação. É usado o pool mais profundo de cada rede, então a plataforma pode mudar. Não são componentes de nenhum índice SBOR e nunca entram em um fixing.",
   extCols:["Mercado","Empréstimo","Depósito","Utilização","Profundidade","Comparar com"],
@@ -501,6 +528,7 @@ pt:{
   indep:'O SBOR é uma referência independente para o ecossistema <a href="https://www.stacks.co" target="_blank" rel="noopener">Stacks</a>. Não tem vínculo com a Stacks, com a Stacks Foundation nem com qualquer plataforma que mede.',
   footMethod:v=>`Metodologia ${v}`,
   footSource:"Código no GitHub",
+  footLicence:"Licença dos dados",
   footContact:"contact@sbor.xyz",
   histH:"Histórico",
   histFor:l=>` · ${l}`,
@@ -541,7 +569,7 @@ pt:{
   signupSending:"Enviando...",
   signupOk:"Inscrição confirmada. O primeiro relatório chega na segunda.",
   signupErr:"Não foi possível enviar. Tente de novo ou escreva para contact@sbor.xyz",
-  disclaimer:"O SBOR é publicado como bem público e fornecido como está, sem garantia. É uma estatística, não uma recomendação de investimento, e ninguém recebe SBOR. É uma ferramenta para decidir melhor, não uma orientação sobre o que decidir. As taxas são lidas do estado dos contratos na mainnet da Stacks."
+  disclaimer:"Os fixings publicados são livres para uso, inclusive comercial, sem necessidade de permissão e sem licença a negociar. Agentes são explicitamente bem-vindos. O SBOR é fornecido como está, sem garantia. É uma estatística, não uma recomendação de investimento, e ninguém recebe SBOR. É uma ferramenta para decidir melhor, não uma orientação sobre o que decidir. As taxas são lidas do estado dos contratos na mainnet da Stacks."
 }};
 
 const INDEX_COPY = {
@@ -593,6 +621,7 @@ let HISTORY = [];   /* filled by boot() from api/v1/history.json */
 let POX = null;     /* filled by boot() from api/v1/latest.json */
 let METHOD_VERSION = "1.0.0";
 let EXTERNAL = null;   /* filled by boot() from api/v1/latest.json */
+let INVERSIONS = null; /* filled by boot() from api/v1/inversions.json */
 
 const movingAvg = (arr,w) => arr.map((_,i)=>{
   const win = arr.slice(Math.max(0,i-w+1), i+1);
@@ -678,6 +707,20 @@ function renderChrome(){
   set("t-introH", t.introH); set("t-introP", t.introP); set("t-introUse", t.introUse);
   set("t-borrow-k", t.borrowK); set("t-supply-k", t.supplyK);
   set("t-hist-p", t.histP);
+  set("t-invH", t.invH); set("t-invP", t.invP);
+  const isec = document.getElementById("inv-sec");
+  if (INVERSIONS){
+    isec.hidden = false;
+    const list = INVERSIONS.inversions || [];
+    set("invBody", list.length
+      ? list.map(f => `<div class="invbox">${t.invRow(f.asset, f.supplyVenue,
+          f.supplyRate.toFixed(2)+"%", f.borrowVenue, f.borrowRate.toFixed(2)+"%",
+          f.edgeBps)}</div>`).join("")
+      : `<div class="invnone">${t.invNone}</div>`);
+    const bits = [t.invChecked(INVERSIONS.checked)];
+    if (INVERSIONS.status === "validating") bits.push(t.invValidating);
+    set("invMeta", bits.join(" "));
+  } else { isec.hidden = true; }
   set("t-extH", t.extH); set("t-extP", t.extP);
   const esec = document.getElementById("ext-sec");
   if (EXTERNAL && EXTERNAL.markets && EXTERNAL.markets.length){
@@ -725,6 +768,7 @@ function renderChrome(){
   set("t-footMethod", t.footMethod(METHOD_VERSION));
   document.getElementById("ghLink").textContent = t.footSource;
   document.getElementById("ghLink").href = GITHUB;
+  document.getElementById("licLink").textContent = t.footLicence;
   document.getElementById("mailLink").textContent = t.footContact;
   document.getElementById("csvBtn").textContent = t.csv;
   const usd = computed("USD");
@@ -834,6 +878,11 @@ function render(){
   set("coverage", t.coverage(venues, (largest*100).toFixed(0)));
   settle(document.getElementById("borrowVal"), ix.borrow);
   settle(document.getElementById("supplyVal"), ix.supply);
+  /* What a supplier actually receives, where protocol yield applies. The
+     fixing above is the lending rate alone. */
+  document.getElementById("borrowDelta").innerHTML = "";
+  document.getElementById("supplyDelta").innerHTML =
+    (ix.allInSupply - ix.supply) >= 0.01 ? t.allIn(ix.allInSupply) : "";
   set("rows", ix.markets.map(m=>`
     <tr>
       <td>${VENUE_URL[m.venue]
@@ -842,7 +891,7 @@ function render(){
       <td class="r num">${fmt(m.borrow)}%</td>
       <td class="r num">${fmt(m.supply)}%</td>
       <td class="r num hide-sm">${m.utilization == null ? "n/a" : fmt(m.utilization)+"%"}</td>
-      <td class="r num hide-sm">${m.incentive ? "+"+fmt(m.incentive)+"%" : "n/a"}</td>
+      <td class="r num">${m.incentive ? "+"+fmt(m.incentive)+"%" : "n/a"}</td>
       <td class="r num hide-sm">$${m.depth.toFixed(2)}M</td>
       <td class="r num">${(m.weight*100).toFixed(1)}%</td>
       <td class="r hide-sm"><span class="bar${m.phaseIn<1?" phase":""}"><i style="width:${(m.weight*100).toFixed(1)}%"></i></span></td>
@@ -922,6 +971,10 @@ async function boot(){
     for (const [label, ix] of Object.entries(d.indices || {}))
       TERM_DATA[label] = { termAverages: ix.termAverages, seriesBegan: ix.seriesBegan };
   }catch(e){ console.warn("Live fixing unavailable, showing bundled snapshot.", e); }
+  try{
+    const v = await fetch("/api/v1/inversions.json", { cache:"no-store" });
+    if (v.ok) INVERSIONS = await v.json();
+  }catch(e){ console.warn("Inversion monitor unavailable.", e); }
   try{
     const h = await fetch("/api/v1/history.json", { cache:"no-store" });
     if (h.ok) HISTORY = await h.json();
