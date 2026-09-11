@@ -46,7 +46,8 @@ demand is outrunning supply.
 ## Outside Stacks
 
 Each fixing also carries externalReference: the same asset class on the largest
-lending market outside Stacks, currently Aave V3 on Ethereum. It is published so
+lending markets off this chain, currently Ethereum and Base. The deepest pool on
+each chain is used, so the venue named can change between fixings. It is published so
 a reader can see what comparable capital costs elsewhere. It is never a
 constituent of any index and never affects a fixing.
 
