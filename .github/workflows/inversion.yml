@@ -1,0 +1,63 @@
+name: SBOR inversion monitor
+
+# Hourly, because an inversion can open and close inside a day. This never
+# writes a fixing and never touches the historical record.
+on:
+  schedule:
+    - cron: "37 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check for an inversion
+        id: check
+        env:
+          # "validating" while the detection is being proven, then "live".
+          # The status is published either way, so the period is visible.
+          SBOR_INVERSION_STATUS: validating
+        run: node scripts/inversion.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "sbor-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A api/v1/inversions.json
+          if git diff --staged --quiet; then
+            echo "No change."
+          else
+            git commit -m "inversion check $(date -u +%Y-%m-%dT%H:%MZ) [skip netlify]"
+            git push
+          fi
+
+      - name: Alert
+        if: steps.check.outputs.found == 'true'
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ]; then exit 0; fi
+          node -e '
+            const fs = require("fs");
+            const body = fs.readFileSync("inversion-alert.txt", "utf8").trim();
+            fetch(`https://api.telegram.org/bot${process.env.TG_TOKEN}/sendMessage`, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                chat_id: process.env.TG_CHAT,
+                text: body + "\n\n——— not part of any post ———\nsbor.xyz/api/v1/inversions.json",
+                disable_web_page_preview: true,
+                link_preview_options: { is_disabled: true }
+              })
+            }).then(async r => { if (!r.ok) console.error("telegram", r.status, await r.text()); });
+          '
