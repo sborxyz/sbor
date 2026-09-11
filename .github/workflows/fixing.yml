@@ -2,7 +2,8 @@ name: SBOR daily fixing
 
 on:
   schedule:
-    - cron: "0 9 * * *"      # target 11:00 UTC; scheduled early because GitHub runs late under load
+    - cron: "23 8 * * *"     # target 11:00 UTC. Scheduled early because GitHub runs late,
+                             # and off the hour because every free tier cron sits at minute zero.
   workflow_dispatch:
 
 permissions:
@@ -37,7 +38,7 @@ jobs:
         run: |
           git config user.name  "sbor-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A api latest.txt post.txt post.json
+          git add -A api latest.txt post.txt post.json post-state.json
           if git diff --staged --quiet; then
             echo "No change, nothing to commit."
           else
