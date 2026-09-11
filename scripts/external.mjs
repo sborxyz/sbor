@@ -14,12 +14,30 @@ const BORROW_URLS = [
   "https://yields.llama.fi/poolsBorrow"
 ];
 
-/* What we compare against, and which SBOR index it sits beside. */
+/* What we compare against, and which SBOR index it sits beside.
+   Each entry lists candidate protocols rather than one, and the deepest
+   matching pool wins. That way a venue losing its lead does not silently
+   freeze the comparison on a shallow pool. */
 const WANTED = [
-  { project:"aave-v3", chain:"Ethereum", symbol:"USDC",  display:"USDC",  against:"SBOR-USD", label:"Aave V3, Ethereum" },
-  { project:"aave-v3", chain:"Ethereum", symbol:"WBTC",  display:"WBTC",  against:"SBOR-BTC", label:"Aave V3, Ethereum" },
-  { project:"aave-v3", chain:"Ethereum", symbol:"CBBTC", display:"cbBTC", against:"SBOR-BTC", label:"Aave V3, Ethereum" }
+  { chain:"Ethereum", symbol:"USDC",  display:"USDC",  against:"SBOR-USD",
+    projects:["aave-v3"] },
+  { chain:"Ethereum", symbol:"WBTC",  display:"WBTC",  against:"SBOR-BTC",
+    projects:["aave-v3"] },
+  { chain:"Ethereum", symbol:"CBBTC", display:"cbBTC", against:"SBOR-BTC",
+    projects:["aave-v3"] },
+  /* Base carries most cbBTC activity and is the closest comparison to the
+     Stacks thesis: bitcoin on an Ethereum L2 against bitcoin on a Bitcoin L2. */
+  { chain:"Base", symbol:"CBBTC", display:"cbBTC", against:"SBOR-BTC",
+    projects:["aave-v3","moonwell","morpho-blue","compound-v3"] },
+  { chain:"Base", symbol:"USDC",  display:"USDC",  against:"SBOR-USD",
+    projects:["aave-v3","moonwell","morpho-blue","compound-v3"] }
 ];
+
+/* DefiLlama project slug to something a person would recognise. */
+const VENUE_NAME = {
+  "aave-v3":"Aave V3", "moonwell":"Moonwell", "morpho-blue":"Morpho",
+  "compound-v3":"Compound V3"
+};
 
 /* Aave keys its reserve pages on the underlying token address, which the pool
    data carries, so each row links to the exact market it reports. */
@@ -56,14 +74,19 @@ export async function externalReference(){
 
   const out = [];
   for (const w of WANTED){
-    /* Pick the deepest matching pool, so a small duplicate listing cannot win. */
+    /* Deepest matching pool across the candidate protocols, so a small
+       duplicate listing cannot win. */
     const matches = data.filter(p =>
-      p.project === w.project &&
+      w.projects.includes(p.project) &&
       p.chain === w.chain &&
       String(p.symbol).toUpperCase() === w.symbol &&
       (p.tvlUsd || 0) > 0);
-    if (!matches.length){ log(`  external: no pool for ${w.symbol} on ${w.label}`); continue; }
+    if (!matches.length){
+      log(`  external: no ${w.symbol} pool on ${w.chain} among ${w.projects.join(", ")}`);
+      continue;
+    }
     const p = matches.sort((a,b) => (b.tvlUsd||0) - (a.tvlUsd||0))[0];
+    const label = `${VENUE_NAME[p.project] || p.project}, ${p.chain}`;
 
     const bRec = borrowBy[p.pool];
     const apr = borrowAprOf(bRec);
@@ -74,7 +97,7 @@ export async function externalReference(){
     const underlying = Array.isArray(p.underlyingTokens) ? p.underlyingTokens[0] : null;
     const entry = {
       asset: w.display || p.symbol,
-      venue: w.label,
+      venue: label,
       comparableTo: w.against,
       supply: round(p.apyBase ?? 0),
       borrow: apr == null ? null : round(apr),
@@ -84,7 +107,7 @@ export async function externalReference(){
       url: aaveUrl(underlying),
       dataUrl: `https://defillama.com/yields/pool/${p.pool}`
     };
-    log(`  external ${entry.asset} @ ${w.label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% util=${entry.utilization ?? "n/a"}% depth=${entry.depthUsd}`);
+    log(`  external ${entry.asset} @ ${label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% util=${entry.utilization ?? "n/a"}% depth=${entry.depthUsd}`);
     out.push(entry);
   }
   if (!out.length) throw new Error("no external reference pools resolved");
