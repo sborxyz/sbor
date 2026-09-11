@@ -9,6 +9,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { fetchCallReadOnlyFunction, contractPrincipalCV, cvToValue } from "@stacks/transactions";
 import { poxReference } from "./pox.mjs";
 import { externalReference } from "./external.mjs";
+import { contextBlock } from "./context.mjs";
 
 const POOLS_URL = "https://yields.llama.fi/pools";
 const STACKINGDAO_APY = "https://app.stackingdao.com/api/apy?v=2";
@@ -80,7 +81,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.7.0";
+const METHODOLOGY_VERSION = "1.8.0";
 
 /* Below this, on both sides at once, a funded market is not reporting. */
 const RATE_FLOOR = 0.05;
@@ -354,6 +355,11 @@ const main = async () => {
   try { external = await externalReference(); }
   catch(e){ log(`  external reference unavailable, omitted. ${e.message}`); }
 
+  /* Context for the record. Never enters an index, never breaks a fixing. */
+  let context = null;
+  try { context = await contextBlock(); }
+  catch(e){ log(`  context unavailable, omitted. ${e.message}`); }
+
   const stamp = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
   const day = stamp.slice(0,10);
 
@@ -372,6 +378,7 @@ const main = async () => {
     indices,
     ...(pox && { poxReference: pox }),
     ...(external && { externalReference: external }),
+    ...(context && { context }),
     notes:[
       "One fixing a day, targeting 11:00 UTC. Publication runs on a scheduler that can be late, so the fixing timestamp is authoritative rather than the target hour.",
       "Rates are read from contract state, not from any venue's published figure.",
@@ -385,6 +392,8 @@ const main = async () => {
       "Zest returns nominal annual rates despite its field names, confirmed with the venue. They are converted here to effective APY, e^r - 1, the same basis Granite's per-second compounding produces. Every market also carries nominalBorrow and nominalSupply so the raw figure is visible.",
       "Fixings before methodology 1.6.0 used Zest's nominal figures unconverted and are therefore a few basis points lower on the Zest-weighted portion. Past fixings are not rewritten; the version recorded on each one identifies the basis it used.",
       "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
+      "The record is sharded by year at /api/v1/history-YYYY.json, indexed at /api/v1/history-index.json. history.json carries a rolling 400 day window for convenience.",
+      "context records SOFR, spot prices, sBTC supply and the Bitcoin block height alongside each fixing. None of it enters an index or affects a rate. It is kept so a past fixing can be read in the conditions of its day.",
       "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
       "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
       "Protocol yield for stSTX and stSTXbtc is sourced from StackingDAO, which derives it from PoX reward claims net of pool commission over stSTX supply. Where a source cannot be reached, the index is marked allInSupplyIncomplete and the yield is left out rather than estimated.",
@@ -407,20 +416,57 @@ const main = async () => {
   writeFileSync("latest.txt", lines.join("\n") + "\n");
 
   if (IS_FIXING){
+    /* History is sharded by year. A single growing file is rewritten in full on
+       every commit, so git stores a new copy each day and the repository grows
+       quadratically. One file a year keeps that flat. history.json remains as a
+       rolling recent window so nothing that reads it breaks. */
+    const year = day.slice(0,4);
+    const shard = `api/v1/history-${year}.json`;
     let history = [];
-    try { history = JSON.parse(readFileSync("api/v1/history.json","utf8")); }
-    catch { try { history = JSON.parse(readFileSync("api/history.json","utf8")); } catch {} }
+    try { history = JSON.parse(readFileSync(shard,"utf8")); }
+    catch {
+      /* First fixing of a new year, or first run after sharding: carry over any
+         rows for this year from the old single file. */
+      try {
+        const old = JSON.parse(readFileSync("api/v1/history.json","utf8"));
+        history = old.filter(r => String(r.date).startsWith(year));
+        if (history.length) log(`  migrated ${history.length} ${year} row(s) into ${shard}`);
+      } catch {}
+    }
     history = history.filter(r => r.date !== day);
     history.push({
       date: day,
       fixedAt: stamp,
       methodologyVersion: METHODOLOGY_VERSION,
-      ...(pox && { "SBOR-PoX": { apy: pox.apy, cycle: pox.cycle } }),
+      ...(pox && { "SBOR-PoX": {
+        apy: pox.apy, cycle: pox.cycle,
+        cycleStart: pox.cycleStartApprox ?? null,
+        cycleEnd: pox.cycleEndApprox ?? null,
+        btcPaid: pox.btcPaid, stxLocked: pox.stxLocked,
+        stxPerBtc: pox.stxPerBtc, stxPerBtcSmoothed: pox.stxPerBtcSmoothed ?? null
+      } }),
+      ...(external && { external: external.markets.map(m => ({
+        v: m.venue, a: m.asset, b: m.borrow, s: m.supply,
+        u: m.utilization ?? null, d: m.depthUsd, vs: m.comparableTo
+      })) }),
       ...Object.fromEntries(Object.entries(indices).map(([k,v]) => [k, {
         borrow: v.borrow, supply: v.supply,
+        allInSupply: v.allInSupply,
         venues: v.venues.length,
         largestConstituentWeight: v.largestConstituentWeight,
-        depthUsd: v.markets.reduce((a,m)=>a+m.depthUsd,0)
+        depthUsd: v.markets.reduce((a,m)=>a+m.depthUsd,0),
+        /* Weighted utilisation for the index, plus a compact per market line,
+           so the series can be charted without opening the daily archives.
+           The archive stays the complete record; this is the queryable one. */
+        utilization: round(v.markets.reduce((a,m)=>
+          a + (typeof m.utilization === "number" ? m.utilization * m.weight : 0), 0)),
+        markets: v.markets.map(m => ({
+          v: m.venue, a: m.asset,
+          b: m.borrow, s: m.supply,
+          u: m.utilization ?? null,
+          py: m.protocolYield ?? null,
+          d: m.depthUsd, w: m.weight
+        }))
       }]))
     });
     history.sort((a,b) => a.date.localeCompare(b.date));
@@ -442,8 +488,31 @@ const main = async () => {
     writeFileSync("api/latest.json", JSON.stringify(withAverages, null, 2) + "\n");
 
     const hist = JSON.stringify(history, null, 2) + "\n";
-    writeFileSync("api/v1/history.json", hist);
-    writeFileSync("api/history.json", hist);
+    writeFileSync(shard, hist);
+
+    /* A rolling recent window at the stable path, so anything already reading
+       history.json keeps working. The shards are the complete record. */
+    const WINDOW_DAYS = 400;
+    const cutoff = new Date(Date.parse(day) - WINDOW_DAYS*864e5).toISOString().slice(0,10);
+    let recent = [];
+    for (const f of [`api/v1/history-${Number(year)-1}.json`, shard]){
+      try { recent = recent.concat(JSON.parse(readFileSync(f,"utf8"))); } catch {}
+    }
+    recent = recent.filter(r => r.date >= cutoff).sort((a,b) => a.date.localeCompare(b.date));
+    const recentJson = JSON.stringify(recent, null, 2) + "\n";
+    writeFileSync("api/v1/history.json", recentJson);
+    writeFileSync("api/history.json", recentJson);
+
+    /* An index of the shards, so a consumer can find the whole record. */
+    const { readdirSync } = await import("node:fs");
+    const shards = readdirSync("api/v1")
+      .filter(f => /^history-\d{4}\.json$/.test(f))
+      .sort();
+    writeFileSync("api/v1/history-index.json", JSON.stringify({
+      note: "The complete record, sharded by year. history.json carries a rolling recent window for convenience; these files are authoritative for anything older.",
+      rollingWindowDays: WINDOW_DAYS,
+      shards: shards.map(f => ({ year: f.slice(8,12), path: `/api/v1/${f}` }))
+    }, null, 2) + "\n");
 
     /* Full immutable snapshot of the day, so any past fixing can be audited
        down to its individual constituents rather than just its headline. */
