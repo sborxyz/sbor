@@ -14,7 +14,15 @@ const BORROW_URLS = [
   "https://yields.llama.fi/poolsBorrow"
 ];
 
-/* What we compare against, and which SBOR index it sits beside.
+/* Rootstock is deliberately absent. It is the closest comparison there is,
+   another Bitcoin sidechain with a bitcoin-backed asset lent on it at a similar
+   scale, but DefiLlama has no lending yield adapters for the chain: its nine
+   listed pools are all DEX pairs, an RWA product and a bridge. LayerBank,
+   Sovryn Lend, Tropykus and Segment have TVL coverage and no rates. Including
+   it means reading Rootstock contracts directly, as SBOR does for Granite.
+   Do not re-add it by guessing project slugs. That has been tried.
+
+   What we compare against, and which SBOR index it sits beside.
    Each entry lists candidate protocols rather than one, and the deepest
    matching pool wins. That way a venue losing its lead does not silently
    freeze the comparison on a shallow pool. */
@@ -30,11 +38,7 @@ const WANTED = [
   { chain:"Base", symbol:"CBBTC", display:"cbBTC", against:"SBOR-BTC",
     projects:["aave-v3","moonwell","morpho-blue","compound-v3"] },
   { chain:"Base", symbol:"USDC",  display:"USDC",  against:"SBOR-USD",
-    projects:["aave-v3","moonwell","morpho-blue","compound-v3"] },
-  /* Rootstock is the closest comparison of all: another Bitcoin sidechain with
-     a bitcoin-backed asset lent on it, at a similar scale to Stacks. */
-  { chain:["Rootstock","RSK"], symbol:["RBTC","WRBTC"], display:"rBTC", against:"SBOR-BTC",
-    projects:["layerbank","sovryn-lend","sovryn","tropykus-rsk","tropykus-finance","segment-finance"] }
+    projects:["aave-v3","moonwell","morpho-blue","compound-v3"] }
 ];
 
 /* DefiLlama project slug to something a person would recognise. */
@@ -78,23 +82,6 @@ export async function externalReference(){
   }
   const list = !borrowRes ? [] : (Array.isArray(borrowRes) ? borrowRes : (borrowRes.data || []));
   const borrowBy = Object.fromEntries(list.map(b => [b.pool, b]));
-
-  /* Diagnostic: DefiLlama covers a chain for TVL without necessarily having a
-     yield adapter for it. If a wanted chain has no pools at all, that is the
-     reason, and no amount of guessing project slugs will fix it. */
-  for (const c of ["Rootstock","RSK"]){
-    const pools = data.filter(p => p.chain === c);
-    if (!pools.length) continue;
-    const seen = new Map();
-    for (const p of pools.sort((a,b) => (b.tvlUsd||0) - (a.tvlUsd||0))){
-      const k = `${p.project}|${p.symbol}`;
-      if (seen.has(k)) continue;
-      seen.set(k, 1);
-      if (seen.size <= 12)
-        log(`  [${c}] ${p.project} ${p.symbol} tvl=${Math.round(p.tvlUsd||0)} apyBase=${p.apyBase}`);
-    }
-    log(`  [${c}] ${pools.length} pools in the yields data, ${seen.size} distinct project/symbol pairs`);
-  }
 
   const out = [];
   for (const w of WANTED){
