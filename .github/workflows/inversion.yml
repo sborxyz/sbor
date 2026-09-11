@@ -32,7 +32,7 @@ jobs:
         run: |
           git config user.name  "sbor-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A api/v1/inversions.json
+          git add -A api/v1/inversions.json api/v1/inversion-log.json
           if git diff --staged --quiet; then
             echo "No change."
           else
