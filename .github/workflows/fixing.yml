@@ -61,8 +61,10 @@ jobs:
             const fs = require("fs");
             const d = JSON.parse(fs.readFileSync("post.json", "utf8"));
             if (!d.top) process.exit(0);
+            /* Everything below the rule is for the reader, not for the post.
+               Copy stops at the rule. */
             const extra = d.otherCount
-              ? `\n\n${d.otherCount} other thing${d.otherCount>1?"s":""} moved today: sbor.xyz/post.txt`
+              ? `\n\n\u2014\u2014\u2014 not part of the post \u2014\u2014\u2014\n${d.otherCount} other thing${d.otherCount>1?"s":""} moved: sbor.xyz/post.txt`
               : "";
             fetch(`https://api.telegram.org/bot${process.env.TG_TOKEN}/sendMessage`, {
               method: "POST",
