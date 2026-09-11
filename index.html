@@ -97,6 +97,8 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .terms .pend{color:var(--ink-soft)}
 .invbox{border:1px solid var(--rule);border-left:2px solid var(--down);padding:16px 18px;margin-bottom:8px;font-size:15px}
 .invnone{color:var(--ink-soft);font-size:15px}
+.spreadbox{border:1px solid var(--rule);border-left:2px solid var(--rule);padding:14px 18px;margin-bottom:8px;font-size:15px;color:var(--ink-soft)}
+.spreadbox strong,.invbox strong{color:var(--ink);font-weight:500}
 .poxchart{height:200px;margin-top:18px}
 .poxbox{border:1px solid var(--rule);padding:24px 26px 22px;
   background:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule-soft) 31px 32px)}
@@ -232,17 +234,6 @@ a{color:var(--accent)}
       </div>
     </section>
 
-    <section id="inv-sec" hidden>
-      <div class="sec-h">
-        <div>
-          <h2 id="t-invH"></h2>
-          <p id="t-invP"></p>
-        </div>
-      </div>
-      <div id="invBody"></div>
-      <p class="coverage" id="invMeta" style="margin:12px 0 0"></p>
-    </section>
-
     <section id="ext-sec" hidden>
       <div class="sec-h">
         <div>
@@ -308,6 +299,18 @@ a{color:var(--accent)}
       </div>
       <p class="foot-note" id="t-cons-foot"></p>
     </section>
+
+    <section id="inv-sec">
+      <div class="sec-h">
+        <div>
+          <h2 id="t-invH"></h2>
+          <p id="t-invP"></p>
+        </div>
+      </div>
+      <div id="invBody"></div>
+      <p class="coverage" id="invMeta" style="margin:12px 0 0"></p>
+    </section>
+
 
     <section>
       <div class="sec-h"><div><h2 id="t-method-h"></h2></div></div>
@@ -417,9 +420,11 @@ en:{
   stamp:d=>`Rate as of <span class="num">${d}</span> · read from Zest contract state · updated daily`,
   borrowK:"Borrow APY", supplyK:"Supply APY",
   allIn:v=>`${v.toFixed(2)}% all in, with protocol yield`,
-  invH:"Inversions",
-  invP:"An inversion is the same asset costing less to borrow at one venue than it pays to supply at another. It should not happen, because that spread is how a lending protocol earns. Incentives can cause it. SBOR publishes any it finds to everyone at once, never to a private channel, and does not trade on its own rate.",
-  invNone:"No inversion found.",
+  invH:"Cross-venue spread",
+  invP:"For each asset lent at more than one venue, the cheapest place to borrow against the best paying place to supply. The gap is normally negative, because that spread is how a lending protocol earns. It narrowing means the market is getting more efficient. If it ever turns positive the same asset pays more to supply than it costs to borrow, which is an inversion, and SBOR publishes any it finds to everyone at once, never to a private channel. SBOR does not trade on its own rate.",
+  invSpread:(a,sv,sr,bv,br,g)=>`<strong>${a}</strong> supply ${sv} ${sr} · borrow ${bv} ${br} · <span class="num">${g > 0 ? "+" : ""}${g} bps</span>`,
+  invSingle:a=>`<strong>${a}</strong> one venue, no cross venue comparison possible`,
+  invNone:"No asset is lent at more than one venue today, so there is nothing to compare.",
   invValidating:"This monitor is being validated. Detections are published so the validation period is visible, but they have not yet been proven over a long enough run to be relied on.",
   invRow:(a,sv,sr,bv,br,e)=>`${a}: supplying at ${sv} pays ${sr}, borrowing the same asset at ${bv} costs ${br}. ${e} bps, before fees, gas and liquidation risk.`,
   invChecked:t=>`Checked ${t}, hourly.`,
@@ -434,9 +439,10 @@ en:{
   deltaBorrow:"", deltaSupply:"",
   poxH:"Bitcoin staking yield",
   poxP:"What PoX currently pays STX stakers, in bitcoin, from what miners commit. It is the bitcoin paid over one two week reward cycle, divided by the STX locked, annualised over the roughly 25 cycles in a year. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over seven days rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. This is a staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
-  poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. The figure is annualised from one two week cycle, so it steps when a cycle settles and drifts in between with the BTC to STX rate.`,
+  poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. Each reading annualises the most recently completed two week cycle, so a marked line is the day a cycle settled and everything to its right is derived from that cycle. The drift between markers is the BTC to STX rate, which is averaged over seven days.`,
   poxChartThin:"Not enough history yet to draw this.",
-  poxMeta:(c,btc,stx,x)=>`Annualised from reward cycle ${c}, a two week period · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over ${"7"} days`,
+  poxCycleMark:c=>`cycle ${c} settled`,
+  poxMeta:(c,btc,stx,x,w)=>`Annualised from completed reward cycle ${c}${w} · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over 7 days`,
   csv:"Download CSV",
   devH:"Use the data",
   devP:"Everything on this page is available as JSON and plain text. The published fixing is free to read: no key, no rate limit, no registration. Build against v1 and it will not change shape under you.",
@@ -497,9 +503,11 @@ pt:{
   stamp:d=>`Taxa em <span class="num">${d}</span> · lida do estado dos contratos da Zest · atualizada diariamente`,
   borrowK:"APY de empréstimo", supplyK:"APY de depósito",
   allIn:v=>`${v.toFixed(2)}% no total, com o rendimento do protocolo`,
-  invH:"Inversões",
-  invP:"Uma inversão é o mesmo ativo custando menos para tomar emprestado em uma plataforma do que ele paga para depositar em outra. Não deveria acontecer, porque esse spread é como um protocolo de crédito ganha. Incentivos podem provocar isso. O SBOR publica qualquer inversão que encontrar para todos ao mesmo tempo, nunca em canal privado, e não opera em cima da própria taxa.",
-  invNone:"Nenhuma inversão encontrada.",
+  invH:"Spread entre plataformas",
+  invP:"Para cada ativo emprestado em mais de uma plataforma, o lugar mais barato para tomar emprestado contra o que melhor paga para depositar. A diferença é normalmente negativa, porque esse spread é como um protocolo de crédito ganha. Ela diminuindo significa um mercado mais eficiente. Se algum dia ficar positiva, o mesmo ativo paga mais para depositar do que custa para tomar emprestado, o que é uma inversão, e o SBOR publica qualquer uma que encontrar para todos ao mesmo tempo, nunca em canal privado. O SBOR não opera em cima da própria taxa.",
+  invSpread:(a,sv,sr,bv,br,g)=>`<strong>${a}</strong> depósito ${sv} ${sr} · empréstimo ${bv} ${br} · <span class="num">${g > 0 ? "+" : ""}${g} pontos-base</span>`,
+  invSingle:a=>`<strong>${a}</strong> uma plataforma, sem comparação possível entre plataformas`,
+  invNone:"Nenhum ativo é emprestado em mais de uma plataforma hoje, então não há o que comparar.",
   invValidating:"Este monitor está em validação. As detecções são publicadas para que o período de validação fique visível, mas ainda não foram comprovadas por tempo suficiente para servirem de base.",
   invRow:(a,sv,sr,bv,br,e)=>`${a}: depositar na ${sv} paga ${sr}, tomar o mesmo ativo emprestado na ${bv} custa ${br}. ${e} pontos-base, antes de taxas, gas e risco de liquidação.`,
   invChecked:t=>`Verificado ${t}, de hora em hora.`,
@@ -514,11 +522,10 @@ pt:{
   deltaBorrow:"", deltaSupply:"",
   poxH:"Rendimento do staking de bitcoin",
   poxP:"O que o PoX paga hoje a quem faz staking de STX, em bitcoin, a partir do que os mineradores comprometem. É o bitcoin pago em um ciclo de recompensa de duas semanas, dividido pelo STX travado, anualizado sobre os cerca de 25 ciclos do ano. O pagamento é em bitcoin sobre uma posição mantida em STX, então o número depende da relação BTC para STX. Essa relação é a média de sete dias, e não a cotação do instante do fixing, para que o rendimento publicado descreva a economia do staking e não a oscilação da moeda entre um fixing e outro. A cotação à vista é publicada ao lado. É um rendimento de staking sobre uma posição travada, não uma taxa de crédito, por isso fica ao lado dos índices e nunca dentro deles.",
-  poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. The figure is annualised from one two week cycle, so it steps when a cycle settles and drifts in between with the BTC to STX rate.`,
-  poxChartThin:"Not enough history yet to draw this.",
-  poxChartNote:(n,first,last)=>`${n} leituras diárias, de ${first} a ${last}. O número é anualizado a partir de um ciclo de duas semanas, então ele dá saltos quando um ciclo fecha e oscila entre eles junto com a relação BTC para STX.`,
+  poxChartNote:(n,first,last)=>`${n} leituras diárias, de ${first} a ${last}. Cada leitura anualiza o último ciclo de duas semanas concluído, então uma linha marcada é o dia em que um ciclo fechou, e tudo à direita dela vem daquele ciclo. A variação entre marcadores é a relação BTC para STX, que é suavizada em sete dias.`,
   poxChartThin:"Ainda não há histórico suficiente para desenhar isso.",
-  poxMeta:(c,btc,stx,x)=>`Anualizado a partir do ciclo de recompensa ${c}, um período de duas semanas · ${btc} BTC pagos a stakers · ${stx} STX travados · convertido a ${x} STX por BTC, média de ${"7"} dias`,
+  poxCycleMark:c=>`ciclo ${c} fechou`,
+  poxMeta:(c,btc,stx,x,w)=>`Anualizado a partir do ciclo de recompensa ${c}, já concluído${w} · ${btc} BTC pagos a stakers · ${stx} STX travados · convertido a ${x} STX por BTC, média de 7 dias`,
   csv:"Baixar CSV",
   devH:"Use os dados",
   devP:"Tudo nesta página está disponível em JSON e texto puro. O fixing publicado é livre para leitura: sem chave, sem limite de requisições, sem cadastro. Construa sobre a v1 e o formato não muda embaixo de você.",
@@ -708,19 +715,36 @@ function renderChrome(){
   set("t-borrow-k", t.borrowK); set("t-supply-k", t.supplyK);
   set("t-hist-p", t.histP);
   set("t-invH", t.invH); set("t-invP", t.invP);
+  /* The spread is derived from the fixing itself, so this section always has
+     something to say. An inversion is simply the day a gap turns positive. */
   const isec = document.getElementById("inv-sec");
-  if (INVERSIONS){
-    isec.hidden = false;
-    const list = INVERSIONS.inversions || [];
-    set("invBody", list.length
-      ? list.map(f => `<div class="invbox">${t.invRow(f.asset, f.supplyVenue,
-          f.supplyRate.toFixed(2)+"%", f.borrowVenue, f.borrowRate.toFixed(2)+"%",
-          f.edgeBps)}</div>`).join("")
-      : `<div class="invnone">${t.invNone}</div>`);
-    const bits = [t.invChecked(INVERSIONS.checked)];
-    if (INVERSIONS.status === "validating") bits.push(t.invValidating);
-    set("invMeta", bits.join(" "));
-  } else { isec.hidden = true; }
+  const byAsset = {};
+  for (const k of Object.keys(INDICES))
+    for (const m of computed(k).markets) (byAsset[m.asset] ||= []).push(m);
+
+  const rows = [];
+  for (const [asset, ms] of Object.entries(byAsset)){
+    if (ms.length < 2) continue;
+    let best = null;
+    for (const b of ms) for (const sup of ms){
+      if (b.venue === sup.venue) continue;
+      const gap = Math.round((sup.supply - b.borrow) * 100);
+      if (!best || gap > best.gap) best = { gap, b, sup };
+    }
+    if (best) rows.push({ asset, ...best });
+  }
+  rows.sort((a,b) => b.gap - a.gap);
+
+  isec.hidden = false;
+  set("invBody", rows.length
+    ? rows.map(r => `<div class="${r.gap > 0 ? "invbox" : "spreadbox"}">${
+        t.invSpread(r.asset, r.sup.venue, fmt(r.sup.supply)+"%",
+                    r.b.venue, fmt(r.b.borrow)+"%", r.gap)}</div>`).join("")
+    : `<div class="invnone">${t.invNone}</div>`);
+  const bits = [];
+  if (INVERSIONS) bits.push(t.invChecked(INVERSIONS.checked));
+  if (INVERSIONS && INVERSIONS.status === "validating") bits.push(t.invValidating);
+  set("invMeta", bits.join(" "));
   set("t-extH", t.extH); set("t-extP", t.extP);
   const esec = document.getElementById("ext-sec");
   if (EXTERNAL && EXTERNAL.markets && EXTERNAL.markets.length){
@@ -749,9 +773,11 @@ function renderChrome(){
     psec.hidden = false;
     document.getElementById("poxVal").textContent = POX.apy.toFixed(2);
     const loc = lang === "pt" ? "pt-BR" : "en-US";
+    const win = (POX.cycleStartApprox && POX.cycleEndApprox)
+      ? `, ${POX.cycleStartApprox} to ${POX.cycleEndApprox}` : ", a two week period";
     set("poxMeta", t.poxMeta(POX.cycle, POX.btcPaid.toFixed(3),
         POX.stxLocked.toLocaleString(loc),
-        Math.round(POX.stxPerBtcSmoothed ?? POX.stxPerBtc).toLocaleString(loc)));
+        Math.round(POX.stxPerBtcSmoothed ?? POX.stxPerBtc).toLocaleString(loc), win));
     drawPox();
   } else { psec.hidden = true; }
   set("t-cons-foot", t.consFoot);
@@ -832,7 +858,7 @@ function drawPox(){
   rows.forEach((r,i) => {
     if (i && r.e.cycle && rows[i-1].e.cycle && r.e.cycle !== rows[i-1].e.cycle){
       g += `<line x1="${x(i).toFixed(1)}" y1="${PT}" x2="${x(i).toFixed(1)}" y2="${H-PB}" stroke="#A2452F" stroke-width="1" stroke-dasharray="4 4"/>`;
-      g += `<text x="${(x(i)+6).toFixed(1)}" y="${PT+13}" font-family="IBM Plex Mono" font-size="11" fill="#A2452F">cycle ${r.e.cycle}</text>`;
+      g += `<text x="${(x(i)+6).toFixed(1)}" y="${PT+13}" font-family="IBM Plex Mono" font-size="11" fill="#A2452F">${t.poxCycleMark(r.e.cycle)}</text>`;
     }
   });
   g += `<text x="${PL}" y="${H-7}" font-family="IBM Plex Mono" font-size="11" fill="#5C646B">${rows[0].date}</text>`;
