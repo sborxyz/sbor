@@ -232,10 +232,10 @@
   },
   {
     "date": "2026-09-11",
-    "fixedAt": "2026-09-11T00:05:33Z",
+    "fixedAt": "2026-09-11T00:13:50Z",
     "methodologyVersion": "1.7.0",
     "SBOR-PoX": {
-      "apy": 7.8,
+      "apy": 7.82,
       "cycle": 142
     },
     "SBOR-USD": {
