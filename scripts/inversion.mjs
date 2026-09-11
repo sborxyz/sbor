@@ -78,6 +78,32 @@ const payload = {
 mkdirSync("api/v1", { recursive: true });
 writeFileSync("api/v1/inversions.json", JSON.stringify(payload, null, 2) + "\n");
 
+/* Append-only log. The file above is the current state; this is the record.
+   An inversion that opens and closes inside an hour would otherwise leave no
+   trace, and the whole point of watching hourly is to catch exactly that. */
+if (found.length){
+  let log_ = [];
+  try { log_ = JSON.parse(readFileSync("api/v1/inversion-log.json", "utf8")); } catch {}
+  for (const f of found){
+    const last = [...log_].reverse().find(e =>
+      e.asset === f.asset && e.borrowVenue === f.borrowVenue && e.supplyVenue === f.supplyVenue);
+    /* Extend an open episode rather than writing a row every hour. */
+    const oneHourAgo = Date.now() - 75 * 60 * 1000;
+    if (last && Date.parse(last.lastSeen) > oneHourAgo){
+      last.lastSeen = stamp;
+      last.checks = (last.checks || 1) + 1;
+      last.maxEdgeBps = Math.max(last.maxEdgeBps ?? last.edgeBps, f.edgeBps);
+      last.lastEdgeBps = f.edgeBps;
+    } else {
+      log_.push({ firstSeen: stamp, lastSeen: stamp, checks: 1,
+                  maxEdgeBps: f.edgeBps, lastEdgeBps: f.edgeBps,
+                  status: STATUS, ...f });
+    }
+  }
+  writeFileSync("api/v1/inversion-log.json", JSON.stringify(log_, null, 2) + "\n");
+  log(`inversion log now has ${log_.length} episode(s)`);
+}
+
 if (!found.length){
   log(`no inversion at ${stamp} (status: ${STATUS})`);
 } else {
