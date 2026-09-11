@@ -1,22 +1,17 @@
 {
-  "fixing": "2026-09-10T23:39:08Z",
-  "comparedWith": "2026-09-09",
+  "fixing": "2026-09-11T00:05:33Z",
+  "comparedWith": "2026-09-10",
   "top": {
-    "why": "PoX cycle 141 to 142",
-    "chars": 141,
-    "text": "Reward cycle 142 settled.\n\n4.44 BTC paid to STX stackers, against 441,576,024 STX locked.\n\nSBOR-PoX: 5.07% to 7.83%.\n\nsbor.xyz"
+    "why": "Zest V2 STX utilisation 83.24%",
+    "chars": 157,
+    "text": "Zest V2 STX is 83.24% utilised.\n\nBorrow 3.48%, supply 2.58%.\n\nAbove 80% a lending market prices steeply, and withdrawals get harder.\n\nsbor.xyz"
   },
-  "otherCount": 2,
+  "otherCount": 1,
   "drafts": [
     {
-      "why": "PoX cycle 141 to 142",
-      "chars": 141,
-      "text": "Reward cycle 142 settled.\n\n4.44 BTC paid to STX stackers, against 441,576,024 STX locked.\n\nSBOR-PoX: 5.07% to 7.83%.\n\nsbor.xyz"
-    },
-    {
-      "why": "Zest V2 STX utilisation 83.44%",
+      "why": "Zest V2 STX utilisation 83.24%",
       "chars": 157,
-      "text": "Zest V2 STX is 83.44% utilised.\n\nBorrow 3.49%, supply 2.60%.\n\nAbove 80% a lending market prices steeply, and withdrawals get harder.\n\nsbor.xyz"
+      "text": "Zest V2 STX is 83.24% utilised.\n\nBorrow 3.48%, supply 2.58%.\n\nAbove 80% a lending market prices steeply, and withdrawals get harder.\n\nsbor.xyz"
     },
     {
       "why": "Zest V2 stSTX utilisation 8.7%",
