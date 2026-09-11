@@ -1,0 +1,10 @@
+{
+  "note": "The complete record, sharded by year. history.json carries a rolling recent window for convenience; these files are authoritative for anything older.",
+  "rollingWindowDays": 400,
+  "shards": [
+    {
+      "year": "2026",
+      "path": "/api/v1/history-2026.json"
+    }
+  ]
+}

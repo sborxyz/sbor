@@ -7,8 +7,8 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-11T14:53:38Z",
-  "methodologyVersion": "1.7.0",
+  "fixing": "2026-09-11T17:39:15Z",
+  "methodologyVersion": "1.8.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
   "zestDataContract": "v0-5-data",
@@ -19,7 +19,7 @@
       "label": "SBOR-USD",
       "currency": "USD",
       "headline": "What money costs in dollars on Stacks.",
-      "borrow": 2.36,
+      "borrow": 2.35,
       "supply": 0.6,
       "allInSupply": 0.6,
       "allInSupplyDiffers": false,
@@ -27,19 +27,19 @@
         "Zest V2",
         "Granite"
       ],
-      "largestConstituentWeight": 0.6505,
+      "largestConstituentWeight": 0.6494,
       "markets": [
         {
           "venue": "Zest V2",
           "asset": "USDCx",
-          "borrow": 2.79,
+          "borrow": 2.78,
           "supply": 0.8,
-          "utilization": 58.52,
-          "nominalBorrow": 2.75,
+          "utilization": 58.48,
+          "nominalBorrow": 2.74,
           "nominalSupply": 0.8,
-          "depthUsd": 10137768,
+          "depthUsd": 10088129,
           "phaseIn": 1,
-          "weight": 0.6505
+          "weight": 0.6494
         },
         {
           "venue": "Granite",
@@ -49,7 +49,7 @@
           "utilization": 23.64,
           "depthUsd": 5006689,
           "phaseIn": 1,
-          "weight": 0.3213
+          "weight": 0.3223
         },
         {
           "venue": "Zest V2",
@@ -59,9 +59,9 @@
           "utilization": 45.17,
           "nominalBorrow": 2.65,
           "nominalSupply": 0,
-          "depthUsd": 439979,
+          "depthUsd": 439790,
           "phaseIn": 1,
-          "weight": 0.0282
+          "weight": 0.0283
         }
       ],
       "termAverages": {
@@ -75,40 +75,40 @@
       "label": "SBOR-STX",
       "currency": "STX",
       "headline": "What money costs in STX on Stacks.",
-      "borrow": 2.29,
-      "supply": 1.16,
-      "allInSupply": 4.65,
+      "borrow": 2.32,
+      "supply": 1.19,
+      "allInSupply": 4.69,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
       ],
-      "largestConstituentWeight": 0.5459,
+      "largestConstituentWeight": 0.547,
       "markets": [
         {
           "venue": "Zest V2",
           "asset": "stSTX",
           "borrow": 1.4,
           "supply": 0.1,
-          "utilization": 8.68,
+          "utilization": 8.66,
           "nominalBorrow": 1.39,
           "nominalSupply": 0.1,
-          "protocolYield": 6.39,
+          "protocolYield": 6.41,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
-          "depthUsd": 2238184,
+          "depthUsd": 2220045,
           "phaseIn": 1,
-          "weight": 0.5459
+          "weight": 0.547
         },
         {
           "venue": "Zest V2",
           "asset": "STX",
-          "borrow": 3.37,
-          "supply": 2.43,
-          "utilization": 80.7,
-          "nominalBorrow": 3.31,
-          "nominalSupply": 2.4,
-          "depthUsd": 1861657,
+          "borrow": 3.42,
+          "supply": 2.5,
+          "utilization": 81.86,
+          "nominalBorrow": 3.36,
+          "nominalSupply": 2.47,
+          "depthUsd": 1838276,
           "phaseIn": 1,
-          "weight": 0.4541
+          "weight": 0.453
         }
       ],
       "termAverages": {
@@ -126,16 +126,21 @@
     "period": "one reward cycle, about two weeks",
     "cyclesPerYear": 25.03,
     "annualisation": "Bitcoin paid over one reward cycle divided by STX locked, annualised over the cycles in a year.",
-    "apy": 7.8,
+    "apy": 7.77,
     "cycle": 142,
-    "cycleYieldPct": 0.3007,
+    "cycleStartBurnBlock": 963900,
+    "cycleEndBurnBlock": 965999,
+    "cycleStartApprox": "2026-08-24",
+    "cycleEndApprox": "2026-09-08",
+    "cycleLengthBlocks": 2100,
+    "cycleYieldPct": 0.2994,
     "btcPaid": 4.43895,
     "stxLocked": 441576024,
-    "stxPerBtc": 299113.95,
-    "stxPerBtcSmoothed": 299113.95,
+    "stxPerBtc": 297874.6,
+    "stxPerBtcSmoothed": 297874.6,
     "crossWindowDays": 1,
     "rateSource": "Bitflow",
-    "rateQuoteImpactBps": 8,
+    "rateQuoteImpactBps": 5,
     "note": "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualised. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over a short window rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. It is a staking yield, not a lending rate, and is never blended into the lending indices."
   },
   "externalReference": {
@@ -146,10 +151,10 @@
         "asset": "USDC",
         "venue": "Aave V3, Ethereum",
         "comparableTo": "SBOR-USD",
-        "supply": 3.54,
-        "borrow": 4.29,
-        "utilization": 91.66,
-        "depthUsd": 197253103,
+        "supply": 3.55,
+        "borrow": 4.3,
+        "utilization": 91.81,
+        "depthUsd": 193824670,
         "pool": "aa70268e-4b52-42bf-a116-608b370f9501",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/aa70268e-4b52-42bf-a116-608b370f9501"
@@ -161,7 +166,7 @@
         "supply": 0,
         "borrow": 0.32,
         "utilization": 2.34,
-        "depthUsd": 2625118406,
+        "depthUsd": 2590526833,
         "pool": "7e382157-b1bc-406d-b17b-facba43b716e",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0x2260fac5e5542a773aa44fbcfedf7c193bc2c599&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/7e382157-b1bc-406d-b17b-facba43b716e"
@@ -173,7 +178,7 @@
         "supply": 0,
         "borrow": 0.28,
         "utilization": 0.66,
-        "depthUsd": 1420755251,
+        "depthUsd": 1405960051,
         "pool": "b1986007-81f3-4150-9565-94d5a4066ce4",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/b1986007-81f3-4150-9565-94d5a4066ce4"
@@ -183,9 +188,9 @@
         "venue": "Morpho, Base",
         "comparableTo": "SBOR-BTC",
         "supply": 0,
-        "borrow": 4.82,
-        "utilization": 47.82,
-        "depthUsd": 2935279051,
+        "borrow": 4.91,
+        "utilization": 48.24,
+        "depthUsd": 2912892624,
         "pool": "7d33d57d-36dc-414b-9538-22a223250468",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/7d33d57d-36dc-414b-9538-22a223250468"
@@ -194,15 +199,45 @@
         "asset": "USDC",
         "venue": "Aave V3, Base",
         "comparableTo": "SBOR-USD",
-        "supply": 3.51,
-        "borrow": 4.51,
-        "utilization": 86.39,
-        "depthUsd": 25006105,
+        "supply": 3.55,
+        "borrow": 4.54,
+        "utilization": 86.85,
+        "depthUsd": 24107823,
         "pool": "7e0661bf-8cf3-45e6-9424-31916d4c7b84",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0x833589fcd6edb6e08f4c7c32d4f71b54bda02913&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/7e0661bf-8cf3-45e6-9424-31916d4c7b84"
       }
     ]
+  },
+  "context": {
+    "note": "Context recorded alongside the fixing. None of this enters an index or affects a rate. It is kept because a rate is easier to understand later if you know what the world looked like when it was set.",
+    "sofr": {
+      "rate": 3.62,
+      "effectiveDate": "2026-09-10",
+      "percentile1": 3.58,
+      "percentile99": 3.7,
+      "volumeBillions": 2921,
+      "average30day": null,
+      "average90day": null,
+      "average180day": null,
+      "source": "Federal Reserve Bank of New York"
+    },
+    "prices": {
+      "btcUsd": 77716,
+      "stxUsd": 0.258694,
+      "source": "CoinGecko"
+    },
+    "sbtcSupply": {
+      "sats": 246476021571,
+      "sbtc": 2464.76021571,
+      "source": "sbtc-token contract"
+    },
+    "chainHeight": {
+      "burnBlockHeight": 966532,
+      "rewardCycle": 143,
+      "stackedUstx": 441576024260845,
+      "source": "Hiro /v2/pox"
+    }
   },
   "notes": [
     "One fixing a day, targeting 11:00 UTC. Publication runs on a scheduler that can be late, so the fixing timestamp is authoritative rather than the target hour.",
@@ -217,6 +252,8 @@
     "Zest returns nominal annual rates despite its field names, confirmed with the venue. They are converted here to effective APY, e^r - 1, the same basis Granite's per-second compounding produces. Every market also carries nominalBorrow and nominalSupply so the raw figure is visible.",
     "Fixings before methodology 1.6.0 used Zest's nominal figures unconverted and are therefore a few basis points lower on the Zest-weighted portion. Past fixings are not rewritten; the version recorded on each one identifies the basis it used.",
     "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
+    "The record is sharded by year at /api/v1/history-YYYY.json, indexed at /api/v1/history-index.json. history.json carries a rolling 400 day window for convenience.",
+    "context records SOFR, spot prices, sBTC supply and the Bitcoin block height alongside each fixing. None of it enters an index or affects a rate. It is kept so a past fixing can be read in the conditions of its day.",
     "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
     "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
     "Protocol yield for stSTX and stSTXbtc is sourced from StackingDAO, which derives it from PoX reward claims net of pool commission over stSTX supply. Where a source cannot be reached, the index is marked allInSupplyIncomplete and the yield is left out rather than estimated.",
