@@ -105,9 +105,12 @@ fixing with a note.
 ## Data
 
 - https://sbor.xyz/api/v1/latest.json    current fixing, with constituents
-- https://sbor.xyz/api/v1/history.json   daily closes since the index began
+- https://sbor.xyz/api/v1/history.json   rolling 400 day window, for convenience
+- https://sbor.xyz/api/v1/history-index.json  index of the full record by year
+- https://sbor.xyz/api/v1/history-YYYY.json   the complete record, one file a year
 - https://sbor.xyz/api/v1/backfill.json  reconstructed context, not the record
 - https://sbor.xyz/api/v1/archive/       full daily snapshots, one file per day
+- https://sbor.xyz/api/v1/inversion-log.json  every inversion episode ever detected
 - https://sbor.xyz/latest.txt            current fixing as plain text
 - https://sbor.xyz/weekly.txt            weekly report as plain text
 
@@ -149,6 +152,64 @@ rather than currency movement between fixings. Both the smoothed rate
 Because it annualises a single two week cycle, a change in one cycle's payout
 moves it considerably. Read the cycle number before comparing two fixings.
 
+## Inversions
+
+An inversion is the same asset costing less to borrow at one venue than it pays
+to supply at another. It should not happen, because that spread is how a lending
+protocol earns, but an incentivised market can cause it.
+
+SBOR checks hourly and publishes what it finds at
+https://sbor.xyz/api/v1/inversions.json, to everyone at once and never to a
+private channel. Each detection carries the asset, both venues, both rates, the
+utilisation on each side and the edge in basis points.
+
+The payload carries a "status" field. While it reads "validating" the detection
+is being proven and should not be relied on; the status is published so the
+validation period is visible rather than private. Rates are compared as SBOR
+publishes them, before fees, gas, liquidation risk and any minimum position
+size. SBOR does not trade on its own rate and does not represent that any
+inversion is executable.
+
+## The record, and what is in it
+
+Two things are published, for two purposes.
+
+history.json is the queryable series: one row a day carrying, for each index,
+the borrow and supply rate, the all-in supply including protocol yield, weighted
+utilisation, total depth, venue count, largest constituent weight, and a compact
+line per constituent market with its own rate, utilisation, protocol yield,
+depth and weight. Plus the staking reference with its cycle number, the
+approximate dates that cycle covered, bitcoin paid, STX locked and both cross
+rates. Plus the external comparison. Plus the methodology version that produced
+the row.
+
+The series is sharded by year at history-YYYY.json, indexed at
+history-index.json. history.json carries a rolling 400 day window so anything
+already reading it keeps working; the shards are authoritative for anything
+older. A single growing file would be rewritten in full on every commit, which
+makes the repository grow quadratically, so it is split.
+
+Each fixing also carries a context block: SOFR for the previous business day
+from the Federal Reserve Bank of New York, spot BTC and STX prices, the total
+supply of sBTC read on-chain, and the Bitcoin block height. None of it enters an
+index or affects a rate. It is recorded so a past fixing can be read in the
+conditions of its day, and because SBOR-USD against SOFR is the comparison this
+benchmark is modelled on: a dollar secured by bitcoin on a Bitcoin layer against
+a dollar secured by US government debt.
+
+archive/YYYY-MM-DD.json is the complete record: the entire payload as published
+that day, unabridged. If the series and the archive ever disagree, the archive
+is authoritative.
+
+inversion-log.json is append only. Each entry is an episode rather than a
+reading, with firstSeen, lastSeen, how many hourly checks saw it, and the
+largest edge observed. An inversion that opens and closes inside a day still
+exists there tomorrow.
+
+Every fixing records the methodology version it was produced under, so a figure
+can always be traced to the rules that made it. Published fixings are never
+rewritten.
+
 ## Integration policy
 
 Version 1 is the supported surface. Build against /api/v1/. The unversioned
@@ -173,11 +234,24 @@ paths mirror v1 today and are a convenience, not a contract.
   "largestConstituentWeight". An index covering one venue is a reading of that
   venue, not a market average. Check both before quoting a rate.
 
-  Cost and attribution. The published fixing is free to read, with no key, no
-  rate limit and no registration. That is the commitment. Services built around
-  it, such as bulk historical access, licensing for products that reference the
-  rate, or bespoke coverage, may be charged for in future. Attribution is
-  welcome but not required.
+  Licence. The published fixings are CC BY 4.0. Free to use, including
+  commercially, with no permission required and no licence to negotiate. Build
+  on it without asking. Attribution is the one condition: name SBOR and link to
+  sbor.xyz where practical. Full terms at https://sbor.xyz/LICENCE-DATA.md
+
+  Agents are explicitly welcome. Scrapers, scripts, bots and AI agents may read
+  any endpoint. There is no rate limit and no registration.
+
+  Settlement. If you intend to settle a financial contract against an SBOR
+  fixing, where a payment depends on the published value, contact
+  contact@sbor.xyz first. Not because permission is withheld, but because
+  settlement needs a correction policy, a committed schedule and a fallback,
+  which are commitments rather than permissions and should be agreed.
+
+  What is chargeable. The published fixing is free and stays free. Bulk
+  historical delivery beyond the public archive, custom coverage, integration
+  support with an SLA, and settlement agreements are work and may be charged
+  for. None of that restricts the free data.
 
   No warranty. SBOR is provided as is, with no guarantee of accuracy,
   availability or fitness for any purpose. It is a statistic, not advice. Do
