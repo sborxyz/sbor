@@ -63,6 +63,12 @@ const round = (n,d=2) => Number(Number(n).toFixed(d));
    currency alone. */
 const CROSS_WINDOW_DAYS = 7;
 
+/* If Hiro does not expose the current burn height under a name we know, fall
+   back to the start of the next reward phase, which is close enough to date a
+   completed cycle. */
+const endBurnFallback = pox =>
+  pox.next_cycle?.reward_phase_start_block_height ?? pox.first_burnchain_block_height;
+
 /* Prior quotes, newest first, from the published record. */
 function priorCrossQuotes(){
   for (const f of ["api/v1/history.json", "api/history.json"]){
@@ -91,6 +97,9 @@ async function getJson(u){
 export async function poxReference(){
   /* 1. cycle geometry and how much STX is locked */
   const pox = await getJson(`${HIRO}/v2/pox`);
+  const curBurn = Number(pox.current_burnchain_block_height
+                      ?? pox.current_cycle?.burn_block_height
+                      ?? endBurnFallback(pox));
   const cycleLen = pox.reward_cycle_length;                 // burn blocks per cycle
   const cur      = pox.current_cycle;
   const cycleId  = cur.id;
@@ -156,6 +165,12 @@ export async function poxReference(){
       `${smoothed.toFixed(0)} STX/BTC smoothed = ${(cycleYield*100).toFixed(4)}% per cycle, ` +
       `${cyclesPerYear.toFixed(2)} cycles a year`);
 
+  /* Bitcoin block times are roughly ten minutes, so the window can be dated
+     well enough to say what a cycle covered. Block heights are exact and
+     dates are approximate; both are published. */
+  const blockDate = h => new Date(Date.now() - (curBurn - h) * 6e5)
+                          .toISOString().slice(0, 10);
+
   return {
     label: "SBOR-PoX",
     headline: "The native Bitcoin yield paid to STX stakers.",
@@ -165,6 +180,11 @@ export async function poxReference(){
     annualisation: "Bitcoin paid over one reward cycle divided by STX locked, annualised over the cycles in a year.",
     apy: round(apy),
     cycle: target,
+    cycleStartBurnBlock: startBlk,
+    cycleEndBurnBlock: endBlk,
+    cycleStartApprox: blockDate(startBlk),
+    cycleEndApprox: blockDate(endBlk),
+    cycleLengthBlocks: cycleLen,
     cycleYieldPct: round(cycleYield*100, 4),
     btcPaid: round(btcPaid, 6),
     stxLocked: Math.round(stxLocked),
