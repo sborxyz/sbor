@@ -1,22 +1,22 @@
 {
-  "fixing": "2026-09-11T00:21:33Z",
+  "fixing": "2026-09-11T13:03:31Z",
   "comparedWith": "2026-09-10",
   "top": {
-    "why": "Zest V2 STX utilisation 83.24%",
+    "why": "Zest V2 STX utilisation 81.51%",
     "chars": 157,
-    "text": "Zest V2 STX is 83.24% utilised.\n\nBorrow 3.48%, supply 2.58%.\n\nAbove 80% a lending market prices steeply, and withdrawals get harder.\n\nsbor.xyz"
+    "text": "Zest V2 STX is 81.51% utilised.\n\nBorrow 3.41%, supply 2.48%.\n\nAbove 80% a lending market prices steeply, and withdrawals get harder.\n\nsbor.xyz"
   },
   "otherCount": 1,
   "drafts": [
     {
-      "why": "Zest V2 STX utilisation 83.24%",
+      "why": "Zest V2 STX utilisation 81.51%",
       "chars": 157,
-      "text": "Zest V2 STX is 83.24% utilised.\n\nBorrow 3.48%, supply 2.58%.\n\nAbove 80% a lending market prices steeply, and withdrawals get harder.\n\nsbor.xyz"
+      "text": "Zest V2 STX is 81.51% utilised.\n\nBorrow 3.41%, supply 2.48%.\n\nAbove 80% a lending market prices steeply, and withdrawals get harder.\n\nsbor.xyz"
     },
     {
-      "why": "Zest V2 stSTX utilisation 8.7%",
+      "why": "Zest V2 stSTX utilisation 8.68%",
       "chars": 171,
-      "text": "Zest V2 stSTX: $2.2M supplied, 8.70% of it borrowed.\n\nBorrow 1.40%, supply 0.10%.\n\nLow utilisation, so the rate is low and the capacity is unused.\n\nsbor.xyz"
+      "text": "Zest V2 stSTX: $2.1M supplied, 8.68% of it borrowed.\n\nBorrow 1.40%, supply 0.10%.\n\nLow utilisation, so the rate is low and the capacity is unused.\n\nsbor.xyz"
     }
   ]
 }

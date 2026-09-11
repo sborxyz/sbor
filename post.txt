@@ -1,21 +1,21 @@
-SBOR post drafts, fixing 2026-09-11T00:21:33Z
+SBOR post drafts, fixing 2026-09-11T13:03:31Z
 Compared with 2026-09-10
 
 2 things worth saying. Pick one. Do not post more than one a day.
 
---- 1. Zest V2 STX utilisation 83.24% (157 chars)
+--- 1. Zest V2 STX utilisation 81.51% (157 chars)
 
-Zest V2 STX is 83.24% utilised.
+Zest V2 STX is 81.51% utilised.
 
-Borrow 3.48%, supply 2.58%.
+Borrow 3.41%, supply 2.48%.
 
 Above 80% a lending market prices steeply, and withdrawals get harder.
 
 sbor.xyz
 
---- 2. Zest V2 stSTX utilisation 8.7% (171 chars)
+--- 2. Zest V2 stSTX utilisation 8.68% (171 chars)
 
-Zest V2 stSTX: $2.2M supplied, 8.70% of it borrowed.
+Zest V2 stSTX: $2.1M supplied, 8.68% of it borrowed.
 
 Borrow 1.40%, supply 0.10%.
 
