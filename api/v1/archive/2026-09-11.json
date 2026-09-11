@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-11T00:17:57Z",
+  "fixing": "2026-09-11T00:21:33Z",
   "methodologyVersion": "1.7.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -77,7 +77,7 @@
       "headline": "What money costs in STX on Stacks.",
       "borrow": 2.35,
       "supply": 1.23,
-      "allInSupply": 4.75,
+      "allInSupply": 4.74,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
@@ -92,7 +92,7 @@
           "utilization": 8.7,
           "nominalBorrow": 1.39,
           "nominalSupply": 0.1,
-          "protocolYield": 6.46,
+          "protocolYield": 6.45,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
           "depthUsd": 2170085,
           "phaseIn": 1,
@@ -126,16 +126,16 @@
     "period": "one reward cycle, about two weeks",
     "cyclesPerYear": 25.03,
     "annualisation": "Bitcoin paid over one reward cycle divided by STX locked, annualised over the cycles in a year.",
-    "apy": 7.84,
+    "apy": 7.82,
     "cycle": 142,
-    "cycleYieldPct": 0.302,
+    "cycleYieldPct": 0.3013,
     "btcPaid": 4.43895,
     "stxLocked": 441576024,
-    "stxPerBtc": 300446.94,
-    "stxPerBtcSmoothed": 300446.94,
+    "stxPerBtc": 299693.62,
+    "stxPerBtcSmoothed": 299693.62,
     "crossWindowDays": 1,
     "rateSource": "Bitflow",
-    "rateQuoteImpactBps": 25,
+    "rateQuoteImpactBps": 4,
     "note": "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualised. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over a short window rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. It is a staking yield, not a lending rate, and is never blended into the lending indices."
   },
   "externalReference": {
