@@ -79,6 +79,23 @@ export async function externalReference(){
   const list = !borrowRes ? [] : (Array.isArray(borrowRes) ? borrowRes : (borrowRes.data || []));
   const borrowBy = Object.fromEntries(list.map(b => [b.pool, b]));
 
+  /* Diagnostic: DefiLlama covers a chain for TVL without necessarily having a
+     yield adapter for it. If a wanted chain has no pools at all, that is the
+     reason, and no amount of guessing project slugs will fix it. */
+  for (const c of ["Rootstock","RSK"]){
+    const pools = data.filter(p => p.chain === c);
+    if (!pools.length) continue;
+    const seen = new Map();
+    for (const p of pools.sort((a,b) => (b.tvlUsd||0) - (a.tvlUsd||0))){
+      const k = `${p.project}|${p.symbol}`;
+      if (seen.has(k)) continue;
+      seen.set(k, 1);
+      if (seen.size <= 12)
+        log(`  [${c}] ${p.project} ${p.symbol} tvl=${Math.round(p.tvlUsd||0)} apyBase=${p.apyBase}`);
+    }
+    log(`  [${c}] ${pools.length} pools in the yields data, ${seen.size} distinct project/symbol pairs`);
+  }
+
   const out = [];
   for (const w of WANTED){
     /* Deepest matching pool across the candidate protocols, so a small
