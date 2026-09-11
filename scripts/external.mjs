@@ -30,13 +30,20 @@ const WANTED = [
   { chain:"Base", symbol:"CBBTC", display:"cbBTC", against:"SBOR-BTC",
     projects:["aave-v3","moonwell","morpho-blue","compound-v3"] },
   { chain:"Base", symbol:"USDC",  display:"USDC",  against:"SBOR-USD",
-    projects:["aave-v3","moonwell","morpho-blue","compound-v3"] }
+    projects:["aave-v3","moonwell","morpho-blue","compound-v3"] },
+  /* Rootstock is the closest comparison of all: another Bitcoin sidechain with
+     a bitcoin-backed asset lent on it, at a similar scale to Stacks. */
+  { chain:["Rootstock","RSK"], symbol:["RBTC","WRBTC"], display:"rBTC", against:"SBOR-BTC",
+    projects:["layerbank","sovryn-lend","sovryn","tropykus-rsk","tropykus-finance","segment-finance"] }
 ];
 
 /* DefiLlama project slug to something a person would recognise. */
 const VENUE_NAME = {
   "aave-v3":"Aave V3", "moonwell":"Moonwell", "morpho-blue":"Morpho",
-  "compound-v3":"Compound V3"
+  "compound-v3":"Compound V3", "layerbank":"LayerBank",
+  "sovryn-lend":"Sovryn", "sovryn":"Sovryn",
+  "tropykus-rsk":"Tropykus", "tropykus-finance":"Tropykus",
+  "segment-finance":"Segment"
 };
 
 /* Aave keys its reserve pages on the underlying token address, which the pool
@@ -76,13 +83,17 @@ export async function externalReference(){
   for (const w of WANTED){
     /* Deepest matching pool across the candidate protocols, so a small
        duplicate listing cannot win. */
+    /* chain and symbol may each be a string or a list of acceptable values,
+       because naming differs between sources and changes over time */
+    const chains  = [].concat(w.chain);
+    const symbols = [].concat(w.symbol).map(x => x.toUpperCase());
     const matches = data.filter(p =>
       w.projects.includes(p.project) &&
-      p.chain === w.chain &&
-      String(p.symbol).toUpperCase() === w.symbol &&
+      chains.includes(p.chain) &&
+      symbols.includes(String(p.symbol).toUpperCase()) &&
       (p.tvlUsd || 0) > 0);
     if (!matches.length){
-      log(`  external: no ${w.symbol} pool on ${w.chain} among ${w.projects.join(", ")}`);
+      log(`  external: no ${symbols.join("/")} pool on ${chains.join("/")} among ${w.projects.join(", ")}`);
       continue;
     }
     const p = matches.sort((a,b) => (b.tvlUsd||0) - (a.tvlUsd||0))[0];
@@ -112,7 +123,7 @@ export async function externalReference(){
   }
   if (!out.length) throw new Error("no external reference pools resolved");
   return {
-    note: "Reference rates from the largest lending market outside Stacks, published for comparison only. These are not constituents of any SBOR index and never enter a fixing. Borrow rates are published as APR by the source and shown as read.",
+    note: "Reference rates from the largest lending markets off this chain, published for comparison only. The deepest pool on each chain is used, so the venue named can change. These are not constituents of any SBOR index and never enter a fixing. Rates come from DefiLlama rather than from contract state, and are shown as the source publishes them, so they are not on the same basis as the SBOR indices.",
     source: "DefiLlama",
     markets: out
   };
