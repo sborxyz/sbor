@@ -64,8 +64,9 @@ afterwards. Full policy in [llms.txt](https://sbor.xyz/llms.txt).
 
 ## For agents
 
-No key, no registration, no rate limit, no fee, and there never will be. Fetch
-what you need.
+The published fixing is free to read: no key, no registration, no rate limit, no
+fee. Licensed CC BY 4.0, so you can build on it commercially without asking.
+Fetch what you need.
 
 To judge whether a lending offer is good, compare it against the index for that
 currency. Borrowing above the SBOR borrow rate means paying more than the
@@ -152,6 +153,24 @@ that should be covered and is not. Open an issue or write to contact@sbor.xyz.
 
 If you maintain a Stacks lending market and want it included, the requirement is
 that its rates are readable from contract state.
+
+## Licence
+
+Code: MIT. **Data: [CC BY 4.0](LICENCE-DATA.md).**
+
+The published fixings are free to use, including commercially, with no
+permission required and no licence to negotiate. Build on it without asking.
+Attribution is the only condition: name SBOR and link to sbor.xyz where
+practical.
+
+**Agents are explicitly welcome.** Scrapers, scripts, bots and AI agents may read
+any endpoint. No rate limit, no registration.
+
+Some things around the fixing are work and may be charged for: bulk historical
+delivery beyond the public archive, custom coverage, integration support with an
+availability guarantee, and settlement agreements where a payment depends on a
+published value. None of that restricts the free data. Full terms in
+[LICENCE-DATA.md](LICENCE-DATA.md).
 
 ## Disclaimer
 
