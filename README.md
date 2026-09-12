@@ -40,12 +40,14 @@ reference rates from Aave V3 on Ethereum for comparison.
 
 ## Data
 
-The published fixing is free to read. No key, no registration, no rate limit, no fee. CORS open.
+No key, no registration, no rate limit, no fee. CORS open.
 
 | Endpoint | What |
 |---|---|
 | [`/api/v1/latest.json`](https://sbor.xyz/api/v1/latest.json) | current fixing, with constituents |
-| [`/api/v1/history.json`](https://sbor.xyz/api/v1/history.json) | daily series since the index began |
+| [`/api/v1/history.json`](https://sbor.xyz/api/v1/history.json) | rolling 400 day series |
+| [`/api/v1/history-index.json`](https://sbor.xyz/api/v1/history-index.json) | index of the full record, sharded by year |
+| [`/api/v1/inversions.json`](https://sbor.xyz/api/v1/inversions.json) | cross-venue inversions, checked hourly |
 | [`/api/v1/archive/`](https://sbor.xyz/api/v1/archive/) | immutable daily snapshots |
 | [`/latest.txt`](https://sbor.xyz/latest.txt) | current fixing, plain text |
 | [`/weekly.txt`](https://sbor.xyz/weekly.txt) | weekly report, plain text |
@@ -62,8 +64,8 @@ afterwards. Full policy in [llms.txt](https://sbor.xyz/llms.txt).
 
 ## For agents
 
-The published fixing is free to read: no key, no registration, no rate limit,
-no fee. Fetch what you need.
+No key, no registration, no rate limit, no fee, and there never will be. Fetch
+what you need.
 
 To judge whether a lending offer is good, compare it against the index for that
 currency. Borrowing above the SBOR borrow rate means paying more than the
@@ -100,9 +102,12 @@ reference it for.
   note, or as a visible withdrawal record.
 - **Term averages** are compounded, actual/365, and publish only once the full
   window of fixings exists.
-- **Rate basis is disclosed, not assumed.** Granite rates are compounded to APY.
-  Zest rates are published as the contract returns them, and whether those are
-  nominal or compounded is under confirmation with the venue.
+- **Context is recorded, not used.** Each fixing also stores SOFR, spot BTC and
+  STX prices, sBTC total supply and the Bitcoin block height. None of it enters
+  an index. It is kept so a past fixing can be read in the conditions of its day.
+- **Rate basis is converted, not assumed.** Both venues return nominal annual
+  rates from their contracts, confirmed with Zest. Each is converted the same
+  way to an effective APY, and every market also carries its nominal figure.
 
 Every fixing records the methodology version it was produced under. Full
 methodology at [sbor.xyz](https://sbor.xyz) and in
