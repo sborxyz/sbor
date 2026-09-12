@@ -32,7 +32,9 @@ jobs:
         run: |
           git config user.name  "sbor-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A api/v1/inversions.json api/v1/inversion-log.json
+          # The log only exists once an inversion has been found, and git add
+          # fails on a pathspec that matches nothing. Stage the directory.
+          git add -A api/v1
           if git diff --staged --quiet; then
             echo "No change."
           else
