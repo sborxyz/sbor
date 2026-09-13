@@ -1,6 +1,6 @@
 {
   "schema": "sbor.v1",
-  "checked": "2026-09-13T17:02:15Z",
+  "checked": "2026-09-13T19:41:45Z",
   "basedOnFixing": "2026-09-13T13:21:32Z",
   "status": "validating",
   "statusNote": "This monitor is being validated. Detections are published so the validation period is visible, but they have not yet been checked against reality over a long enough run to be relied on.",
