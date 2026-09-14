@@ -81,7 +81,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.8.0";
+const METHODOLOGY_VERSION = "1.9.0";
 
 /* Below this, on both sides at once, a funded market is not reporting. */
 const RATE_FLOOR = 0.05;
