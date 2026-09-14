@@ -136,8 +136,12 @@ export async function externalReference(){
        one thing this comparison is for. So rank on completeness first, then
        depth. Jupiter Lend on Solana is the case that forced this: $481M of
        USDC and no borrow side published at all. */
-    const complete = p => (typeof p.apyBaseBorrow === "number" ? 2 : 0)
-                        + (typeof p.utilization === "number" ? 1 : 0);
+    const complete = cand => {
+      const rec = borrowBy[cand.pool];
+      const sup = Number(rec?.totalSupplyUsd), bor = Number(rec?.totalBorrowUsd);
+      return (borrowAprOf(rec) != null ? 2 : 0)
+           + (Number.isFinite(sup) && Number.isFinite(bor) && sup > 0 ? 1 : 0);
+    };
     const ranked = [...matches].sort((a,b) =>
       complete(b) - complete(a) || (b.tvlUsd||0) - (a.tvlUsd||0));
     const p = ranked[0];
@@ -145,7 +149,7 @@ export async function externalReference(){
     if (p !== deepest)
       log(`  external: ${w.display} on ${chains[0]} using ${p.project} ` +
           `($${Math.round((p.tvlUsd||0)/1e6)}M, complete) over ${deepest.project} ` +
-          `($${Math.round((deepest.tvlUsd||0)/1e6)}M, no borrow side)`);
+          `($${Math.round((deepest.tvlUsd||0)/1e6)}M, borrow side not published)`);
     const label = `${VENUE_NAME[p.project] || p.project}, ${p.chain}`;
 
     const bRec = borrowBy[p.pool];
@@ -172,7 +176,7 @@ export async function externalReference(){
   }
   if (!out.length) throw new Error("no external reference pools resolved");
   return {
-    note: "Reference rates from the largest lending markets off this chain, published for comparison only. The deepest pool on each chain is used, so the venue named can change. These are not constituents of any SBOR index and never enter a fixing. Rates come from DefiLlama rather than from contract state, and are shown as the source publishes them, so they are not on the same basis as the SBOR indices.",
+    note: "Reference rates from the largest lending markets off this chain, published for comparison only. One market is selected per chain: a venue that publishes a borrow rate and utilisation is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. These are not constituents of any SBOR index and never enter a fixing. Rates come from DefiLlama rather than from contract state, and are shown as the source publishes them, so they are not on the same basis as the SBOR indices.",
     source: "DefiLlama",
     markets: out
   };
