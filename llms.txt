@@ -46,8 +46,12 @@ demand is outrunning supply.
 ## Outside Stacks
 
 Each fixing also carries externalReference: the same asset class on the largest
-lending markets off this chain, currently Ethereum and Base. The deepest pool on
-each chain is used, so the venue named can change between fixings. It is published so
+lending markets off this chain, currently Ethereum, Base, Hyperliquid and
+Solana. The venue named can change between fixings, because it is selected per
+chain rather than fixed: a market that publishes a borrow rate and utilisation
+is preferred over one that does not, and depth decides between markets that
+publish both. A borrow rate with no utilisation beside it explains nothing,
+which is what this comparison exists for. It is published so
 a reader can see what comparable capital costs elsewhere. It is never a
 constituent of any index and never affects a fixing.
 
