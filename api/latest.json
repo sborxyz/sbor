@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-14T18:40:22Z",
+  "fixing": "2026-09-14T18:43:29Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -77,7 +77,7 @@
       "headline": "What money costs in STX on Stacks.",
       "borrow": 2.33,
       "supply": 1.22,
-      "allInSupply": 4.66,
+      "allInSupply": 4.68,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
@@ -92,7 +92,7 @@
           "utilization": 8.53,
           "nominalBorrow": 1.37,
           "nominalSupply": 0.09,
-          "protocolYield": 6.21,
+          "protocolYield": 6.24,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
           "depthUsd": 2317703,
           "phaseIn": 1,
@@ -141,7 +141,7 @@
     "stxPerBtcBuy": 294168.1,
     "crossSpreadBps": 93,
     "crossNote": "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it.",
-    "stxPerBtcSmoothed": 290490.55,
+    "stxPerBtcSmoothed": 290505.14,
     "crossWindowDays": 5,
     "rateSource": "Bitflow",
     "rateQuoteImpactBps": 14,
@@ -274,8 +274,8 @@
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 79110,
-      "stxUsd": 0.269376,
+      "btcUsd": 79046,
+      "stxUsd": 0.269111,
       "source": "CoinGecko"
     },
     "sbtcSupply": {

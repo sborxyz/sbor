@@ -634,7 +634,7 @@
   },
   {
     "date": "2026-09-14",
-    "fixedAt": "2026-09-14T18:40:22Z",
+    "fixedAt": "2026-09-14T18:43:29Z",
     "methodologyVersion": "1.9.0",
     "SBOR-PoX": {
       "apy": 7.57,
@@ -644,7 +644,7 @@
       "btcPaid": 4.43895,
       "stxLocked": 441576024,
       "stxPerBtc": 292809.15,
-      "stxPerBtcSmoothed": 290490.55
+      "stxPerBtcSmoothed": 290505.14
     },
     "external": [
       {
@@ -773,7 +773,7 @@
     "SBOR-STX": {
       "borrow": 2.33,
       "supply": 1.22,
-      "allInSupply": 4.66,
+      "allInSupply": 4.68,
       "venues": 1,
       "largestConstituentWeight": 0.5535,
       "depthUsd": 4186994,
@@ -785,7 +785,7 @@
           "b": 1.38,
           "s": 0.09,
           "u": 8.53,
-          "py": 6.21,
+          "py": 6.24,
           "d": 2317703,
           "w": 0.5535
         },
