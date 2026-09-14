@@ -38,7 +38,16 @@ const WANTED = [
   { chain:"Base", symbol:"CBBTC", display:"cbBTC", against:"SBOR-BTC",
     projects:["aave-v3","moonwell","morpho-blue","compound-v3"] },
   { chain:"Base", symbol:"USDC",  display:"USDC",  against:"SBOR-USD",
-    projects:["aave-v3","moonwell","morpho-blue","compound-v3"] }
+    projects:["aave-v3","moonwell","morpho-blue","compound-v3"] },
+  /* Hyperliquid. UBTC is Unit's wrapped bitcoin on HyperEVM, lent on HyperLend
+     and through Morpho. A chain with real traction and a bitcoin market, so the
+     same comparison as cbBTC on Base. */
+  { chain:["Hyperliquid","HyperEVM","Hyperliquid L1"], symbol:["UBTC","WBTC"], display:"UBTC",
+    against:"SBOR-BTC",
+    projects:["hyperlend","hyperbeat","morpho-blue","hyperdrive","felix"] },
+  { chain:["Hyperliquid","HyperEVM","Hyperliquid L1"], symbol:["USDC","USDT0"], display:"USDC",
+    against:"SBOR-USD",
+    projects:["hyperlend","hyperbeat","morpho-blue","hyperdrive","felix"] }
 ];
 
 /* DefiLlama project slug to something a person would recognise. */
@@ -47,7 +56,9 @@ const VENUE_NAME = {
   "compound-v3":"Compound V3", "layerbank":"LayerBank",
   "sovryn-lend":"Sovryn", "sovryn":"Sovryn",
   "tropykus-rsk":"Tropykus", "tropykus-finance":"Tropykus",
-  "segment-finance":"Segment"
+  "segment-finance":"Segment",
+  "hyperlend":"HyperLend", "hyperbeat":"Hyperbeat",
+  "hyperdrive":"Hyperdrive", "felix":"Felix"
 };
 
 /* Aave keys its reserve pages on the underlying token address, which the pool
@@ -82,6 +93,23 @@ export async function externalReference(){
   }
   const list = !borrowRes ? [] : (Array.isArray(borrowRes) ? borrowRes : (borrowRes.data || []));
   const borrowBy = Object.fromEntries(list.map(b => [b.pool, b]));
+
+  /* Diagnostic while Hyperliquid coverage is unproven. DefiLlama names chains
+     inconsistently and a miss should say what is actually available rather than
+     leaving us guessing slugs. Remove once it resolves. */
+  for (const c of ["Hyperliquid","HyperEVM","Hyperliquid L1"]){
+    const pools = data.filter(p => p.chain === c);
+    if (!pools.length) continue;
+    const seen = new Set();
+    for (const p of pools.sort((a,b) => (b.tvlUsd||0)-(a.tvlUsd||0))){
+      const k = `${p.project}|${p.symbol}`;
+      if (seen.has(k)) continue;
+      seen.add(k);
+      if (seen.size <= 10)
+        log(`  [${c}] ${p.project} ${p.symbol} tvl=${Math.round(p.tvlUsd||0)} apyBase=${p.apyBase}`);
+    }
+    log(`  [${c}] ${pools.length} pools, ${seen.size} distinct project/symbol pairs`);
+  }
 
   const out = [];
   for (const w of WANTED){
