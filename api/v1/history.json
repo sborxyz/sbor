@@ -634,17 +634,17 @@
   },
   {
     "date": "2026-09-14",
-    "fixedAt": "2026-09-14T18:27:58Z",
+    "fixedAt": "2026-09-14T18:34:04Z",
     "methodologyVersion": "1.9.0",
     "SBOR-PoX": {
-      "apy": 7.58,
+      "apy": 7.57,
       "cycle": 142,
       "cycleStart": "2026-08-24",
       "cycleEnd": "2026-09-07",
       "btcPaid": 4.43895,
       "stxLocked": 441576024,
-      "stxPerBtc": 293226.25,
-      "stxPerBtcSmoothed": 290874.72
+      "stxPerBtc": 292736.21,
+      "stxPerBtcSmoothed": 290573.97
     },
     "external": [
       {
@@ -720,12 +720,12 @@
         "vs": "SBOR-BTC"
       },
       {
-        "v": "Kamino, Solana",
+        "v": "Jupiter Lend, Solana",
         "a": "USDC",
-        "b": 5.29,
-        "s": 3.41,
-        "u": 80.18,
-        "d": 24964136,
+        "b": null,
+        "s": 3.56,
+        "u": null,
+        "d": 481298950,
         "vs": "SBOR-USD"
       }
     ],
@@ -773,7 +773,7 @@
     "SBOR-STX": {
       "borrow": 2.33,
       "supply": 1.22,
-      "allInSupply": 4.66,
+      "allInSupply": 4.68,
       "venues": 1,
       "largestConstituentWeight": 0.5535,
       "depthUsd": 4186994,
@@ -785,7 +785,7 @@
           "b": 1.38,
           "s": 0.09,
           "u": 8.53,
-          "py": 6.21,
+          "py": 6.24,
           "d": 2317703,
           "w": 0.5535
         },
