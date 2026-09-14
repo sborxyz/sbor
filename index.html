@@ -83,7 +83,7 @@ section{padding:44px 0;border-bottom:1px solid var(--rule)}
 .tscroll{width:100%;overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:15px}
 th{text-align:left;font-weight:500;font-size:13.5px;color:var(--ink-soft);padding:0 12px 9px 0;border-bottom:1px solid var(--rule);white-space:nowrap}
-th.r,td.r{text-align:right;padding-right:0;padding-left:18px}
+th.r,td.r{text-align:right;padding-right:0}
 td{padding:13px 12px 13px 0;border-bottom:1px solid var(--rule-soft);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 .venue{font-weight:500}
@@ -185,29 +185,6 @@ a{color:var(--accent)}
   .wrap{padding:0 20px}
   .switch button{margin-right:26px;font-size:14px}
   th.hide-sm,td.hide-sm{display:none}
-}
-/* Phones: tables stop behaving like tables. Every row becomes a labelled
-   block, so no column is hidden, no figure is truncated, and nothing has to
-   be found by scrolling sideways. Labels come from the existing column
-   headings, so both languages are already covered. */
-@media (max-width:720px){
-  .tscroll{overflow-x:visible}
-  .tscroll thead{display:none}
-  .tscroll table,.tscroll tbody,.tscroll tr,.tscroll td{display:block;width:100%}
-  .tscroll tr{border-bottom:1px solid var(--rule);padding:15px 0 17px}
-  .tscroll tr:last-child{border-bottom:none}
-  .tscroll td,.tscroll td.r{display:flex;justify-content:space-between;align-items:baseline;
-    gap:18px;text-align:left;border:none;padding:5px 0}
-  .tscroll td::before{content:attr(data-l);color:var(--ink-soft);font-size:13.5px;line-height:1.45}
-  .tscroll td:first-child{display:block;padding:0 0 10px;font-size:16px;line-height:1.4}
-  .tscroll td:first-child::before{content:none}
-  .tscroll td.barcell{display:block;padding:9px 0 1px}
-  .tscroll td.barcell::before{content:none}
-  .tscroll td.barcell .bar{max-width:none;margin-left:0;height:8px}
-  .tscroll .terms td,.tscroll .terms th{white-space:normal}
-  /* Ruled paper behind a big number reads well. Behind body copy it slices
-     through the lines. Delete this one line to put the ruling back. */
-  .sofrbox{background:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -487,7 +464,7 @@ en:{
   sofrWhy:"Bitcoin is the riskier collateral, so by any textbook this is backwards. It is cheaper here because almost nobody is borrowing yet, so utilisation is low and the rate has not been bid up. The gap is a measure of how early this market is.",
   sofrAvgs:(a30,a90,a180)=>`SOFR averages: 30 day ${a30}, 90 day ${a90}, 180 day ${a180}.`,
   extH:"Outside Stacks",
-  extP:"The same asset class on the largest lending markets off this chain, shown for comparison. The deepest pool on each chain is used, so the venue can change. These are not constituents of any SBOR index and never enter a fixing.",
+  extP:"The same asset class on the largest lending markets off this chain, shown for comparison. One market is selected per chain: a venue that publishes a borrow rate and utilisation is preferred over one that does not, and depth decides between those that publish both. So the venue named can change. These are not constituents of any SBOR index and never enter a fixing.",
   extCols:["Market","Borrow","Supply","Utilisation","Depth","Compare with"],
   termsH:"Term averages",
   termsP:"Compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window of fixings exists.",
@@ -575,7 +552,7 @@ pt:{
   sofrWhy:"O bitcoin é a garantia mais arriscada, então pela teoria isso está invertido. Sai mais barato aqui porque quase ninguém ainda toma emprestado, então a utilização é baixa e a taxa não foi disputada. A diferença mede o quanto este mercado ainda é inicial.",
   sofrAvgs:(a30,a90,a180)=>`Médias da SOFR: 30 dias ${a30}, 90 dias ${a90}, 180 dias ${a180}.`,
   extH:"Fora da Stacks",
-  extP:"A mesma classe de ativo nos maiores mercados de crédito fora desta rede, mostrada para comparação. É usado o pool mais profundo de cada rede, então a plataforma pode mudar. Não são componentes de nenhum índice SBOR e nunca entram em um fixing.",
+  extP:"A mesma classe de ativo nos maiores mercados de crédito fora desta rede, mostrada para comparação. É escolhido um mercado por rede: uma plataforma que publica taxa de empréstimo e utilização tem preferência sobre uma que não publica, e a profundidade decide entre as que publicam as duas. Por isso a plataforma citada pode mudar. Não são componentes de nenhum índice SBOR e nunca entram em um fixing.",
   extCols:["Mercado","Empréstimo","Depósito","Utilização","Profundidade","Comparar com"],
   termsH:"Médias de prazo",
   termsP:"Médias compostas dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa de fixings.",
@@ -846,13 +823,13 @@ function renderChrome(){
         <td>${m.url
             ? `<a class="venue" href="${m.url}" target="_blank" rel="noopener">${m.venue}</a>`
             : `<span class="venue">${m.venue}</span>`}<span class="asset">${m.asset}</span></td>
-        <td class="r num" data-l="${t.extCols[1]}">${m.borrow == null ? "n/a" : m.borrow.toFixed(2)+"%"}</td>
-        <td class="r num" data-l="${t.extCols[2]}">${m.supply.toFixed(2)}%</td>
-        <td class="r num" data-l="${t.extCols[3]}">${m.utilization == null ? "n/a" : m.utilization.toFixed(2)+"%"}</td>
-        <td class="r num" data-l="${t.extCols[4]}">${m.dataUrl
+        <td class="r num">${m.borrow == null ? "n/a" : m.borrow.toFixed(2)+"%"}</td>
+        <td class="r num">${m.supply.toFixed(2)}%</td>
+        <td class="r num">${m.utilization == null ? "n/a" : m.utilization.toFixed(2)+"%"}</td>
+        <td class="r num">${m.dataUrl
             ? `<a href="${m.dataUrl}" target="_blank" rel="noopener">${depth(m.depthUsd)}</a>`
             : depth(m.depthUsd)}</td>
-        <td class="r" data-l="${t.extCols[5]}"><span class="asset">${m.comparableTo}</span></td>
+        <td class="r"><span class="asset">${m.comparableTo}</span></td>
       </tr>`).join(""));
   } else { esec.hidden = true; }
   set("t-termsH", t.termsH); set("t-termsP", t.termsP);
@@ -899,7 +876,8 @@ function renderChrome(){
     `<span><i class="swatch" style="background:#A2452F"></i>${t.legend[2]}</span>`].join(""));
   set("thead", t.thead.map((h,i)=>
     i===0 ? `<th>${h}</th>`
-    : i===7 ? `<th class="r" style="width:170px"></th>`
+    : i===3||i===4||i===5 ? `<th class="r hide-sm">${h}</th>`
+    : i===7 ? `<th class="r hide-sm" style="width:170px"></th>`
     : `<th class="r">${h}</th>`).join(""));
   const F = '<div class="formula">SBOR(borrow) = Σ wᵢ·rᵢ / Σ wᵢ<br>SBOR(supply) = Σ wᵢ·sᵢ / Σ wᵢ</div>';
   set("method-a", t.methodA.map(p => p==="FORMULA" ? F : `<p>${p}</p>`).join(""));
@@ -966,15 +944,14 @@ function renderTerms(){
     const d = TERM_DATA[label] || {};
     const av = d.termAverages || {};
     const cells = [30,90,180].map(n => {
-      const col = t.termCol(n);
       const v = av[`d${n}`];
       if (v && typeof v.borrow === "number")
-        return `<td class="r num" data-l="${col}">${v.borrow.toFixed(2)}% <span class="pend">/ ${
+        return `<td class="r num">${v.borrow.toFixed(2)}% <span class="pend">/ ${
           typeof v.supply === "number" ? v.supply.toFixed(2)+"%" : ""}</span></td>`;
       const from = d.seriesBegan
         ? new Date(Date.parse(d.seriesBegan) + (n-1)*864e5).toISOString().slice(0,10)
         : null;
-      return `<td class="r pend" data-l="${col}">${from ? t.termFrom(from) : t.termPending}</td>`;
+      return `<td class="r pend">${from ? t.termFrom(from) : t.termPending}</td>`;
     }).join("");
     return `<tr><td><span class="venue">${label}</span></td>${cells}</tr>`;
   }).join(""));
@@ -999,21 +976,18 @@ function render(){
   document.getElementById("borrowDelta").innerHTML = "";
   document.getElementById("supplyDelta").innerHTML =
     (ix.allInSupply - ix.supply) >= 0.01 ? t.allIn(ix.allInSupply) : "";
-  /* data-l carries the column heading down into the cell, which is what the
-     phone layout prints as the row label. Same strings, both languages. */
-  const th = t.thead;
   set("rows", ix.markets.map(m=>`
     <tr>
       <td>${VENUE_URL[m.venue]
           ? `<a class="venue" href="${VENUE_URL[m.venue]}" target="_blank" rel="noopener">${m.venue}</a>`
           : `<span class="venue">${m.venue}</span>`}<span class="asset">${m.asset}</span></td>
-      <td class="r num" data-l="${th[1]}">${fmt(m.borrow)}%</td>
-      <td class="r num" data-l="${th[2]}">${fmt(m.supply)}%</td>
-      <td class="r num" data-l="${th[3]}">${m.utilization == null ? "n/a" : fmt(m.utilization)+"%"}</td>
-      <td class="r num" data-l="${th[4]}">${m.incentive ? "+"+fmt(m.incentive)+"%" : "n/a"}</td>
-      <td class="r num" data-l="${th[5]}">${depth(m.depth * 1e6)}</td>
-      <td class="r num" data-l="${th[6]}">${(m.weight*100).toFixed(1)}%</td>
-      <td class="r barcell"><span class="bar${m.phaseIn<1?" phase":""}"><i style="width:${(m.weight*100).toFixed(1)}%"></i></span></td>
+      <td class="r num">${fmt(m.borrow)}%</td>
+      <td class="r num">${fmt(m.supply)}%</td>
+      <td class="r num hide-sm">${m.utilization == null ? "n/a" : fmt(m.utilization)+"%"}</td>
+      <td class="r num">${m.incentive ? "+"+fmt(m.incentive)+"%" : "n/a"}</td>
+      <td class="r num hide-sm">${depth(m.depth * 1e6)}</td>
+      <td class="r num">${(m.weight*100).toFixed(1)}%</td>
+      <td class="r hide-sm"><span class="bar${m.phaseIn<1?" phase":""}"><i style="width:${(m.weight*100).toFixed(1)}%"></i></span></td>
     </tr>`).join(""));
   draw();
 }
