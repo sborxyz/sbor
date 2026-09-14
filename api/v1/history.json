@@ -634,17 +634,17 @@
   },
   {
     "date": "2026-09-14",
-    "fixedAt": "2026-09-14T13:39:50Z",
+    "fixedAt": "2026-09-14T14:04:32Z",
     "methodologyVersion": "1.8.0",
     "SBOR-PoX": {
-      "apy": 7.53,
+      "apy": 7.55,
       "cycle": 142,
       "cycleStart": "2026-08-24",
       "cycleEnd": "2026-09-07",
       "btcPaid": 4.43895,
       "stxLocked": 441576024,
-      "stxPerBtc": 290185.31,
-      "stxPerBtcSmoothed": 288928
+      "stxPerBtc": 291668.19,
+      "stxPerBtcSmoothed": 289752.18
     },
     "external": [
       {
@@ -693,13 +693,22 @@
         "vs": "SBOR-USD"
       },
       {
-        "v": "Morpho, Hyperliquid L1",
+        "v": "HyperLend, Hyperliquid L1",
         "a": "UBTC",
-        "b": 7.43,
-        "s": 0,
-        "u": 48.43,
-        "d": 2062687,
+        "b": 1,
+        "s": 0.14,
+        "u": 17.45,
+        "d": 10100398,
         "vs": "SBOR-BTC"
+      },
+      {
+        "v": "HyperLend, Hyperliquid L1",
+        "a": "USDC",
+        "b": 7.18,
+        "s": 5.56,
+        "u": 86.03,
+        "d": 15839255,
+        "vs": "SBOR-USD"
       }
     ],
     "SBOR-USD": {
@@ -714,9 +723,9 @@
         {
           "v": "Zest V2",
           "a": "USDCx",
-          "b": 2.82,
+          "b": 2.83,
           "s": 0.82,
-          "u": 59.23,
+          "u": 59.42,
           "py": null,
           "d": 10088585,
           "w": 0.6494
@@ -734,9 +743,9 @@
         {
           "v": "Zest V2",
           "a": "USDh",
-          "b": 1.8,
+          "b": 1.52,
           "s": 0,
-          "u": 30.32,
+          "u": 25.78,
           "py": null,
           "d": 440097,
           "w": 0.0283
@@ -746,7 +755,7 @@
     "SBOR-STX": {
       "borrow": 2.33,
       "supply": 1.22,
-      "allInSupply": 4.62,
+      "allInSupply": 4.65,
       "venues": 1,
       "largestConstituentWeight": 0.5532,
       "depthUsd": 4181766,
@@ -758,7 +767,7 @@
           "b": 1.38,
           "s": 0.09,
           "u": 8.55,
-          "py": 6.13,
+          "py": 6.19,
           "d": 2313162,
           "w": 0.5532
         },
