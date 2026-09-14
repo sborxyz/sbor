@@ -103,7 +103,20 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .sofrv{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
   font-size:clamp(38px,6vw,62px);line-height:.98;font-weight:500;letter-spacing:-.03em;margin:6px 0 12px;color:var(--ink)}
 .sofrv .pct{font-size:.42em;font-weight:400;letter-spacing:0;margin-left:.08em;color:var(--ink-soft)}
-.sofrbox p{font-size:14.5px;color:var(--ink-soft);max-width:64ch;margin-bottom:8px}
+.sofrbox p{font-size:14.5px;color:var(--ink-soft);margin-bottom:10px;max-width:none}
+.sofrbox{display:grid;grid-template-columns:minmax(180px,auto) minmax(0,1fr);gap:6px 34px;align-items:start}
+.sofrbox .sofrk{grid-column:1;align-self:end}
+.sofrbox .sofrv{grid-column:1;grid-row:2;margin:2px 0 0}
+.sofrbox #sofrAvgs{grid-column:1;grid-row:3;margin-top:12px !important;max-width:24ch}
+.sofrbox #sofrLine{grid-column:2;grid-row:1 / span 2}
+.sofrbox #sofrCompare{grid-column:2}
+.sofrbox #sofrWhy{grid-column:2}
+@media (max-width:720px){
+  .sofrbox{grid-template-columns:1fr}
+  .sofrbox .sofrk,.sofrbox .sofrv,.sofrbox #sofrAvgs,
+  .sofrbox #sofrLine,.sofrbox #sofrCompare,.sofrbox #sofrWhy{grid-column:1;grid-row:auto}
+  .sofrbox #sofrAvgs{max-width:none}
+}
 .sofrcmp{color:var(--ink) !important;font-weight:450}
 .sofrwhy{font-size:13.5px !important}
 .spreadbox{border:1px solid var(--rule);border-left:2px solid var(--rule);padding:14px 18px;margin-bottom:8px;font-size:15px;color:var(--ink-soft)}
@@ -447,7 +460,7 @@ en:{
   invChecked:t=>`Checked ${t}, hourly.`,
   sofrH:"Secured by Treasuries",
   sofrLine:(r,d)=>`SOFR ${r}, the overnight cost of a dollar in the US repo market, secured by US government debt. Published by the Federal Reserve Bank of New York for ${d}.`,
-  sofrCompare:(sbor,sofr,bps)=>`A dollar secured by bitcoin on Stacks costs ${sbor} to borrow. A dollar secured by Treasuries costs ${sofr}. That is ${bps} basis points ${bps.startsWith("-") ? "less" : "more"}.`,
+  sofrCompare:(sbor,sofr,bps)=>`A dollar secured by bitcoin on Stacks costs ${sbor} to borrow. A dollar secured by Treasuries costs ${sofr}. That is ${Math.abs(bps)} basis points ${bps < 0 ? "cheaper on Stacks" : "dearer on Stacks"}.`,
   sofrWhy:"Bitcoin is the riskier collateral, so by any textbook this is backwards. It is cheaper here because almost nobody is borrowing yet, so utilisation is low and the rate has not been bid up. The gap is a measure of how early this market is.",
   sofrAvgs:(a30,a90,a180)=>`SOFR averages: 30 day ${a30}, 90 day ${a90}, 180 day ${a180}.`,
   extH:"Outside Stacks",
@@ -535,7 +548,7 @@ pt:{
   invChecked:t=>`Verificado ${t}, de hora em hora.`,
   sofrH:"Garantido por títulos do Tesouro",
   sofrLine:(r,d)=>`SOFR ${r}, o custo overnight de um dólar no mercado de repo dos Estados Unidos, garantido por dívida do governo americano. Publicado pelo Federal Reserve Bank of New York para ${d}.`,
-  sofrCompare:(sbor,sofr,bps)=>`Um dólar garantido por bitcoin na Stacks custa ${sbor} para tomar emprestado. Um dólar garantido por títulos do Tesouro custa ${sofr}. São ${bps} pontos-base ${bps.startsWith("-") ? "a menos" : "a mais"}.`,
+  sofrCompare:(sbor,sofr,bps)=>`Um dólar garantido por bitcoin na Stacks custa ${sbor} para tomar emprestado. Um dólar garantido por títulos do Tesouro custa ${sofr}. São ${Math.abs(bps)} pontos-base ${bps < 0 ? "mais barato na Stacks" : "mais caro na Stacks"}.`,
   sofrWhy:"O bitcoin é a garantia mais arriscada, então pela teoria isso está invertido. Sai mais barato aqui porque quase ninguém ainda toma emprestado, então a utilização é baixa e a taxa não foi disputada. A diferença mede o quanto este mercado ainda é inicial.",
   sofrAvgs:(a30,a90,a180)=>`Médias da SOFR: 30 dias ${a30}, 90 dias ${a90}, 180 dias ${a180}.`,
   extH:"Fora da Stacks",
@@ -791,7 +804,7 @@ function renderChrome(){
     set("sofrLine", t.sofrLine(fmt(sr.rate)+"%", sr.effectiveDate));
     if (usdIx){
       const d = Math.round((usdIx.borrow - sr.rate) * 100);
-      set("sofrCompare", t.sofrCompare(fmt(usdIx.borrow)+"%", fmt(sr.rate)+"%", String(d)));
+      set("sofrCompare", t.sofrCompare(fmt(usdIx.borrow)+"%", fmt(sr.rate)+"%", d));
       set("sofrWhy", d < 0 ? t.sofrWhy : "");
     } else { set("sofrCompare",""); set("sofrWhy",""); }
     set("sofrAvgs", (sr.average30day && sr.average90day && sr.average180day)
