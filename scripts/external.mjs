@@ -14,7 +14,12 @@ const BORROW_URLS = [
   "https://yields.llama.fi/poolsBorrow"
 ];
 
-/* Rootstock is deliberately absent. It is the closest comparison there is,
+/* Hyperliquid appears in DefiLlama as chain "Hyperliquid L1", and HyperLend's
+   project slug is "hyperlend-pooled" rather than "hyperlend". Checked 14 Sep:
+   530 pools, 476 distinct project and symbol pairs. Most HyperLend pools return
+   apyBase 0, so their supply side may not be populated there.
+
+   Rootstock is deliberately absent. It is the closest comparison there is,
    another Bitcoin sidechain with a bitcoin-backed asset lent on it at a similar
    scale, but DefiLlama has no lending yield adapters for the chain: its nine
    listed pools are all DEX pairs, an RWA product and a bridge. LayerBank,
@@ -42,12 +47,10 @@ const WANTED = [
   /* Hyperliquid. UBTC is Unit's wrapped bitcoin on HyperEVM, lent on HyperLend
      and through Morpho. A chain with real traction and a bitcoin market, so the
      same comparison as cbBTC on Base. */
-  { chain:["Hyperliquid","HyperEVM","Hyperliquid L1"], symbol:["UBTC","WBTC"], display:"UBTC",
-    against:"SBOR-BTC",
-    projects:["hyperlend","hyperbeat","morpho-blue","hyperdrive","felix"] },
-  { chain:["Hyperliquid","HyperEVM","Hyperliquid L1"], symbol:["USDC","USDT0"], display:"USDC",
-    against:"SBOR-USD",
-    projects:["hyperlend","hyperbeat","morpho-blue","hyperdrive","felix"] }
+  { chain:"Hyperliquid L1", symbol:["UBTC","WBTC"], display:"UBTC", against:"SBOR-BTC",
+    projects:["hyperlend-pooled","hyperlend","hyperbeat","morpho-blue","hyperdrive","felix-cdp"] },
+  { chain:"Hyperliquid L1", symbol:["USDC","USDT0","USDE"], display:"USDC", against:"SBOR-USD",
+    projects:["hyperlend-pooled","hyperlend","hyperbeat","morpho-blue","hyperdrive","felix-cdp"] }
 ];
 
 /* DefiLlama project slug to something a person would recognise. */
@@ -57,8 +60,8 @@ const VENUE_NAME = {
   "sovryn-lend":"Sovryn", "sovryn":"Sovryn",
   "tropykus-rsk":"Tropykus", "tropykus-finance":"Tropykus",
   "segment-finance":"Segment",
-  "hyperlend":"HyperLend", "hyperbeat":"Hyperbeat",
-  "hyperdrive":"Hyperdrive", "felix":"Felix"
+  "hyperlend":"HyperLend", "hyperlend-pooled":"HyperLend",
+  "hyperbeat":"Hyperbeat", "hyperdrive":"Hyperdrive", "felix-cdp":"Felix"
 };
 
 /* Aave keys its reserve pages on the underlying token address, which the pool
@@ -93,23 +96,6 @@ export async function externalReference(){
   }
   const list = !borrowRes ? [] : (Array.isArray(borrowRes) ? borrowRes : (borrowRes.data || []));
   const borrowBy = Object.fromEntries(list.map(b => [b.pool, b]));
-
-  /* Diagnostic while Hyperliquid coverage is unproven. DefiLlama names chains
-     inconsistently and a miss should say what is actually available rather than
-     leaving us guessing slugs. Remove once it resolves. */
-  for (const c of ["Hyperliquid","HyperEVM","Hyperliquid L1"]){
-    const pools = data.filter(p => p.chain === c);
-    if (!pools.length) continue;
-    const seen = new Set();
-    for (const p of pools.sort((a,b) => (b.tvlUsd||0)-(a.tvlUsd||0))){
-      const k = `${p.project}|${p.symbol}`;
-      if (seen.has(k)) continue;
-      seen.add(k);
-      if (seen.size <= 10)
-        log(`  [${c}] ${p.project} ${p.symbol} tvl=${Math.round(p.tvlUsd||0)} apyBase=${p.apyBase}`);
-    }
-    log(`  [${c}] ${pools.length} pools, ${seen.size} distinct project/symbol pairs`);
-  }
 
   const out = [];
   for (const w of WANTED){
