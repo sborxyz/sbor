@@ -130,7 +130,22 @@ export async function externalReference(){
       log(`  external: no ${symbols.join("/")} pool on ${chains.join("/")} among ${w.projects.join(", ")}`);
       continue;
     }
-    const p = matches.sort((a,b) => (b.tvlUsd||0) - (a.tvlUsd||0))[0];
+    /* Depth is the right tiebreaker between two complete readings, but a
+       complete smaller market beats an incomplete larger one. A borrow rate
+       with no utilisation beside it does not explain anything, which is the
+       one thing this comparison is for. So rank on completeness first, then
+       depth. Jupiter Lend on Solana is the case that forced this: $481M of
+       USDC and no borrow side published at all. */
+    const complete = p => (typeof p.apyBaseBorrow === "number" ? 2 : 0)
+                        + (typeof p.utilization === "number" ? 1 : 0);
+    const ranked = [...matches].sort((a,b) =>
+      complete(b) - complete(a) || (b.tvlUsd||0) - (a.tvlUsd||0));
+    const p = ranked[0];
+    const deepest = [...matches].sort((a,b) => (b.tvlUsd||0)-(a.tvlUsd||0))[0];
+    if (p !== deepest)
+      log(`  external: ${w.display} on ${chains[0]} using ${p.project} ` +
+          `($${Math.round((p.tvlUsd||0)/1e6)}M, complete) over ${deepest.project} ` +
+          `($${Math.round((deepest.tvlUsd||0)/1e6)}M, no borrow side)`);
     const label = `${VENUE_NAME[p.project] || p.project}, ${p.chain}`;
 
     const bRec = borrowBy[p.pool];
