@@ -31,30 +31,58 @@ async function stxPerBtcFromBitflow(){
   const sbtc = find("SBTC"), stx = find("STX");
   if (!sbtc || !stx) throw new Error(`pair not listed. symbols seen: ${tokens.map(t=>t.symbol).join(",")}`);
 
-  /* quote a small size so the figure is a spot rate, not an execution price */
-  const amountIn = String(Math.round(0.01 * 10 ** sbtc.decimals));
-  const r = await fetch(`${BITFLOW}/quote`, {
-    method: "POST",
-    headers: { "content-type": "application/json", accept: "application/json" },
-    body: JSON.stringify({
-      input_token: sbtc.contract_address,
-      output_token: stx.contract_address,
-      amount_in: amountIn,
-      amm_strategy: "best"
-    })
-  });
-  if (!r.ok) throw new Error(`quote responded ${r.status}`);
-  const q = await r.json();
-  if (!q.success) throw new Error(q.error || "quote unsuccessful");
+  async function quote(inTok, outTok, amountHuman){
+    const amountIn = String(Math.round(amountHuman * 10 ** inTok.decimals));
+    const r = await fetch(`${BITFLOW}/quote`, {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({
+        input_token: inTok.contract_address,
+        output_token: outTok.contract_address,
+        amount_in: amountIn,
+        amm_strategy: "best"
+      })
+    });
+    if (!r.ok) throw new Error(`quote responded ${r.status}`);
+    const q = await r.json();
+    if (!q.success) throw new Error(q.error || "quote unsuccessful");
+    const out = Number(q.amount_out) / 10 ** (q.output_token_decimals ?? outTok.decimals);
+    return { out, impactBps: q.price_impact_bps ?? null };
+  }
 
-  const outStx = Number(q.amount_out) / 10 ** (q.output_token_decimals ?? stx.decimals);
-  const rate = outStx / 0.01;
-  log(`bitflow: 0.01 sBTC quotes ${outStx.toFixed(2)} STX, impact ${q.price_impact_bps} bps ` +
-      `=> ${rate.toFixed(0)} STX per BTC`);
-  if (!Number.isFinite(rate) || rate <= 0) throw new Error("implausible rate");
-  return { rate, source: "Bitflow", priceImpactBps: q.price_impact_bps };
+  /* Quote both directions and take the midpoint.
+     Price impact always costs the taker, so a one sided quote is an execution
+     price and is systematically below true mid rather than noisy around it.
+     Impact works against you in both directions, so averaging cancels it and
+     leaves a reference price, which is what a benchmark should use.
+     Small size, so the figure is a spot rate rather than an execution. */
+  const SIZE_SBTC = 0.01;
+  const sell = await quote(sbtc, stx, SIZE_SBTC);              // sBTC -> STX
+  const rateSell = sell.out / SIZE_SBTC;                       // STX per BTC, low side
+
+  const sizeStx = Math.round(rateSell * SIZE_SBTC);            // same notional back
+  const buy = await quote(stx, sbtc, sizeStx);                 // STX -> sBTC
+  const rateBuy = sizeStx / buy.out;                           // STX per BTC, high side
+
+  if (!Number.isFinite(rateSell) || !Number.isFinite(rateBuy) || rateSell <= 0 || rateBuy <= 0)
+    throw new Error(`implausible quotes: sell ${rateSell}, buy ${rateBuy}`);
+
+  const rate = (rateSell + rateBuy) / 2;
+  const spreadBps = Math.round((rateBuy - rateSell) / rate * 10000);
+
+  log(`bitflow: sell ${rateSell.toFixed(0)} (impact ${sell.impactBps ?? "n/a"} bps), ` +
+      `buy ${rateBuy.toFixed(0)} (impact ${buy.impactBps ?? "n/a"} bps), ` +
+      `mid ${rate.toFixed(0)} STX per BTC, spread ${spreadBps} bps`);
+
+  return {
+    rate, source: "Bitflow",
+    rateSell: Number(rateSell.toFixed(2)),
+    rateBuy: Number(rateBuy.toFixed(2)),
+    spreadBps,
+    priceImpactBps: sell.impactBps,
+    priceImpactBpsReverse: buy.impactBps
+  };
 }
-
 const round = (n,d=2) => Number(Number(n).toFixed(d));
 
 /* Days of BTC/STX quotes to average over. The staking economics change once a
@@ -135,10 +163,10 @@ export async function poxReference(){
   if (!seen) throw new Error("No reward payouts found in the cycle window. Check the block range.");
 
   /* 4. the BTC/STX rate. Dollar prices cancel, so only the ratio is needed. */
-  let rate, rateSource, priceImpactBps = null;
+  let rate, rateSource, priceImpactBps = null, twoWay = null;
   try {
     const bf = await stxPerBtcFromBitflow();
-    rate = bf.rate; rateSource = bf.source; priceImpactBps = bf.priceImpactBps;
+    rate = bf.rate; rateSource = bf.source; priceImpactBps = bf.priceImpactBps; twoWay = bf;
   } catch(e){
     log(`bitflow rate unavailable, falling back to CoinGecko. ${e.message}`);
     const px = await getJson(PRICES);
@@ -189,6 +217,12 @@ export async function poxReference(){
     btcPaid: round(btcPaid, 6),
     stxLocked: Math.round(stxLocked),
     stxPerBtc: round(rate, 2),
+    ...(twoWay && {
+      stxPerBtcSell: twoWay.rateSell,
+      stxPerBtcBuy: twoWay.rateBuy,
+      crossSpreadBps: twoWay.spreadBps,
+      crossNote: "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it."
+    }),
     stxPerBtcSmoothed: round(smoothed, 2),
     crossWindowDays: window.length,
     rateSource,
