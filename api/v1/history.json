@@ -634,26 +634,26 @@
   },
   {
     "date": "2026-09-14",
-    "fixedAt": "2026-09-14T15:05:57Z",
+    "fixedAt": "2026-09-14T18:27:58Z",
     "methodologyVersion": "1.9.0",
     "SBOR-PoX": {
-      "apy": 7.59,
+      "apy": 7.58,
       "cycle": 142,
       "cycleStart": "2026-08-24",
       "cycleEnd": "2026-09-07",
       "btcPaid": 4.43895,
       "stxLocked": 441576024,
-      "stxPerBtc": 294239.97,
-      "stxPerBtcSmoothed": 291077.49
+      "stxPerBtc": 293226.25,
+      "stxPerBtcSmoothed": 290874.72
     },
     "external": [
       {
         "v": "Aave V3, Ethereum",
         "a": "USDC",
         "b": 4.32,
-        "s": 3.59,
-        "u": 92.26,
-        "d": 183438476,
+        "s": 3.58,
+        "u": 92.19,
+        "d": 185296286,
         "vs": "SBOR-USD"
       },
       {
@@ -661,8 +661,8 @@
         "a": "WBTC",
         "b": 0.32,
         "s": 0,
-        "u": 2.34,
-        "d": 2600179594,
+        "u": 2.36,
+        "d": 2624484980,
         "vs": "SBOR-BTC"
       },
       {
@@ -670,44 +670,62 @@
         "a": "cbBTC",
         "b": 0.28,
         "s": 0,
-        "u": 0.67,
-        "d": 1417274247,
+        "u": 0.68,
+        "d": 1432284039,
         "vs": "SBOR-BTC"
       },
       {
         "v": "Morpho, Base",
         "a": "cbBTC",
-        "b": 4.73,
+        "b": 4.76,
         "s": 0,
-        "u": 48.13,
-        "d": 2928163140,
+        "u": 47.65,
+        "d": 2958583806,
         "vs": "SBOR-BTC"
       },
       {
         "v": "Aave V3, Base",
         "a": "USDC",
-        "b": 4.53,
-        "s": 3.54,
-        "u": 86.81,
-        "d": 24052015,
+        "b": 4.55,
+        "s": 3.56,
+        "u": 87.09,
+        "d": 23485601,
         "vs": "SBOR-USD"
       },
       {
         "v": "HyperLend, Hyperliquid L1",
         "a": "UBTC",
-        "b": 1,
-        "s": 0.14,
-        "u": 17.45,
-        "d": 10154621,
+        "b": 1.02,
+        "s": 0.15,
+        "u": 17.88,
+        "d": 9900533,
         "vs": "SBOR-BTC"
       },
       {
         "v": "HyperLend, Hyperliquid L1",
         "a": "USDC",
-        "b": 7.17,
-        "s": 5.55,
-        "u": 85.93,
-        "d": 15961118,
+        "b": 7.14,
+        "s": 5.49,
+        "u": 85.53,
+        "d": 16480335,
+        "vs": "SBOR-USD"
+      },
+      {
+        "v": "Kamino, Solana",
+        "a": "cbBTC",
+        "b": 0.19,
+        "s": 0,
+        "u": 2.59,
+        "d": 56980980,
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Kamino, Solana",
+        "a": "USDC",
+        "b": 5.29,
+        "s": 3.41,
+        "u": 80.18,
+        "d": 24964136,
         "vs": "SBOR-USD"
       }
     ],
@@ -717,17 +735,17 @@
       "allInSupply": 0.62,
       "venues": 2,
       "largestConstituentWeight": 0.6494,
-      "depthUsd": 15535847,
-      "utilization": 46.92,
+      "depthUsd": 15536150,
+      "utilization": 46.93,
       "markets": [
         {
           "v": "Zest V2",
           "a": "USDCx",
           "b": 2.83,
           "s": 0.82,
-          "u": 59.42,
+          "u": 59.44,
           "py": null,
-          "d": 10088947,
+          "d": 10089270,
           "w": 0.6494
         },
         {
@@ -747,7 +765,7 @@
           "s": 0,
           "u": 25.78,
           "py": null,
-          "d": 440104,
+          "d": 440084,
           "w": 0.0283
         }
       ]
@@ -755,21 +773,21 @@
     "SBOR-STX": {
       "borrow": 2.33,
       "supply": 1.22,
-      "allInSupply": 4.69,
+      "allInSupply": 4.66,
       "venues": 1,
-      "largestConstituentWeight": 0.5551,
-      "depthUsd": 4167153,
-      "utilization": 42.1,
+      "largestConstituentWeight": 0.5535,
+      "depthUsd": 4186994,
+      "utilization": 42.21,
       "markets": [
         {
           "v": "Zest V2",
           "a": "stSTX",
           "b": 1.38,
           "s": 0.09,
-          "u": 8.55,
-          "py": 6.25,
-          "d": 2313162,
-          "w": 0.5551
+          "u": 8.53,
+          "py": 6.21,
+          "d": 2317703,
+          "w": 0.5535
         },
         {
           "v": "Zest V2",
@@ -778,8 +796,8 @@
           "s": 2.63,
           "u": 83.96,
           "py": null,
-          "d": 1853991,
-          "w": 0.4449
+          "d": 1869291,
+          "w": 0.4465
         }
       ]
     }
