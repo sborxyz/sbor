@@ -519,6 +519,23 @@ const main = async () => {
     mkdirSync("api/v1/archive", { recursive:true });
     writeFileSync(`api/v1/archive/${day}.json`, JSON.stringify(withAverages, null, 2) + "\n");
     console.log(`archived api/v1/archive/${day}.json`);
+
+    /* An index of the archive, so a per date lookup is discoverable. The files
+       have always been there; nothing pointed at them. */
+    const { readdirSync: readArchiveDir } = await import("node:fs");
+    const days = readArchiveDir("api/v1/archive")
+      .filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f))
+      .map(f => f.slice(0,10))
+      .sort();
+    writeFileSync("api/v1/archive-index.json", JSON.stringify({
+      note: "Every fixing ever published, one file a day, complete and unabridged. To read a specific date, fetch /api/v1/archive/YYYY-MM-DD.json. These files are never rewritten. If one of them ever disagrees with the series in history.json, the archive is authoritative.",
+      first: days[0] ?? null,
+      last: days[days.length-1] ?? null,
+      count: days.length,
+      pattern: "/api/v1/archive/{date}.json",
+      dates: days
+    }, null, 2) + "\n");
+    console.log(`archive index: ${days.length} day(s), ${days[0]} to ${days[days.length-1]}`);
     console.log(`daily fixing recorded, history rows: ${history.length}`);
   } else {
     console.log("not a recorded fixing, history unchanged");
