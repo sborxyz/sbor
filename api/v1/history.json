@@ -634,17 +634,17 @@
   },
   {
     "date": "2026-09-14",
-    "fixedAt": "2026-09-14T21:48:07Z",
+    "fixedAt": "2026-09-14T21:53:11Z",
     "methodologyVersion": "1.9.0",
     "SBOR-PoX": {
-      "apy": 7.58,
+      "apy": 7.6,
       "cycle": 142,
       "cycleStart": "2026-08-24",
       "cycleEnd": "2026-09-07",
       "btcPaid": 4.43895,
       "stxLocked": 441576024,
-      "stxPerBtc": 295207.86,
-      "stxPerBtcSmoothed": 290984.88
+      "stxPerBtc": 296076.85,
+      "stxPerBtcSmoothed": 291638.42
     },
     "external": [
       {
