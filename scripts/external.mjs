@@ -14,7 +14,12 @@ const BORROW_URLS = [
   "https://yields.llama.fi/poolsBorrow"
 ];
 
-/* Hyperliquid appears in DefiLlama as chain "Hyperliquid L1", and HyperLend's
+/* Solana: chain is "Solana", and the slugs that matter are "kamino-lend" and
+   "jupiter-lend". Checked 14 Sep: 89 BTC or USDC pools, 22 distinct pairs.
+   Jupiter Lend holds about $481M of USDC against Kamino's $25M, so the
+   deepest-pool rule picks Jupiter for dollars and Kamino for bitcoin.
+
+   Hyperliquid appears in DefiLlama as chain "Hyperliquid L1", and HyperLend's
    project slug is "hyperlend-pooled" rather than "hyperlend". Checked 14 Sep:
    530 pools, 476 distinct project and symbol pairs. Most HyperLend pools return
    apyBase 0, so their supply side may not be populated there.
@@ -56,9 +61,9 @@ const WANTED = [
      a large supply of wrapped bitcoin that almost nobody borrows, so the rate
      is nothing. */
   { chain:"Solana", symbol:["CBBTC","WBTC","XBTC","ZBTC","LBTC"], display:"cbBTC", against:"SBOR-BTC",
-    projects:["kamino-lend","kamino","save","solend","marginfi","drift"] },
+    projects:["kamino-lend","jupiter-lend","save","solend","marginfi","drift","loopscale"] },
   { chain:"Solana", symbol:["USDC","USDT"], display:"USDC", against:"SBOR-USD",
-    projects:["kamino-lend","kamino","save","solend","marginfi","drift"] }
+    projects:["kamino-lend","jupiter-lend","save","solend","marginfi","drift","loopscale"] }
 ];
 
 /* DefiLlama project slug to something a person would recognise. */
@@ -70,8 +75,9 @@ const VENUE_NAME = {
   "segment-finance":"Segment",
   "hyperlend":"HyperLend", "hyperlend-pooled":"HyperLend",
   "hyperbeat":"Hyperbeat", "hyperdrive":"Hyperdrive", "felix-cdp":"Felix",
-  "kamino-lend":"Kamino", "kamino":"Kamino", "save":"Save",
-  "solend":"Solend", "marginfi":"marginfi", "drift":"Drift"
+  "kamino-lend":"Kamino", "jupiter-lend":"Jupiter Lend", "save":"Save",
+  "solend":"Solend", "marginfi":"marginfi", "drift":"Drift",
+  "loopscale":"Loopscale"
 };
 
 /* Aave keys its reserve pages on the underlying token address, which the pool
@@ -106,24 +112,6 @@ export async function externalReference(){
   }
   const list = !borrowRes ? [] : (Array.isArray(borrowRes) ? borrowRes : (borrowRes.data || []));
   const borrowBy = Object.fromEntries(list.map(b => [b.pool, b]));
-
-  /* Diagnostic while Solana coverage is unproven. DefiLlama names chains and
-     projects inconsistently, and a miss should say what is actually there
-     rather than leave us guessing slugs. Remove once it resolves. */
-  for (const c of ["Solana"]){
-    const pools = data.filter(p => p.chain === c &&
-      ["CBBTC","WBTC","XBTC","ZBTC","LBTC","USDC"].includes(String(p.symbol).toUpperCase()));
-    if (!pools.length) continue;
-    const seen = new Set();
-    for (const p of pools.sort((a,b) => (b.tvlUsd||0)-(a.tvlUsd||0))){
-      const k = `${p.project}|${p.symbol}`;
-      if (seen.has(k)) continue;
-      seen.add(k);
-      if (seen.size <= 12)
-        log(`  [${c}] ${p.project} ${p.symbol} tvl=${Math.round(p.tvlUsd||0)} apyBase=${p.apyBase}`);
-    }
-    log(`  [${c}] ${pools.length} BTC or USDC pools, ${seen.size} distinct project/symbol pairs`);
-  }
 
   const out = [];
   for (const w of WANTED){
