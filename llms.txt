@@ -109,7 +109,8 @@ fixing with a note.
 - https://sbor.xyz/api/v1/history-index.json  index of the full record by year
 - https://sbor.xyz/api/v1/history-YYYY.json   the complete record, one file a year
 - https://sbor.xyz/api/v1/backfill.json  reconstructed context, not the record
-- https://sbor.xyz/api/v1/archive/       full daily snapshots, one file per day
+- https://sbor.xyz/api/v1/archive/YYYY-MM-DD.json  the fixing for one specific date
+- https://sbor.xyz/api/v1/archive-index.json  every date available, first and last
 - https://sbor.xyz/api/v1/inversion-log.json  every inversion episode ever detected
 - https://sbor.xyz/latest.txt            current fixing as plain text
 - https://sbor.xyz/weekly.txt            weekly report as plain text
