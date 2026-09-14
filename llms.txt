@@ -145,10 +145,16 @@ two week reward cycle, divided by the STX locked, annualised over about 25
 cycles a year.
 
 The payout is in bitcoin against a position held in STX, so the figure depends
-on the BTC to STX rate. That rate is averaged over seven days rather than taken
-at the instant of the fixing, so the published yield tracks staking economics
-rather than currency movement between fixings. Both the smoothed rate
-(stxPerBtcSmoothed) and the spot quote (stxPerBtc) are published.
+on the BTC to STX rate. That rate is quoted in both directions and
+midpointed, because price impact always costs the taker and a one sided quote
+would be an execution price that sits systematically below true mid rather than
+noisy around it. Both sides are published as stxPerBtcSell and stxPerBtcBuy,
+with the spread between them in crossSpreadBps.
+
+The midpoint is then averaged over seven days rather than taken at the instant
+of the fixing, so the published yield tracks staking economics rather than
+currency movement between fixings. Both the smoothed rate (stxPerBtcSmoothed)
+and the spot midpoint (stxPerBtc) are published.
 
 Because it annualises a single two week cycle, a change in one cycle's payout
 moves it considerably. Read the cycle number before comparing two fixings.
