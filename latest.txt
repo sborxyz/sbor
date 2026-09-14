@@ -1,4 +1,4 @@
-SBOR fixing 2026-09-14T14:25:45Z
+SBOR fixing 2026-09-14T14:31:18Z
 currency  borrow%  supply%
 SBOR-USD  2.35     0.62
 SBOR-STX  2.33     1.22
