@@ -791,47 +791,6 @@ function renderChrome(){
   if (INVERSIONS) bits.push(t.invChecked(INVERSIONS.checked));
   if (INVERSIONS && INVERSIONS.status === "validating") bits.push(t.invValidating);
   set("invMeta", bits.join(" "));
-  /* SOFR is the comparison SBOR is modelled on: the cost of a dollar secured by
-     US government debt, against one secured by bitcoin. It lives here because
-     this section is already what things cost elsewhere. */
-  const sbox = document.getElementById("sofrBox");
-  const usdIx = INDICES.USD ? computed("USD") : null;
-  if (CONTEXT && CONTEXT.sofr && typeof CONTEXT.sofr.rate === "number"){
-    sbox.hidden = false;
-    const sr = CONTEXT.sofr;
-    set("t-sofrH", t.sofrH);
-    document.getElementById("sofrVal").textContent = sr.rate.toFixed(2);
-    set("sofrLine", t.sofrLine(fmt(sr.rate)+"%", sr.effectiveDate));
-    if (usdIx){
-      const d = Math.round((usdIx.borrow - sr.rate) * 100);
-      set("sofrCompare", t.sofrCompare(fmt(usdIx.borrow)+"%", fmt(sr.rate)+"%", d));
-      set("sofrWhy", d < 0 ? t.sofrWhy : "");
-    } else { set("sofrCompare",""); set("sofrWhy",""); }
-    set("sofrAvgs", (sr.average30day && sr.average90day && sr.average180day)
-      ? t.sofrAvgs(fmt(sr.average30day)+"%", fmt(sr.average90day)+"%", fmt(sr.average180day)+"%")
-      : "");
-  } else { sbox.hidden = true; }
-
-  set("t-extH", t.extH); set("t-extP", t.extP);
-  const esec = document.getElementById("ext-sec");
-  if (EXTERNAL && EXTERNAL.markets && EXTERNAL.markets.length){
-    esec.hidden = false;
-    set("extHead", t.extCols.map((c,i) =>
-      i === 0 ? `<th>${c}</th>` : `<th class="r">${c}</th>`).join(""));
-    set("extBody", EXTERNAL.markets.map(m => `
-      <tr>
-        <td>${m.url
-            ? `<a class="venue" href="${m.url}" target="_blank" rel="noopener">${m.venue}</a>`
-            : `<span class="venue">${m.venue}</span>`}<span class="asset">${m.asset}</span></td>
-        <td class="r num">${m.borrow == null ? "n/a" : m.borrow.toFixed(2)+"%"}</td>
-        <td class="r num">${m.supply.toFixed(2)}%</td>
-        <td class="r num">${m.utilization == null ? "n/a" : m.utilization.toFixed(2)+"%"}</td>
-        <td class="r num">${m.dataUrl
-            ? `<a href="${m.dataUrl}" target="_blank" rel="noopener">${depth(m.depthUsd)}</a>`
-            : depth(m.depthUsd)}</td>
-        <td class="r"><span class="asset">${m.comparableTo}</span></td>
-      </tr>`).join(""));
-  } else { esec.hidden = true; }
   set("t-termsH", t.termsH); set("t-termsP", t.termsP);
   renderTerms();
   set("t-poxH", t.poxH); set("t-poxP", t.poxP);
@@ -969,6 +928,51 @@ function render(){
   const venues = new Set(ix.markets.map(m => m.venue)).size;
   const largest = Math.max(...ix.markets.map(m => m.weight));
   set("coverage", t.coverage(venues, (largest*100).toFixed(0)));
+
+  /* Outside Stacks and SOFR both belong to the index being shown. A dollar
+     market does not explain a bitcoin rate, so only rows marked comparable to
+     the current index are drawn, and the section disappears when there is
+     nothing to compare against. This lives in render rather than renderChrome
+     because it has to follow the tab. */
+  const sbox = document.getElementById("sofrBox");
+  const esec = document.getElementById("ext-sec");
+  const forThis = (EXTERNAL?.markets || []).filter(m => m.comparableTo === ix.label);
+
+  set("t-extH", t.extH); set("t-extP", t.extP);
+  if (forThis.length){
+    esec.hidden = false;
+    set("extHead", t.extCols.map((c,i) =>
+      i === 0 ? `<th>${c}</th>` : `<th class="r">${c}</th>`).join(""));
+    set("extBody", forThis.map(m => `
+      <tr>
+        <td>${m.url
+            ? `<a class="venue" href="${m.url}" target="_blank" rel="noopener">${m.venue}</a>`
+            : `<span class="venue">${m.venue}</span>`}<span class="asset">${m.asset}</span></td>
+        <td class="r num" data-l="${t.extCols[1]}">${m.borrow == null ? "n/a" : m.borrow.toFixed(2)+"%"}</td>
+        <td class="r num" data-l="${t.extCols[2]}">${m.supply.toFixed(2)}%</td>
+        <td class="r num" data-l="${t.extCols[3]}">${m.utilization == null ? "n/a" : m.utilization.toFixed(2)+"%"}</td>
+        <td class="r num" data-l="${t.extCols[4]}">${m.dataUrl
+            ? `<a href="${m.dataUrl}" target="_blank" rel="noopener">${depth(m.depthUsd)}</a>`
+            : depth(m.depthUsd)}</td>
+        <td class="r" data-l="${t.extCols[5]}"><span class="asset">${m.comparableTo}</span></td>
+      </tr>`).join(""));
+  } else { esec.hidden = true; }
+
+  /* SOFR is the cost of a dollar. It belongs beside the dollar index and
+     nowhere else. */
+  if (ix.label === "SBOR-USD" && CONTEXT?.sofr && typeof CONTEXT.sofr.rate === "number"){
+    sbox.hidden = false;
+    const sr = CONTEXT.sofr;
+    set("t-sofrH", t.sofrH);
+    document.getElementById("sofrVal").textContent = sr.rate.toFixed(2);
+    set("sofrLine", t.sofrLine(fmt(sr.rate)+"%", sr.effectiveDate));
+    const d = Math.round((ix.borrow - sr.rate) * 100);
+    set("sofrCompare", t.sofrCompare(fmt(ix.borrow)+"%", fmt(sr.rate)+"%", d));
+    set("sofrWhy", d < 0 ? t.sofrWhy : "");
+    set("sofrAvgs", (sr.average30day && sr.average90day && sr.average180day)
+      ? t.sofrAvgs(fmt(sr.average30day)+"%", fmt(sr.average90day)+"%", fmt(sr.average180day)+"%")
+      : "");
+  } else { sbox.hidden = true; }
   settle(document.getElementById("borrowVal"), ix.borrow);
   settle(document.getElementById("supplyVal"), ix.supply);
   /* What a supplier actually receives, where protocol yield applies. The
