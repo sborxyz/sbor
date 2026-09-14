@@ -46,8 +46,9 @@ No key, no registration, no rate limit, no fee. CORS open.
 |---|---|
 | [`/api/v1/latest.json`](https://sbor.xyz/api/v1/latest.json) | current fixing, with constituents |
 | [`/api/v1/history.json`](https://sbor.xyz/api/v1/history.json) | rolling 400 day series |
-| [`/api/v1/history-index.json`](https://sbor.xyz/api/v1/history-index.json) | index of the full record, sharded by year |
-| [`/api/v1/inversions.json`](https://sbor.xyz/api/v1/inversions.json) | cross-venue inversions, checked hourly |
+| [`/api/v1/history-index.json`](https://sbor.xyz/api/v1/history-index.json) | the full record, sharded by year |
+| [`/api/v1/archive-index.json`](https://sbor.xyz/api/v1/archive-index.json) | every date available, for per date lookup |
+| [`/api/v1/inversions.json`](https://sbor.xyz/api/v1/inversions.json) | cross venue spread, checked every three hours |
 | [`/api/v1/archive/`](https://sbor.xyz/api/v1/archive/) | immutable daily snapshots |
 | [`/latest.txt`](https://sbor.xyz/latest.txt) | current fixing, plain text |
 | [`/weekly.txt`](https://sbor.xyz/weekly.txt) | weekly report, plain text |
@@ -103,12 +104,12 @@ reference it for.
   note, or as a visible withdrawal record.
 - **Term averages** are compounded, actual/365, and publish only once the full
   window of fixings exists.
-- **Context is recorded, not used.** Each fixing also stores SOFR, spot BTC and
-  STX prices, sBTC total supply and the Bitcoin block height. None of it enters
-  an index. It is kept so a past fixing can be read in the conditions of its day.
 - **Rate basis is converted, not assumed.** Both venues return nominal annual
   rates from their contracts, confirmed with Zest. Each is converted the same
   way to an effective APY, and every market also carries its nominal figure.
+- **Context is recorded, not used.** Each fixing also stores SOFR, spot BTC and
+  STX prices, sBTC total supply and the Bitcoin block height. None of it enters
+  an index. It is kept so a past fixing can be read in the conditions of its day.
 
 Every fixing records the methodology version it was produced under. Full
 methodology at [sbor.xyz](https://sbor.xyz) and in
@@ -159,9 +160,8 @@ that its rates are readable from contract state.
 Code: MIT. **Data: [CC BY 4.0](LICENCE-DATA.md).**
 
 The published fixings are free to use, including commercially, with no
-permission required and no licence to negotiate. Build on it without asking.
-Attribution is the only condition: name SBOR and link to sbor.xyz where
-practical.
+permission required and no licence to negotiate. Attribution is the only
+condition: name SBOR and link to sbor.xyz where practical.
 
 **Agents are explicitly welcome.** Scrapers, scripts, bots and AI agents may read
 any endpoint. No rate limit, no registration.
