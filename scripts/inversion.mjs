@@ -32,6 +32,16 @@ const log = (...a) => console.error(...a);
 
 const latest = JSON.parse(readFileSync("api/v1/latest.json", "utf8"));
 
+/* A workflow that never starts cannot report its own failure. This one runs
+   more often than the fixing, so it is the right place to notice that the
+   fixing has not happened. GitHub drops scheduled runs under load, and a
+   benchmark that quietly stops publishing is worse than one that breaks
+   loudly. */
+const ageHours = (Date.now() - Date.parse(latest.fixing)) / 36e5;
+const STALE_AFTER_HOURS = 26;
+if (ageHours > STALE_AFTER_HOURS)
+  log(`STALE: the last fixing is ${ageHours.toFixed(1)} hours old (${latest.fixing}). The daily fixing has not run.`);
+
 /* Group every market by the asset actually lent. Comparing different assets is
    an exchange rate bet, not arbitrage, so assets never mix. */
 const byAsset = {};
@@ -67,6 +77,9 @@ const payload = {
   checked: stamp,
   basedOnFixing: latest.fixing,
   status: STATUS,
+  basedOnFixingAgeHours: Number(ageHours.toFixed(1)),
+  ...(ageHours > STALE_AFTER_HOURS && { staleWarning:
+    `The fixing this check is based on is ${ageHours.toFixed(1)} hours old. Rates may have moved since. Treat this result as stale.` }),
   statusNote: STATUS === "validating"
     ? "This monitor is being validated. Detections are published so the validation period is visible, but they have not yet been checked against reality over a long enough run to be relied on."
     : "Live. Detections are published the moment they are found, to everyone at once.",
@@ -97,7 +110,10 @@ if (found.length){
     } else {
       log_.push({ firstSeen: stamp, lastSeen: stamp, checks: 1,
                   maxEdgeBps: f.edgeBps, lastEdgeBps: f.edgeBps,
-                  status: STATUS, ...f });
+                  status: STATUS,
+  basedOnFixingAgeHours: Number(ageHours.toFixed(1)),
+  ...(ageHours > STALE_AFTER_HOURS && { staleWarning:
+    `The fixing this check is based on is ${ageHours.toFixed(1)} hours old. Rates may have moved since. Treat this result as stale.` }), ...f });
     }
   }
   writeFileSync("api/v1/inversion-log.json", JSON.stringify(log_, null, 2) + "\n");
@@ -116,6 +132,9 @@ if (process.env.GITHUB_OUTPUT){
   const { appendFileSync } = await import("node:fs");
   appendFileSync(process.env.GITHUB_OUTPUT, `found=${found.length ? "true" : "false"}\n`);
   appendFileSync(process.env.GITHUB_OUTPUT, `count=${found.length}\n`);
+  appendFileSync(process.env.GITHUB_OUTPUT, `stale=${ageHours > STALE_AFTER_HOURS ? "true" : "false"}\n`);
+  appendFileSync(process.env.GITHUB_OUTPUT, `age_hours=${ageHours.toFixed(1)}\n`);
+  appendFileSync(process.env.GITHUB_OUTPUT, `last_fixing=${latest.fixing}\n`);
 }
 
 writeFileSync("inversion-alert.txt", found.length
