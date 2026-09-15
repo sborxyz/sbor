@@ -493,7 +493,12 @@ const main = async () => {
 
     /* A rolling recent window at the stable path, so anything already reading
        history.json keeps working. The shards are the complete record. */
-    const WINDOW_DAYS = 400;
+    /* The free window is set by what verification requires, not by what is
+       commercially convenient. The longest term average SBOR publishes is 180
+       days, and anyone reading a published average has to be able to check it
+       against the data behind it. 200 gives that plus room. The shards hold
+       everything; this is the rolling window at the stable path. */
+    const WINDOW_DAYS = 200;
     const cutoff = new Date(Date.parse(day) - WINDOW_DAYS*864e5).toISOString().slice(0,10);
     let recent = [];
     for (const f of [`api/v1/history-${Number(year)-1}.json`, shard]){
