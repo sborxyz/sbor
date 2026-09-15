@@ -108,13 +108,12 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .sofrbox .sofrk{grid-column:1;align-self:end}
 .sofrbox .sofrv{grid-column:1;grid-row:2;margin:2px 0 0}
 .sofrbox #sofrAvgs{grid-column:1;grid-row:3;margin-top:12px !important;max-width:24ch}
-.sofrbox #sofrLine{grid-column:2;grid-row:1 / span 2}
-.sofrbox #sofrCompare{grid-column:2}
-.sofrbox #sofrWhy{grid-column:2}
+.sofrbox .sofrtext{grid-column:2;grid-row:1 / -1}
+.sofrbox .sofrtext p:last-child{margin-bottom:0}
 @media (max-width:720px){
   .sofrbox{grid-template-columns:1fr}
   .sofrbox .sofrk,.sofrbox .sofrv,.sofrbox #sofrAvgs,
-  .sofrbox #sofrLine,.sofrbox #sofrCompare,.sofrbox #sofrWhy{grid-column:1;grid-row:auto}
+  .sofrbox .sofrtext{grid-column:1;grid-row:auto}
   .sofrbox #sofrAvgs{max-width:none}
 }
 .sofrcmp{color:var(--ink) !important;font-weight:450}
@@ -266,9 +265,11 @@ a{color:var(--accent)}
       <div id="sofrBox" class="sofrbox" hidden>
         <div class="sofrk" id="t-sofrH"></div>
         <div class="sofrv"><span class="num" id="sofrVal">0.00</span><span class="pct">%</span></div>
-        <p id="sofrLine"></p>
-        <p id="sofrCompare" class="sofrcmp"></p>
-        <p id="sofrWhy" class="sofrwhy"></p>
+        <div class="sofrtext">
+          <p id="sofrLine"></p>
+          <p id="sofrCompare" class="sofrcmp"></p>
+          <p id="sofrWhy" class="sofrwhy"></p>
+        </div>
         <p class="coverage" id="sofrAvgs" style="margin:10px 0 0"></p>
       </div>
       <div class="tscroll">
