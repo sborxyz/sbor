@@ -38,9 +38,20 @@ const latest = JSON.parse(readFileSync("api/v1/latest.json", "utf8"));
    benchmark that quietly stops publishing is worse than one that breaks
    loudly. */
 const ageHours = (Date.now() - Date.parse(latest.fixing)) / 36e5;
-const STALE_AFTER_HOURS = 26;
-if (ageHours > STALE_AFTER_HOURS)
-  log(`STALE: the last fixing is ${ageHours.toFixed(1)} hours old (${latest.fixing}). The daily fixing has not run.`);
+
+/* An hour count is the wrong test. A fixing that lands late yesterday pushes
+   the alarm past midnight today, so a missed morning is not reported until the
+   following day. What matters is whether there is a fixing for today, and by
+   the time the last scheduled attempt has passed there should be. */
+const LAST_ATTEMPT_UTC_HOUR = 17;   // after the 16:52 cron has had its chance
+const today = new Date().toISOString().slice(0, 10);
+const fixedToday = String(latest.fixing).slice(0, 10) === today;
+const stale = !fixedToday && new Date().getUTCHours() >= LAST_ATTEMPT_UTC_HOUR;
+
+if (stale)
+  log(`STALE: no fixing for ${today}. Last one was ${latest.fixing}, ${ageHours.toFixed(1)} hours ago. Every scheduled attempt has passed.`);
+else if (!fixedToday)
+  log(`no fixing for ${today} yet. Scheduled attempts remain, so not raising the alarm.`);
 
 /* Group every market by the asset actually lent. Comparing different assets is
    an exchange rate bet, not arbitrage, so assets never mix. */
@@ -78,8 +89,8 @@ const payload = {
   basedOnFixing: latest.fixing,
   status: STATUS,
   basedOnFixingAgeHours: Number(ageHours.toFixed(1)),
-  ...(ageHours > STALE_AFTER_HOURS && { staleWarning:
-    `The fixing this check is based on is ${ageHours.toFixed(1)} hours old. Rates may have moved since. Treat this result as stale.` }),
+  ...(!fixedToday && { staleWarning:
+    `This check is based on the fixing of ${String(latest.fixing).slice(0,10)}, ${ageHours.toFixed(1)} hours ago. There is no fixing for today yet, so rates may have moved. Treat this result as stale.` }),
   statusNote: STATUS === "validating"
     ? "This monitor is being validated. Detections are published so the validation period is visible, but they have not yet been checked against reality over a long enough run to be relied on."
     : "Live. Detections are published the moment they are found, to everyone at once.",
@@ -110,10 +121,7 @@ if (found.length){
     } else {
       log_.push({ firstSeen: stamp, lastSeen: stamp, checks: 1,
                   maxEdgeBps: f.edgeBps, lastEdgeBps: f.edgeBps,
-                  status: STATUS,
-  basedOnFixingAgeHours: Number(ageHours.toFixed(1)),
-  ...(ageHours > STALE_AFTER_HOURS && { staleWarning:
-    `The fixing this check is based on is ${ageHours.toFixed(1)} hours old. Rates may have moved since. Treat this result as stale.` }), ...f });
+                  status: STATUS, ...f });
     }
   }
   writeFileSync("api/v1/inversion-log.json", JSON.stringify(log_, null, 2) + "\n");
@@ -132,7 +140,7 @@ if (process.env.GITHUB_OUTPUT){
   const { appendFileSync } = await import("node:fs");
   appendFileSync(process.env.GITHUB_OUTPUT, `found=${found.length ? "true" : "false"}\n`);
   appendFileSync(process.env.GITHUB_OUTPUT, `count=${found.length}\n`);
-  appendFileSync(process.env.GITHUB_OUTPUT, `stale=${ageHours > STALE_AFTER_HOURS ? "true" : "false"}\n`);
+  appendFileSync(process.env.GITHUB_OUTPUT, `stale=${stale ? "true" : "false"}\n`);
   appendFileSync(process.env.GITHUB_OUTPUT, `age_hours=${ageHours.toFixed(1)}\n`);
   appendFileSync(process.env.GITHUB_OUTPUT, `last_fixing=${latest.fixing}\n`);
 }
