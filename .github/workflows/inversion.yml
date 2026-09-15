@@ -4,8 +4,10 @@ name: SBOR inversion monitor
 # writes a fixing and never touches the historical record.
 on:
   schedule:
-    - cron: "37 */3 * * *"   # every three hours. Hourly was being dropped by the
-                             # scheduler anyway, and asking for less gets more.
+    # Every three hours. Hourly was being dropped by the scheduler anyway, and
+    # asking for less gets more. This one also watches whether the daily fixing
+    # ran, so it needs a run after the fixing's last scheduled attempt.
+    - cron: "37 */3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -78,7 +80,7 @@ jobs:
           LAST: ${{ steps.check.outputs.last_fixing }}
         run: |
           if [ -z "$TG_TOKEN" ]; then exit 0; fi
-          MSG=$(printf 'SBOR has not fixed in %s hours.\n\nLast fixing: %s\n\nThe daily workflow did not run. GitHub drops scheduled runs under load, so this is usually not a failure, it simply never started. Run it by hand:\nhttps://github.com/sborxyz/sbor/actions' "$AGE" "$LAST")
+          MSG=$(printf 'SBOR has no fixing for today.\n\nLast one: %s, %s hours ago.\n\nAll four scheduled attempts have passed, so GitHub dropped every one of them. Run it by hand:\nhttps://github.com/sborxyz/sbor/actions' "$LAST" "$AGE")
           curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
             --data-urlencode "chat_id=$TG_CHAT" \
             --data-urlencode "disable_web_page_preview=true" \
