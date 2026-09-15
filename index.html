@@ -104,17 +104,14 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
   font-size:clamp(38px,6vw,62px);line-height:.98;font-weight:500;letter-spacing:-.03em;margin:6px 0 12px;color:var(--ink)}
 .sofrv .pct{font-size:.42em;font-weight:400;letter-spacing:0;margin-left:.08em;color:var(--ink-soft)}
 .sofrbox p{font-size:14.5px;color:var(--ink-soft);margin-bottom:10px;max-width:none}
-.sofrbox{display:grid;grid-template-columns:minmax(180px,auto) minmax(0,1fr);gap:6px 34px;align-items:start}
-.sofrbox .sofrk{grid-column:1;align-self:end}
-.sofrbox .sofrv{grid-column:1;grid-row:2;margin:2px 0 0}
-.sofrbox #sofrAvgs{grid-column:1;grid-row:3;margin-top:12px !important;max-width:24ch}
-.sofrbox .sofrtext{grid-column:2;grid-row:1 / -1}
+.sofrbox .sofrcols{display:flex;gap:34px;align-items:flex-start}
+.sofrbox .sofrnum{flex:0 0 auto;min-width:150px}
+.sofrbox .sofrv{margin:4px 0 0}
+.sofrbox .sofrtext{flex:1 1 0;min-width:0}
 .sofrbox .sofrtext p:last-child{margin-bottom:0}
 @media (max-width:720px){
-  .sofrbox{grid-template-columns:1fr}
-  .sofrbox .sofrk,.sofrbox .sofrv,.sofrbox #sofrAvgs,
-  .sofrbox .sofrtext{grid-column:1;grid-row:auto}
-  .sofrbox #sofrAvgs{max-width:none}
+  .sofrbox .sofrcols{display:block}
+  .sofrbox .sofrtext{margin-top:14px}
 }
 .sofrcmp{color:var(--ink) !important;font-weight:450}
 .sofrwhy{font-size:13.5px !important}
@@ -263,14 +260,18 @@ a{color:var(--accent)}
         </div>
       </div>
       <div id="sofrBox" class="sofrbox" hidden>
-        <div class="sofrk" id="t-sofrH"></div>
-        <div class="sofrv"><span class="num" id="sofrVal">0.00</span><span class="pct">%</span></div>
+        <div class="sofrcols">
+        <div class="sofrnum">
+          <div class="sofrk" id="t-sofrH"></div>
+          <div class="sofrv"><span class="num" id="sofrVal">0.00</span><span class="pct">%</span></div>
+        </div>
         <div class="sofrtext">
           <p id="sofrLine"></p>
           <p id="sofrCompare" class="sofrcmp"></p>
           <p id="sofrWhy" class="sofrwhy"></p>
         </div>
-        <p class="coverage" id="sofrAvgs" style="margin:10px 0 0"></p>
+        </div>
+        <p class="coverage" id="sofrAvgs" style="margin:14px 0 0"></p>
       </div>
       <div class="tscroll">
         <table>
