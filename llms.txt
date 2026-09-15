@@ -109,7 +109,7 @@ fixing with a note.
 ## Data
 
 - https://sbor.xyz/api/v1/latest.json    current fixing, with constituents
-- https://sbor.xyz/api/v1/history.json   rolling 400 day window, for convenience
+- https://sbor.xyz/api/v1/history.json   rolling 200 day window, for convenience
 - https://sbor.xyz/api/v1/history-index.json  index of the full record by year
 - https://sbor.xyz/api/v1/history-YYYY.json   the complete record, one file a year
 - https://sbor.xyz/api/v1/backfill.json  reconstructed context, not the record
@@ -195,9 +195,11 @@ rates. Plus the external comparison. Plus the methodology version that produced
 the row.
 
 The series is sharded by year at history-YYYY.json, indexed at
-history-index.json. history.json carries a rolling 400 day window so anything
+history-index.json. history.json carries a rolling 200 day window so anything
 already reading it keeps working; the shards are authoritative for anything
-older. A single growing file would be rewritten in full on every commit, which
+older. Two hundred is set by what verification requires rather than by
+convenience: the longest term average published is 180 days, and a reader must
+be able to check a published average against the data behind it. A single growing file would be rewritten in full on every commit, which
 makes the repository grow quadratically, so it is split.
 
 Each fixing also carries a context block: SOFR for the previous business day
