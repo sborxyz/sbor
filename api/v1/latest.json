@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-15T13:41:23Z",
+  "fixing": "2026-09-15T14:08:11Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -34,7 +34,7 @@
           "asset": "USDCx",
           "borrow": 2.83,
           "supply": 0.82,
-          "utilization": 59.42,
+          "utilization": 59.45,
           "nominalBorrow": 2.79,
           "nominalSupply": 0.82,
           "depthUsd": 10139289,
@@ -126,7 +126,7 @@
     "period": "one reward cycle, about two weeks",
     "cyclesPerYear": 25.03,
     "annualisation": "Bitcoin paid over one reward cycle divided by STX locked, annualised over the cycles in a year.",
-    "apy": 7.62,
+    "apy": 7.63,
     "cycle": 142,
     "cycleStartBurnBlock": 963900,
     "cycleEndBurnBlock": 965999,
@@ -136,15 +136,15 @@
     "cycleYieldPct": 0.294,
     "btcPaid": 4.43895,
     "stxLocked": 441576024,
-    "stxPerBtc": 295575.14,
-    "stxPerBtcSell": 294147.97,
-    "stxPerBtcBuy": 297002.31,
-    "crossSpreadBps": 97,
+    "stxPerBtc": 296484.22,
+    "stxPerBtcSell": 295518.06,
+    "stxPerBtcBuy": 297450.38,
+    "crossSpreadBps": 65,
     "crossNote": "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it.",
-    "stxPerBtcSmoothed": 292431.99,
+    "stxPerBtcSmoothed": 292507.27,
     "crossWindowDays": 6,
     "rateSource": "Bitflow",
-    "rateQuoteImpactBps": 12,
+    "rateQuoteImpactBps": 41,
     "note": "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualised. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over a short window rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. It is a staking yield, not a lending rate, and is never blended into the lending indices."
   },
   "externalReference": {
@@ -275,17 +275,17 @@
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 76292,
-      "stxUsd": 0.257433,
+      "btcUsd": 76347,
+      "stxUsd": 0.256566,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
-      "sats": 246542463295,
-      "sbtc": 2465.42463295,
+      "sats": 246544119070,
+      "sbtc": 2465.4411907,
       "source": "sbtc-token contract"
     },
     "chainHeight": {
-      "burnBlockHeight": 967127,
+      "burnBlockHeight": 967131,
       "rewardCycle": 143,
       "stackedUstx": 441576024260845,
       "source": "Hiro /v2/pox"

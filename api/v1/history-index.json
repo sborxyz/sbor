@@ -1,6 +1,6 @@
 {
   "note": "The complete record, sharded by year. history.json carries a rolling recent window for convenience; these files are authoritative for anything older.",
-  "rollingWindowDays": 400,
+  "rollingWindowDays": 200,
   "shards": [
     {
       "year": "2026",
