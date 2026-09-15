@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-15T14:12:59Z",
+  "fixing": "2026-09-15T14:16:49Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -77,7 +77,7 @@
       "headline": "What money costs in STX on Stacks.",
       "borrow": 2.34,
       "supply": 1.23,
-      "allInSupply": 4.74,
+      "allInSupply": 4.73,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
@@ -92,7 +92,7 @@
           "utilization": 8.54,
           "nominalBorrow": 1.37,
           "nominalSupply": 0.09,
-          "protocolYield": 6.34,
+          "protocolYield": 6.32,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
           "depthUsd": 2227377,
           "phaseIn": 1,
@@ -136,12 +136,12 @@
     "cycleYieldPct": 0.2943,
     "btcPaid": 4.43895,
     "stxLocked": 441576024,
-    "stxPerBtc": 296813.33,
-    "stxPerBtcSell": 296176.18,
+    "stxPerBtc": 296824.54,
+    "stxPerBtcSell": 296198.59,
     "stxPerBtcBuy": 297450.48,
-    "crossSpreadBps": 43,
+    "crossSpreadBps": 42,
     "crossNote": "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it.",
-    "stxPerBtcSmoothed": 292713.63,
+    "stxPerBtcSmoothed": 292770.35,
     "crossWindowDays": 6,
     "rateSource": "Bitflow",
     "rateQuoteImpactBps": 3,
@@ -275,8 +275,8 @@
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 76404,
-      "stxUsd": 0.25699,
+      "btcUsd": 76372,
+      "stxUsd": 0.256961,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
@@ -285,7 +285,7 @@
       "source": "sbtc-token contract"
     },
     "chainHeight": {
-      "burnBlockHeight": 967131,
+      "burnBlockHeight": 967132,
       "rewardCycle": 143,
       "stackedUstx": 441576024260845,
       "source": "Hiro /v2/pox"
