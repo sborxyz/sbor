@@ -2,8 +2,16 @@ name: SBOR daily fixing
 
 on:
   schedule:
-    - cron: "23 8 * * *"     # target 11:00 UTC. Scheduled early because GitHub runs late,
-                             # and off the hour because every free tier cron sits at minute zero.
+    # GitHub drops scheduled runs on free public repos under load. It dropped
+    # the fixing entirely on 14 September and ran three hours late on others.
+    # So ask several times instead of once. Re-running is harmless: a fixing
+    # replaces that day's row rather than adding another, and the first one to
+    # land is usually the one that stands. Every time is off the hour, because
+    # the top of the hour is the most contended minute on the platform.
+    - cron: "23 8 * * *"     # target, 11:00 UTC allowing for delay
+    - cron: "41 10 * * *"    # if the first was dropped
+    - cron: "17 13 * * *"    # if both were
+    - cron: "52 16 * * *"    # last chance before the day is lost
   workflow_dispatch:
 
 permissions:
