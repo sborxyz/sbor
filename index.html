@@ -115,6 +115,8 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 }
 .sofrcmp{color:var(--ink) !important;font-weight:450}
 .sofrwhy{font-size:13.5px !important}
+tr.ownrow td{background:rgba(29,78,107,.05);font-weight:500}
+tr.ownrow .venue{color:var(--accent)}
 .spreadbox{border:1px solid var(--rule);border-left:2px solid var(--rule);padding:14px 18px;margin-bottom:8px;font-size:15px;color:var(--ink-soft)}
 .spreadbox strong,.invbox strong{color:var(--ink);font-weight:500}
 .poxchart{height:200px;margin-top:18px}
@@ -465,9 +467,10 @@ en:{
   sofrCompare:(sbor,sofr,bps)=>`A dollar secured by bitcoin on Stacks costs ${sbor} to borrow. A dollar secured by Treasuries costs ${sofr}. That is ${Math.abs(bps)} basis points ${bps < 0 ? "cheaper on Stacks" : "dearer on Stacks"}.`,
   sofrWhy:"Bitcoin is the riskier collateral, so by any textbook this is backwards. It is cheaper here because almost nobody is borrowing yet, so utilisation is low and the rate has not been bid up. The gap is a measure of how early this market is.",
   sofrAvgs:(a30,a90,a180)=>`SOFR averages: 30 day ${a30}, 90 day ${a90}, 180 day ${a180}.`,
-  extH:"Outside Stacks",
-  extP:"The same asset class on the largest lending markets off this chain, shown for comparison. One market is selected per chain: a venue that publishes a borrow rate and utilisation is preferred over one that does not, and depth decides between those that publish both. So the venue named can change. These are not constituents of any SBOR index and never enter a fixing.",
+  extH:"How this compares",
+  extP:"This index against the same asset class on the largest lending markets off this chain. The first row is SBOR itself, so the comparison is in one place. One market is selected per chain: a venue that publishes a borrow rate and utilisation is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. Nothing below the first row is a constituent of any SBOR index, and none of it ever enters a fixing.",
   extCols:["Market","Borrow","Supply","Utilisation","Depth","Compare with"],
+  extThis:"this index",
   termsH:"Term averages",
   termsP:"Compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window of fixings exists.",
   termCol:d=>`${d}-day`,
@@ -553,9 +556,10 @@ pt:{
   sofrCompare:(sbor,sofr,bps)=>`Um dólar garantido por bitcoin na Stacks custa ${sbor} para tomar emprestado. Um dólar garantido por títulos do Tesouro custa ${sofr}. São ${Math.abs(bps)} pontos-base ${bps < 0 ? "mais barato na Stacks" : "mais caro na Stacks"}.`,
   sofrWhy:"O bitcoin é a garantia mais arriscada, então pela teoria isso está invertido. Sai mais barato aqui porque quase ninguém ainda toma emprestado, então a utilização é baixa e a taxa não foi disputada. A diferença mede o quanto este mercado ainda é inicial.",
   sofrAvgs:(a30,a90,a180)=>`Médias da SOFR: 30 dias ${a30}, 90 dias ${a90}, 180 dias ${a180}.`,
-  extH:"Fora da Stacks",
-  extP:"A mesma classe de ativo nos maiores mercados de crédito fora desta rede, mostrada para comparação. É escolhido um mercado por rede: uma plataforma que publica taxa de empréstimo e utilização tem preferência sobre uma que não publica, e a profundidade decide entre as que publicam as duas. Por isso a plataforma citada pode mudar. Não são componentes de nenhum índice SBOR e nunca entram em um fixing.",
+  extH:"Como isto se compara",
+  extP:"Este índice contra a mesma classe de ativo nos maiores mercados de crédito fora desta rede. A primeira linha é o próprio SBOR, para a comparação ficar em um lugar só. É escolhido um mercado por rede: uma plataforma que publica taxa de empréstimo e utilização tem preferência sobre uma que não publica, e a profundidade decide entre as que publicam as duas, então a plataforma citada pode mudar. Nada abaixo da primeira linha é componente de algum índice SBOR, e nada disso entra em um fixing.",
   extCols:["Mercado","Empréstimo","Depósito","Utilização","Profundidade","Comparar com"],
+  extThis:"este índice",
   termsH:"Médias de prazo",
   termsP:"Médias compostas dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa de fixings.",
   termCol:d=>`${d} dias`,
@@ -945,7 +949,20 @@ function render(){
     esec.hidden = false;
     set("extHead", t.extCols.map((c,i) =>
       i === 0 ? `<th>${c}</th>` : `<th class="r">${c}</th>`).join(""));
-    set("extBody", forThis.map(m => `
+    /* The thing being compared belongs in the comparison. Without this the
+       reader has to scroll back up to remember what SBOR said. */
+    const ownUtil = ix.markets.reduce((a,m) => a + (typeof m.utilization === "number" ? m.utilization * m.weight : 0), 0);
+    const own = `
+      <tr class="ownrow">
+        <td><span class="venue">${ix.label}</span><span class="asset">${t.extThis}</span></td>
+        <td class="r num" data-l="${t.extCols[1]}">${fmt(ix.borrow)}%</td>
+        <td class="r num" data-l="${t.extCols[2]}">${fmt(ix.supply)}%</td>
+        <td class="r num" data-l="${t.extCols[3]}">${ownUtil ? fmt(ownUtil)+"%" : "n/a"}</td>
+        <td class="r num" data-l="${t.extCols[4]}">${depth(ix.markets.reduce((a,m)=>a+m.depth*1e6,0))}</td>
+        <td class="r" data-l="${t.extCols[5]}"><span class="asset">Stacks</span></td>
+      </tr>`;
+
+    set("extBody", own + forThis.map(m => `
       <tr>
         <td>${m.url
             ? `<a class="venue" href="${m.url}" target="_blank" rel="noopener">${m.venue}</a>`
