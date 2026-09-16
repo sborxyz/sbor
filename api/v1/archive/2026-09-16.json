@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-16T14:40:11Z",
+  "fixing": "2026-09-16T15:09:48Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -77,7 +77,7 @@
       "headline": "What money costs in STX on Stacks.",
       "borrow": 2.3,
       "supply": 1.19,
-      "allInSupply": 4.93,
+      "allInSupply": 4.97,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
@@ -92,7 +92,7 @@
           "utilization": 8.44,
           "nominalBorrow": 1.35,
           "nominalSupply": 0.09,
-          "protocolYield": 6.81,
+          "protocolYield": 6.89,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
           "depthUsd": 2053189,
           "phaseIn": 1,
@@ -126,25 +126,25 @@
     "period": "one reward cycle, about two weeks",
     "cyclesPerYear": 25.03,
     "annualisation": "Bitcoin paid over one reward cycle divided by STX locked, annualised over the cycles in a year.",
-    "apy": 7.86,
+    "apy": 7.87,
     "cycle": 142,
     "cycleStartBurnBlock": 963900,
     "cycleEndBurnBlock": 965999,
     "cycleStartApprox": "2026-08-24",
     "cycleEndApprox": "2026-09-07",
     "cycleLengthBlocks": 2100,
-    "cycleYieldPct": 0.3029,
+    "cycleYieldPct": 0.3032,
     "btcPaid": 4.43895,
     "stxLocked": 441576024,
-    "stxPerBtc": 319574.81,
-    "stxPerBtcSell": 317871.06,
-    "stxPerBtcBuy": 321278.57,
-    "crossSpreadBps": 107,
+    "stxPerBtc": 321550.86,
+    "stxPerBtcSell": 320080.64,
+    "stxPerBtcBuy": 323021.08,
+    "crossSpreadBps": 91,
     "crossNote": "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it.",
-    "stxPerBtcSmoothed": 301334.53,
+    "stxPerBtcSmoothed": 301663.3,
     "crossWindowDays": 7,
     "rateSource": "Bitflow",
-    "rateQuoteImpactBps": 0,
+    "rateQuoteImpactBps": 20,
     "note": "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualised. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over a short window rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. It is a staking yield, not a lending rate, and is never blended into the lending indices."
   },
   "externalReference": {
@@ -275,17 +275,17 @@
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 75670,
-      "stxUsd": 0.23502,
+      "btcUsd": 75592,
+      "stxUsd": 0.23497,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
-      "sats": 246426399452,
-      "sbtc": 2464.26399452,
+      "sats": 246426731287,
+      "sbtc": 2464.26731287,
       "source": "sbtc-token contract"
     },
     "chainHeight": {
-      "burnBlockHeight": 967291,
+      "burnBlockHeight": 967292,
       "rewardCycle": 143,
       "stackedUstx": 441576024260845,
       "source": "Hiro /v2/pox"
