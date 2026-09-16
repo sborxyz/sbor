@@ -959,7 +959,7 @@ function render(){
         <td class="r num" data-l="${t.extCols[2]}">${fmt(ix.supply)}%</td>
         <td class="r num" data-l="${t.extCols[3]}">${ownUtil ? fmt(ownUtil)+"%" : "n/a"}</td>
         <td class="r num" data-l="${t.extCols[4]}">${depth(ix.markets.reduce((a,m)=>a+m.depth*1e6,0))}</td>
-        <td class="r" data-l="${t.extCols[5]}"><span class="asset">Stacks</span></td>
+        <td class="r" data-l="${t.extCols[5]}"></td>
       </tr>`;
 
     set("extBody", own + forThis.map(m => `
