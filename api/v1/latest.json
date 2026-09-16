@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-16T15:09:48Z",
+  "fixing": "2026-09-16T15:14:45Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -77,7 +77,7 @@
       "headline": "What money costs in STX on Stacks.",
       "borrow": 2.3,
       "supply": 1.19,
-      "allInSupply": 4.97,
+      "allInSupply": 4.96,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
@@ -92,7 +92,7 @@
           "utilization": 8.44,
           "nominalBorrow": 1.35,
           "nominalSupply": 0.09,
-          "protocolYield": 6.89,
+          "protocolYield": 6.87,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
           "depthUsd": 2053189,
           "phaseIn": 1,
@@ -126,14 +126,14 @@
     "period": "one reward cycle, about two weeks",
     "cyclesPerYear": 25.03,
     "annualisation": "Bitcoin paid over one reward cycle divided by STX locked, annualised over the cycles in a year.",
-    "apy": 7.87,
+    "apy": 7.88,
     "cycle": 142,
     "cycleStartBurnBlock": 963900,
     "cycleEndBurnBlock": 965999,
     "cycleStartApprox": "2026-08-24",
     "cycleEndApprox": "2026-09-07",
     "cycleLengthBlocks": 2100,
-    "cycleYieldPct": 0.3032,
+    "cycleYieldPct": 0.3035,
     "btcPaid": 4.43895,
     "stxLocked": 441576024,
     "stxPerBtc": 321550.86,
@@ -141,7 +141,7 @@
     "stxPerBtcBuy": 323021.08,
     "crossSpreadBps": 91,
     "crossNote": "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it.",
-    "stxPerBtcSmoothed": 301663.3,
+    "stxPerBtcSmoothed": 301945.59,
     "crossWindowDays": 7,
     "rateSource": "Bitflow",
     "rateQuoteImpactBps": 20,
@@ -275,8 +275,8 @@
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 75592,
-      "stxUsd": 0.23497,
+      "btcUsd": 75665,
+      "stxUsd": 0.23507,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
@@ -285,7 +285,7 @@
       "source": "sbtc-token contract"
     },
     "chainHeight": {
-      "burnBlockHeight": 967292,
+      "burnBlockHeight": 967293,
       "rewardCycle": 143,
       "stackedUstx": 441576024260845,
       "source": "Hiro /v2/pox"
