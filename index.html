@@ -469,7 +469,7 @@ en:{
   sofrAvgs:(a30,a90,a180)=>`SOFR averages: 30 day ${a30}, 90 day ${a90}, 180 day ${a180}.`,
   extH:"How this compares",
   extP:"This index against the same asset class on the largest lending markets off this chain. The first row is SBOR itself, so the comparison is in one place. One market is selected per chain: a venue that publishes a borrow rate and utilisation is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. Nothing below the first row is a constituent of any SBOR index, and none of it ever enters a fixing.",
-  extCols:["Market","Borrow","Supply","Utilisation","Depth","Compare with"],
+  extCols:["Market","Borrow","Supply","Utilisation","Depth"],
   extThis:"this index",
   termsH:"Term averages",
   termsP:"Compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window of fixings exists.",
@@ -558,7 +558,7 @@ pt:{
   sofrAvgs:(a30,a90,a180)=>`Médias da SOFR: 30 dias ${a30}, 90 dias ${a90}, 180 dias ${a180}.`,
   extH:"Como isto se compara",
   extP:"Este índice contra a mesma classe de ativo nos maiores mercados de crédito fora desta rede. A primeira linha é o próprio SBOR, para a comparação ficar em um lugar só. É escolhido um mercado por rede: uma plataforma que publica taxa de empréstimo e utilização tem preferência sobre uma que não publica, e a profundidade decide entre as que publicam as duas, então a plataforma citada pode mudar. Nada abaixo da primeira linha é componente de algum índice SBOR, e nada disso entra em um fixing.",
-  extCols:["Mercado","Empréstimo","Depósito","Utilização","Profundidade","Comparar com"],
+  extCols:["Mercado","Empréstimo","Depósito","Utilização","Profundidade"],
   extThis:"este índice",
   termsH:"Médias de prazo",
   termsP:"Médias compostas dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa de fixings.",
@@ -959,7 +959,6 @@ function render(){
         <td class="r num" data-l="${t.extCols[2]}">${fmt(ix.supply)}%</td>
         <td class="r num" data-l="${t.extCols[3]}">${ownUtil ? fmt(ownUtil)+"%" : "n/a"}</td>
         <td class="r num" data-l="${t.extCols[4]}">${depth(ix.markets.reduce((a,m)=>a+m.depth*1e6,0))}</td>
-        <td class="r" data-l="${t.extCols[5]}"></td>
       </tr>`;
 
     set("extBody", own + forThis.map(m => `
@@ -973,7 +972,6 @@ function render(){
         <td class="r num" data-l="${t.extCols[4]}">${m.dataUrl
             ? `<a href="${m.dataUrl}" target="_blank" rel="noopener">${depth(m.depthUsd)}</a>`
             : depth(m.depthUsd)}</td>
-        <td class="r" data-l="${t.extCols[5]}"><span class="asset">${m.comparableTo}</span></td>
       </tr>`).join(""));
   } else { esec.hidden = true; }
 
