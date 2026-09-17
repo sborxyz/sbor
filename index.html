@@ -766,38 +766,6 @@ function renderChrome(){
   set("t-introH", t.introH); set("t-introP", t.introP); set("t-introUse", t.introUse);
   set("t-borrow-k", t.borrowK); set("t-supply-k", t.supplyK);
   set("t-hist-p", t.histP);
-  set("t-invH", t.invH); set("t-invP", t.invP);
-  /* The spread is derived from the fixing itself, so this section always has
-     something to say. An inversion is simply the day a gap turns positive. */
-  const isec = document.getElementById("inv-sec");
-  /* Only the index being shown. A dollar spread says nothing about a bitcoin
-     rate, and showing it on every tab implies a comparison that is not there. */
-  const byAsset = {};
-  for (const m of ix.markets) (byAsset[m.asset] ||= []).push(m);
-
-  const rows = [];
-  for (const [asset, ms] of Object.entries(byAsset)){
-    if (ms.length < 2) continue;
-    let best = null;
-    for (const b of ms) for (const sup of ms){
-      if (b.venue === sup.venue) continue;
-      const gap = Math.round((sup.supply - b.borrow) * 100);
-      if (!best || gap > best.gap) best = { gap, b, sup };
-    }
-    if (best) rows.push({ asset, ...best });
-  }
-  rows.sort((a,b) => b.gap - a.gap);
-
-  isec.hidden = false;
-  set("invBody", rows.length
-    ? rows.map(r => `<div class="${r.gap > 0 ? "invbox" : "spreadbox"}">${
-        t.invSpread(r.asset, r.sup.venue, fmt(r.sup.supply)+"%",
-                    r.b.venue, fmt(r.b.borrow)+"%", r.gap)}</div>`).join("")
-    : `<div class="invnone">${t.invNone(ix.label)}</div>`);
-  const bits = [];
-  if (INVERSIONS) bits.push(t.invChecked(INVERSIONS.checked));
-  if (INVERSIONS && INVERSIONS.status === "validating") bits.push(t.invValidating);
-  set("invMeta", bits.join(" "));
   set("t-termsH", t.termsH); set("t-termsP", t.termsP);
   renderTerms();
   set("t-poxH", t.poxH); set("t-poxP", t.poxP);
@@ -944,6 +912,39 @@ function render(){
   const sbox = document.getElementById("sofrBox");
   const esec = document.getElementById("ext-sec");
   const forThis = (EXTERNAL?.markets || []).filter(m => m.comparableTo === ix.label);
+
+  /* The spread is derived from the fixing itself, so this section always has
+     something to say. An inversion is simply the day a gap turns positive.
+     It lives in render rather than renderChrome because it is scoped to the
+     index being shown, and renderChrome does not run on a tab change. */
+  const isec = document.getElementById("inv-sec");
+  const byAsset = {};
+  for (const m of ix.markets) (byAsset[m.asset] ||= []).push(m);
+
+  const spreadRows = [];
+  for (const [asset, ms] of Object.entries(byAsset)){
+    if (ms.length < 2) continue;
+    let best = null;
+    for (const b of ms) for (const sup of ms){
+      if (b.venue === sup.venue) continue;
+      const gap = Math.round((sup.supply - b.borrow) * 100);
+      if (!best || gap > best.gap) best = { gap, b, sup };
+    }
+    if (best) spreadRows.push({ asset, ...best });
+  }
+  spreadRows.sort((a,b) => b.gap - a.gap);
+
+  isec.hidden = false;
+  set("t-invH", t.invH); set("t-invP", t.invP);
+  set("invBody", spreadRows.length
+    ? spreadRows.map(r => `<div class="${r.gap > 0 ? "invbox" : "spreadbox"}">${
+        t.invSpread(r.asset, r.sup.venue, fmt(r.sup.supply)+"%",
+                    r.b.venue, fmt(r.b.borrow)+"%", r.gap)}</div>`).join("")
+    : `<div class="invnone">${t.invNone(ix.label)}</div>`);
+  const invBits = [];
+  if (INVERSIONS) invBits.push(t.invChecked(INVERSIONS.checked));
+  if (INVERSIONS && INVERSIONS.status === "validating") invBits.push(t.invValidating);
+  set("invMeta", invBits.join(" "));
 
   set("t-extH", t.extH); set("t-extP", t.extP);
   if (forThis.length){
