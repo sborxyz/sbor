@@ -38,7 +38,32 @@ async function protocolYields(){
     if (st !== null) out.stSTX = st;
     const sb = pick("ststxbtc","stStxBtc","stSTXbtc","btc","ststxbtc.apy","data.ststxbtc");
     if (sb !== null) out.stSTXbtc = sb;
-    log(`  protocol yields resolved: ${JSON.stringify(out)}`);
+
+    /* Two more numbers arrive in the same payload and were being discarded.
+       Neither enters a fixing, but both are worth the record:
+
+       native is what stacking pays with no liquid token and no commission,
+       locked for the cycle. Against stSTX it is the cost of liquidity, which
+       nobody publishes and which cannot be reconstructed later.
+
+       stBTC was described by the venue as a fallback constant. It has since
+       moved 2.6, 2.4, 2.54, so it may have become live. Recording it is how we
+       find out. */
+    const native = pick("stx","native","stacking","data.stx");
+    const stbtc  = pick("stbtc","stBtc","stBTC","data.stbtc");
+    out._context = {
+      ...(native !== null && { nativeStackingApy: native }),
+      ...(stbtc  !== null && { stBtcApy: stbtc }),
+      ...(native !== null && st !== null && {
+        liquidityCostBps: Math.round((native - st) * 100),
+        liquidityCostNote: "Native stacking pays more than the liquid token because the position is locked for the cycle and the issuer takes a commission. The gap is what liquidity costs."
+      }),
+      source: "StackingDAO"
+    };
+
+    log(`  protocol yields resolved: ${JSON.stringify({ stSTX: out.stSTX, stSTXbtc: out.stSTXbtc })}`);
+    if (Object.keys(out._context).length > 1)
+      log(`  staking context: ${JSON.stringify(out._context)}`);
     return out;
   } catch(e){
     log(`  protocol yield source unavailable, omitted. ${e.message}`);
@@ -258,7 +283,10 @@ const main = async () => {
   selfCheck();
   const depth = await depthBySymbol();
   log("depth from DefiLlama:", JSON.stringify(depth));
-  const protoYield = await protocolYields();
+  const protoYieldRaw = await protocolYields();
+  const stakingContext = protoYieldRaw._context ?? null;
+  const protoYield = { ...protoYieldRaw };
+  delete protoYield._context;
 
   const markets = [];
   for (const a of ZEST.assets){
@@ -359,6 +387,8 @@ const main = async () => {
   let context = null;
   try { context = await contextBlock(); }
   catch(e){ log(`  context unavailable, omitted. ${e.message}`); }
+  if (stakingContext && Object.keys(stakingContext).length > 1)
+    context = { ...(context || { note: "Context recorded alongside the fixing. None of this enters an index or affects a rate." }), staking: stakingContext };
 
   const stamp = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
   const day = stamp.slice(0,10);
