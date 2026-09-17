@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-17T16:37:57Z",
+  "fixing": "2026-09-17T17:16:12Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -172,12 +172,12 @@
     "cycleYieldPct": 0.303,
     "btcPaid": 4.43895,
     "stxLocked": 441576024,
-    "stxPerBtc": 306422.21,
+    "stxPerBtc": 306431.17,
     "stxPerBtcSell": 305575.34,
-    "stxPerBtcBuy": 307269.09,
-    "crossSpreadBps": 55,
+    "stxPerBtcBuy": 307287.01,
+    "crossSpreadBps": 56,
     "crossNote": "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it.",
-    "stxPerBtcSmoothed": 301392.26,
+    "stxPerBtcSmoothed": 301393.8,
     "crossWindowDays": 7,
     "rateSource": "Bitflow",
     "rateQuoteImpactBps": 6,
@@ -311,8 +311,8 @@
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 76567,
-      "stxUsd": 0.248289,
+      "btcUsd": 76769,
+      "stxUsd": 0.250504,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
@@ -321,15 +321,15 @@
       "source": "sbtc-token contract"
     },
     "chainHeight": {
-      "burnBlockHeight": 967440,
+      "burnBlockHeight": 967442,
       "rewardCycle": 143,
       "stackedUstx": 441576024260845,
       "source": "Hiro /v2/pox"
     },
     "staking": {
-      "nativeStackingApy": 5.93,
-      "stBtcApy": 2.54,
-      "liquidityCostBps": 256,
+      "nativeStackingApy": 5.97,
+      "stBtcApy": 2.89,
+      "liquidityCostBps": 260,
       "liquidityCostNote": "Native stacking pays more than the liquid token because the position is locked for the cycle and the issuer takes a commission. The gap is what liquidity costs.",
       "source": "StackingDAO"
     }
