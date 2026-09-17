@@ -458,7 +458,7 @@ en:{
   invP:"For each asset lent at more than one venue, the cheapest place to borrow against the best paying place to supply. The gap is normally negative, because that spread is how a lending protocol earns. It narrowing means the market is getting more efficient. If it ever turns positive the same asset pays more to supply than it costs to borrow, which is an inversion, and SBOR publishes any it finds to everyone at once, never to a private channel. SBOR does not trade on its own rate.",
   invSpread:(a,sv,sr,bv,br,g)=>`<strong>${a}</strong> supply ${sv} ${sr} · borrow ${bv} ${br} · <span class="num">${g > 0 ? "+" : ""}${g} bps</span>`,
   invSingle:a=>`<strong>${a}</strong> one venue, no cross venue comparison possible`,
-  invNone:"No asset is lent at more than one venue today, so there is nothing to compare.",
+  invNone:l=>`No asset in ${l} is lent at more than one venue today, so there is nothing to compare across venues.`,
   invValidating:"This monitor is being validated. Detections are published so the validation period is visible, but they have not yet been proven over a long enough run to be relied on.",
   invRow:(a,sv,sr,bv,br,e)=>`${a}: supplying at ${sv} pays ${sr}, borrowing the same asset at ${bv} costs ${br}. ${e} bps, before fees, gas and liquidation risk.`,
   invChecked:t=>`Checked ${t}, hourly.`,
@@ -547,7 +547,7 @@ pt:{
   invP:"Para cada ativo emprestado em mais de uma plataforma, o lugar mais barato para tomar emprestado contra o que melhor paga para depositar. A diferença é normalmente negativa, porque esse spread é como um protocolo de crédito ganha. Ela diminuindo significa um mercado mais eficiente. Se algum dia ficar positiva, o mesmo ativo paga mais para depositar do que custa para tomar emprestado, o que é uma inversão, e o SBOR publica qualquer uma que encontrar para todos ao mesmo tempo, nunca em canal privado. O SBOR não opera em cima da própria taxa.",
   invSpread:(a,sv,sr,bv,br,g)=>`<strong>${a}</strong> depósito ${sv} ${sr} · empréstimo ${bv} ${br} · <span class="num">${g > 0 ? "+" : ""}${g} pontos-base</span>`,
   invSingle:a=>`<strong>${a}</strong> uma plataforma, sem comparação possível entre plataformas`,
-  invNone:"Nenhum ativo é emprestado em mais de uma plataforma hoje, então não há o que comparar.",
+  invNone:l=>`Nenhum ativo do ${l} é emprestado em mais de uma plataforma hoje, então não há o que comparar entre plataformas.`,
   invValidating:"Este monitor está em validação. As detecções são publicadas para que o período de validação fique visível, mas ainda não foram comprovadas por tempo suficiente para servirem de base.",
   invRow:(a,sv,sr,bv,br,e)=>`${a}: depositar na ${sv} paga ${sr}, tomar o mesmo ativo emprestado na ${bv} custa ${br}. ${e} pontos-base, antes de taxas, gas e risco de liquidação.`,
   invChecked:t=>`Verificado ${t}, de hora em hora.`,
@@ -770,9 +770,10 @@ function renderChrome(){
   /* The spread is derived from the fixing itself, so this section always has
      something to say. An inversion is simply the day a gap turns positive. */
   const isec = document.getElementById("inv-sec");
+  /* Only the index being shown. A dollar spread says nothing about a bitcoin
+     rate, and showing it on every tab implies a comparison that is not there. */
   const byAsset = {};
-  for (const k of Object.keys(INDICES))
-    for (const m of computed(k).markets) (byAsset[m.asset] ||= []).push(m);
+  for (const m of ix.markets) (byAsset[m.asset] ||= []).push(m);
 
   const rows = [];
   for (const [asset, ms] of Object.entries(byAsset)){
@@ -792,7 +793,7 @@ function renderChrome(){
     ? rows.map(r => `<div class="${r.gap > 0 ? "invbox" : "spreadbox"}">${
         t.invSpread(r.asset, r.sup.venue, fmt(r.sup.supply)+"%",
                     r.b.venue, fmt(r.b.borrow)+"%", r.gap)}</div>`).join("")
-    : `<div class="invnone">${t.invNone}</div>`);
+    : `<div class="invnone">${t.invNone(ix.label)}</div>`);
   const bits = [];
   if (INVERSIONS) bits.push(t.invChecked(INVERSIONS.checked));
   if (INVERSIONS && INVERSIONS.status === "validating") bits.push(t.invValidating);
