@@ -204,7 +204,16 @@ makes the repository grow quadratically, so it is split.
 
 Each fixing also carries a context block: SOFR for the previous business day
 from the Federal Reserve Bank of New York, spot BTC and STX prices, the total
-supply of sBTC read on-chain, and the Bitcoin block height. None of it enters an
+supply of sBTC read on-chain, the Bitcoin block height, and a staking block.
+
+The staking block records what native stacking pays with no liquid token and no
+commission, locked for the reward cycle, alongside the liquid stSTX yield that
+does enter the fixing as protocol yield. The gap between them is published as
+liquidityCostBps: what it costs to keep a position tradeable rather than locked.
+It moves, and it can invert: on 16 September it was -14 bps and on 17 September
+it was +255. It also records the stBTC figure, which the venue described as a
+fallback constant and which has since moved, so the record is how we find out
+whether it has become live. None of it enters an
 index or affects a rate. It is recorded so a past fixing can be read in the
 conditions of its day, and because SBOR-USD against SOFR is the comparison this
 benchmark is modelled on: a dollar secured by bitcoin on a Bitcoin layer against
