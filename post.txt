@@ -1,16 +1,10 @@
-SBOR post drafts, fixing 2026-09-17T19:54:37Z
-Compared with 2026-09-16
+SBOR post drafts, fixing 2026-09-18T12:32:08Z
+Compared with 2026-09-17
 
-1 thing worth saying. Pick one. Do not post more than one a day.
+Nothing moved enough to be worth posting.
 
---- 1. SBOR-BTC returned (207 chars)
-
-SBOR-BTC is publishing again.
-
-Borrow 1.31%, supply 0.12%.
-
-It was omitted while the market could not be read. SBOR leaves an index out rather than publish a figure that is not real.
-
-sbor.xyz
-
-Check the numbers against the site before posting. Never state a cause.
+Thresholds: a rate moving 25 bps, the staking yield moving 50 bps or
+changing cycle, an index appearing or dropping out, utilisation
+crossing 80% or 20% in either direction, an inversion, or a term
+average publishing. A level that has not moved since yesterday is
+not news and is deliberately not flagged.

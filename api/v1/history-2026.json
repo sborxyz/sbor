@@ -1332,5 +1332,196 @@
         }
       ]
     }
+  },
+  {
+    "date": "2026-09-18",
+    "fixedAt": "2026-09-18T12:32:08Z",
+    "methodologyVersion": "1.9.0",
+    "SBOR-PoX": {
+      "apy": 7.78,
+      "cycle": 142,
+      "cycleStart": "2026-08-24",
+      "cycleEnd": "2026-09-07",
+      "btcPaid": 4.43895,
+      "stxLocked": 441576024,
+      "stxPerBtc": 284223.74,
+      "stxPerBtcSmoothed": 298266.76
+    },
+    "external": [
+      {
+        "v": "Aave V3, Ethereum",
+        "a": "USDC",
+        "b": 4.33,
+        "s": 3.6,
+        "u": 92.5,
+        "d": 178149836,
+        "vs": "SBOR-USD"
+      },
+      {
+        "v": "Aave V3, Ethereum",
+        "a": "WBTC",
+        "b": 0.32,
+        "s": 0,
+        "u": 2.3,
+        "d": 2612882359,
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Aave V3, Ethereum",
+        "a": "cbBTC",
+        "b": 0.29,
+        "s": 0,
+        "u": 0.71,
+        "d": 1427903551,
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Morpho, Base",
+        "a": "cbBTC",
+        "b": 4.91,
+        "s": 0,
+        "u": 48.34,
+        "d": 2937005609,
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Aave V3, Base",
+        "a": "USDC",
+        "b": 4.59,
+        "s": 3.63,
+        "u": 87.9,
+        "d": 21863244,
+        "vs": "SBOR-USD"
+      },
+      {
+        "v": "HyperLend, Hyperliquid L1",
+        "a": "UBTC",
+        "b": 0.93,
+        "s": 0.12,
+        "u": 16.26,
+        "d": 10311256,
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "HyperLend, Hyperliquid L1",
+        "a": "USDC",
+        "b": 6.83,
+        "s": 5.04,
+        "u": 81.89,
+        "d": 20291037,
+        "vs": "SBOR-USD"
+      },
+      {
+        "v": "Kamino, Solana",
+        "a": "cbBTC",
+        "b": 0.19,
+        "s": 0,
+        "u": 2.1,
+        "d": 57306734,
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Kamino, Solana",
+        "a": "USDC",
+        "b": 5.43,
+        "s": 3.62,
+        "u": 82.56,
+        "d": 22002938,
+        "vs": "SBOR-USD"
+      }
+    ],
+    "SBOR-USD": {
+      "borrow": 2.36,
+      "supply": 0.63,
+      "allInSupply": 0.63,
+      "venues": 2,
+      "largestConstituentWeight": 0.6505,
+      "depthUsd": 15584040,
+      "utilization": 47.14,
+      "markets": [
+        {
+          "v": "Zest V2",
+          "a": "USDCx",
+          "b": 2.85,
+          "s": 0.84,
+          "u": 59.81,
+          "py": null,
+          "d": 10137598,
+          "w": 0.6505
+        },
+        {
+          "v": "Granite",
+          "a": "USDCx",
+          "b": 1.45,
+          "s": 0.26,
+          "u": 23.59,
+          "py": null,
+          "d": 5006848,
+          "w": 0.3213
+        },
+        {
+          "v": "Zest V2",
+          "a": "USDh",
+          "b": 1.36,
+          "s": 0,
+          "u": 23.03,
+          "py": null,
+          "d": 439594,
+          "w": 0.0282
+        }
+      ]
+    },
+    "SBOR-BTC": {
+      "borrow": 1.31,
+      "supply": 0.12,
+      "allInSupply": 0.12,
+      "venues": 1,
+      "largestConstituentWeight": 1,
+      "depthUsd": 51644564,
+      "utilization": 11.11,
+      "markets": [
+        {
+          "v": "Zest V2",
+          "a": "sBTC",
+          "b": 1.31,
+          "s": 0.12,
+          "u": 11.11,
+          "py": null,
+          "d": 51644564,
+          "w": 1
+        }
+      ]
+    },
+    "SBOR-STX": {
+      "borrow": 2.35,
+      "supply": 1.26,
+      "allInSupply": 2.97,
+      "venues": 1,
+      "largestConstituentWeight": 0.5445,
+      "depthUsd": 4362974,
+      "utilization": 43.05,
+      "markets": [
+        {
+          "v": "Zest V2",
+          "a": "stSTX",
+          "b": 1.36,
+          "s": 0.09,
+          "u": 8.42,
+          "py": 3.14,
+          "d": 2375428,
+          "w": 0.5445
+        },
+        {
+          "v": "Zest V2",
+          "a": "STX",
+          "b": 3.53,
+          "s": 2.66,
+          "u": 84.45,
+          "py": null,
+          "d": 1987546,
+          "w": 0.4555
+        }
+      ]
+    }
   }
 ]
