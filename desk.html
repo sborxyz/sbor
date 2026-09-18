@@ -192,6 +192,8 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
     out += `<tr><td class="nm">${name}</td><td class="num">${fmtv}</td>${c1}${c7}<td class="spark">${spark(series)}</td></tr>`;
   }
   out += `</table></div>`;
+  if (today.ctx == null)
+    out += `<div class="note">No context recorded on this fixing. The context line was added to the history rows on 18 September, so rows before that show nothing here. The full context is in that day's archive either way.</div>`;
   if (usd != null && sofr != null)
     out += `<div class="note">A dollar on Stacks costs <strong>${F(usd)}%</strong>. Secured by Treasuries it costs <strong>${F(sofr)}%</strong>. That is ${Math.abs(BPS(usd, sofr))} bps ${usd < sofr ? "cheaper here" : "dearer here"}, and the reason is utilisation rather than risk.</div>`;
 
@@ -206,10 +208,25 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
       if (d != null && Math.abs(d) >= 25) flags.push(`${label} borrow moved ${d > 0 ? "+" : ""}${d} bps in a day.`);
     }
     for (const m of (n?.markets || [])){
-      if (m.u != null && m.u >= 90) flags.push(`${m.v} ${m.a} is ${F(m.u)}% utilised. Withdrawals may be constrained.`);
       const am = (a?.markets || []).find(x => x.v === m.v && x.a === m.a);
+
+      if (m.u != null && m.u >= 90)
+        flags.push(`${m.v} ${m.a} is ${F(m.u)}% utilised. Withdrawals may be constrained.`);
+
+      /* A large move in utilisation matters wherever it starts from. A jump of
+         five points in a day is somebody sizeable arriving or leaving, and the
+         rate follows it. */
+      const du = BPS(m.u, am?.u);
+      if (du != null && Math.abs(du) >= 300)
+        flags.push(`${m.v} ${m.a} utilisation moved ${du > 0 ? "+" : ""}${(du/100).toFixed(1)} points in a day, to ${F(m.u)}%.`);
+
+      const dr = BPS(m.b, am?.b);
+      if (dr != null && Math.abs(dr) >= 40)
+        flags.push(`${m.v} ${m.a} borrow moved ${dr > 0 ? "+" : ""}${dr} bps in a day, to ${F(m.b)}%.`);
+
       const dd = PCT(m.d, am?.d);
-      if (dd != null && Math.abs(dd) >= 15) flags.push(`${m.v} ${m.a} depth moved ${dd > 0 ? "+" : ""}${dd.toFixed(0)}% in a day.`);
+      if (dd != null && Math.abs(dd) >= 8)
+        flags.push(`${m.v} ${m.a} depth moved ${dd > 0 ? "+" : ""}${dd.toFixed(0)}% in a day, to $${((m.d||0)/1e6).toFixed(1)}M.`);
     }
   }
   const sd = BPS(today.ctx?.sofr, d1.ctx?.sofr);
