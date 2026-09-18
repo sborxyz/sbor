@@ -1,17 +1,7 @@
 {
-  "fixing": "2026-09-18T14:56:37Z",
+  "fixing": "2026-09-18T17:06:09Z",
   "comparedWith": "2026-09-17",
-  "top": {
-    "why": "SBOR-STX supply moved +27 bps",
-    "chars": 149,
-    "text": "SBOR-STX supply rate: 1.14% to 1.41%.\n\n+27 bps in a day.\n\nCheapest constituent now Zest V2 STX at 2.99%, utilisation 85.32%.\n\nsbor.xyz"
-  },
+  "top": null,
   "otherCount": 0,
-  "drafts": [
-    {
-      "why": "SBOR-STX supply moved +27 bps",
-      "chars": 149,
-      "text": "SBOR-STX supply rate: 1.14% to 1.41%.\n\n+27 bps in a day.\n\nCheapest constituent now Zest V2 STX at 2.99%, utilisation 85.32%.\n\nsbor.xyz"
-    }
-  ]
+  "drafts": []
 }
