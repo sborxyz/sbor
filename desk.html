@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>SBOR desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F1F2ED;--paper-2:#E7E9E1;--ink:#131A1F;--soft:#5C646B;--rule:#CBCFC4;--rule-soft:#DEE1D8;--accent:#1D4E6B;--up:#2E6A4E;--down:#A2452F}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:15px;line-height:1.5;padding:22px 18px 70px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-size:19px;font-weight:600;letter-spacing:.02em}
+.sub{color:var(--soft);font-size:13px;margin-top:3px;font-family:"IBM Plex Mono",monospace}
+h2{font-size:14px;font-weight:600;margin:30px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--rule)}
+.hint{color:var(--soft);font-size:12.5px;margin:-4px 0 9px}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th{text-align:right;font-weight:500;font-size:11.5px;color:var(--soft);padding:0 0 6px 14px;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+th:first-child,td:first-child{text-align:left;padding-left:0}
+td{text-align:right;padding:7px 0 7px 14px;border-bottom:1px solid var(--rule-soft);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+.num{font-family:"IBM Plex Mono",monospace}
+.nm{font-weight:500}
+.dim{color:var(--soft)}
+.up{color:var(--up)}
+.dn{color:var(--down)}
+.flat{color:var(--soft)}
+.big{background:rgba(162,69,47,.09);font-weight:600}
+.self td{background:rgba(29,78,107,.06)}
+.self td:first-child{font-weight:600;color:var(--accent)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.note{color:var(--soft);font-size:12.5px;margin-top:8px;max-width:78ch}
+.err{border:1px solid var(--down);padding:14px;color:var(--down);font-size:14px}
+.spark{font-family:"IBM Plex Mono",monospace;letter-spacing:-1px;color:var(--accent)}
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--rule);color:var(--soft);font-size:12px}
+@media(max-width:700px){body{padding:16px 12px 60px}table{font-size:13px}th,td{padding-left:9px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>SBOR desk</h1>
+  <div class="sub" id="stamp">loading</div>
+  <div id="out"></div>
+  <footer>
+    Not linked from sbor.xyz. Reads the same public API as everything else, so nothing here is private.
+    Moves above the threshold for each table are shaded. 1d compares with the previous fixing, 7d with seven fixings back.
+  </footer>
+</div>
+
+<script>
+const F = n => n == null || !Number.isFinite(Number(n)) ? "n/a" : Number(n).toFixed(2);
+const BPS = (now, then) =>
+  now == null || then == null || !Number.isFinite(now) || !Number.isFinite(then)
+    ? null : Math.round((now - then) * 100);
+const PCT = (now, then) =>
+  now == null || then == null || !then ? null : ((now - then) / then) * 100;
+
+/* A change cell. Threshold decides what gets shaded, so each table can set its
+   own idea of what counts as a move. */
+function chg(v, unit, thresh){
+  if (v == null) return `<td class="dim">.</td>`;
+  const big = Math.abs(v) >= thresh;
+  const cls = v > 0 ? "up" : v < 0 ? "dn" : "flat";
+  const sign = v > 0 ? "+" : "";
+  const txt = unit === "bps" ? `${sign}${v}` : `${sign}${v.toFixed(1)}%`;
+  return `<td class="num ${cls}${big ? " big" : ""}">${txt}</td>`;
+}
+
+const spark = vals => {
+  const v = vals.filter(x => Number.isFinite(x));
+  if (v.length < 2) return "";
+  const lo = Math.min(...v), hi = Math.max(...v), r = hi - lo || 1;
+  const bars = "\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588";
+  return v.map(x => bars[Math.min(7, Math.floor((x - lo) / r * 7.999))]).join("");
+};
+
+const el = document.getElementById("out");
+const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
+
+(async function(){
+  let H, L;
+  try {
+    const [h, l] = await Promise.all([
+      fetch("/api/v1/history.json", { cache: "no-store" }),
+      fetch("/api/v1/latest.json",  { cache: "no-store" })
+    ]);
+    if (!h.ok || !l.ok) return fail("Could not read the API.");
+    H = await h.json(); L = await l.json();
+  } catch(e){ return fail("Could not read the API: " + e.message); }
+
+  H.sort((a,b) => a.date.localeCompare(b.date));
+  const today = H[H.length-1] || {};
+  const d1    = H[H.length-2] || {};
+  const d7    = H[Math.max(0, H.length-8)] || {};
+  const win   = H.slice(-8);
+
+  document.getElementById("stamp").textContent =
+    `${L.fixing} · methodology ${L.methodologyVersion} · ${H.length} fixings · comparing with ${d1.date || "n/a"} and ${d7.date || "n/a"}`;
+
+  let out = "";
+
+  /* ---- the indices ---- */
+  out += `<h2>Indices</h2><div class="hint">Shaded above 15 bps. Utilisation is depth weighted across the constituents.</div><div class="scroll"><table>
+    <tr><th>Index</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>1d</th><th>7d</th><th>Util</th><th>1d</th><th>Depth</th><th>7d borrow</th></tr>`;
+  for (const label of ["SBOR-USD","SBOR-BTC","SBOR-STX"]){
+    const n = today[label], a = d1[label], b = d7[label];
+    if (!n) { out += `<tr><td class="nm">${label}</td><td colspan="10" class="dim">not published today</td></tr>`; continue; }
+    out += `<tr class="self"><td>${label}</td>
+      <td class="num">${F(n.borrow)}%</td>${chg(BPS(n.borrow, a?.borrow),"bps",15)}${chg(BPS(n.borrow, b?.borrow),"bps",15)}
+      <td class="num">${F(n.supply)}%</td>${chg(BPS(n.supply, a?.supply),"bps",15)}${chg(BPS(n.supply, b?.supply),"bps",15)}
+      <td class="num">${F(n.utilization)}%</td>${chg(BPS(n.utilization, a?.utilization),"bps",200)}
+      <td class="num dim">$${((n.depthUsd||0)/1e6).toFixed(1)}M</td>
+      <td class="spark">${spark(win.map(r => r[label]?.borrow))}</td></tr>`;
+  }
+  out += `</table></div>`;
+
+  /* ---- constituents ---- */
+  out += `<h2>Constituents, on Stacks</h2><div class="hint">Shaded above 15 bps on a rate, 200 bps on utilisation. This is where a move in an index comes from.</div><div class="scroll"><table>
+    <tr><th>Market</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>1d</th><th>Util</th><th>1d</th><th>Depth</th><th>1d</th><th>Proto</th></tr>`;
+  for (const label of ["SBOR-USD","SBOR-BTC","SBOR-STX"]){
+    for (const m of (today[label]?.markets || [])){
+      const find = row => (row[label]?.markets || []).find(x => x.v === m.v && x.a === m.a);
+      const a = find(d1), b = find(d7);
+      out += `<tr><td class="nm">${m.v} <span class="dim">${m.a}</span></td>
+        <td class="num">${F(m.b)}%</td>${chg(BPS(m.b, a?.b),"bps",15)}${chg(BPS(m.b, b?.b),"bps",15)}
+        <td class="num">${F(m.s)}%</td>${chg(BPS(m.s, a?.s),"bps",15)}
+        <td class="num">${F(m.u)}%</td>${chg(BPS(m.u, a?.u),"bps",200)}
+        <td class="num dim">$${((m.d||0)/1e6).toFixed(1)}M</td>${chg(PCT(m.d, a?.d),"pct",5)}
+        <td class="num dim">${m.py == null ? "." : F(m.py)+"%"}</td></tr>`;
+    }
+  }
+  out += `</table></div>`;
+
+  /* ---- off Stacks ---- */
+  out += `<h2>Off Stacks</h2><div class="hint">Context only. Never a constituent. From DefiLlama rather than contract state, so small differences are expected.</div><div class="scroll"><table>
+    <tr><th>Market</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>Util</th><th>1d</th><th>Depth</th></tr>`;
+  for (const m of (today.external || [])){
+    const find = row => (row.external || []).find(x => x.v === m.v && x.a === m.a);
+    const a = find(d1), b = find(d7);
+    out += `<tr><td class="nm">${m.v} <span class="dim">${m.a}</span></td>
+      <td class="num">${F(m.b)}%</td>${chg(BPS(m.b, a?.b),"bps",15)}${chg(BPS(m.b, b?.b),"bps",15)}
+      <td class="num">${F(m.s)}%</td>
+      <td class="num">${F(m.u)}%</td>${chg(BPS(m.u, a?.u),"bps",200)}
+      <td class="num dim">$${((m.d||0)/1e9 >= 1 ? ((m.d/1e9).toFixed(2)+"B") : ((m.d||0)/1e6).toFixed(1)+"M")}</td></tr>`;
+  }
+  out += `</table></div>`;
+
+  /* ---- staking ---- */
+  const px = r => r["SBOR-PoX"] || {};
+  out += `<h2>Staking</h2><div class="hint">The cross is what moves PoX between cycles. Same cycle plus same bitcoin paid plus a moved rate means it is currency, not staking.</div><div class="scroll"><table>
+    <tr><th></th><th>Now</th><th>1d</th><th>7d</th><th>7 fixings</th></tr>`;
+  const rows = [
+    ["SBOR-PoX",        px(today).apy,        px(d1).apy,        px(d7).apy,        "bps", 25, win.map(r => px(r).apy)],
+    ["Cross, smoothed", px(today).stxPerBtcSmoothed, px(d1).stxPerBtcSmoothed, px(d7).stxPerBtcSmoothed, "pct", 2, win.map(r => px(r).stxPerBtcSmoothed)],
+    ["Cross, spot",     px(today).stxPerBtc,  px(d1).stxPerBtc,  px(d7).stxPerBtc,  "pct", 2, win.map(r => px(r).stxPerBtc)],
+    ["Native stacking", today.ctx?.nativeStacking, d1.ctx?.nativeStacking, d7.ctx?.nativeStacking, "bps", 25, win.map(r => r.ctx?.nativeStacking)],
+    ["stBTC",           today.ctx?.stBtc,     d1.ctx?.stBtc,     d7.ctx?.stBtc,     "bps", 25, win.map(r => r.ctx?.stBtc)],
+    ["Liquidity cost",  today.ctx?.liquidityCostBps, d1.ctx?.liquidityCostBps, d7.ctx?.liquidityCostBps, "raw", 30, win.map(r => r.ctx?.liquidityCostBps)]
+  ];
+  for (const [name, n, a, b, unit, th, series] of rows){
+    const fmtv = unit === "pct" ? (n == null ? "n/a" : Math.round(n).toLocaleString())
+               : unit === "raw" ? (n == null ? "n/a" : n + " bps")
+               : F(n) + "%";
+    const c1 = unit === "pct" ? chg(PCT(n,a),"pct",th) : unit === "raw" ? chg(n!=null&&a!=null?n-a:null,"bps",th) : chg(BPS(n,a),"bps",th);
+    const c7 = unit === "pct" ? chg(PCT(n,b),"pct",th) : unit === "raw" ? chg(n!=null&&b!=null?n-b:null,"bps",th) : chg(BPS(n,b),"bps",th);
+    out += `<tr><td class="nm">${name}</td><td class="num">${fmtv}</td>${c1}${c7}<td class="spark">${spark(series)}</td></tr>`;
+  }
+  out += `</table></div>`;
+  if (px(today).cycle) out += `<div class="note">Measuring completed cycle ${px(today).cycle}. ${(px(today).btcPaid||0).toFixed(3)} BTC paid on ${(px(today).stxLocked||0).toLocaleString()} STX locked.</div>`;
+
+  /* ---- the world ---- */
+  out += `<h2>The world</h2><div class="hint">Recorded beside every fixing, never used in a calculation.</div><div class="scroll"><table>
+    <tr><th></th><th>Now</th><th>1d</th><th>7d</th><th>7 fixings</th></tr>`;
+  const usd = today["SBOR-USD"]?.borrow, sofr = today.ctx?.sofr;
+  const world = [
+    ["SOFR",        sofr, d1.ctx?.sofr, d7.ctx?.sofr, "bps", 10, win.map(r => r.ctx?.sofr)],
+    ["BTC",         today.ctx?.btcUsd, d1.ctx?.btcUsd, d7.ctx?.btcUsd, "pct", 3, win.map(r => r.ctx?.btcUsd)],
+    ["STX",         today.ctx?.stxUsd, d1.ctx?.stxUsd, d7.ctx?.stxUsd, "pct", 3, win.map(r => r.ctx?.stxUsd)],
+    ["sBTC supply", today.ctx?.sbtcSupply, d1.ctx?.sbtcSupply, d7.ctx?.sbtcSupply, "pct", 1, win.map(r => r.ctx?.sbtcSupply)]
+  ];
+  for (const [name, n, a, b, unit, th, series] of world){
+    const fmtv = n == null ? "n/a"
+      : name === "BTC" ? "$" + Math.round(n).toLocaleString()
+      : name === "STX" ? "$" + Number(n).toFixed(4)
+      : name === "sBTC supply" ? Number(n).toFixed(1)
+      : F(n) + "%";
+    const c1 = unit === "pct" ? chg(PCT(n,a),"pct",th) : chg(BPS(n,a),"bps",th);
+    const c7 = unit === "pct" ? chg(PCT(n,b),"pct",th) : chg(BPS(n,b),"bps",th);
+    out += `<tr><td class="nm">${name}</td><td class="num">${fmtv}</td>${c1}${c7}<td class="spark">${spark(series)}</td></tr>`;
+  }
+  out += `</table></div>`;
+  if (usd != null && sofr != null)
+    out += `<div class="note">A dollar on Stacks costs <strong>${F(usd)}%</strong>. Secured by Treasuries it costs <strong>${F(sofr)}%</strong>. That is ${Math.abs(BPS(usd, sofr))} bps ${usd < sofr ? "cheaper here" : "dearer here"}, and the reason is utilisation rather than risk.</div>`;
+
+  /* ---- what to look at ---- */
+  const flags = [];
+  for (const label of ["SBOR-USD","SBOR-BTC","SBOR-STX"]){
+    const n = today[label], a = d1[label];
+    if (!n && d1[label]) flags.push(`${label} is not published today. It was yesterday.`);
+    if (n && !d1[label]) flags.push(`${label} is publishing again after being absent.`);
+    if (n && a){
+      const d = BPS(n.borrow, a.borrow);
+      if (d != null && Math.abs(d) >= 25) flags.push(`${label} borrow moved ${d > 0 ? "+" : ""}${d} bps in a day.`);
+    }
+    for (const m of (n?.markets || [])){
+      if (m.u != null && m.u >= 90) flags.push(`${m.v} ${m.a} is ${F(m.u)}% utilised. Withdrawals may be constrained.`);
+      const am = (a?.markets || []).find(x => x.v === m.v && x.a === m.a);
+      const dd = PCT(m.d, am?.d);
+      if (dd != null && Math.abs(dd) >= 15) flags.push(`${m.v} ${m.a} depth moved ${dd > 0 ? "+" : ""}${dd.toFixed(0)}% in a day.`);
+    }
+  }
+  const sd = BPS(today.ctx?.sofr, d1.ctx?.sofr);
+  if (sd != null && Math.abs(sd) >= 10) flags.push(`SOFR moved ${sd > 0 ? "+" : ""}${sd} bps, which is large for an overnight rate.`);
+  const cd = PCT(px(today).stxPerBtc, px(d1).stxPerBtc);
+  if (cd != null && Math.abs(cd) >= 5) flags.push(`The BTC to STX cross moved ${cd > 0 ? "+" : ""}${cd.toFixed(1)}% on spot. The seven day mean absorbs most of it.`);
+  if (today.methodologyVersion !== d1.methodologyVersion)
+    flags.push(`Methodology changed from ${d1.methodologyVersion} to ${today.methodologyVersion}. Figures either side are on a different basis.`);
+
+  out += `<h2>Worth a look</h2>`;
+  out += flags.length
+    ? `<ul style="margin-left:18px">${flags.map(f => `<li style="margin:4px 0">${f}</li>`).join("")}</ul>`
+    : `<div class="note">Nothing crossed a threshold since the last fixing. That is most days, and it is the system working rather than the system asleep.</div>`;
+
+  el.innerHTML = out;
+})();
+</script>
+</body>
+</html>
