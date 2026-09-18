@@ -1335,17 +1335,28 @@
   },
   {
     "date": "2026-09-18",
-    "fixedAt": "2026-09-18T14:38:55Z",
+    "fixedAt": "2026-09-18T14:56:37Z",
     "methodologyVersion": "1.9.0",
     "SBOR-PoX": {
-      "apy": 7.8,
+      "apy": 7.83,
       "cycle": 142,
       "cycleStart": "2026-08-24",
       "cycleEnd": "2026-09-07",
       "btcPaid": 4.43895,
       "stxLocked": 441576024,
-      "stxPerBtc": 291578.64,
-      "stxPerBtcSmoothed": 298982.32
+      "stxPerBtc": 291816.8,
+      "stxPerBtcSmoothed": 300067.04
+    },
+    "ctx": {
+      "sofr": 3.85,
+      "sofrDate": "2026-09-17",
+      "btcUsd": 80858,
+      "stxUsd": 0.274518,
+      "sbtcSupply": 2466.87553242,
+      "burnBlock": 967564,
+      "nativeStacking": 5.75,
+      "stBtc": 2.6,
+      "liquidityCostBps": 251
     },
     "external": [
       {
@@ -1437,7 +1448,7 @@
       "venues": 2,
       "largestConstituentWeight": 0.6505,
       "depthUsd": 15584153,
-      "utilization": 47.34,
+      "utilization": 47.35,
       "markets": [
         {
           "v": "Zest V2",
@@ -1462,9 +1473,9 @@
         {
           "v": "Zest V2",
           "a": "USDh",
-          "b": 1.36,
+          "b": 1.37,
           "s": 0,
-          "u": 23.03,
+          "u": 23.1,
           "py": null,
           "d": 439591,
           "w": 0.0282
@@ -1495,7 +1506,7 @@
     "SBOR-STX": {
       "borrow": 2.53,
       "supply": 1.41,
-      "allInSupply": 3.16,
+      "allInSupply": 3.17,
       "venues": 1,
       "largestConstituentWeight": 0.5436,
       "depthUsd": 4354131,
@@ -1506,8 +1517,8 @@
           "a": "stSTX",
           "b": 1.36,
           "s": 0.09,
-          "u": 8.43,
-          "py": 3.22,
+          "u": 8.42,
+          "py": 3.24,
           "d": 2366845,
           "w": 0.5436
         },
