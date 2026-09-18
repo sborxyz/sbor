@@ -1,10 +1,16 @@
-SBOR post drafts, fixing 2026-09-18T13:01:19Z
+SBOR post drafts, fixing 2026-09-18T14:38:55Z
 Compared with 2026-09-17
 
-Nothing moved enough to be worth posting.
+1 thing worth saying. Pick one. Do not post more than one a day.
 
-Thresholds: a rate moving 25 bps, the staking yield moving 50 bps or
-changing cycle, an index appearing or dropping out, utilisation
-crossing 80% or 20% in either direction, an inversion, or a term
-average publishing. A level that has not moved since yesterday is
-not news and is deliberately not flagged.
+--- 1. SBOR-STX supply moved +27 bps (149 chars)
+
+SBOR-STX supply rate: 1.14% to 1.41%.
+
++27 bps in a day.
+
+Cheapest constituent now Zest V2 STX at 2.99%, utilisation 85.32%.
+
+sbor.xyz
+
+Check the numbers against the site before posting. Never state a cause.
