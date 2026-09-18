@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-18T12:32:08Z",
+  "fixing": "2026-09-18T13:01:19Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -34,7 +34,7 @@
           "asset": "USDCx",
           "borrow": 2.85,
           "supply": 0.84,
-          "utilization": 59.81,
+          "utilization": 59.82,
           "nominalBorrow": 2.81,
           "nominalSupply": 0.84,
           "depthUsd": 10137598,
@@ -162,14 +162,14 @@
     "period": "one reward cycle, about two weeks",
     "cyclesPerYear": 25.03,
     "annualisation": "Bitcoin paid over one reward cycle divided by STX locked, annualised over the cycles in a year.",
-    "apy": 7.78,
+    "apy": 7.77,
     "cycle": 142,
     "cycleStartBurnBlock": 963900,
     "cycleEndBurnBlock": 965999,
     "cycleStartApprox": "2026-08-24",
     "cycleEndApprox": "2026-09-07",
     "cycleLengthBlocks": 2100,
-    "cycleYieldPct": 0.2998,
+    "cycleYieldPct": 0.2995,
     "btcPaid": 4.43895,
     "stxLocked": 441576024,
     "stxPerBtc": 284223.74,
@@ -177,7 +177,7 @@
     "stxPerBtcBuy": 285648.49,
     "crossSpreadBps": 100,
     "crossNote": "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it.",
-    "stxPerBtcSmoothed": 298266.76,
+    "stxPerBtcSmoothed": 297931.62,
     "crossWindowDays": 7,
     "rateSource": "Bitflow",
     "rateQuoteImpactBps": 0,
@@ -311,8 +311,8 @@
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 77953,
-      "stxUsd": 0.272811,
+      "btcUsd": 77975,
+      "stxUsd": 0.272366,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
@@ -328,7 +328,7 @@
     },
     "staking": {
       "nativeStackingApy": 5.58,
-      "stBtcApy": 2.61,
+      "stBtcApy": 2.64,
       "liquidityCostBps": 244,
       "liquidityCostNote": "Native stacking pays more than the liquid token because the position is locked for the cycle and the issuer takes a commission. The gap is what liquidity costs.",
       "source": "StackingDAO"
