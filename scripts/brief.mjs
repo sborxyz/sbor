@@ -196,7 +196,11 @@ async function write(){
     signal: AbortSignal.timeout(TIMEOUT),
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 700,
+      /* Extended thinking is on by default and is counted against max_tokens.
+         At 700 the model spent the whole budget thinking and produced no text.
+         The budget below leaves room to think and then write. The brief itself
+         is 250 words at most, so the rest is headroom rather than length. */
+      max_tokens: 4000,
       system: SYSTEM,
       messages: [{ role: "user", content: JSON.stringify(facts) }]
     })
@@ -204,6 +208,11 @@ async function write(){
   if (!r.ok) throw new Error(`anthropic responded ${r.status}: ${(await r.text()).slice(0,200)}`);
   const d = await r.json();
   const text = (d.content || []).filter(c => c.type === "text").map(c => c.text).join("\n").trim();
+  /* A thinking-only response means the budget ran out before any prose. Say
+     that plainly rather than reporting it as empty. */
+  if (!text && d.stop_reason === "max_tokens")
+    throw new Error(`ran out of tokens before writing. All ${d.usage?.output_tokens ?? "?"} output tokens went to thinking. Raise max_tokens.`);
+
   if (!text) {
     /* Say what actually came back rather than "empty". A silent shape change in
        the response is the kind of thing that takes an hour to guess at and ten
