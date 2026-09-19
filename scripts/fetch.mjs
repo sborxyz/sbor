@@ -487,7 +487,9 @@ const main = async () => {
         burnBlock: context.chainHeight?.burnBlockHeight ?? null,
         nativeStacking: context.staking?.nativeStackingApy ?? null,
         stBtc: context.staking?.stBtcApy ?? null,
-        liquidityCostBps: context.staking?.liquidityCostBps ?? null
+        liquidityCostBps: context.staking?.liquidityCostBps ?? null,
+        npmLastDay: context.npmDownloads?.lastDay ?? null,
+        npmLastWeek: context.npmDownloads?.lastWeek ?? null
       } }),
       ...(external && { external: external.markets.map(m => ({
         v: m.venue, a: m.asset, b: m.borrow, s: m.supply,
