@@ -1,0 +1,46 @@
+name: SBOR morning brief
+
+# After the fixing has had its scheduled attempts, so the brief describes today
+# rather than yesterday. If no fixing landed, the brief says the record has not
+# moved, which is itself worth knowing.
+on:
+  schedule:
+    - cron: "48 17 * * *"   # 14:48 in Brazil, after the fixing's last attempt
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Write and send the brief
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Change to claude-haiku-4-5-20251001 for a cheaper, terser brief.
+          BRIEF_MODEL: claude-sonnet-5
+        run: node scripts/brief.mjs
+
+      # The brief reads the published API and writes nothing back, so there is
+      # nothing to commit. Silence on failure would defeat the purpose though.
+      - name: Notify on failure
+        if: failure()
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ]; then exit 0; fi
+          MSG=$(printf 'SBOR morning brief FAILED at %s.\n\nThe fixing and the monitor are unaffected. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%dT%H:%MZ)")
+          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TG_CHAT" \
+            --data-urlencode "disable_web_page_preview=true" \
+            --data-urlencode "text=$MSG" > /dev/null
