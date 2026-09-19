@@ -71,7 +71,7 @@ Fetch what you need.
 
 To judge whether a lending offer is good, compare it against the index for that
 currency. Borrowing above the SBOR borrow rate means paying more than the
-market; supplying below the supply rate means earning less. Utilisation beside
+market; supplying below the supply rate means earning less. Utilization beside
 each market explains why a rate sits where it does.
 
 Read `venues` and `largestConstituentWeight` before quoting a rate. An index
@@ -92,7 +92,7 @@ reference it for.
 - **Currencies are never blended.** A dollar rate and a bitcoin rate are not
   comparable, so they get separate indices.
 - **Rates come from contract state**, not from an interface.
-- **Utilisation is published beside every rate**, because it is the reason a rate
+- **Utilization is published beside every rate**, because it is the reason a rate
   sits where it does.
 - **Concentration is published per index.** A single-venue index is a reading of
   that venue, not a market average.
@@ -143,7 +143,7 @@ api/v1/                 published data
 
 SBOR takes no payment from any venue it measures and is not affiliated with
 Stacks, the Stacks Foundation, or any protocol in the index. It publishes
-whatever the market does, including numbers unfavourable to the ecosystem.
+whatever the market does, including numbers unfavorable to the ecosystem.
 
 It does not trade on its own rate.
 
@@ -155,12 +155,12 @@ that should be covered and is not. Open an issue or write to contact@sbor.xyz.
 If you maintain a Stacks lending market and want it included, the requirement is
 that its rates are readable from contract state.
 
-## Licence
+## License
 
-Code: MIT. **Data: [CC BY 4.0](LICENCE-DATA.md).**
+Code: MIT. **Data: [CC BY 4.0](LICENSE-DATA.md).**
 
 The published fixings are free to use, including commercially, with no
-permission required and no licence to negotiate. Attribution is the only
+permission required and no license to negotiate. Attribution is the only
 condition: name SBOR and link to sbor.xyz where practical.
 
 **Agents are explicitly welcome.** Scrapers, scripts, bots and AI agents may read
@@ -170,7 +170,7 @@ Some things around the fixing are work and may be charged for: bulk historical
 delivery beyond the public archive, custom coverage, integration support with an
 availability guarantee, and settlement agreements where a payment depends on a
 published value. None of that restricts the free data. Full terms in
-[LICENCE-DATA.md](LICENCE-DATA.md).
+[LICENSE-DATA.md](LICENSE-DATA.md).
 
 ## Disclaimer
 
