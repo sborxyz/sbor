@@ -105,7 +105,7 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .sofrv .pct{font-size:.42em;font-weight:400;letter-spacing:0;margin-left:.08em;color:var(--ink-soft)}
 .sofrbox p{font-size:14.5px;color:var(--ink-soft);margin-bottom:10px;max-width:none}
 .sofrbox .sofrcols{display:flex;gap:34px;align-items:flex-start}
-.sofrbox .sofrnum{flex:0 0 auto;min-width:150px}
+.sofrbox .sofrnum{flex:0 0 auto;min-width:140px}
 .sofrbox .sofrv{margin:4px 0 0}
 .sofrbox .sofrtext{flex:1 1 0;min-width:0}
 .sofrbox .sofrtext p:last-child{margin-bottom:0}
@@ -294,7 +294,6 @@ a{color:var(--accent)}
           <p id="sofrWhy" class="sofrwhy"></p>
         </div>
         </div>
-        <p class="coverage" id="sofrAvgs" style="margin:14px 0 0"></p>
       </div>
       <div class="tscroll">
         <table>
@@ -487,7 +486,6 @@ en:{
   sofrLine:(r,d)=>`SOFR ${r}, the overnight cost of a dollar in the US repo market, secured by US government debt. Published by the Federal Reserve Bank of New York for ${d}.`,
   sofrCompare:(sbor,sofr,bps)=>`A dollar borrowed against crypto collateral on Stacks costs ${sbor}. A dollar secured by US government debt costs ${sofr}. That is ${Math.abs(bps)} basis points ${bps < 0 ? "cheaper on Stacks" : "dearer on Stacks"}.`,
   sofrWhy:"Crypto is the riskier collateral, so by any textbook this is backwards. It is cheaper here because almost nobody is borrowing yet, so utilization is low and the rate has not been bid up. The gap measures how early this market is, not that it is safer.",
-  sofrAvgs:(a30,a90,a180)=>`SOFR averages: 30 day ${a30}, 90 day ${a90}, 180 day ${a180}.`,
   extH:"How this compares",
   extP:"This index against the same asset class on the largest lending markets off this chain. The first row is SBOR itself, so the comparison is in one place. One market is selected per chain: a venue that publishes a borrow rate and utilization is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. Nothing below the first row is a constituent of any SBOR index, and none of it ever enters a fixing.",
   extCols:["Market","Borrow","Supply","Utilization","Depth"],
@@ -578,7 +576,6 @@ pt:{
   sofrLine:(r,d)=>`SOFR ${r}, o custo overnight de um dólar no mercado de repo dos Estados Unidos, garantido por dívida do governo americano. Publicado pelo Federal Reserve Bank of New York para ${d}.`,
   sofrCompare:(sbor,sofr,bps)=>`Um dólar tomado emprestado contra colateral cripto na Stacks custa ${sbor}. Um dólar garantido por dívida do governo americano custa ${sofr}. São ${Math.abs(bps)} pontos-base ${bps < 0 ? "mais barato na Stacks" : "mais caro na Stacks"}.`,
   sofrWhy:"O colateral cripto é o mais arriscado, então pela teoria isso está invertido. Sai mais barato aqui porque quase ninguém ainda toma emprestado, então a utilização é baixa e a taxa não foi disputada. A diferença mede o quanto este mercado ainda é inicial, não que ele seja mais seguro.",
-  sofrAvgs:(a30,a90,a180)=>`Médias da SOFR: 30 dias ${a30}, 90 dias ${a90}, 180 dias ${a180}.`,
   extH:"Como isto se compara",
   extP:"Este índice contra a mesma classe de ativo nos maiores mercados de crédito fora desta rede. A primeira linha é o próprio SBOR, para a comparação ficar em um lugar só. É escolhido um mercado por rede: uma plataforma que publica taxa de empréstimo e utilização tem preferência sobre uma que não publica, e a profundidade decide entre as que publicam as duas, então a plataforma citada pode mudar. Nada abaixo da primeira linha é componente de algum índice SBOR, e nada disso entra em um fixing.",
   extCols:["Mercado","Empréstimo","Depósito","Utilização","Profundidade"],
@@ -1021,9 +1018,6 @@ function render(){
     const d = Math.round((ix.borrow - sr.rate) * 100);
     set("sofrCompare", t.sofrCompare(fmt(ix.borrow)+"%", fmt(sr.rate)+"%", d));
     set("sofrWhy", d < 0 ? t.sofrWhy : "");
-    set("sofrAvgs", (sr.average30day && sr.average90day && sr.average180day)
-      ? t.sofrAvgs(fmt(sr.average30day)+"%", fmt(sr.average90day)+"%", fmt(sr.average180day)+"%")
-      : "");
   } else { sbox.hidden = true; }
   settle(document.getElementById("borrowVal"), ix.borrow);
   settle(document.getElementById("supplyVal"), ix.supply);
