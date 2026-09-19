@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-19T14:00:25Z",
+  "fixing": "2026-09-19T14:11:44Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -113,7 +113,7 @@
       "headline": "What money costs in STX on Stacks.",
       "borrow": 2.57,
       "supply": 1.45,
-      "allInSupply": 3.74,
+      "allInSupply": 3.76,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
@@ -128,7 +128,7 @@
           "utilization": 8.41,
           "nominalBorrow": 1.35,
           "nominalSupply": 0.09,
-          "protocolYield": 4.18,
+          "protocolYield": 4.21,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
           "depthUsd": 2697484,
           "phaseIn": 1,
@@ -162,14 +162,14 @@
     "period": "one reward cycle, about two weeks",
     "cyclesPerYear": 25.03,
     "annualisation": "Bitcoin paid over one reward cycle divided by STX locked, annualised over the cycles in a year.",
-    "apy": 7.62,
+    "apy": 7.64,
     "cycle": 142,
     "cycleStartBurnBlock": 963900,
     "cycleEndBurnBlock": 965999,
     "cycleStartApprox": "2026-08-24",
     "cycleEndApprox": "2026-09-07",
     "cycleLengthBlocks": 2100,
-    "cycleYieldPct": 0.2939,
+    "cycleYieldPct": 0.2946,
     "btcPaid": 4.43895,
     "stxLocked": 441576024,
     "stxPerBtc": 261004,
@@ -177,7 +177,7 @@
     "stxPerBtcBuy": 262325.35,
     "crossSpreadBps": 101,
     "crossNote": "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it.",
-    "stxPerBtcSmoothed": 292400.61,
+    "stxPerBtcSmoothed": 293023.3,
     "crossWindowDays": 7,
     "rateSource": "Bitflow",
     "rateQuoteImpactBps": 0,
@@ -311,8 +311,8 @@
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 81309,
-      "stxUsd": 0.310971,
+      "btcUsd": 81384,
+      "stxUsd": 0.310596,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
@@ -327,9 +327,9 @@
       "source": "Hiro /v2/pox"
     },
     "staking": {
-      "nativeStackingApy": 5.13,
+      "nativeStackingApy": 5.11,
       "stBtcApy": 2.58,
-      "liquidityCostBps": 95,
+      "liquidityCostBps": 90,
       "liquidityCostNote": "Native stacking pays more than the liquid token because the position is locked for the cycle and the issuer takes a commission. The gap is what liquidity costs.",
       "source": "StackingDAO"
     }
