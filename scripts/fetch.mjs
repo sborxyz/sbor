@@ -88,7 +88,7 @@ const ZEST = {
 };
 
 /* Granite. Single USDCx market. Rates are derived from the interest rate
-   curve and current utilisation, exactly as Granite's own math SDK does. */
+   curve and current utilization, exactly as Granite's own math SDK does. */
 const GRANITE = {
   venue: "Granite",
   /* The USDCx market spans two deployments: v1 holds state-v1, the v2 upgrade
@@ -198,7 +198,7 @@ async function apysFor(asset){
   const borrowNominal = Number(t["borrow-apy"]?.value ?? t["borrow-apy"]) / 100;
   const supply = nominalToApy(supplyNominal);
   const borrow = nominalToApy(borrowNominal);
-  /* utilisation is published in the same tuple, in basis points */
+  /* utilization is published in the same tuple, in basis points */
   const utilRaw = Number(t["utilization"]?.value ?? t["utilization"]);
   const utilization = Number.isFinite(utilRaw) ? utilRaw / 100 : null;
   if (!Number.isFinite(supply) || !Number.isFinite(borrow))
@@ -476,19 +476,6 @@ const main = async () => {
         btcPaid: pox.btcPaid, stxLocked: pox.stxLocked,
         stxPerBtc: pox.stxPerBtc, stxPerBtcSmoothed: pox.stxPerBtcSmoothed ?? null
       } }),
-      /* A compact context line per row, so a seven day view can be built from
-         one file instead of seven archives. The archive stays the full record. */
-      ...(context && { ctx: {
-        sofr: context.sofr?.rate ?? null,
-        sofrDate: context.sofr?.effectiveDate ?? null,
-        btcUsd: context.prices?.btcUsd ?? null,
-        stxUsd: context.prices?.stxUsd ?? null,
-        sbtcSupply: context.sbtcSupply?.sbtc ?? null,
-        burnBlock: context.chainHeight?.burnBlockHeight ?? null,
-        nativeStacking: context.staking?.nativeStackingApy ?? null,
-        stBtc: context.staking?.stBtcApy ?? null,
-        liquidityCostBps: context.staking?.liquidityCostBps ?? null
-      } }),
       ...(external && { external: external.markets.map(m => ({
         v: m.venue, a: m.asset, b: m.borrow, s: m.supply,
         u: m.utilization ?? null, d: m.depthUsd, vs: m.comparableTo
@@ -499,7 +486,7 @@ const main = async () => {
         venues: v.venues.length,
         largestConstituentWeight: v.largestConstituentWeight,
         depthUsd: v.markets.reduce((a,m)=>a+m.depthUsd,0),
-        /* Weighted utilisation for the index, plus a compact per market line,
+        /* Weighted utilization for the index, plus a compact per market line,
            so the series can be charted without opening the daily archives.
            The archive stays the complete record; this is the queryable one. */
         utilization: round(v.markets.reduce((a,m)=>
