@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-19T18:10:21Z",
+  "fixing": "2026-09-19T18:18:15Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -313,8 +313,8 @@
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 81448,
-      "stxUsd": 0.302013,
+      "btcUsd": 81345,
+      "stxUsd": 0.302656,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
