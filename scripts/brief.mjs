@@ -65,50 +65,50 @@ const facts = {
     if (!n) return { label, published: false, publishedYesterday: !!a };
     return {
       label, published: true,
-      borrow: F(n.borrow), borrow1d: bps(n.borrow, a?.borrow), borrow7d: bps(n.borrow, b?.borrow),
-      supply: F(n.supply), supply1d: bps(n.supply, a?.supply),
-      utilization: F(n.utilization), utilization1d: bps(n.utilization, a?.utilization),
-      depthUsd: n.depthUsd, depth1dPct: pctChg(n.depthUsd, a?.depthUsd),
+      borrowPct: F(n.borrow), borrowChange1dBps: bps(n.borrow, a?.borrow), borrowChange7dBps: bps(n.borrow, b?.borrow),
+      supplyPct: F(n.supply), supplyChange1dBps: bps(n.supply, a?.supply),
+      utilizationPct: F(n.utilization), utilizationChange1dBps: bps(n.utilization, a?.utilization),
+      depthUsd: n.depthUsd, depthChange1dPercent: pctChg(n.depthUsd, a?.depthUsd),
       venues: n.venues ?? null,
       markets: (n.markets || []).map(m => {
         const am = (a?.markets || []).find(x => x.v === m.v && x.a === m.a);
         return {
           venue: m.v, asset: m.a,
-          borrow: F(m.b), borrow1d: bps(m.b, am?.b),
-          supply: F(m.s), supply1d: bps(m.s, am?.s),
-          utilization: F(m.u), utilization1d: bps(m.u, am?.u),
-          depthUsd: m.d, depth1dPct: pctChg(m.d, am?.d),
-          protocolYield: F(m.py)
+          borrowPct: F(m.b), borrowChange1dBps: bps(m.b, am?.b),
+          supplyPct: F(m.s), supplyChange1dBps: bps(m.s, am?.s),
+          utilizationPct: F(m.u), utilizationChange1dBps: bps(m.u, am?.u),
+          depthUsd: m.d, depthChange1dPercent: pctChg(m.d, am?.d),
+          protocolYieldPct: F(m.py)
         };
       })
     };
   }),
 
   staking: {
-    poxApy: F(px(today).apy), poxApy1d: bps(px(today).apy, px(d1).apy),
+    poxApyPct: F(px(today).apy), poxApyChange1dBps: bps(px(today).apy, px(d1).apy),
     cycle: px(today).cycle ?? null,
     crossSmoothed: px(today).stxPerBtcSmoothed ?? null,
     crossSpot: px(today).stxPerBtc ?? null,
-    crossSpot1dPct: pctChg(px(today).stxPerBtc, px(d1).stxPerBtc),
-    nativeStacking: F(today.ctx?.nativeStacking),
-    stBtc: F(today.ctx?.stBtc),
+    crossSpotChange1dPercent: pctChg(px(today).stxPerBtc, px(d1).stxPerBtc),
+    nativeStackingPct: F(today.ctx?.nativeStacking),
+    stBtcPct: F(today.ctx?.stBtc),
     liquidityCostBps: today.ctx?.liquidityCostBps ?? null,
-    liquidityCost1d: (today.ctx?.liquidityCostBps != null && d1.ctx?.liquidityCostBps != null)
+    liquidityCostChange1dBps: (today.ctx?.liquidityCostBps != null && d1.ctx?.liquidityCostBps != null)
       ? today.ctx.liquidityCostBps - d1.ctx.liquidityCostBps : null
   },
 
   world: {
-    sofr: F(today.ctx?.sofr), sofr1d: bps(today.ctx?.sofr, d1.ctx?.sofr),
+    sofrPct: F(today.ctx?.sofr), sofrChange1dBps: bps(today.ctx?.sofr, d1.ctx?.sofr),
     sofrDate: today.ctx?.sofrDate ?? null,
-    btcUsd: today.ctx?.btcUsd, btc1dPct: pctChg(today.ctx?.btcUsd, d1.ctx?.btcUsd),
-    stxUsd: today.ctx?.stxUsd, stx1dPct: pctChg(today.ctx?.stxUsd, d1.ctx?.stxUsd),
-    sbtcSupply: today.ctx?.sbtcSupply, sbtcSupply1dPct: pctChg(today.ctx?.sbtcSupply, d1.ctx?.sbtcSupply)
+    btcUsd: today.ctx?.btcUsd, btcChange1dPercent: pctChg(today.ctx?.btcUsd, d1.ctx?.btcUsd),
+    stxUsd: today.ctx?.stxUsd, stxChange1dPercent: pctChg(today.ctx?.stxUsd, d1.ctx?.stxUsd),
+    sbtcSupply: today.ctx?.sbtcSupply, sbtcSupplyChange1dPercent: pctChg(today.ctx?.sbtcSupply, d1.ctx?.sbtcSupply)
   },
 
   offStacks: (today.external || []).map(m => {
     const a = (d1.external || []).find(x => x.v === m.v && x.a === m.a);
-    return { venue: m.v, asset: m.a, borrow: F(m.b), borrow1d: bps(m.b, a?.b),
-             supply: F(m.s), utilization: F(m.u), depthUsd: m.d };
+    return { venue: m.v, asset: m.a, borrowPct: F(m.b), borrowChange1dBps: bps(m.b, a?.b),
+             supplyPct: F(m.s), utilizationPct: F(m.u), depthUsd: m.d };
   })
 };
 
@@ -118,23 +118,23 @@ const flags = [];
 for (const ix of facts.indices){
   if (!ix.published && ix.publishedYesterday) flags.push(`${ix.label} is not published today. It was yesterday.`);
   if (!ix.published) continue;
-  if (ix.borrow1d != null && Math.abs(ix.borrow1d) >= 25)
-    flags.push(`${ix.label} borrow moved ${ix.borrow1d > 0 ? "+" : ""}${ix.borrow1d} bps to ${ix.borrow}%.`);
+  if (ix.borrowChange1dBps != null && Math.abs(ix.borrowChange1dBps) >= 25)
+    flags.push(`${ix.label} borrow moved ${ix.borrowChange1dBps > 0 ? "+" : ""}${ix.borrowChange1dBps} bps to ${ix.borrowPct}%.`);
   for (const m of ix.markets){
-    if (m.utilization != null && m.utilization >= 90)
-      flags.push(`${m.venue} ${m.asset} is ${m.utilization}% utilized. Withdrawals may be constrained.`);
-    if (m.utilization1d != null && Math.abs(m.utilization1d) >= 300)
-      flags.push(`${m.venue} ${m.asset} utilization moved ${(m.utilization1d/100).toFixed(1)} points to ${m.utilization}%.`);
-    if (m.borrow1d != null && Math.abs(m.borrow1d) >= 40)
-      flags.push(`${m.venue} ${m.asset} borrow moved ${m.borrow1d > 0 ? "+" : ""}${m.borrow1d} bps to ${m.borrow}%.`);
-    if (m.depth1dPct != null && Math.abs(m.depth1dPct) >= 8)
-      flags.push(`${m.venue} ${m.asset} depth moved ${m.depth1dPct > 0 ? "+" : ""}${m.depth1dPct}%.`);
+    if (m.utilizationPct != null && m.utilizationPct >= 90)
+      flags.push(`${m.venue} ${m.asset} is ${m.utilizationPct}% utilized. Withdrawals may be constrained.`);
+    if (m.utilizationChange1dBps != null && Math.abs(m.utilizationChange1dBps) >= 300)
+      flags.push(`${m.venue} ${m.asset} utilization moved ${(m.utilizationChange1dBps/100).toFixed(1)} points to ${m.utilizationPct}%.`);
+    if (m.borrowChange1dBps != null && Math.abs(m.borrowChange1dBps) >= 40)
+      flags.push(`${m.venue} ${m.asset} borrow moved ${m.borrowChange1dBps > 0 ? "+" : ""}${m.borrowChange1dBps} bps to ${m.borrowPct}%.`);
+    if (m.depthChange1dPercent != null && Math.abs(m.depthChange1dPercent) >= 8)
+      flags.push(`${m.venue} ${m.asset} depth moved ${m.depthChange1dPercent > 0 ? "+" : ""}${m.depthChange1dPercent}%.`);
   }
 }
-if (facts.world.sofr1d != null && Math.abs(facts.world.sofr1d) >= 10)
-  flags.push(`SOFR moved ${facts.world.sofr1d > 0 ? "+" : ""}${facts.world.sofr1d} bps to ${facts.world.sofr}%, which is large for an overnight rate.`);
-if (facts.staking.crossSpot1dPct != null && Math.abs(facts.staking.crossSpot1dPct) >= 5)
-  flags.push(`The BTC to STX cross moved ${facts.staking.crossSpot1dPct}% on spot. The seven day mean absorbs most of it.`);
+if (facts.world.sofrChange1dBps != null && Math.abs(facts.world.sofrChange1dBps) >= 10)
+  flags.push(`SOFR moved ${facts.world.sofrChange1dBps > 0 ? "+" : ""}${facts.world.sofrChange1dBps} bps to ${facts.world.sofrPct}%, which is large for an overnight rate.`);
+if (facts.staking.crossSpotChange1dPercent != null && Math.abs(facts.staking.crossSpotChange1dPercent) >= 5)
+  flags.push(`The BTC to STX cross moved ${facts.staking.crossSpotChange1dPercent}% on spot. The seven day mean absorbs most of it.`);
 if (today.methodologyVersion !== d1.methodologyVersion)
   flags.push(`Methodology changed from ${d1.methodologyVersion} to ${today.methodologyVersion}. Figures either side are on a different basis.`);
 
@@ -145,15 +145,15 @@ const stx = facts.indices.find(i => i.label === "SBOR-STX");
 if (stx?.published){
   const plain = stx.markets.find(m => m.asset === "STX");
   const yld   = stx.markets.find(m => m.asset === "stSTX");
-  if (plain && yld && yld.protocolYield != null){
-    const py = yld.protocolYield;
+  if (plain && yld && yld.protocolYieldPct != null){
+    const py = yld.protocolYieldPct;
     facts.sameExposure = [
-      { leg: "supply STX, borrow stSTX", earn: plain.supply, trueCost: F(yld.borrow + py),
-        netBps: Math.round((plain.supply - (yld.borrow + py)) * 100),
-        ignoringYieldBps: Math.round((plain.supply - yld.borrow) * 100) },
-      { leg: "supply stSTX, borrow STX", earn: F(yld.supply + py), trueCost: plain.borrow,
-        netBps: Math.round(((yld.supply + py) - plain.borrow) * 100),
-        ignoringYieldBps: Math.round((yld.supply - plain.borrow) * 100) }
+      { leg: "supply STX, borrow stSTX", earn: plain.supplyPct, trueCost: F(yld.borrowPct + py),
+        netBps: Math.round((plain.supplyPct - (yld.borrowPct + py)) * 100),
+        ignoringYieldBps: Math.round((plain.supplyPct - yld.borrowPct) * 100) },
+      { leg: "supply stSTX, borrow STX", earn: F(yld.supplyPct + py), trueCost: plain.borrowPct,
+        netBps: Math.round(((yld.supplyPct + py) - plain.borrowPct) * 100),
+        ignoringYieldBps: Math.round((yld.supplyPct - plain.borrowPct) * 100) }
     ];
     for (const l of facts.sameExposure)
       if (l.netBps > 0) flags.push(`Same exposure: ${l.leg} nets +${l.netBps} bps after the protocol yield. Worth checking whether it is real.`);
@@ -168,6 +168,8 @@ log(`brief for ${facts.date}: ${flags.length} flag(s)`);
 const SYSTEM = `You write the morning brief for SBOR, the benchmark lending rate for Stacks. You are writing for the person who maintains it, who already knows what every field means.
 
 RULES, in order of importance.
+
+0. Field names carry their units. Anything ending Bps is a change in basis points, not a percentage change. A borrow rate moving from 2.30 to 2.56 is a 26 basis point move; it is not a 26% move and it is not "up 26%". Anything ending Percent is a percentage change. Anything ending Pct is a level, already expressed as a percentage.
 
 1. Every number you write must appear in the JSON you are given. You cannot fetch anything, and any figure not in the payload does not exist. If you are unsure of a number, leave it out. A benchmark that publishes an invented figure has failed at the only thing it does.
 
@@ -242,7 +244,7 @@ try {
     : e.message;
   log(`model unavailable, sending the findings raw. ${why}`);
   const ix = facts.indices.filter(i => i.published)
-    .map(i => `${i.label} borrow ${i.borrow}%, supply ${i.supply}%`).join("\n");
+    .map(i => `${i.label} borrow ${i.borrowPct}%, supply ${i.supplyPct}%`).join("\n");
   body = flags.length
     ? `${ix}\n\n${flags.map(f => `- ${f}`).join("\n")}`
     : `${ix}\n\nNothing crossed a threshold since the last fixing.`;
