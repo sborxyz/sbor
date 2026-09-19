@@ -15,7 +15,10 @@ import { writeFileSync } from "node:fs";
 
 const BASE = process.env.SBOR_BASE || "https://sbor.xyz";
 const MODEL = process.env.BRIEF_MODEL || "claude-sonnet-5";
+/* Reading the API is quick. The model thinks before it writes and that takes
+   longer than a fetch, so the two get different allowances. */
 const TIMEOUT = 20_000;
+const MODEL_TIMEOUT = 120_000;
 const log = (...a) => console.error(...a);
 
 const F = n => (n == null || !Number.isFinite(Number(n))) ? null : Number(Number(n).toFixed(2));
@@ -193,7 +196,7 @@ async function write(){
       "x-api-key": key,
       "anthropic-version": "2023-06-01"
     },
-    signal: AbortSignal.timeout(TIMEOUT),
+    signal: AbortSignal.timeout(MODEL_TIMEOUT),
     body: JSON.stringify({
       model: MODEL,
       /* Extended thinking is on by default and is counted against max_tokens.
@@ -234,7 +237,10 @@ try {
   body = await write();
 } catch (e) {
   wrote = "fallback";
-  log(`model unavailable, sending the findings raw. ${e.message}`);
+  const why = e.name === "TimeoutError"
+    ? `the model did not answer within ${MODEL_TIMEOUT / 1000}s`
+    : e.message;
+  log(`model unavailable, sending the findings raw. ${why}`);
   const ix = facts.indices.filter(i => i.published)
     .map(i => `${i.label} borrow ${i.borrow}%, supply ${i.supply}%`).join("\n");
   body = flags.length
