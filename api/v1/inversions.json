@@ -1,10 +1,10 @@
 {
   "schema": "sbor.v1",
-  "checked": "2026-09-19T04:57:32Z",
+  "checked": "2026-09-19T11:25:35Z",
   "basedOnFixing": "2026-09-18T19:15:20Z",
   "status": "validating",
-  "basedOnFixingAgeHours": 9.7,
-  "staleWarning": "This check is based on the fixing of 2026-09-18, 9.7 hours ago. There is no fixing for today yet, so rates may have moved. Treat this result as stale.",
+  "basedOnFixingAgeHours": 16.2,
+  "staleWarning": "This check is based on the fixing of 2026-09-18, 16.2 hours ago. There is no fixing for today yet, so rates may have moved. Treat this result as stale.",
   "statusNote": "This monitor is being validated. Detections are published so the validation period is visible, but they have not yet been checked against reality over a long enough run to be relied on.",
   "minimumEdgeBps": 10,
   "note": "An inversion is the same asset costing less to borrow at one venue than it pays to supply at another. Rates are compared as published by SBOR, before fees, gas, liquidation risk and any minimum position size. SBOR does not trade on its own rate and does not represent that any inversion is executable.",
