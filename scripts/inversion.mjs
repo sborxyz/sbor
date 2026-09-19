@@ -73,9 +73,9 @@ for (const [asset, ms] of Object.entries(byAsset)){
           asset,
           index: borrowAt.index,
           borrowVenue: borrowAt.venue, borrowRate: borrowAt.borrow,
-          borrowUtilisation: borrowAt.utilization ?? null,
+          borrowUtilization: borrowAt.utilization ?? null,
           supplyVenue: supplyAt.venue, supplyRate: supplyAt.supply,
-          supplyUtilisation: supplyAt.utilization ?? null,
+          supplyUtilization: supplyAt.utilization ?? null,
           edgeBps: edge
         };
     }
@@ -149,8 +149,8 @@ writeFileSync("inversion-alert.txt", found.length
   ? found.map(f =>
 `${f.asset} is inverted across venues.
 
-Supplying at ${f.supplyVenue} pays ${pct(f.supplyRate)}, utilisation ${f.supplyUtilisation == null ? "n/a" : pct(f.supplyUtilisation)}.
-Borrowing the same asset at ${f.borrowVenue} costs ${pct(f.borrowRate)}, utilisation ${f.borrowUtilisation == null ? "n/a" : pct(f.borrowUtilisation)}.
+Supplying at ${f.supplyVenue} pays ${pct(f.supplyRate)}, utilization ${f.supplyUtilization == null ? "n/a" : pct(f.supplyUtilization)}.
+Borrowing the same asset at ${f.borrowVenue} costs ${pct(f.borrowRate)}, utilization ${f.borrowUtilization == null ? "n/a" : pct(f.borrowUtilization)}.
 
 Edge ${f.edgeBps} bps, before fees, gas and liquidation risk.
 
