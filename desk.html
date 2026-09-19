@@ -88,7 +88,7 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--rule);color:v
   /* the source line under a name is useful on paper, just smaller */
   td .src{display:block;margin-top:0;font-size:6.2pt}
 
-  /* colour carries meaning here, so keep it rather than printing grey */
+  /* color carries meaning here, so keep it rather than printing grey */
   .up{color:#1a5c3a !important}
   .dn{color:#8f3524 !important}
   .big{background:#f0e2de !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -166,7 +166,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
   let out = "";
 
   /* ---- the indices ---- */
-  out += `<h2>Indices</h2><div class="hint">Highlighted above 15 bps. Utilisation is depth weighted across the constituents.</div><div class="scroll"><table>
+  out += `<h2>Indices</h2><div class="hint">Highlighted above 15 bps. Utilization is depth weighted across the constituents.</div><div class="scroll"><table>
     <tr><th>Index</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>1d</th><th>7d</th><th>Util</th><th>1d</th><th>Depth</th><th>7d borrow</th></tr>`;
   for (const label of ["SBOR-USD","SBOR-BTC","SBOR-STX"]){
     const n = today[label], a = d1[label], b = d7[label];
@@ -174,14 +174,14 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
     out += `<tr class="self"><td>${label}</td>
       <td class="num" data-l="Borrow">${F(n.borrow)}%</td>${chg(BPS(n.borrow, a?.borrow),"bps",15,"Borrow 1d")}${chg(BPS(n.borrow, b?.borrow),"bps",15,"Borrow 7d")}
       <td class="num" data-l="Supply">${F(n.supply)}%</td>${chg(BPS(n.supply, a?.supply),"bps",15,"Supply 1d")}${chg(BPS(n.supply, b?.supply),"bps",15,"Supply 7d")}
-      <td class="num" data-l="Utilisation">${F(n.utilization)}%</td>${chg(BPS(n.utilization, a?.utilization),"bps",200,"Util 1d")}
+      <td class="num" data-l="Utilization">${F(n.utilization)}%</td>${chg(BPS(n.utilization, a?.utilization),"bps",200,"Util 1d")}
       <td class="num dim" data-l="Depth">$${((n.depthUsd||0)/1e6).toFixed(1)}M</td>
       <td class="spark" data-l="7 fixings">${spark(win.map(r => r[label]?.borrow))}</td></tr>`;
   }
   out += `</table></div>`;
 
   /* ---- constituents ---- */
-  out += `<h2>Constituents, on Stacks</h2><div class="hint">Read from Zest and Granite contract state on Stacks mainnet. Protocol yield from StackingDAO. Highlighted above 15 bps on a rate, 200 bps on utilisation. This is where a move in an index comes from.</div><div class="scroll"><table>
+  out += `<h2>Constituents, on Stacks</h2><div class="hint">Read from Zest and Granite contract state on Stacks mainnet. Protocol yield from StackingDAO. Highlighted above 15 bps on a rate, 200 bps on utilization. This is where a move in an index comes from.</div><div class="scroll"><table>
     <tr><th>Market</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>1d</th><th>Util</th><th>1d</th><th>Depth</th><th>1d</th><th>Proto</th></tr>`;
   for (const label of ["SBOR-USD","SBOR-BTC","SBOR-STX"]){
     for (const m of (today[label]?.markets || [])){
@@ -190,7 +190,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
       out += `<tr><td class="nm">${m.v} <span class="dim">${m.a}</span></td>
         <td class="num" data-l="Borrow">${F(m.b)}%</td>${chg(BPS(m.b, a?.b),"bps",15,"Borrow 1d")}${chg(BPS(m.b, b?.b),"bps",15,"Borrow 7d")}
         <td class="num" data-l="Supply">${F(m.s)}%</td>${chg(BPS(m.s, a?.s),"bps",15,"Supply 1d")}
-        <td class="num" data-l="Utilisation">${F(m.u)}%</td>${chg(BPS(m.u, a?.u),"bps",200,"Util 1d")}
+        <td class="num" data-l="Utilization">${F(m.u)}%</td>${chg(BPS(m.u, a?.u),"bps",200,"Util 1d")}
         <td class="num dim" data-l="Depth">$${((m.d||0)/1e6).toFixed(1)}M</td>${chg(PCT(m.d, a?.d),"pct",5,"Depth 1d")}
         <td class="num dim" data-l="Protocol yield">${m.py == null ? "." : F(m.py)+"%"}</td></tr>`;
     }
@@ -206,7 +206,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
     out += `<tr><td class="nm">${m.v} <span class="dim">${m.a}</span></td>
       <td class="num" data-l="Borrow">${F(m.b)}%</td>${chg(BPS(m.b, a?.b),"bps",15,"Borrow 1d")}${chg(BPS(m.b, b?.b),"bps",15,"Borrow 7d")}
       <td class="num" data-l="Supply">${F(m.s)}%</td>
-      <td class="num" data-l="Utilisation">${F(m.u)}%</td>${chg(BPS(m.u, a?.u),"bps",200,"Util 1d")}
+      <td class="num" data-l="Utilization">${F(m.u)}%</td>${chg(BPS(m.u, a?.u),"bps",200,"Util 1d")}
       <td class="num dim" data-l="Depth">$${((m.d||0)/1e9 >= 1 ? ((m.d/1e9).toFixed(2)+"B") : ((m.d||0)/1e6).toFixed(1)+"M")}</td></tr>`;
   }
   out += `</table></div>`;
@@ -274,7 +274,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
   if (today.ctx == null)
     out += `<div class="note">No context recorded on this fixing. The context line was added to the history rows on 18 September, so rows before that show nothing here. The full context is in that day's archive either way.</div>`;
   if (usd != null && sofr != null)
-    out += `<div class="note">A dollar on Stacks costs <strong>${F(usd)}%</strong>. Secured by Treasuries it costs <strong>${F(sofr)}%</strong>. That is ${Math.abs(BPS(usd, sofr))} bps ${usd < sofr ? "cheaper here" : "dearer here"}, and the reason is utilisation rather than risk.</div>`;
+    out += `<div class="note">A dollar on Stacks costs <strong>${F(usd)}%</strong>. Secured by Treasuries it costs <strong>${F(sofr)}%</strong>. That is ${Math.abs(BPS(usd, sofr))} bps ${usd < sofr ? "cheaper here" : "dearer here"}, and the reason is utilization rather than risk.</div>`;
 
   /* ---- same exposure pairs ----
      Two assets that are claims on the same underlying look like an arbitrage
@@ -340,14 +340,14 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
       const am = (a?.markets || []).find(x => x.v === m.v && x.a === m.a);
 
       if (m.u != null && m.u >= 90)
-        flags.push(`${m.v} ${m.a} is ${F(m.u)}% utilised. Withdrawals may be constrained.`);
+        flags.push(`${m.v} ${m.a} is ${F(m.u)}% utilized. Withdrawals may be constrained.`);
 
-      /* A large move in utilisation matters wherever it starts from. A jump of
+      /* A large move in utilization matters wherever it starts from. A jump of
          five points in a day is somebody sizeable arriving or leaving, and the
          rate follows it. */
       const du = BPS(m.u, am?.u);
       if (du != null && Math.abs(du) >= 300)
-        flags.push(`${m.v} ${m.a} utilisation moved ${du > 0 ? "+" : ""}${(du/100).toFixed(1)} points in a day, to ${F(m.u)}%.`);
+        flags.push(`${m.v} ${m.a} utilization moved ${du > 0 ? "+" : ""}${(du/100).toFixed(1)} points in a day, to ${F(m.u)}%.`);
 
       const dr = BPS(m.b, am?.b);
       if (dr != null && Math.abs(dr) >= 40)
