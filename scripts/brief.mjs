@@ -204,7 +204,19 @@ async function write(){
   if (!r.ok) throw new Error(`anthropic responded ${r.status}: ${(await r.text()).slice(0,200)}`);
   const d = await r.json();
   const text = (d.content || []).filter(c => c.type === "text").map(c => c.text).join("\n").trim();
-  if (!text) throw new Error("empty response");
+  if (!text) {
+    /* Say what actually came back rather than "empty". A silent shape change in
+       the response is the kind of thing that takes an hour to guess at and ten
+       seconds to read. */
+    const shape = {
+      stop_reason: d.stop_reason ?? null,
+      model: d.model ?? null,
+      blocks: (d.content || []).map(c => c.type),
+      usage: d.usage ?? null,
+      error: d.error ?? null
+    };
+    throw new Error(`no text in response: ${JSON.stringify(shape)}`);
+  }
   return text;
 }
 
