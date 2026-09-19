@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-19T14:11:44Z",
+  "fixing": "2026-09-19T14:20:20Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -305,14 +305,16 @@
       "percentile1": 3.7,
       "percentile99": 3.93,
       "volumeBillions": 2992,
-      "average30day": null,
-      "average90day": null,
-      "average180day": null,
+      "average30day": 3.65452,
+      "average90day": 3.64874,
+      "average180day": 3.65909,
+      "indexValue": 1.25922944,
+      "averagesDate": "2026-09-18",
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 81384,
-      "stxUsd": 0.310596,
+      "btcUsd": 81396,
+      "stxUsd": 0.309886,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
@@ -321,7 +323,7 @@
       "source": "sbtc-token contract"
     },
     "chainHeight": {
-      "burnBlockHeight": 967712,
+      "burnBlockHeight": 967713,
       "rewardCycle": 143,
       "stackedUstx": 441576024260845,
       "source": "Hiro /v2/pox"

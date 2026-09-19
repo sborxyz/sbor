@@ -1537,7 +1537,7 @@
   },
   {
     "date": "2026-09-19",
-    "fixedAt": "2026-09-19T14:11:44Z",
+    "fixedAt": "2026-09-19T14:20:20Z",
     "methodologyVersion": "1.9.0",
     "SBOR-PoX": {
       "apy": 7.64,
@@ -1552,10 +1552,10 @@
     "ctx": {
       "sofr": 3.85,
       "sofrDate": "2026-09-17",
-      "btcUsd": 81384,
-      "stxUsd": 0.310596,
+      "btcUsd": 81396,
+      "stxUsd": 0.309886,
       "sbtcSupply": 2472.57053787,
-      "burnBlock": 967712,
+      "burnBlock": 967713,
       "nativeStacking": 5.11,
       "stBtc": 2.58,
       "liquidityCostBps": 90
