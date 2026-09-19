@@ -83,7 +83,7 @@ section{padding:44px 0;border-bottom:1px solid var(--rule)}
 .tscroll{width:100%;overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:15px}
 th{text-align:left;font-weight:500;font-size:13.5px;color:var(--ink-soft);padding:0 12px 9px 0;border-bottom:1px solid var(--rule);white-space:nowrap}
-th.r,td.r{text-align:right;padding-right:0}
+th.r,td.r{text-align:right;padding-right:0;padding-left:18px}
 td{padding:13px 12px 13px 0;border-bottom:1px solid var(--rule-soft);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 .venue{font-weight:500}
@@ -183,6 +183,27 @@ a{color:var(--accent)}
   .wrap{padding:0 20px}
   .switch button{margin-right:26px;font-size:14px}
   th.hide-sm,td.hide-sm{display:none}
+}
+/* Phones: tables stop behaving like tables. Every row becomes a labelled block,
+   so no column is hidden, no figure is truncated, and nothing has to be found
+   by scrolling sideways. Labels come from the column headings, so both
+   languages are covered already. */
+@media (max-width:720px){
+  .tscroll{overflow-x:visible}
+  .tscroll thead{display:none}
+  .tscroll table,.tscroll tbody,.tscroll tr,.tscroll td{display:block;width:100%}
+  .tscroll tr{border-bottom:1px solid var(--rule);padding:15px 0 17px}
+  .tscroll tr:last-child{border-bottom:none}
+  .tscroll td,.tscroll td.r{display:flex;justify-content:space-between;align-items:baseline;
+    gap:18px;text-align:left;border:none;padding:5px 0}
+  .tscroll td::before{content:attr(data-l);color:var(--ink-soft);font-size:13.5px;line-height:1.45}
+  .tscroll td:first-child{display:block;padding:0 0 10px;font-size:16px;line-height:1.4}
+  .tscroll td:first-child::before{content:none}
+  .tscroll td.barcell{display:block;padding:9px 0 1px}
+  .tscroll td.barcell::before{content:none}
+  .tscroll td.barcell .bar{max-width:none;margin-left:0;height:8px}
+  .tscroll .terms td,.tscroll .terms th{white-space:normal}
+  .sofrbox{background:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -439,7 +460,7 @@ const CONTRACTS = [
 ];
 const SOURCES = [
   { name:"Protocol yield", label:"app.stackingdao.com/api/apy", url:"https://app.stackingdao.com/api/apy?v=2" },
-  { name:"BTC to STX rate", label:"Bitflow quotes API", url:"https://www.bitflow.finance" },
+  { name:"BTC to STX rate", label:"bitflow.finance, quotes API", url:"https://www.bitflow.finance" },
   { name:"Depth", label:"DefiLlama yields", url:"https://defillama.com/yields?chain=Stacks" }
 ];
 const GITHUB = "https://github.com/sborxyz/sbor";
@@ -450,7 +471,7 @@ en:{
   fullname:"Stacks Bitcoin Offered Rate",
   introH:"What money actually costs on Stacks.",
   introP:"Every lending market prices differently. SBOR publishes one market rate per currency, weighted by size and read straight from the contracts, so you see the market rather than one venue's number.",
-  introUse:"Use it as a yardstick. Borrow above SBOR and you are paying more than the market. Supply below it and you are earning less. The table shows where each venue sits today.",
+  introUse:"Use it as a yardstick. Borrow above SBOR and you are paying more than the market. Supply below it and you are earning less. Every loan here is overcollateralised, and the collateral is whatever you supplied rather than one particular asset, so a dollar borrowed on Stacks is secured by crypto collateral rather than by bitcoin specifically.",
   stamp:d=>`Rate as of <span class="num">${d}</span> · read from Zest contract state · updated daily`,
   borrowK:"Borrow APY", supplyK:"Supply APY",
   allIn:v=>`${v.toFixed(2)}% all in, with protocol yield`,
@@ -461,11 +482,11 @@ en:{
   invNone:l=>`No asset in ${l} is lent at more than one venue today, so there is nothing to compare across venues.`,
   invValidating:"This monitor is being validated. Detections are published so the validation period is visible, but they have not yet been proven over a long enough run to be relied on.",
   invRow:(a,sv,sr,bv,br,e)=>`${a}: supplying at ${sv} pays ${sr}, borrowing the same asset at ${bv} costs ${br}. ${e} bps, before fees, gas and liquidation risk.`,
-  invChecked:t=>`Checked ${t}, hourly.`,
+  invChecked:t=>`Checked ${t}, every three hours.`,
   sofrH:"Secured by Treasuries",
   sofrLine:(r,d)=>`SOFR ${r}, the overnight cost of a dollar in the US repo market, secured by US government debt. Published by the Federal Reserve Bank of New York for ${d}.`,
-  sofrCompare:(sbor,sofr,bps)=>`A dollar secured by bitcoin on Stacks costs ${sbor} to borrow. A dollar secured by Treasuries costs ${sofr}. That is ${Math.abs(bps)} basis points ${bps < 0 ? "cheaper on Stacks" : "dearer on Stacks"}.`,
-  sofrWhy:"Bitcoin is the riskier collateral, so by any textbook this is backwards. It is cheaper here because almost nobody is borrowing yet, so utilisation is low and the rate has not been bid up. The gap is a measure of how early this market is.",
+  sofrCompare:(sbor,sofr,bps)=>`A dollar borrowed against crypto collateral on Stacks costs ${sbor}. A dollar secured by US government debt costs ${sofr}. That is ${Math.abs(bps)} basis points ${bps < 0 ? "cheaper on Stacks" : "dearer on Stacks"}.`,
+  sofrWhy:"Crypto is the riskier collateral, so by any textbook this is backwards. It is cheaper here because almost nobody is borrowing yet, so utilisation is low and the rate has not been bid up. The gap measures how early this market is, not that it is safer.",
   sofrAvgs:(a30,a90,a180)=>`SOFR averages: 30 day ${a30}, 90 day ${a90}, 180 day ${a180}.`,
   extH:"How this compares",
   extP:"This index against the same asset class on the largest lending markets off this chain. The first row is SBOR itself, so the comparison is in one place. One market is selected per chain: a venue that publishes a borrow rate and utilisation is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. Nothing below the first row is a constituent of any SBOR index, and none of it ever enters a fixing.",
@@ -476,13 +497,14 @@ en:{
   termCol:d=>`${d}-day`,
   termFrom:d=>`from ${d}`,
   termPending:"not yet",
+  termSofr:"for comparison, US repo market",
   deltaBorrow:"", deltaSupply:"",
-  poxH:"Bitcoin staking yield",
+  poxH:"Bitcoin staking yield, from PoX (Proof of Transfer)",
   poxP:"What PoX pays STX stakers, in bitcoin, from what miners commit. The bitcoin paid over one two week reward cycle, divided by the STX locked, annualised. A staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
   poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. Each reading annualises the most recently completed two week cycle, so a marked line is the day a cycle settled and everything to its right is derived from that cycle. The drift between markers is the BTC to STX rate, which is averaged over seven days.`,
   poxChartThin:"Not enough history yet to draw this.",
   poxCycleMark:c=>`cycle ${c} settled`,
-  poxMeta:(c,btc,stx,x,w)=>`Annualised from completed reward cycle ${c}${w} · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over 7 days`,
+  poxMeta:(c,btc,stx,x,w)=>`Read fresh each day from the bitcoin actually paid out in completed reward cycle ${c}${w} · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over 7 days`,
   csv:"Download CSV",
   devH:"Use the data",
   devP:"Everything on this page is available as JSON and plain text. The published fixing is free to read: no key, no rate limit, no registration. Build against v1 and it will not change shape under you.",
@@ -515,6 +537,7 @@ en:{
   ],
   methodB:[
     "<strong>Daily fixing.</strong> One fixing a day, targeting 11:00 UTC. Publication runs on a scheduler that can be late under load, so the timestamp carried by each fixing is authoritative rather than the target hour. Every fixing enters the historical record.",
+    "<strong>What moves the staking figure day to day.</strong> The reward cycle it measures is fixed, and so is the bitcoin paid in it. Both are read again every morning, so the cycle figures only change when a cycle settles. What moves in between is the BTC to STX rate used to convert them, which is why the published yield drifts on days when nothing about staking changed.",
     "<strong>PoX needs an exchange rate, not a price.</strong> The staking yield is paid in bitcoin against a position locked in STX, so the figure depends on the BTC to STX rate rather than on either dollar price, which cancels. That rate is quoted from Bitflow, the deepest venue for the pair on Stacks, so the input stays native to the market being measured.",
     "<strong>Rate basis.</strong> Every rate here is an effective APY, continuously compounded. Both venues return nominal annual rates from their contracts, despite Zest naming its fields apy, which the venue has confirmed. Each is converted the same way so constituents are comparable, and every market also carries its nominal figure so the raw value stays visible. At current levels the conversion is a few basis points; on a market above its utilisation kink it is very large, which is why it is done rather than ignored.",
     "<strong>Instruments, not native assets.</strong> Every rate is quoted on the asset actually lent on Stacks. SBOR-BTC measures sBTC, not native bitcoin, and SBOR-USD measures USDCx and USDh, not bank dollars. Each carries issuance, peg or bridge risk that the underlying asset does not.",
@@ -533,13 +556,13 @@ en:{
   signupSending:"Sending...",
   signupOk:"You are subscribed. The first report lands on Monday.",
   signupErr:"That did not go through. Try again, or email contact@sbor.xyz",
-  disclaimer:"The published fixings are free to use, including commercially, with no permission required and no licence to negotiate. Agents are explicitly welcome. SBOR is provided as is, without warranty. It is a statistic, not investment advice, and nobody earns SBOR. It is a tool for making better decisions, not a recommendation to make any. Rates are read from contract state on Stacks mainnet."
+  disclaimer:"The published fixings are free to use, including commercially, with no permission required and no licence to negotiate, under CC BY 4.0. Attribution is the only condition: name SBOR and link to sbor.xyz where practical. Agents are explicitly welcome. SBOR is provided as is, without warranty. It is a statistic, not investment advice, and nobody earns SBOR. It is a tool for making better decisions, not a recommendation to make any. Rates are read from contract state on Stacks mainnet."
 },
 pt:{
   fullname:"Taxa de Referência de Bitcoin da Stacks",
   introH:"Quanto o dinheiro custa de verdade na Stacks.",
   introP:"Cada mercado de crédito cobra o seu preço. O SBOR publica uma taxa de mercado por moeda, ponderada pelo tamanho e lida direto dos contratos, para você ver o mercado em vez do número de uma plataforma só.",
-  introUse:"Use como régua. Tomar emprestado acima do SBOR significa pagar mais que o mercado. Depositar abaixo dele significa ganhar menos. A tabela mostra onde cada plataforma está hoje.",
+  introUse:"Use como régua. Tomar emprestado acima do SBOR significa pagar mais que o mercado. Depositar abaixo dele significa ganhar menos. Todo empréstimo aqui é sobrecolateralizado, e a garantia é o que você depositou, não um ativo específico, então um dólar tomado emprestado na Stacks é garantido por colateral cripto e não por bitcoin especificamente.",
   stamp:d=>`Taxa em <span class="num">${d}</span> · lida do estado dos contratos da Zest · atualizada diariamente`,
   borrowK:"APY de empréstimo", supplyK:"APY de depósito",
   allIn:v=>`${v.toFixed(2)}% no total, com o rendimento do protocolo`,
@@ -550,11 +573,11 @@ pt:{
   invNone:l=>`Nenhum ativo do ${l} é emprestado em mais de uma plataforma hoje, então não há o que comparar entre plataformas.`,
   invValidating:"Este monitor está em validação. As detecções são publicadas para que o período de validação fique visível, mas ainda não foram comprovadas por tempo suficiente para servirem de base.",
   invRow:(a,sv,sr,bv,br,e)=>`${a}: depositar na ${sv} paga ${sr}, tomar o mesmo ativo emprestado na ${bv} custa ${br}. ${e} pontos-base, antes de taxas, gas e risco de liquidação.`,
-  invChecked:t=>`Verificado ${t}, de hora em hora.`,
+  invChecked:t=>`Verificado ${t}, a cada três horas.`,
   sofrH:"Garantido por títulos do Tesouro",
   sofrLine:(r,d)=>`SOFR ${r}, o custo overnight de um dólar no mercado de repo dos Estados Unidos, garantido por dívida do governo americano. Publicado pelo Federal Reserve Bank of New York para ${d}.`,
-  sofrCompare:(sbor,sofr,bps)=>`Um dólar garantido por bitcoin na Stacks custa ${sbor} para tomar emprestado. Um dólar garantido por títulos do Tesouro custa ${sofr}. São ${Math.abs(bps)} pontos-base ${bps < 0 ? "mais barato na Stacks" : "mais caro na Stacks"}.`,
-  sofrWhy:"O bitcoin é a garantia mais arriscada, então pela teoria isso está invertido. Sai mais barato aqui porque quase ninguém ainda toma emprestado, então a utilização é baixa e a taxa não foi disputada. A diferença mede o quanto este mercado ainda é inicial.",
+  sofrCompare:(sbor,sofr,bps)=>`Um dólar tomado emprestado contra colateral cripto na Stacks custa ${sbor}. Um dólar garantido por dívida do governo americano custa ${sofr}. São ${Math.abs(bps)} pontos-base ${bps < 0 ? "mais barato na Stacks" : "mais caro na Stacks"}.`,
+  sofrWhy:"O colateral cripto é o mais arriscado, então pela teoria isso está invertido. Sai mais barato aqui porque quase ninguém ainda toma emprestado, então a utilização é baixa e a taxa não foi disputada. A diferença mede o quanto este mercado ainda é inicial, não que ele seja mais seguro.",
   sofrAvgs:(a30,a90,a180)=>`Médias da SOFR: 30 dias ${a30}, 90 dias ${a90}, 180 dias ${a180}.`,
   extH:"Como isto se compara",
   extP:"Este índice contra a mesma classe de ativo nos maiores mercados de crédito fora desta rede. A primeira linha é o próprio SBOR, para a comparação ficar em um lugar só. É escolhido um mercado por rede: uma plataforma que publica taxa de empréstimo e utilização tem preferência sobre uma que não publica, e a profundidade decide entre as que publicam as duas, então a plataforma citada pode mudar. Nada abaixo da primeira linha é componente de algum índice SBOR, e nada disso entra em um fixing.",
@@ -565,13 +588,14 @@ pt:{
   termCol:d=>`${d} dias`,
   termFrom:d=>`a partir de ${d}`,
   termPending:"ainda não",
+  termSofr:"para comparação, mercado de repo dos EUA",
   deltaBorrow:"", deltaSupply:"",
-  poxH:"Rendimento do staking de bitcoin",
+  poxH:"Rendimento do staking de bitcoin, via PoX (Proof of Transfer)",
   poxP:"O que o PoX paga a quem faz staking de STX, em bitcoin, a partir do que os mineradores comprometem. O bitcoin pago em um ciclo de recompensa de duas semanas, dividido pelo STX travado, anualizado. É um rendimento de staking sobre uma posição travada, não uma taxa de crédito, por isso fica ao lado dos índices e nunca dentro deles.",
   poxChartNote:(n,first,last)=>`${n} leituras diárias, de ${first} a ${last}. Cada leitura anualiza o último ciclo de duas semanas concluído, então uma linha marcada é o dia em que um ciclo fechou, e tudo à direita dela vem daquele ciclo. A variação entre marcadores é a relação BTC para STX, que é suavizada em sete dias.`,
   poxChartThin:"Ainda não há histórico suficiente para desenhar isso.",
   poxCycleMark:c=>`ciclo ${c} fechou`,
-  poxMeta:(c,btc,stx,x,w)=>`Anualizado a partir do ciclo de recompensa ${c}, já concluído${w} · ${btc} BTC pagos a stakers · ${stx} STX travados · convertido a ${x} STX por BTC, média de 7 dias`,
+  poxMeta:(c,btc,stx,x,w)=>`Lido todo dia a partir do bitcoin efetivamente pago no ciclo de recompensa ${c}, já concluído${w} · ${btc} BTC pagos a stakers · ${stx} STX travados · convertido a ${x} STX por BTC, média de 7 dias`,
   csv:"Baixar CSV",
   devH:"Use os dados",
   devP:"Tudo nesta página está disponível em JSON e texto puro. O fixing publicado é livre para leitura: sem chave, sem limite de requisições, sem cadastro. Construa sobre a v1 e o formato não muda embaixo de você.",
@@ -604,6 +628,7 @@ pt:{
   ],
   methodB:[
     "<strong>Fixing diário.</strong> Um fixing por dia, com alvo às 11:00 UTC. A publicação depende de um agendador que pode atrasar sob carga, então vale o horário registrado em cada fixing, não o horário alvo. Todo fixing entra no registro histórico.",
+    "<strong>O que move o número do staking de um dia para o outro.</strong> O ciclo de recompensa medido é fixo, e o bitcoin pago nele também. Os dois são lidos de novo toda manhã, então os números do ciclo só mudam quando um ciclo fecha. O que muda no meio é a relação BTC para STX usada na conversão, e é por isso que o rendimento publicado oscila em dias nos quais nada do staking mudou.",
     "<strong>O PoX depende de uma taxa de câmbio, não de um preço.</strong> O rendimento do staking é pago em bitcoin sobre uma posição travada em STX, então o número depende da relação BTC para STX, e não de qualquer preço em dólar, que se cancela. Essa relação é cotada na Bitflow, a maior liquidez do par na Stacks, o que mantém a entrada nativa ao mercado medido.",
     "<strong>Base das taxas.</strong> Toda taxa aqui é um APY efetivo, com capitalização contínua. As duas plataformas devolvem taxas nominais anuais nos contratos, apesar de a Zest nomear seus campos como apy, o que a própria plataforma confirmou. Cada uma é convertida da mesma forma para que os componentes sejam comparáveis, e cada mercado também carrega seu número nominal, para que o valor bruto continue visível. Nos níveis atuais a conversão vale alguns pontos-base; em um mercado acima do ponto de inflexão da utilização ela é enorme, e é por isso que é feita em vez de ignorada.",
     "<strong>Instrumentos, não ativos nativos.</strong> Cada taxa se refere ao ativo que é de fato emprestado na Stacks. O SBOR-BTC mede o sBTC, não o bitcoin nativo, e o SBOR-USD mede USDCx e USDh, não dólares bancários. Cada um carrega risco de emissão, paridade ou ponte que o ativo original não tem.",
@@ -622,7 +647,7 @@ pt:{
   signupSending:"Enviando...",
   signupOk:"Inscrição confirmada. O primeiro relatório chega na segunda.",
   signupErr:"Não foi possível enviar. Tente de novo ou escreva para contact@sbor.xyz",
-  disclaimer:"Os fixings publicados são livres para uso, inclusive comercial, sem necessidade de permissão e sem licença a negociar. Agentes são explicitamente bem-vindos. O SBOR é fornecido como está, sem garantia. É uma estatística, não uma recomendação de investimento, e ninguém recebe SBOR. É uma ferramenta para decidir melhor, não uma orientação sobre o que decidir. As taxas são lidas do estado dos contratos na mainnet da Stacks."
+  disclaimer:"Os fixings publicados são livres para uso, inclusive comercial, sem necessidade de permissão e sem licença a negociar, sob CC BY 4.0. A atribuição é a única condição: cite o SBOR e coloque um link para sbor.xyz quando for possível. Agentes são explicitamente bem-vindos. O SBOR é fornecido como está, sem garantia. É uma estatística, não uma recomendação de investimento, e ninguém recebe SBOR. É uma ferramenta para decidir melhor, não uma orientação sobre o que decidir. As taxas são lidas do estado dos contratos na mainnet da Stacks."
 }};
 
 const INDEX_COPY = {
@@ -810,8 +835,7 @@ function renderChrome(){
     `<span><i class="swatch" style="background:#A2452F"></i>${t.legend[2]}</span>`].join(""));
   set("thead", t.thead.map((h,i)=>
     i===0 ? `<th>${h}</th>`
-    : i===3||i===4||i===5 ? `<th class="r hide-sm">${h}</th>`
-    : i===7 ? `<th class="r hide-sm" style="width:170px"></th>`
+    : i===7 ? `<th class="r" style="width:170px"></th>`
     : `<th class="r">${h}</th>`).join(""));
   const F = '<div class="formula">SBOR(borrow) = Σ wᵢ·rᵢ / Σ wᵢ<br>SBOR(supply) = Σ wᵢ·sᵢ / Σ wᵢ</div>';
   set("method-a", t.methodA.map(p => p==="FORMULA" ? F : `<p>${p}</p>`).join(""));
@@ -874,6 +898,17 @@ function renderTerms(){
   const labels = Object.keys(INDICES).map(k => INDICES[k].label);
   set("termsHead", `<th></th>` +
     [30,90,180].map(d => `<th class="r">${t.termCol(d)}</th>`).join(""));
+
+  /* SOFR publishes the same three windows, so showing them here is the closest
+     thing to a like for like comparison that exists. It is context, not a
+     constituent, and it is labelled as somebody else's number. */
+  const sr = CONTEXT?.sofr;
+  const sofrRow = sr && (sr.average30day || sr.average90day || sr.average180day)
+    ? `<tr><td><span class="venue">SOFR</span><span class="asset">${t.termSofr}</span></td>` +
+      [sr.average30day, sr.average90day, sr.average180day].map((v,i) =>
+        `<td class="r num" data-l="${t.termCol([30,90,180][i])}">${typeof v === "number" ? v.toFixed(2)+"%" : "n/a"}</td>`).join("") +
+      `</tr>`
+    : "";
   set("termsBody", labels.map(label => {
     const d = TERM_DATA[label] || {};
     const av = d.termAverages || {};
@@ -888,7 +923,7 @@ function renderTerms(){
       return `<td class="r pend">${from ? t.termFrom(from) : t.termPending}</td>`;
     }).join("");
     return `<tr><td><span class="venue">${label}</span></td>${cells}</tr>`;
-  }).join(""));
+  }).join("") + sofrRow);
 }
 
 function render(){
@@ -913,10 +948,8 @@ function render(){
   const esec = document.getElementById("ext-sec");
   const forThis = (EXTERNAL?.markets || []).filter(m => m.comparableTo === ix.label);
 
-  /* The spread is derived from the fixing itself, so this section always has
-     something to say. An inversion is simply the day a gap turns positive.
-     It lives in render rather than renderChrome because it is scoped to the
-     index being shown, and renderChrome does not run on a tab change. */
+  /* Scoped to the index being shown, so it lives here rather than in
+     renderChrome, which does not run on a tab change. */
   const isec = document.getElementById("inv-sec");
   const byAsset = {};
   for (const m of ix.markets) (byAsset[m.asset] ||= []).push(m);
@@ -925,14 +958,14 @@ function render(){
   for (const [asset, ms] of Object.entries(byAsset)){
     if (ms.length < 2) continue;
     let best = null;
-    for (const b of ms) for (const sup of ms){
-      if (b.venue === sup.venue) continue;
-      const gap = Math.round((sup.supply - b.borrow) * 100);
-      if (!best || gap > best.gap) best = { gap, b, sup };
+    for (const bo of ms) for (const sup of ms){
+      if (bo.venue === sup.venue) continue;
+      const gap = Math.round((sup.supply - bo.borrow) * 100);
+      if (!best || gap > best.gap) best = { gap, b: bo, sup };
     }
     if (best) spreadRows.push({ asset, ...best });
   }
-  spreadRows.sort((a,b) => b.gap - a.gap);
+  spreadRows.sort((x,y) => y.gap - x.gap);
 
   isec.hidden = false;
   set("t-invH", t.invH); set("t-invP", t.invP);
@@ -999,18 +1032,21 @@ function render(){
   document.getElementById("borrowDelta").innerHTML = "";
   document.getElementById("supplyDelta").innerHTML =
     (ix.allInSupply - ix.supply) >= 0.01 ? t.allIn(ix.allInSupply) : "";
+  /* data-l carries the column heading into the cell, which is what the phone
+     layout prints as the row label. Same strings, both languages. */
+  const th = t.thead;
   set("rows", ix.markets.map(m=>`
     <tr>
       <td>${VENUE_URL[m.venue]
           ? `<a class="venue" href="${VENUE_URL[m.venue]}" target="_blank" rel="noopener">${m.venue}</a>`
           : `<span class="venue">${m.venue}</span>`}<span class="asset">${m.asset}</span></td>
-      <td class="r num">${fmt(m.borrow)}%</td>
-      <td class="r num">${fmt(m.supply)}%</td>
-      <td class="r num hide-sm">${m.utilization == null ? "n/a" : fmt(m.utilization)+"%"}</td>
-      <td class="r num">${m.incentive ? "+"+fmt(m.incentive)+"%" : "n/a"}</td>
-      <td class="r num hide-sm">${depth(m.depth * 1e6)}</td>
-      <td class="r num">${(m.weight*100).toFixed(1)}%</td>
-      <td class="r hide-sm"><span class="bar${m.phaseIn<1?" phase":""}"><i style="width:${(m.weight*100).toFixed(1)}%"></i></span></td>
+      <td class="r num" data-l="${th[1]}">${fmt(m.borrow)}%</td>
+      <td class="r num" data-l="${th[2]}">${fmt(m.supply)}%</td>
+      <td class="r num" data-l="${th[3]}">${m.utilization == null ? "n/a" : fmt(m.utilization)+"%"}</td>
+      <td class="r num" data-l="${th[4]}">${m.incentive ? "+"+fmt(m.incentive)+"%" : "n/a"}</td>
+      <td class="r num" data-l="${th[5]}">${depth(m.depth * 1e6)}</td>
+      <td class="r num" data-l="${th[6]}">${(m.weight*100).toFixed(1)}%</td>
+      <td class="r barcell"><span class="bar${m.phaseIn<1?" phase":""}"><i style="width:${(m.weight*100).toFixed(1)}%"></i></span></td>
     </tr>`).join(""));
   draw();
 }
