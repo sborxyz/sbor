@@ -66,7 +66,7 @@ const WANTED = [
     projects:["kamino-lend","jupiter-lend","save","solend","marginfi","drift","loopscale"] }
 ];
 
-/* DefiLlama project slug to something a person would recognise. */
+/* DefiLlama project slug to something a person would recognize. */
 const VENUE_NAME = {
   "aave-v3":"Aave V3", "moonwell":"Moonwell", "morpho-blue":"Morpho",
   "compound-v3":"Compound V3", "layerbank":"LayerBank",
@@ -132,7 +132,7 @@ export async function externalReference(){
     }
     /* Depth is the right tiebreaker between two complete readings, but a
        complete smaller market beats an incomplete larger one. A borrow rate
-       with no utilisation beside it does not explain anything, which is the
+       with no utilization beside it does not explain anything, which is the
        one thing this comparison is for. So rank on completeness first, then
        depth. Jupiter Lend on Solana is the case that forced this: $481M of
        USDC and no borrow side published at all. */
@@ -154,7 +154,7 @@ export async function externalReference(){
 
     const bRec = borrowBy[p.pool];
     const apr = borrowAprOf(bRec);
-    /* utilisation: borrowed over supplied, from the same borrow dataset */
+    /* utilization: borrowed over supplied, from the same borrow dataset */
     const sup = Number(bRec?.totalSupplyUsd), bor = Number(bRec?.totalBorrowUsd);
     const utilization = (Number.isFinite(sup) && Number.isFinite(bor) && sup > 0)
       ? round(bor / sup * 100) : null;
@@ -176,7 +176,7 @@ export async function externalReference(){
   }
   if (!out.length) throw new Error("no external reference pools resolved");
   return {
-    note: "Reference rates from the largest lending markets off this chain, published for comparison only. One market is selected per chain: a venue that publishes a borrow rate and utilisation is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. These are not constituents of any SBOR index and never enter a fixing. Rates come from DefiLlama rather than from contract state, and are shown as the source publishes them, so they are not on the same basis as the SBOR indices.",
+    note: "Reference rates from the largest lending markets off this chain, published for comparison only. One market is selected per chain: a venue that publishes a borrow rate and utilization is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. These are not constituents of any SBOR index and never enter a fixing. Rates come from DefiLlama rather than from contract state, and are shown as the source publishes them, so they are not on the same basis as the SBOR indices.",
     source: "DefiLlama",
     markets: out
   };
