@@ -54,6 +54,51 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--rule);color:v
   .scroll td:first-child::before{content:none}
   .scroll td:empty{display:none}
 }
+
+/* Print. The phone layout is keyed to width, and a printer renders at a narrow
+   effective width, so without this the tables arrive stacked and the sheet runs
+   to twenty pages. Force them back to tables and fit the page. */
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  body{background:#fff;color:#000;font-size:8.5pt;padding:0;line-height:1.3}
+  .wrap{max-width:none}
+  h1{font-size:12pt}
+  h2{font-size:9pt;margin:10pt 0 3pt;padding-bottom:2pt;border-bottom:1px solid #999;
+    break-after:avoid;page-break-after:avoid}
+  .sub{font-size:7.5pt}
+  .hint,.note,.src{font-size:6.8pt;color:#555}
+  .hint{margin:-1pt 0 3pt}
+
+  /* undo the phone layout in full */
+  .scroll{overflow:visible !important}
+  .scroll thead{display:table-header-group !important}
+  .scroll table{display:table !important;width:100% !important;border-collapse:collapse}
+  .scroll tbody{display:table-row-group !important}
+  .scroll tr{display:table-row !important;padding:0 !important;
+    break-inside:avoid;page-break-inside:avoid}
+  .scroll td{display:table-cell !important;width:auto !important;
+    text-align:right !important;padding:2.5pt 0 2.5pt 8pt !important;
+    border-bottom:1px solid #ddd !important;white-space:nowrap}
+  .scroll td::before{content:none !important}
+  .scroll td:first-child{display:table-cell !important;text-align:left !important;
+    padding-left:0 !important;font-size:8.5pt !important}
+  .scroll th{font-size:6.8pt;padding:0 0 2pt 8pt;color:#555}
+  .scroll td.barcell{display:table-cell !important}
+
+  /* the source line under a name is useful on paper, just smaller */
+  td .src{display:block;margin-top:0;font-size:6.2pt}
+
+  /* colour carries meaning here, so keep it rather than printing grey */
+  .up{color:#1a5c3a !important}
+  .dn{color:#8f3524 !important}
+  .big{background:#f0e2de !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .self td{background:#e6edf2 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .spark{font-size:9pt}
+  footer{margin-top:10pt;padding-top:5pt;font-size:6.5pt;border-top:1px solid #999}
+  ul{margin-left:12pt}
+  li{margin:1.5pt 0;break-inside:avoid}
+  a{color:#000;text-decoration:none}
+}
 </style>
 </head>
 <body>
