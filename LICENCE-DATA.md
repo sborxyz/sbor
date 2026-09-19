@@ -1,7 +1,7 @@
-# SBOR data licence
+# SBOR data license
 
 **The published fixings are free to use, including commercially, with no
-permission required and no licence to negotiate.**
+permission required and no license to negotiate.**
 
 Applies to everything SBOR publishes: the daily fixings, the historical record,
 the archive, the inversion monitor, the term averages, and every API endpoint at
@@ -17,7 +17,7 @@ The code is separately licensed MIT.
 **Use it.** Read it, store it, redistribute it, build products on it, quote it in
 research, display it in an app, put it in a spreadsheet. Commercially or not.
 
-**Build on it without asking.** No written consent, no commercial licence, no
+**Build on it without asking.** No written consent, no commercial license, no
 conversation with us first. If you need a lawyer to work out whether you may use
 a benchmark, it is not much of a benchmark.
 
@@ -43,7 +43,7 @@ benchmark value, it is a rumour.
 
 **Do not imply endorsement.** Using SBOR does not mean SBOR endorses you.
 
-## What this licence does not do
+## What this license does not do
 
 **It does not make SBOR responsible for your decisions.** SBOR is a statistic,
 published as is, without warranty of accuracy, availability or fitness for
@@ -53,7 +53,7 @@ purpose. It is not investment advice.
 against an SBOR fixing, a loan, a swap, a structured product, anything where a
 payment depends on the published value, talk to us first at contact@sbor.xyz.
 Not because permission is withheld, but because settlement needs things this
-licence does not provide: a correction and restatement policy you can rely on, a
+license does not provide: a correction and restatement policy you can rely on, a
 committed publication schedule, a fallback when a fixing cannot be produced, and
 somebody accountable for all three. Those are commitments, not permissions, and
 they should be agreed rather than assumed.
@@ -81,11 +81,11 @@ A benchmark is worth what it is referenced for. Restricting who may reference it
 is the fastest way to make it worth nothing.
 
 There is an existing institutional Bitcoin interest rate benchmark, regulated and
-well run, that requires a commercial licence before you may build on it and whose
+well run, that requires a commercial license before you may build on it and whose
 terms of service expressly prohibit agents from accessing it. That is a
 reasonable position for a regulated administrator serving prime brokers. It is
 the wrong position for the market SBOR measures, where the growth in consumers is
-software that will never negotiate a licence.
+software that will never negotiate a license.
 
 So: free to read, free to build on, agents welcome, and the code is open so the
 number can be checked rather than trusted.
