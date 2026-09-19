@@ -16,6 +16,12 @@ const SOFR   = "https://markets.newyorkfed.org/api/rates/secured/sofr/last/1.jso
 const SOFR_AVG = "https://markets.newyorkfed.org/api/rates/secured/sofrai/last/1.json";
 const PRICES = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,blockstack&vs_currencies=usd";
 const HIRO   = "https://api.hiro.so";
+/* npm publishes download counts openly, with no key and no account. It is the
+   only adoption number SBOR can evidence without tracking anyone, which matters:
+   SBOR has no registration and no logging because it does not watch who reads
+   it. Recorded daily so there is a series rather than a rolling window. */
+const NPM    = "https://api.npmjs.org/downloads/point";
+const PKG    = "sbor-mcp";
 
 const SBTC = { address:"SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4", contract:"sbtc-token" };
 
@@ -105,15 +111,35 @@ async function chainHeight(){
   };
 }
 
+/* Downloads of the MCP server. Not a count of agents, and it should never be
+   described as one: a download is a machine fetching a package, which may be a
+   person trying it once, a CI job, or a mirror. It is a floor on interest
+   rather than a measure of use. */
+async function npmDownloads(){
+  const windows = { lastDay: "last-day", lastWeek: "last-week", lastMonth: "last-month" };
+  const out = { package: PKG, source: "npm registry, api.npmjs.org" };
+  for (const [key, w] of Object.entries(windows)){
+    try {
+      const d = await getJson(`${NPM}/${w}/${PKG}`);
+      const n = Number(d?.downloads);
+      if (Number.isFinite(n)) out[key] = n;
+    } catch(e){ /* one window failing should not lose the others */ }
+  }
+  if (out.lastDay == null && out.lastWeek == null) throw new Error("no download figures returned");
+  out.note = "A download is a machine fetching the package. It is a floor on interest, not a count of agents or of people.";
+  return out;
+}
+
 export async function contextBlock(){
   const out = {};
-  for (const [key, fn] of Object.entries({ sofr, prices, sbtcSupply, chainHeight })){
+  for (const [key, fn] of Object.entries({ sofr, prices, sbtcSupply, chainHeight, npmDownloads })){
     try { out[key] = await fn(); }
     catch(e){ log(`  context ${key} unavailable, omitted. ${e.message}`); }
   }
   if (out.sofr && out.prices) log(`  context: SOFR ${out.sofr.rate}% (${out.sofr.effectiveDate}), BTC $${out.prices.btcUsd}, STX $${out.prices.stxUsd}`);
   if (out.sbtcSupply) log(`  context: sBTC supply ${out.sbtcSupply.sbtc}`);
   if (out.chainHeight?.burnBlockHeight) log(`  context: burn block ${out.chainHeight.burnBlockHeight}, cycle ${out.chainHeight.rewardCycle}`);
+  if (out.npmDownloads) log(`  npm ${PKG}: ${out.npmDownloads.lastDay ?? "?"} today, ${out.npmDownloads.lastWeek ?? "?"} this week, ${out.npmDownloads.lastMonth ?? "?"} this month`);
   return Object.keys(out).length ? {
     note: "Context recorded alongside the fixing. None of this enters an index or affects a rate. It is kept because a rate is easier to understand later if you know what the world looked like when it was set.",
     ...out
