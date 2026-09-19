@@ -184,7 +184,7 @@ a{color:var(--accent)}
   .switch button{margin-right:26px;font-size:14px}
   th.hide-sm,td.hide-sm{display:none}
 }
-/* Phones: tables stop behaving like tables. Every row becomes a labelled block,
+/* Phones: tables stop behaving like tables. Every row becomes a labeled block,
    so no column is hidden, no figure is truncated, and nothing has to be found
    by scrolling sideways. Labels come from the column headings, so both
    languages are covered already. */
@@ -435,7 +435,7 @@ a{color:var(--accent)}
       <div class="footlinks">
         <span id="t-footMethod"></span>
         <a href="https://github.com/sborxyz/sbor" id="ghLink" target="_blank" rel="noopener"></a>
-        <a href="https://github.com/sborxyz/sbor/blob/main/LICENCE-DATA.md" id="licLink" target="_blank" rel="noopener"></a>
+        <a href="https://github.com/sborxyz/sbor/blob/main/LICENSE-DATA.md" id="licLink" target="_blank" rel="noopener"></a>
         <a href="mailto:contact@sbor.xyz" id="mailLink"></a>
         <a href="https://x.com/SBORindex" target="_blank" rel="noopener">@SBORindex</a>
         <span>sbor.xyz · sbor.btc · sbor.stx</span>
@@ -486,11 +486,11 @@ en:{
   sofrH:"Secured by Treasuries",
   sofrLine:(r,d)=>`SOFR ${r}, the overnight cost of a dollar in the US repo market, secured by US government debt. Published by the Federal Reserve Bank of New York for ${d}.`,
   sofrCompare:(sbor,sofr,bps)=>`A dollar borrowed against crypto collateral on Stacks costs ${sbor}. A dollar secured by US government debt costs ${sofr}. That is ${Math.abs(bps)} basis points ${bps < 0 ? "cheaper on Stacks" : "dearer on Stacks"}.`,
-  sofrWhy:"Crypto is the riskier collateral, so by any textbook this is backwards. It is cheaper here because almost nobody is borrowing yet, so utilisation is low and the rate has not been bid up. The gap measures how early this market is, not that it is safer.",
+  sofrWhy:"Crypto is the riskier collateral, so by any textbook this is backwards. It is cheaper here because almost nobody is borrowing yet, so utilization is low and the rate has not been bid up. The gap measures how early this market is, not that it is safer.",
   sofrAvgs:(a30,a90,a180)=>`SOFR averages: 30 day ${a30}, 90 day ${a90}, 180 day ${a180}.`,
   extH:"How this compares",
-  extP:"This index against the same asset class on the largest lending markets off this chain. The first row is SBOR itself, so the comparison is in one place. One market is selected per chain: a venue that publishes a borrow rate and utilisation is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. Nothing below the first row is a constituent of any SBOR index, and none of it ever enters a fixing.",
-  extCols:["Market","Borrow","Supply","Utilisation","Depth"],
+  extP:"This index against the same asset class on the largest lending markets off this chain. The first row is SBOR itself, so the comparison is in one place. One market is selected per chain: a venue that publishes a borrow rate and utilization is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. Nothing below the first row is a constituent of any SBOR index, and none of it ever enters a fixing.",
+  extCols:["Market","Borrow","Supply","Utilization","Depth"],
   extThis:"this index",
   termsH:"Term averages",
   termsP:"Compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window of fixings exists.",
@@ -514,7 +514,7 @@ en:{
   indep:'SBOR is an independent benchmark for the <a href="https://www.stacks.co" target="_blank" rel="noopener">Stacks</a> ecosystem. It is not affiliated with Stacks, the Stacks Foundation, or any venue it measures.',
   footMethod:v=>`Methodology ${v}`,
   footSource:"Source on GitHub",
-  footLicence:"Data licence",
+  footLicense:"Data license",
   footContact:"contact@sbor.xyz",
   histH:"History",
   histFor:l=>` · ${l}`,
@@ -524,7 +524,7 @@ en:{
   legend:["Borrow APY","Supply APY","Borrow, 30-day average"],
   ago:d=>d===30?"30 days ago":d===90?"90 days ago":"1 year ago", today:"today",
   consH:"Constituents",
-  thead:["Market","Borrow APY","Supply APY","Utilisation","Protocol yield","Depth","Weight",""],
+  thead:["Market","Borrow APY","Supply APY","Utilization","Protocol yield","Depth","Weight",""],
   coverage:(n,pct)=>`${n} ${n===1?"venue":"venues"} in this index · largest constituent ${pct}% of depth`,
   sources:"Lending rates are read from Zest and Granite contract state on Stacks mainnet. Depth is read on-chain where available and from DefiLlama otherwise. Protocol yield comes from StackingDAO. The BTC to STX rate used for the staking yield is quoted from Bitflow.",
   consFoot:"Hatched weights are phasing in. A market becomes eligible once its lending depth stays above the inclusion floor for 30 consecutive days. Protocol yield is yield carried by the asset itself rather than by the loan. It is displayed but excluded from the fixing.",
@@ -539,12 +539,12 @@ en:{
     "<strong>Daily fixing.</strong> One fixing a day, targeting 11:00 UTC. Publication runs on a scheduler that can be late under load, so the timestamp carried by each fixing is authoritative rather than the target hour. Every fixing enters the historical record.",
     "<strong>What moves the staking figure day to day.</strong> The reward cycle it measures is fixed, and so is the bitcoin paid in it. Both are read again every morning, so the cycle figures only change when a cycle settles. What moves in between is the BTC to STX rate used to convert them, which is why the published yield drifts on days when nothing about staking changed.",
     "<strong>PoX needs an exchange rate, not a price.</strong> The staking yield is paid in bitcoin against a position locked in STX, so the figure depends on the BTC to STX rate rather than on either dollar price, which cancels. That rate is quoted from Bitflow, the deepest venue for the pair on Stacks, so the input stays native to the market being measured.",
-    "<strong>Rate basis.</strong> Every rate here is an effective APY, continuously compounded. Both venues return nominal annual rates from their contracts, despite Zest naming its fields apy, which the venue has confirmed. Each is converted the same way so constituents are comparable, and every market also carries its nominal figure so the raw value stays visible. At current levels the conversion is a few basis points; on a market above its utilisation kink it is very large, which is why it is done rather than ignored.",
+    "<strong>Rate basis.</strong> Every rate here is an effective APY, continuously compounded. Both venues return nominal annual rates from their contracts, despite Zest naming its fields apy, which the venue has confirmed. Each is converted the same way so constituents are comparable, and every market also carries its nominal figure so the raw value stays visible. At current levels the conversion is a few basis points; on a market above its utilization kink it is very large, which is why it is done rather than ignored.",
     "<strong>Instruments, not native assets.</strong> Every rate is quoted on the asset actually lent on Stacks. SBOR-BTC measures sBTC, not native bitcoin, and SBOR-USD measures USDCx and USDh, not bank dollars. Each carries issuance, peg or bridge risk that the underlying asset does not.",
     "<strong>Protocol yield is sourced, not estimated.</strong> For stSTX and stSTXbtc it comes from StackingDAO, derived from PoX reward claims net of pool commission over stSTX supply. If a source cannot be reached the yield is left out and the figure is marked incomplete, rather than filled in with an estimate.",
     "<strong>Protocol yield excluded.</strong> Some assets carry yield from the asset itself rather than from lending. sBTC carries Bitcoin protocol yield through dual stacking, and stSTX carries PoX staking yield managed by StackingDAO. That yield belongs to the asset, not the loan, so it never enters the fixing.",
     "<strong>Phase-in.</strong> A newly eligible market enters at zero weight and ramps to full weight linearly over 30 days, so adding a venue cannot step the rate.",
-    "<strong>Utilisation explains the rate.</strong> Utilisation is the share of supplied capital currently borrowed. It is the reason a rate sits where it does: a market with little borrowing pays its suppliers little, however large that market is. It is published beside every rate so no figure has to be taken on trust.",
+    "<strong>Utilization explains the rate.</strong> Utilization is the share of supplied capital currently borrowed. It is the reason a rate sits where it does: a market with little borrowing pays its suppliers little, however large that market is. It is published beside every rate so no figure has to be taken on trust.",
     "<strong>Outside Stacks is context, not a constituent.</strong> Reference rates from the largest lending market elsewhere are published beside the indices so a reader can see what the same asset class costs off this chain. They are never weighted into a fixing and never move an SBOR number.",
     "<strong>Term averages.</strong> The 30, 90 and 180 day figures are compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window exists. A 180 day average appears on day 180, not before.",
     "<strong>Stale or implausible data.</strong> If a market's state cannot be read, its weight is zero for that fixing and the omission is recorded. A funded market whose borrow and supply rates both read below 0.05% is treated the same way, because a market with real depth does not price money at nothing on both sides at once.",
@@ -556,7 +556,7 @@ en:{
   signupSending:"Sending...",
   signupOk:"You are subscribed. The first report lands on Monday.",
   signupErr:"That did not go through. Try again, or email contact@sbor.xyz",
-  disclaimer:"The published fixings are free to use, including commercially, with no permission required and no licence to negotiate, under CC BY 4.0. Attribution is the only condition: name SBOR and link to sbor.xyz where practical. Agents are explicitly welcome. SBOR is provided as is, without warranty. It is a statistic, not investment advice, and nobody earns SBOR. It is a tool for making better decisions, not a recommendation to make any. Rates are read from contract state on Stacks mainnet."
+  disclaimer:"The published fixings are free to use, including commercially, with no permission required and no license to negotiate, under CC BY 4.0. Attribution is the only condition: name SBOR and link to sbor.xyz where practical. Agents are explicitly welcome. SBOR is provided as is, without warranty. It is a statistic, not investment advice, and nobody earns SBOR. It is a tool for making better decisions, not a recommendation to make any. Rates are read from contract state on Stacks mainnet."
 },
 pt:{
   fullname:"Taxa de Referência de Bitcoin da Stacks",
@@ -605,7 +605,7 @@ pt:{
   indep:'O SBOR é uma referência independente para o ecossistema <a href="https://www.stacks.co" target="_blank" rel="noopener">Stacks</a>. Não tem vínculo com a Stacks, com a Stacks Foundation nem com qualquer plataforma que mede.',
   footMethod:v=>`Metodologia ${v}`,
   footSource:"Código no GitHub",
-  footLicence:"Licença dos dados",
+  footLicense:"Licença dos dados",
   footContact:"contact@sbor.xyz",
   histH:"Histórico",
   histFor:l=>` · ${l}`,
@@ -820,7 +820,7 @@ function renderChrome(){
   set("t-footMethod", t.footMethod(METHOD_VERSION));
   document.getElementById("ghLink").textContent = t.footSource;
   document.getElementById("ghLink").href = GITHUB;
-  document.getElementById("licLink").textContent = t.footLicence;
+  document.getElementById("licLink").textContent = t.footLicense;
   document.getElementById("mailLink").textContent = t.footContact;
   document.getElementById("csvBtn").textContent = t.csv;
   const usd = computed("USD");
@@ -901,7 +901,7 @@ function renderTerms(){
 
   /* SOFR publishes the same three windows, so showing them here is the closest
      thing to a like for like comparison that exists. It is context, not a
-     constituent, and it is labelled as somebody else's number. */
+     constituent, and it is labeled as somebody else's number. */
   const sr = CONTEXT?.sofr;
   const sofrRow = sr && (sr.average30day || sr.average90day || sr.average180day)
     ? `<tr><td><span class="venue">SOFR</span><span class="asset">${t.termSofr}</span></td>` +
