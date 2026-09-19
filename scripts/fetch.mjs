@@ -476,6 +476,19 @@ const main = async () => {
         btcPaid: pox.btcPaid, stxLocked: pox.stxLocked,
         stxPerBtc: pox.stxPerBtc, stxPerBtcSmoothed: pox.stxPerBtcSmoothed ?? null
       } }),
+      /* A compact context line per row, so a seven day view can be built from
+         one file instead of seven archives. The archive stays the full record. */
+      ...(context && { ctx: {
+        sofr: context.sofr?.rate ?? null,
+        sofrDate: context.sofr?.effectiveDate ?? null,
+        btcUsd: context.prices?.btcUsd ?? null,
+        stxUsd: context.prices?.stxUsd ?? null,
+        sbtcSupply: context.sbtcSupply?.sbtc ?? null,
+        burnBlock: context.chainHeight?.burnBlockHeight ?? null,
+        nativeStacking: context.staking?.nativeStackingApy ?? null,
+        stBtc: context.staking?.stBtcApy ?? null,
+        liquidityCostBps: context.staking?.liquidityCostBps ?? null
+      } }),
       ...(external && { external: external.markets.map(m => ({
         v: m.venue, a: m.asset, b: m.borrow, s: m.supply,
         u: m.utilization ?? null, d: m.depthUsd, vs: m.comparableTo
