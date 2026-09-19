@@ -231,6 +231,56 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
   if (usd != null && sofr != null)
     out += `<div class="note">A dollar on Stacks costs <strong>${F(usd)}%</strong>. Secured by Treasuries it costs <strong>${F(sofr)}%</strong>. That is ${Math.abs(BPS(usd, sofr))} bps ${usd < sofr ? "cheaper here" : "dearer here"}, and the reason is utilisation rather than risk.</div>`;
 
+  /* ---- same exposure pairs ----
+     Two assets that are claims on the same underlying look like an arbitrage
+     when you read only the lending rates. They are not, because borrowing a
+     yield bearing token means owing its appreciation. This section does that
+     arithmetic so nobody has to do it in their head, and so an agent reading
+     the raw rates cannot walk into it. */
+  const sameExposure = [
+    { name: "STX and stSTX", index: "SBOR-STX", plain: "STX", yielding: "stSTX",
+      note: "stSTX is a claim on STX. Borrowing it means owing the staking yield it accrues, on top of the interest." }
+  ];
+
+  let pairRows = "";
+  for (const pair of sameExposure){
+    const ms = today[pair.index]?.markets || [];
+    const plain = ms.find(m => m.a === pair.plain);
+    const yld   = ms.find(m => m.a === pair.yielding);
+    if (!plain || !yld) continue;
+    const py = yld.py ?? 0;
+
+    /* Two legs, both delta neutral on the underlying. Cost of borrowing a
+       yield bearing token is its interest plus the yield you now owe. */
+    const legs = [
+      { label: `Supply ${pair.plain}, borrow ${pair.yielding}`,
+        earn: plain.s, earnWhat: `${pair.plain} supply ${F(plain.s)}%`,
+        cost: yld.b + py, costWhat: `${pair.yielding} borrow ${F(yld.b)}% plus ${F(py)}% yield owed` },
+      { label: `Supply ${pair.yielding}, borrow ${pair.plain}`,
+        earn: yld.s + py, earnWhat: `${pair.yielding} supply ${F(yld.s)}% plus ${F(py)}% yield earned`,
+        cost: plain.b, costWhat: `${pair.plain} borrow ${F(plain.b)}%` }
+    ];
+
+    for (const leg of legs){
+      const net = Math.round((leg.earn - leg.cost) * 100);
+      const naive = leg.label.startsWith(`Supply ${pair.plain}`)
+        ? Math.round((plain.s - yld.b) * 100)
+        : Math.round((yld.s - plain.b) * 100);
+      pairRows += `<tr${net > 0 ? ' class="self"' : ''}>
+        <td class="nm">${leg.label}<span class="src">${leg.earnWhat}, against ${leg.costWhat}</span></td>
+        <td class="num" data-l="Earn">${F(leg.earn)}%</td>
+        <td class="num" data-l="True cost">${F(leg.cost)}%</td>
+        <td class="num ${net > 0 ? "up big" : "dn"}" data-l="Net">${net > 0 ? "+" : ""}${net} bps</td>
+        <td class="num dim" data-l="Ignoring yield">${naive > 0 ? "+" : ""}${naive} bps</td></tr>`;
+    }
+  }
+
+  if (pairRows){
+    out += `<h2>Same exposure, both legs</h2><div class="hint">Pairs of assets that are claims on the same underlying, so holding one against the other is delta neutral. The last column is what the lending rates alone suggest, and it is the trap: it ignores the protocol yield you owe when you borrow a yield bearing token. A positive net is highlighted and would be worth a second look.</div><div class="scroll"><table>
+      <tr><th>Leg</th><th>Earn</th><th>True cost</th><th>Net</th><th>Ignoring yield</th></tr>${pairRows}</table></div>`;
+    out += `<div class="note">SBOR publishes this because an agent reading only the borrow and supply rates would see free money where there is none. It does not trade on its own rate and this is not a recommendation.</div>`;
+  }
+
   /* ---- what to look at ---- */
   const flags = [];
   for (const label of ["SBOR-USD","SBOR-BTC","SBOR-STX"]){
@@ -263,6 +313,17 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
         flags.push(`${m.v} ${m.a} depth moved ${dd > 0 ? "+" : ""}${dd.toFixed(0)}% in a day, to $${((m.d||0)/1e6).toFixed(1)}M.`);
     }
   }
+  for (const pair of sameExposure){
+    const ms = today[pair.index]?.markets || [];
+    const plain = ms.find(m => m.a === pair.plain), yld = ms.find(m => m.a === pair.yielding);
+    if (!plain || !yld) continue;
+    const py = yld.py ?? 0;
+    const a1 = Math.round((plain.s - (yld.b + py)) * 100);
+    const a2 = Math.round(((yld.s + py) - plain.b) * 100);
+    if (a1 > 0) flags.push(`${pair.plain} against ${pair.yielding}: supplying ${pair.plain} and borrowing ${pair.yielding} nets +${a1} bps after the yield owed. Worth checking whether it is real.`);
+    if (a2 > 0) flags.push(`${pair.plain} against ${pair.yielding}: supplying ${pair.yielding} and borrowing ${pair.plain} nets +${a2} bps after the yield earned. Worth checking whether it is real.`);
+  }
+
   const sd = BPS(today.ctx?.sofr, d1.ctx?.sofr);
   if (sd != null && Math.abs(sd) >= 10) flags.push(`SOFR moved ${sd > 0 ? "+" : ""}${sd} bps, which is large for an overnight rate.`);
   const cd = PCT(px(today).stxPerBtc, px(d1).stxPerBtc);
