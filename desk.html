@@ -258,16 +258,23 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
     ["STX", "CoinGecko spot. Not used in any calculation",
       today.ctx?.stxUsd, d1.ctx?.stxUsd, d7.ctx?.stxUsd, "pct", 3, win.map(r => r.ctx?.stxUsd)],
     ["sBTC supply", "read from the sbtc-token contract on Stacks mainnet",
-      today.ctx?.sbtcSupply, d1.ctx?.sbtcSupply, d7.ctx?.sbtcSupply, "pct", 1, win.map(r => r.ctx?.sbtcSupply)]
+      today.ctx?.sbtcSupply, d1.ctx?.sbtcSupply, d7.ctx?.sbtcSupply, "pct", 1, win.map(r => r.ctx?.sbtcSupply)],
+    ["npm downloads, week", "sbor-mcp on the npm registry. A download is a machine fetching the package, not a count of agents",
+      today.ctx?.npmLastWeek, d1.ctx?.npmLastWeek, d7.ctx?.npmLastWeek, "raw", 5, win.map(r => r.ctx?.npmLastWeek)]
   ];
   for (const [name, src, n, a, b, unit, th, series] of world){
     const fmtv = n == null ? "n/a"
       : name === "BTC" ? "$" + Math.round(n).toLocaleString()
       : name === "STX" ? "$" + Number(n).toFixed(4)
       : name === "sBTC supply" ? Number(n).toFixed(1)
+      : unit === "raw" ? Math.round(n).toLocaleString()
       : F(n) + "%";
-    const c1 = unit === "pct" ? chg(PCT(n,a),"pct",th,"1d") : chg(BPS(n,a),"bps",th,"1d");
-    const c7 = unit === "pct" ? chg(PCT(n,b),"pct",th,"7d") : chg(BPS(n,b),"bps",th,"7d");
+    const c1 = unit === "pct" ? chg(PCT(n,a),"pct",th,"1d")
+             : unit === "raw" ? chg(n!=null&&a!=null ? n-a : null,"bps",th,"1d")
+             : chg(BPS(n,a),"bps",th,"1d");
+    const c7 = unit === "pct" ? chg(PCT(n,b),"pct",th,"7d")
+             : unit === "raw" ? chg(n!=null&&b!=null ? n-b : null,"bps",th,"7d")
+             : chg(BPS(n,b),"bps",th,"7d");
     out += `<tr><td class="nm">${name}<span class="src">${src}</span></td><td class="num" data-l="Now">${fmtv}</td>${c1}${c7}<td class="spark" data-l="7 fixings">${spark(series)}</td></tr>`;
   }
   out += `</table></div>`;
