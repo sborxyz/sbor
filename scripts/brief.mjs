@@ -124,7 +124,7 @@ for (const ix of facts.indices){
     if (m.utilizationPct != null && m.utilizationPct >= 90)
       flags.push(`${m.venue} ${m.asset} is ${m.utilizationPct}% utilized. Withdrawals may be constrained.`);
     if (m.utilizationChange1dBps != null && Math.abs(m.utilizationChange1dBps) >= 300)
-      flags.push(`${m.venue} ${m.asset} utilization moved ${(m.utilizationChange1dBps/100).toFixed(1)} points to ${m.utilizationPct}%.`);
+      flags.push(`${m.venue} ${m.asset} utilization moved ${m.utilizationChange1dBps > 0 ? "+" : ""}${m.utilizationChange1dBps} basis points to ${m.utilizationPct}%.`);
     if (m.borrowChange1dBps != null && Math.abs(m.borrowChange1dBps) >= 40)
       flags.push(`${m.venue} ${m.asset} borrow moved ${m.borrowChange1dBps > 0 ? "+" : ""}${m.borrowChange1dBps} bps to ${m.borrowPct}%.`);
     if (m.depthChange1dPercent != null && Math.abs(m.depthChange1dPercent) >= 8)
@@ -169,7 +169,17 @@ const SYSTEM = `You write the morning brief for SBOR, the benchmark lending rate
 
 RULES, in order of importance.
 
-0. Field names carry their units. Anything ending Bps is a change in basis points, not a percentage change. A borrow rate moving from 2.30 to 2.56 is a 26 basis point move; it is not a 26% move and it is not "up 26%". Anything ending Percent is a percentage change. Anything ending Pct is a level, already expressed as a percentage.
+0. UNITS. Get these wrong and the brief is worthless.
+
+A field ending **Bps** is a change in basis points. One basis point is one hundredth of one percentage point. A borrow rate going from 2.30% to 2.56% is a **26 basis point** move. It is not 26%, not "up 26%", and not 26 points.
+
+**Never write "points" when you mean basis points.** A point is one hundred basis points. Utilization moving from 84.83% to 85.43% is 60 basis points, which is 0.6 of a point. Writing "60 points" claims a move a hundred times larger than the one that happened. Write "basis points" in full every time, or write "bps". Never "points" alone.
+
+A field ending **Percent** is a percentage change, so write it with a percent sign: depth up 8.2%.
+
+A field ending **Pct** is a level already expressed as a percentage: borrow 4.05%.
+
+Before you send, reread every number you wrote and check its unit against the field it came from.
 
 1. Every number you write must appear in the JSON you are given. You cannot fetch anything, and any figure not in the payload does not exist. If you are unsure of a number, leave it out. A benchmark that publishes an invented figure has failed at the only thing it does.
 
