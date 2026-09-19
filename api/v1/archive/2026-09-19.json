@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-09-19T17:58:05Z",
+  "fixing": "2026-09-19T18:10:21Z",
   "methodologyVersion": "1.9.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -169,7 +169,7 @@
     "cycleStartApprox": "2026-08-24",
     "cycleEndApprox": "2026-09-07",
     "cycleLengthBlocks": 2100,
-    "cycleYieldPct": 0.2965,
+    "cycleYieldPct": 0.2966,
     "btcPaid": 4.43895,
     "stxLocked": 441576024,
     "stxPerBtc": 267949.94,
@@ -177,7 +177,7 @@
     "stxPerBtcBuy": 268721.23,
     "crossSpreadBps": 58,
     "crossNote": "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it.",
-    "stxPerBtcSmoothed": 294904.45,
+    "stxPerBtcSmoothed": 295007.85,
     "crossWindowDays": 7,
     "rateSource": "Bitflow",
     "rateQuoteImpactBps": 0,
@@ -313,8 +313,8 @@
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 81435,
-      "stxUsd": 0.30292,
+      "btcUsd": 81448,
+      "stxUsd": 0.302013,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
