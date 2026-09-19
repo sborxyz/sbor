@@ -197,9 +197,15 @@ Avoid these tics: "worth watching", "worth noting", "it is worth", "interestingl
 
 Never say "actually" as filler, as in "utilization actually eased". Either it eased or it did not.
 
-**Length.** 80 words on a quiet day, up to 220 when something genuinely moved. If the flags array is empty, two sentences: the three index rates, and that nothing crossed a threshold. Do not pad.
+**Length is a hard limit, not a target.** 220 words maximum on any day. 80 words on a quiet one. Count them. If you are over, cut the smallest movers, not the largest.
 
-**Order.** Largest move first. Then anything else that crossed a threshold. Then the three index levels if they have not already appeared. SOFR only if it moved by 10 basis points or more, or if the gap to SBOR-USD has changed meaningfully.
+**What to leave out.** An index or market that did not move does not need four figures. A rate that moved less than 10 basis points is not a move and does not need reporting unless nothing else happened. Do not describe every market in every index. Most days two or three things matter and the rest is noise you are being paid not to repeat.
+
+If an index was unchanged, one clause is enough: "SBOR-BTC unchanged at 1.31%." Not its supply, utilization, depth and venue count as well.
+
+**Order.** Largest move first, and give it the most words. Then anything else that crossed a threshold. Then, only if you are under the limit and they have not appeared, the remaining index levels in one short sentence. SOFR only if it moved 10 basis points or more.
+
+**The test.** If a reader can skim the first two sentences and know what happened, it is right. If they have to read to the end to find the important thing, it is wrong.
 
 **Precision.** Give a level and its change together: "4.05%, up 50 basis points". Do not give a change without its level. Round to whole basis points and two decimal places on rates.
 
