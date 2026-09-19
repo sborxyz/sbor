@@ -24,7 +24,7 @@ const LIMIT = 280;
 /* Thresholds. Below these, nothing is worth saying. */
 const RATE_MOVE_BPS = 25;      // a borrow or supply rate moving this much
 const POX_MOVE_BPS = 50;       // the staking yield moving this much
-const UTIL_HIGH = 80;          // utilisation crossing up through this
+const UTIL_HIGH = 80;          // utilization crossing up through this
 const UTIL_LOW = 20;           // or down through this
 
 const bps = (a, b) => Math.round((a - b) * 100);
@@ -33,13 +33,24 @@ const pct = n => n.toFixed(2) + "%";
 
 const latest = JSON.parse(readFileSync("api/v1/latest.json", "utf8"));
 
-/* Per market utilisation from the previous run. History rows do not carry it,
+/* Per market utilization from the previous run. History rows do not carry it,
    and storing it there would bloat the record, so it lives in its own small
    file. Without this the drafter re-announces a standing condition every day
    until it changes, which is how a notification channel gets ignored. */
 let priorUtil = {};
-try { priorUtil = JSON.parse(readFileSync("post-state.json", "utf8")).utilisation || {}; }
-catch {}
+let announced = {};
+try {
+  const st = JSON.parse(readFileSync("post-state.json", "utf8"));
+  priorUtil = st.utilization || {};
+  announced = st.announced || {};
+} catch {}
+
+/* The drafter compares today against the previous history row, so on a day with
+   four scheduled attempts every run sees the same event as new and sends the
+   same message again. SBOR-BTC returning fired twice on 17 September. A draft is
+   keyed by what it is about rather than by its text, and a key already announced
+   for the same day is not sent again. */
+const alreadySaid = key => announced[key] === latest.fixing.slice(0, 10);
 let history = [];
 try { history = JSON.parse(readFileSync("api/v1/history.json", "utf8")); } catch {}
 
@@ -47,7 +58,7 @@ const today = latest.fixing.slice(0, 10);
 const prior = [...history].reverse().find(r => r.date < today) || null;
 const poxOf = r => r && (r["SBOR-PoX"] || r["SBOR-POX"]);
 
-const drafts = [];
+let drafts = [];
 
 /* ---------- 1. a rate moved ---------- */
 if (prior){
@@ -70,13 +81,14 @@ if (prior){
 
     drafts.push({
       rank: 50,
+      key: `ratemove:${moved.label}:${moved.key}`,
       why: `${label} ${moved.key} moved ${sign(moved.d)} bps`,
       text:
 `${label} ${moved.key} rate: ${pct(moved.then)} to ${pct(moved.now)}.
 
 ${sign(moved.d)} bps in a day.
 
-Cheapest constituent now ${best.venue} ${best.asset} at ${pct(best[moved.key])}, utilisation ${pct(best.utilization)}.
+Cheapest constituent now ${best.venue} ${best.asset} at ${pct(best[moved.key])}, utilization ${pct(best.utilization)}.
 
 ${LINK}`
     });
@@ -89,6 +101,7 @@ if (prior){
   const wasSet = new Set(Object.keys(prior).filter(k => k.startsWith("SBOR-") && k !== "SBOR-PoX" && k !== "SBOR-POX"));
   for (const label of nowSet) if (!wasSet.has(label)) drafts.push({
     rank: 20,
+    key: `returned:${label}`,
     why: `${label} returned`,
     text:
 `${label} is publishing again.
@@ -101,6 +114,7 @@ ${LINK}`
   });
   for (const label of wasSet) if (!nowSet.has(label)) drafts.push({
     rank: 20,
+    key: `dropped:${label}`,
     why: `${label} dropped out`,
     text:
 `${label} is not published today.
@@ -122,6 +136,7 @@ ${LINK}`
     if (Math.abs(d) >= POX_MOVE_BPS || cycleChanged){
       drafts.push({
         rank: cycleChanged ? 30 : 60,
+        key: cycleChanged ? `poxsettled:${pox.cycle}` : `poxdrift:${new Date().toISOString().slice(0,10)}`,
         why: cycleChanged ? `PoX cycle ${was.cycle} to ${now.cycle}` : `PoX moved ${sign(d)} bps`,
         text: cycleChanged
 ? `Reward cycle ${now.cycle} settled.
@@ -141,7 +156,7 @@ ${LINK}`
   }
 }
 
-/* ---------- 4. utilisation crossed a threshold ----------
+/* ---------- 4. utilization crossed a threshold ----------
    A crossing is news. A level that has not moved since yesterday is not. */
 for (const [label, ix] of Object.entries(latest.indices)){
   for (const m of ix.markets){
@@ -157,9 +172,10 @@ for (const [label, ix] of Object.entries(latest.indices)){
 
     if (crossedUp) drafts.push({
       rank: 85,
-      why: `${m.venue} ${m.asset} utilisation crossed above ${UTIL_HIGH}%`,
+      key: `utilup:${m.venue}:${m.asset}`,
+      why: `${m.venue} ${m.asset} utilization crossed above ${UTIL_HIGH}%`,
       text:
-`${m.venue} ${m.asset} is now ${pct(m.utilization)} utilised, up from ${pct(was)}.
+`${m.venue} ${m.asset} is now ${pct(m.utilization)} utilized, up from ${pct(was)}.
 
 Borrow ${pct(m.borrow)}, supply ${pct(m.supply)}.
 
@@ -169,9 +185,10 @@ ${LINK}`
     });
     else if (crossedDown) drafts.push({
       rank: 85,
-      why: `${m.venue} ${m.asset} utilisation fell back below ${UTIL_HIGH}%`,
+      key: `utildown:${m.venue}:${m.asset}`,
+      why: `${m.venue} ${m.asset} utilization fell back below ${UTIL_HIGH}%`,
       text:
-`${m.venue} ${m.asset} is back to ${pct(m.utilization)} utilised, down from ${pct(was)}.
+`${m.venue} ${m.asset} is back to ${pct(m.utilization)} utilized, down from ${pct(was)}.
 
 Borrow ${pct(m.borrow)}, supply ${pct(m.supply)}.
 
@@ -181,7 +198,8 @@ ${LINK}`
     });
     else if (fellLow) drafts.push({
       rank: 90,
-      why: `${m.venue} ${m.asset} utilisation fell below ${UTIL_LOW}%`,
+      key: `utillow:${m.venue}:${m.asset}`,
+      why: `${m.venue} ${m.asset} utilization fell below ${UTIL_LOW}%`,
       text:
 `${m.venue} ${m.asset}: $${(m.depthUsd/1e6).toFixed(1)}M supplied, now only ${pct(m.utilization)} of it borrowed, down from ${pct(was)}.
 
@@ -191,9 +209,10 @@ ${LINK}`
     });
     else if (roseOffLow) drafts.push({
       rank: 90,
-      why: `${m.venue} ${m.asset} utilisation rose above ${UTIL_LOW}%`,
+      key: `utiloff:${m.venue}:${m.asset}`,
+      why: `${m.venue} ${m.asset} utilization rose above ${UTIL_LOW}%`,
       text:
-`${m.venue} ${m.asset} is ${pct(m.utilization)} utilised, up from ${pct(was)}.
+`${m.venue} ${m.asset} is ${pct(m.utilization)} utilized, up from ${pct(was)}.
 
 Borrow ${pct(m.borrow)}, supply ${pct(m.supply)}.
 
@@ -231,6 +250,7 @@ ${LINK}`
 
     drafts.push({
       rank: 10,
+      key: `inversion:${f.asset}:${f.borrowVenue}:${f.supplyVenue}`,
       why: `INVERSION on ${asset}: supply ${best.supplyAt.venue} ${best.supplyAt.supply}% vs borrow ${best.borrowAt.venue} ${best.borrowAt.borrow}%`,
       text:
 `${asset} is inverted across venues.
@@ -253,6 +273,7 @@ for (const [label, ix] of Object.entries(latest.indices)){
     if (wasIx && wasIx[`avg${days}`]) continue;   // only announce once
     drafts.push({
       rank: 40,
+      key: `poxcycle:${pox.cycle}`,
       why: `${label} ${days}-day average first published`,
       text:
 `${label} now has a ${days} day average.
@@ -270,6 +291,13 @@ ${LINK}`
    Lowest number first. An inversion beats an index appearing, which beats a
    cycle settling, which beats an ordinary rate move. Only the top one is
    notified; the rest sit in post.txt if you want them. */
+/* Drop anything already announced today. A draft with no key is always allowed
+   through, so a new kind of draft is never silently swallowed. */
+const suppressed = drafts.filter(d => d.key && alreadySaid(d.key));
+drafts = drafts.filter(d => !(d.key && alreadySaid(d.key)));
+if (suppressed.length)
+  log(`${suppressed.length} draft(s) already announced today, not repeating: ${suppressed.map(d => d.key).join(", ")}`);
+
 drafts.sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
 
 /* ---------- write it out ---------- */
@@ -284,7 +312,7 @@ if (!drafts.length){
   out.push("Nothing moved enough to be worth posting.");
   out.push("");
   out.push("Thresholds: a rate moving 25 bps, the staking yield moving 50 bps or");
-  out.push("changing cycle, an index appearing or dropping out, utilisation");
+  out.push("changing cycle, an index appearing or dropping out, utilization");
   out.push("crossing 80% or 20% in either direction, an inversion, or a term");
   out.push("average publishing. A level that has not moved since yesterday is");
   out.push("not news and is deliberately not flagged.");
@@ -301,12 +329,20 @@ if (!drafts.length){
   out.push("Check the numbers against the site before posting. Never state a cause.");
 }
 
-/* Carry today's utilisation forward so tomorrow can detect a crossing. */
-const utilisation = {};
+/* Carry today's utilization forward so tomorrow can detect a crossing. */
+const utilization = {};
 for (const ix of Object.values(latest.indices))
   for (const m of ix.markets)
-    if (typeof m.utilization === "number") utilisation[`${m.venue}|${m.asset}`] = m.utilization;
-writeFileSync("post-state.json", JSON.stringify({ fixing: latest.fixing, utilisation }, null, 2) + "\n");
+    if (typeof m.utilization === "number") utilization[`${m.venue}|${m.asset}`] = m.utilization;
+/* Record what went out, so a later run today does not repeat it. Keys older
+   than a week are dropped to keep the file from growing forever. */
+const top = drafts[0];
+if (top && top.key) announced[top.key] = today;
+const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+for (const k of Object.keys(announced)) if (announced[k] < weekAgo) delete announced[k];
+
+writeFileSync("post-state.json",
+  JSON.stringify({ fixing: latest.fixing, utilization, announced }, null, 2) + "\n");
 
 const text = out.join("\n") + "\n";
 writeFileSync("post.txt", text);
