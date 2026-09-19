@@ -11,6 +11,9 @@
 import { fetchCallReadOnlyFunction, cvToValue } from "@stacks/transactions";
 
 const SOFR   = "https://markets.newyorkfed.org/api/rates/secured/sofr/last/1.json";
+/* The averages are a separate series with its own endpoint. The rate endpoint
+   does not carry them, which is why they read as null if you only fetch that. */
+const SOFR_AVG = "https://markets.newyorkfed.org/api/rates/secured/sofrai/last/1.json";
 const PRICES = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,blockstack&vs_currencies=usd";
 const HIRO   = "https://api.hiro.so";
 
@@ -32,15 +35,35 @@ async function sofr(){
   const d = await getJson(SOFR);
   const r = d?.refRates?.[0];
   if (!r || typeof r.percentRate !== "number") throw new Error("unexpected shape");
+
+  /* The 30, 90 and 180 day averages are the same construction SBOR uses for its
+     own term averages, so they are the only like for like comparison that
+     exists. They live on a separate endpoint and are fetched separately. A
+     failure here must not lose the rate itself. */
+  let avg = {};
+  try {
+    const a = await getJson(SOFR_AVG);
+    const row = a?.refRates?.[0];
+    const num = v => { const n = Number(v); return Number.isFinite(n) ? n : null; };
+    if (row) avg = {
+      average30day:  num(row.average30day),
+      average90day:  num(row.average90day),
+      average180day: num(row.average180day),
+      indexValue:    num(row.index),
+      averagesDate:  row.effectiveDate ?? null
+    };
+    log(`  sofr averages: 30d ${avg.average30day}, 90d ${avg.average90day}, 180d ${avg.average180day}`);
+  } catch(e){
+    log(`  sofr averages unavailable, omitted. ${e.message}`);
+  }
+
   return {
     rate: r.percentRate,
     effectiveDate: r.effectiveDate,
     percentile1: r.percentPercentile1 ?? null,
     percentile99: r.percentPercentile99 ?? null,
     volumeBillions: r.volumeInBillions ?? null,
-    average30day: r.average30day ?? null,
-    average90day: r.average90day ?? null,
-    average180day: r.average180day ?? null,
+    ...avg,
     source: "Federal Reserve Bank of New York"
   };
 }
