@@ -1741,28 +1741,28 @@
   },
   {
     "date": "2026-09-20",
-    "fixedAt": "2026-09-20T13:06:14Z",
+    "fixedAt": "2026-09-20T14:21:03Z",
     "methodologyVersion": "1.9.0",
     "SBOR-PoX": {
-      "apy": 7.63,
+      "apy": 7.49,
       "cycle": 142,
       "cycleStart": "2026-08-24",
       "cycleEnd": "2026-09-07",
       "btcPaid": 4.43895,
       "stxLocked": 441576024,
-      "stxPerBtc": 255787.71,
-      "stxPerBtcSmoothed": 292642.89
+      "stxPerBtc": 260199.23,
+      "stxPerBtcSmoothed": 287517.51
     },
     "ctx": {
       "sofr": 3.85,
       "sofrDate": "2026-09-17",
-      "btcUsd": 80511,
-      "stxUsd": 0.312331,
-      "sbtcSupply": 2476.39871614,
-      "burnBlock": 967833,
-      "nativeStacking": 5.11,
-      "stBtc": 2.41,
-      "liquidityCostBps": 97,
+      "btcUsd": 80446,
+      "stxUsd": 0.308323,
+      "sbtcSupply": 2476.2699085,
+      "burnBlock": 967840,
+      "nativeStacking": 5.15,
+      "stBtc": 2.42,
+      "liquidityCostBps": 92,
       "npmLastDay": 2,
       "npmLastWeek": 14
     },
@@ -1772,7 +1772,7 @@
         "a": "USDC",
         "b": 4.34,
         "s": 3.62,
-        "u": 92.72,
+        "u": 92.73,
         "d": 173223390,
         "vs": "SBOR-USD"
       },
@@ -1781,7 +1781,7 @@
         "a": "WBTC",
         "b": 0.32,
         "s": 0,
-        "u": 2.25,
+        "u": 2.24,
         "d": 2697847450,
         "vs": "SBOR-BTC"
       },
@@ -1797,9 +1797,9 @@
       {
         "v": "Morpho, Base",
         "a": "cbBTC",
-        "b": 4.89,
+        "b": 4.81,
         "s": 0,
-        "u": 46.99,
+        "u": 47.05,
         "d": 3040025125,
         "vs": "SBOR-BTC"
       },
@@ -1815,27 +1815,27 @@
       {
         "v": "HyperLend, Hyperliquid L1",
         "a": "UBTC",
-        "b": 0.98,
+        "b": 1.53,
         "s": 0.13,
-        "u": 17.18,
+        "u": 26.84,
         "d": 11037554,
         "vs": "SBOR-BTC"
       },
       {
         "v": "HyperLend, Hyperliquid L1",
         "a": "USDC",
-        "b": 5.82,
+        "b": 5.87,
         "s": 3.66,
-        "u": 69.77,
+        "u": 70.34,
         "d": 33301929,
         "vs": "SBOR-USD"
       },
       {
         "v": "Kamino, Solana",
         "a": "cbBTC",
-        "b": 0.25,
+        "b": 0.23,
         "s": 0.01,
-        "u": 2.9,
+        "u": 2.67,
         "d": 57955748,
         "vs": "SBOR-BTC"
       },
@@ -1844,7 +1844,7 @@
         "a": "USDC",
         "b": 5.43,
         "s": 3.62,
-        "u": 82.56,
+        "u": 82.59,
         "d": 21908102,
         "vs": "SBOR-USD"
       }
@@ -1914,7 +1914,7 @@
     "SBOR-STX": {
       "borrow": 2.57,
       "supply": 1.43,
-      "allInSupply": 3.75,
+      "allInSupply": 3.8,
       "venues": 1,
       "largestConstituentWeight": 0.56,
       "depthUsd": 4975809,
@@ -1926,7 +1926,7 @@
           "b": 1.36,
           "s": 0.09,
           "u": 8.4,
-          "py": 4.14,
+          "py": 4.23,
           "d": 2786239,
           "w": 0.56
         },
