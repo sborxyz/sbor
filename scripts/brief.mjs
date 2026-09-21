@@ -221,9 +221,22 @@ If an index was unchanged, one clause is enough: "SBOR-BTC unchanged at 1.31%." 
 
 The flags array is what crossed a threshold. Use it as your agenda, not as your text: write it properly rather than listing it back. Do not mention that flags exist.`;
 
-async function write(){
+/* One call to the model. Thinking is capped explicitly rather than left to
+   expand: at 4000 total tokens it worked one day and consumed the whole budget
+   the next, because thinking grows to fill what it is given. A fixed thinking
+   budget below max_tokens guarantees room for the brief itself. */
+async function call(thinking){
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("no ANTHROPIC_API_KEY");
+  const body = {
+    model: MODEL,
+    max_tokens: thinking ? 6000 : 1500,
+    system: SYSTEM,
+    messages: [{ role: "user", content: JSON.stringify(facts) }],
+    ...(thinking
+      ? { thinking: { type: "enabled", budget_tokens: 2000 } }
+      : { thinking: { type: "disabled" } })
+  };
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -232,39 +245,27 @@ async function write(){
       "anthropic-version": "2023-06-01"
     },
     signal: AbortSignal.timeout(MODEL_TIMEOUT),
-    body: JSON.stringify({
-      model: MODEL,
-      /* Extended thinking is on by default and is counted against max_tokens.
-         At 700 the model spent the whole budget thinking and produced no text.
-         The budget below leaves room to think and then write. The brief itself
-         is 250 words at most, so the rest is headroom rather than length. */
-      max_tokens: 4000,
-      system: SYSTEM,
-      messages: [{ role: "user", content: JSON.stringify(facts) }]
-    })
+    body: JSON.stringify(body)
   });
-  if (!r.ok) throw new Error(`anthropic responded ${r.status}: ${(await r.text()).slice(0,200)}`);
+  if (!r.ok) throw new Error(`anthropic responded ${r.status}: ${(await r.text()).slice(0,300)}`);
   const d = await r.json();
   const text = (d.content || []).filter(c => c.type === "text").map(c => c.text).join("\n").trim();
-  /* A thinking-only response means the budget ran out before any prose. Say
-     that plainly rather than reporting it as empty. */
   if (!text && d.stop_reason === "max_tokens")
-    throw new Error(`ran out of tokens before writing. All ${d.usage?.output_tokens ?? "?"} output tokens went to thinking. Raise max_tokens.`);
-
-  if (!text) {
-    /* Say what actually came back rather than "empty". A silent shape change in
-       the response is the kind of thing that takes an hour to guess at and ten
-       seconds to read. */
-    const shape = {
-      stop_reason: d.stop_reason ?? null,
-      model: d.model ?? null,
-      blocks: (d.content || []).map(c => c.type),
-      usage: d.usage ?? null,
-      error: d.error ?? null
-    };
-    throw new Error(`no text in response: ${JSON.stringify(shape)}`);
-  }
+    throw new Error(`ran out of tokens before writing (${d.usage?.output_tokens ?? "?"} output tokens, thinking ${thinking ? "capped at 2000" : "off"})`);
+  if (!text) throw new Error(`no text in response: ${JSON.stringify({ stop_reason: d.stop_reason ?? null, blocks: (d.content || []).map(c => c.type) })}`);
   return text;
+}
+
+/* Capped thinking first, because it writes better. If that fails for any
+   reason, one more attempt with thinking off, which is terser but reliable.
+   Only if both fail does the brief go out as raw findings. */
+async function write(){
+  try {
+    return await call(true);
+  } catch (e) {
+    log(`first attempt failed, retrying with thinking off. ${e.name === "TimeoutError" ? "timed out" : e.message}`);
+    return await call(false);
+  }
 }
 
 let body, wrote = "model";
