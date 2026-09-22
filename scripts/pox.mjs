@@ -3,7 +3,7 @@
  *
  * PoX pays stackers in BTC from what miners commit. The rate is therefore
  *   cycle yield = BTC paid over one cycle x BTC/STX rate / STX locked
- * annualised over the number of reward cycles in a year. Dollar prices cancel,
+ * annualized over the number of reward cycles in a year. Dollar prices cancel,
  * so only the BTC to STX rate is needed, quoted from Bitflow.
  *
  * That cross is averaged over a short window. Staking economics change once a
@@ -205,7 +205,9 @@ export async function poxReference(){
     kind: "staking yield",
     period: "one reward cycle, about two weeks",
     cyclesPerYear: round(cyclesPerYear, 2),
-    annualisation: "Bitcoin paid over one reward cycle divided by STX locked, annualised over the cycles in a year.",
+    /* The key keeps its original spelling: it is a published field, and the API
+       promises fields are never renamed. The text itself is US English. */
+    annualisation: "Bitcoin paid over one reward cycle divided by STX locked, annualized over the cycles in a year.",
     apy: round(apy),
     cycle: target,
     cycleStartBurnBlock: startBlk,
@@ -227,7 +229,7 @@ export async function poxReference(){
     crossWindowDays: window.length,
     rateSource,
     ...(priceImpactBps != null && { rateQuoteImpactBps: priceImpactBps }),
-    note: "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualised. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over a short window rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. It is a staking yield, not a lending rate, and is never blended into the lending indices."
+    note: "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualized. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over a short window rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. It is a staking yield, not a lending rate, and is never blended into the lending indices."
   };
 }
 
