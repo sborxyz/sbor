@@ -46,9 +46,11 @@ async function protocolYields(){
        locked for the cycle. Against stSTX it is the cost of liquidity, which
        nobody publishes and which cannot be reconstructed later.
 
-       stBTC was described by the venue as a fallback constant. It has since
-       moved 2.6, 2.4, 2.54, so it may have become live. Recording it is how we
-       find out. */
+       stBTC is StackingDAO's estimated net yield on the Bitcoin Staking bond,
+       per their method published 15 September 2026: 3.0% on bonded sBTC,
+       diluted by an unbonded liquidity buffer, less a 10% commission, less a
+       payment to stSTX holders for STX locked in the bond. It moves with the
+       STX yield and STX price, which is why it changes day to day. */
     const native = pick("stx","native","stacking","data.stx");
     const stbtc  = pick("stbtc","stBtc","stBTC","data.stbtc");
     out._context = {
