@@ -1,11 +1,9 @@
 name: SBOR morning brief
 
-# After the fixing has had its scheduled attempts, so the brief describes today
-# rather than yesterday. If no fixing landed, the brief says the record has not
-# moved, which is itself worth knowing.
+# The brief now runs inside the fixing job, straight after the day's fixing,
+# so it arrives in the morning. This workflow no longer runs on a schedule; it
+# is kept so a brief can be produced by hand at any time, reading the site.
 on:
-  schedule:
-    - cron: "48 17 * * *"   # 14:48 in Brazil, after the fixing's last attempt
   workflow_dispatch:
 
 permissions:
