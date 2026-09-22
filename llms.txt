@@ -211,9 +211,10 @@ commission, locked for the reward cycle, alongside the liquid stSTX yield that
 does enter the fixing as protocol yield. The gap between them is published as
 liquidityCostBps: what it costs to keep a position tradeable rather than locked.
 It moves, and it can invert: on 16 September it was -14 bps and on 17 September
-it was +255. It also records the stBTC figure, which the venue described as a
-fallback constant and which has since moved, so the record is how we find out
-whether it has become live. None of it enters an
+it was +255. It also records StackingDAO's stBTC figure, an estimated net yield
+they calculate from the Bitcoin Staking bond: 3.0% on bonded sBTC, diluted by an
+unbonded liquidity buffer, less their commission, less a payment to stSTX holders
+for STX locked in the bond. It moves with the STX yield and STX price. None of it enters an
 index or affects a rate. It is recorded so a past fixing can be read in the
 conditions of its day, and because SBOR-USD against SOFR is the comparison this
 benchmark is modelled on: a dollar secured by bitcoin on a Bitcoin layer against
