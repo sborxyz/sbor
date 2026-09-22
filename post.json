@@ -1,17 +1,7 @@
 {
-  "fixing": "2026-09-21T15:10:48Z",
-  "comparedWith": "2026-09-20",
-  "top": {
-    "why": "SBOR-STX borrow moved -26 bps",
-    "chars": 150,
-    "text": "SBOR-STX borrow rate: 2.53% to 2.27%.\n\n-26 bps in a day.\n\nCheapest constituent now Zest V2 stSTX at 1.29%, utilization 7.98%.\n\nsbor.xyz"
-  },
+  "fixing": "2026-09-22T13:29:34Z",
+  "comparedWith": "2026-09-21",
+  "top": null,
   "otherCount": 0,
-  "drafts": [
-    {
-      "why": "SBOR-STX borrow moved -26 bps",
-      "chars": 150,
-      "text": "SBOR-STX borrow rate: 2.53% to 2.27%.\n\n-26 bps in a day.\n\nCheapest constituent now Zest V2 stSTX at 1.29%, utilization 7.98%.\n\nsbor.xyz"
-    }
-  ]
+  "drafts": []
 }
