@@ -32,7 +32,7 @@ tr:last-child td{border-bottom:none}
 .self td{background:rgba(29,78,107,.06)}
 .self td:first-child{font-weight:600;color:var(--accent)}
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.note{color:var(--soft);font-size:12.5px;margin-top:8px;max-width:78ch}
+.note{color:var(--soft);font-size:12.5px;margin-top:8px}
 .err{border:1px solid var(--down);padding:14px;color:var(--down);font-size:14px}
 .spark{font-family:"IBM Plex Mono",monospace;letter-spacing:-1px;color:var(--accent)}
 .src{font-size:11px;color:var(--soft);font-weight:400}
@@ -281,7 +281,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
   if (today.ctx == null)
     out += `<div class="note">No context recorded on this fixing. The context line was added to the history rows on 18 September, so rows before that show nothing here. The full context is in that day's archive either way.</div>`;
   if (usd != null && sofr != null)
-    out += `<div class="note">A dollar on Stacks costs <strong>${F(usd)}%</strong>. Secured by Treasuries it costs <strong>${F(sofr)}%</strong>. That is ${Math.abs(BPS(usd, sofr))} bps ${usd < sofr ? "cheaper here" : "dearer here"}, and the reason is utilization rather than risk.</div>`;
+    out += `<div class="note">A dollar costs <strong>${F(usd)}%</strong> on Stacks and <strong>${F(sofr)}%</strong> secured by Treasuries, ${Math.abs(BPS(usd, sofr))} bps ${usd < sofr ? "cheaper" : "dearer"} here because of utilization, not risk.</div>`;
 
   /* ---- same exposure pairs ----
      Two assets that are claims on the same underlying look like an arbitrage
@@ -330,7 +330,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
   if (pairRows){
     out += `<h2>Same exposure, both legs</h2><div class="hint">Pairs of assets that are claims on the same underlying, so holding one against the other is delta neutral. The last column is what the lending rates alone suggest, and it is the trap: it ignores the protocol yield you owe when you borrow a yield bearing token. A positive net is highlighted and would be worth a second look.</div><div class="scroll"><table>
       <tr><th>Leg</th><th>Earn</th><th>True cost</th><th>Net</th><th>Ignoring yield</th></tr>${pairRows}</table></div>`;
-    out += `<div class="note">SBOR publishes this because an agent reading only the borrow and supply rates would see free money where there is none. It does not trade on its own rate and this is not a recommendation.</div>`;
+    out += `<div class="note">Shown because an agent reading only borrow and supply rates would see free money where there is none. Not a recommendation.</div>`;
   }
 
   /* ---- what to look at ---- */
