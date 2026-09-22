@@ -74,9 +74,11 @@ are not comparable and are never blended into one figure. Current indices:
 - SBOR-STX: STX markets (STX, stSTX)
 
 The fixing is published once daily and enters the historical record. The
-scheduler that runs it can drop or delay jobs, so it is attempted four times a
-day between 08:00 and 17:00 UTC and any one landing is enough. The "fixing"
-timestamp on each payload is authoritative, not the time of any attempt. Every fixing records the methodology version it was produced under, and
+scheduler that runs it can drop or delay jobs, so it is attempted up to four
+times a day between 08:00 and 17:00 UTC. The first successful attempt is final:
+the later ones are backups and run only if no fixing has landed that day. A
+fixing is set once, the way SOFR is. The "fixing" timestamp on each payload is
+authoritative, not the time of any attempt. Every fixing records the methodology version it was produced under, and
 a full snapshot of that day's constituents is archived so any past figure can
 be audited down to its inputs.
 
@@ -283,8 +285,8 @@ paths mirror v1 today and are a convenience, not a contract.
   change ships as /api/v2/ and v1 keeps running for at least 12 months
   afterwards.
 
-  Schedule. One fixing a day, attempted four times between 08:00 and 17:00 UTC
-  because the scheduler can drop runs. Every payload carries a "fixing"
+  Schedule. One fixing a day, final at the first successful attempt, with backup
+  attempts until 17:00 UTC because the scheduler can drop runs. Every payload carries a "fixing"
   timestamp; use that, not the time of any attempt. Treat data older than 48 hours as stale and fall back to your
   own logic.
 
