@@ -119,6 +119,13 @@ tr.ownrow td{background:rgba(29,78,107,.05);font-weight:500}
 tr.ownrow .venue{color:var(--accent)}
 .spreadbox{border:1px solid var(--rule);border-left:2px solid var(--rule);padding:14px 18px;margin-bottom:8px;font-size:15px;color:var(--ink-soft)}
 .spreadbox strong,.invbox strong{color:var(--ink);font-weight:500}
+.spreadbox,.invbox{display:grid;grid-template-columns:minmax(64px,.6fr) 1fr 1fr .8fr;gap:18px;align-items:end}
+.sp-a{color:var(--ink);font-weight:500;align-self:center}
+.sp-c{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sp-k{font-size:11.5px;color:var(--ink-soft);letter-spacing:.02em}
+.sp-v{font-size:16px;color:var(--ink)}
+.sp-w{font-size:12.5px;color:var(--ink-soft)}
+@media (max-width:720px){.spreadbox,.invbox{grid-template-columns:1fr 1fr;gap:12px 16px}.sp-a{grid-column:1/-1}}
 .poxchart{height:200px;margin-top:18px}
 .poxbox{border:1px solid var(--rule);padding:24px 26px 22px;
   background:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule-soft) 31px 32px)}
@@ -470,13 +477,13 @@ en:{
   fullname:"Stacks Bitcoin Offered Rate",
   introH:"What money actually costs on Stacks.",
   introP:"Every lending market prices differently. SBOR publishes one market rate per currency, weighted by size and read straight from the contracts, so you see the market rather than one venue's number.",
-  introUse:"Use it as a yardstick. Borrow above SBOR and you are paying more than the market. Supply below it and you are earning less. Every loan here is overcollateralised, and the collateral is whatever you supplied rather than one particular asset, so a dollar borrowed on Stacks is secured by crypto collateral rather than by bitcoin specifically.",
+  introUse:"Use it as a yardstick. Borrow above SBOR and you are paying more than the market. Supply below it and you are earning less. Every loan here is overcollateralized, and the collateral is whatever you supplied rather than one particular asset, so a dollar borrowed on Stacks is secured by crypto collateral rather than by bitcoin specifically.",
   stamp:d=>`Rate as of <span class="num">${d}</span> · read from Zest contract state · updated daily`,
   borrowK:"Borrow APY", supplyK:"Supply APY",
   allIn:v=>`${v.toFixed(2)}% all in, with protocol yield`,
   invH:"Cross-venue spread",
   invP:"For each asset lent at more than one venue, the cheapest place to borrow against the best paying place to supply. The gap is normally negative, because that spread is how a lending protocol earns. It narrowing means the market is getting more efficient. If it ever turns positive the same asset pays more to supply than it costs to borrow, which is an inversion, and SBOR publishes any it finds to everyone at once, never to a private channel. SBOR does not trade on its own rate.",
-  invSpread:(a,sv,sr,bv,br,g)=>`<strong>${a}</strong> supply ${sv} ${sr} · borrow ${bv} ${br} · <span class="num">${g > 0 ? "+" : ""}${g} bps</span>`,
+  invSpread:(a,sv,sr,bv,br,g)=>`<span class="sp-a">${a}</span><span class="sp-c"><span class="sp-k">Best to supply</span><span class="sp-v num">${sr}</span><span class="sp-w">${sv}</span></span><span class="sp-c"><span class="sp-k">Cheapest to borrow</span><span class="sp-v num">${br}</span><span class="sp-w">${bv}</span></span><span class="sp-c"><span class="sp-k">Spread</span><span class="sp-v num">${g > 0 ? "+" : ""}${g} bps</span></span>`,
   invSingle:a=>`<strong>${a}</strong> one venue, no cross venue comparison possible`,
   invNone:l=>`No asset in ${l} is lent at more than one venue today, so there is nothing to compare across venues.`,
   invValidating:"This monitor is being validated. Detections are published so the validation period is visible, but they have not yet been proven over a long enough run to be relied on.",
@@ -498,8 +505,8 @@ en:{
   termSofr:"for comparison, US repo market",
   deltaBorrow:"", deltaSupply:"",
   poxH:"Bitcoin staking yield, from PoX (Proof of Transfer)",
-  poxP:"What PoX pays STX stakers, in bitcoin, from what miners commit. The bitcoin paid over one two week reward cycle, divided by the STX locked, annualised. A staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
-  poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. Each reading annualises the most recently completed two week cycle, so a marked line is the day a cycle settled and everything to its right is derived from that cycle. The drift between markers is the BTC to STX rate, which is averaged over seven days.`,
+  poxP:"What PoX pays STX stakers, in bitcoin, from what miners commit. The bitcoin paid over one two week reward cycle, divided by the STX locked, annualized. A staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
+  poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. Each reading annualizes the most recently completed two week cycle, so a marked line is the day a cycle settled and everything to its right is derived from that cycle. The drift between markers is the BTC to STX rate, which is averaged over seven days.`,
   poxChartThin:"Not enough history yet to draw this.",
   poxCycleMark:c=>`cycle ${c} settled`,
   poxMeta:(c,btc,stx,x,w)=>`Read fresh each day from the bitcoin actually paid out in completed reward cycle ${c}${w} · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over 7 days`,
@@ -566,7 +573,7 @@ pt:{
   allIn:v=>`${v.toFixed(2)}% no total, com o rendimento do protocolo`,
   invH:"Spread entre plataformas",
   invP:"Para cada ativo emprestado em mais de uma plataforma, o lugar mais barato para tomar emprestado contra o que melhor paga para depositar. A diferença é normalmente negativa, porque esse spread é como um protocolo de crédito ganha. Ela diminuindo significa um mercado mais eficiente. Se algum dia ficar positiva, o mesmo ativo paga mais para depositar do que custa para tomar emprestado, o que é uma inversão, e o SBOR publica qualquer uma que encontrar para todos ao mesmo tempo, nunca em canal privado. O SBOR não opera em cima da própria taxa.",
-  invSpread:(a,sv,sr,bv,br,g)=>`<strong>${a}</strong> depósito ${sv} ${sr} · empréstimo ${bv} ${br} · <span class="num">${g > 0 ? "+" : ""}${g} pontos-base</span>`,
+  invSpread:(a,sv,sr,bv,br,g)=>`<span class="sp-a">${a}</span><span class="sp-c"><span class="sp-k">Melhor para depositar</span><span class="sp-v num">${sr}</span><span class="sp-w">${sv}</span></span><span class="sp-c"><span class="sp-k">Mais barato para tomar</span><span class="sp-v num">${br}</span><span class="sp-w">${bv}</span></span><span class="sp-c"><span class="sp-k">Spread</span><span class="sp-v num">${g > 0 ? "+" : ""}${g} pontos-base</span></span>`,
   invSingle:a=>`<strong>${a}</strong> uma plataforma, sem comparação possível entre plataformas`,
   invNone:l=>`Nenhum ativo do ${l} é emprestado em mais de uma plataforma hoje, então não há o que comparar entre plataformas.`,
   invValidating:"Este monitor está em validação. As detecções são publicadas para que o período de validação fique visível, mas ainda não foram comprovadas por tempo suficiente para servirem de base.",
