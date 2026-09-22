@@ -1,7 +1,7 @@
 {
   "name": "sbor-mcp",
-  "version": "1.0.1",
-  "description": "MCP server for SBOR, the benchmark lending rate for Stacks",
+  "version": "1.1.0",
+  "description": "Check a lending rate before your agent borrows. The benchmark rate for Stacks, read from contract state. Free, no key, no rate limit.",
   "type": "module",
   "bin": {
     "sbor-mcp": "./server.mjs"
@@ -15,11 +15,18 @@
   },
   "keywords": [
     "mcp",
+    "mcp-server",
     "stacks",
     "bitcoin",
+    "bitcoin-defi",
+    "btcfi",
     "defi",
+    "lending",
     "interest-rates",
     "benchmark",
+    "ai-agents",
+    "agents",
+    "sbtc",
     "sbor"
   ],
   "dependencies": {
