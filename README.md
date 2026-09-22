@@ -1,7 +1,14 @@
 # SBOR
 
-**Stacks Bitcoin Offered Rate.** The benchmark lending rate for Stacks, read
-from contract state and published daily as a public good.
+**Bitcoin DeFi has no benchmark lending rate. SBOR starts with Stacks, where the
+market is.**
+
+Every venue publishes its own number, so nobody, human or agent, can tell
+whether the rate they are offered is fair. SBOR, the Stacks Bitcoin Offered
+Rate, is that benchmark, starting with Stacks: one borrow and one supply rate
+per currency, read from lending contract state and published daily, alongside
+the same markets on Ethereum, Base, Solana and Hyperliquid. Free, no key, no
+rate limit, open to any agent on any chain.
 
 Live at **[sbor.xyz](https://sbor.xyz)**
 
@@ -35,8 +42,9 @@ Supplying below it means earning less.
 | `SBOR-BTC` | sBTC markets |
 | `SBOR-STX` | STX and stSTX markets |
 
-Published beside them, never inside them: a PoX staking reference, and
-reference rates from Aave V3 on Ethereum for comparison.
+Published beside them, never inside them: a Proof of Transfer staking
+reference, and the same asset classes on the largest lending markets on
+Ethereum, Base, Hyperliquid and Solana, for comparison.
 
 ## Data
 
@@ -45,10 +53,11 @@ No key, no registration, no rate limit, no fee. CORS open.
 | Endpoint | What |
 |---|---|
 | [`/api/v1/latest.json`](https://sbor.xyz/api/v1/latest.json) | current fixing, with constituents |
-| [`/api/v1/history.json`](https://sbor.xyz/api/v1/history.json) | rolling 400 day series |
+| [`/api/v1/history.json`](https://sbor.xyz/api/v1/history.json) | rolling 200 day series |
 | [`/api/v1/history-index.json`](https://sbor.xyz/api/v1/history-index.json) | the full record, sharded by year |
 | [`/api/v1/archive-index.json`](https://sbor.xyz/api/v1/archive-index.json) | every date available, for per date lookup |
 | [`/api/v1/inversions.json`](https://sbor.xyz/api/v1/inversions.json) | cross venue spread, checked every three hours |
+| [`/api/v1/inversion-log.json`](https://sbor.xyz/api/v1/inversion-log.json) | append-only record of every inversion found |
 | [`/api/v1/archive/`](https://sbor.xyz/api/v1/archive/) | immutable daily snapshots |
 | [`/latest.txt`](https://sbor.xyz/latest.txt) | current fixing, plain text |
 | [`/weekly.txt`](https://sbor.xyz/weekly.txt) | weekly report, plain text |
@@ -65,17 +74,37 @@ afterwards. Full policy in [llms.txt](https://sbor.xyz/llms.txt).
 
 ## For agents
 
-The published fixing is free to read: no key, no registration, no rate limit, no
-fee. Licensed CC BY 4.0, so you can build on it commercially without asking.
-Fetch what you need.
+**Check the rate against SBOR before you borrow.** On Stacks the same dollar can
+cost nearly twice as much at one venue as at another, on the same day, and every
+venue publishes only its own number.
 
-To judge whether a lending offer is good, compare it against the index for that
-currency. Borrowing above the SBOR borrow rate means paying more than the
-market; supplying below the supply rate means earning less. Utilization beside
-each market explains why a rate sits where it does.
+**The rule:** if an offer is more than 50 basis points above the SBOR borrow rate
+for that currency, stop and ask a human. Use SBOR to stop, never to start. A
+wrong reading under that rule costs a pause, not a trade.
 
-Read `venues` and `largestConstituentWeight` before quoting a rate. An index
-covering one venue is a reading of that venue, not a market average.
+**As an MCP tool**, in Claude Desktop, Cowork, Cursor or any MCP client:
+
+```bash
+npx -y sbor-mcp
+```
+
+Then call `compare_rate`. Setup for each client is in [mcp/](mcp/).
+
+**Over plain HTTP**, no key, no registration, no fee, CORS open. Licensed
+CC BY 4.0, so you can build on it commercially without asking.
+
+Four things to get right:
+
+- **Read utilization beside every rate.** A cheap rate at low utilization means
+  almost nobody is borrowing. Above 90%, the pool is nearly empty and
+  withdrawals may be constrained.
+- **Never add protocol yield to a lending rate.** It comes from holding the
+  asset, not from the loan, and is published separately.
+- **Borrowing a yield-bearing token means owing its yield as well as the
+  interest.** The true cost of borrowing stSTX is its borrow rate plus the yield
+  it accrues. The raw rates can suggest carry that does not exist.
+- **Read `venues` before quoting a rate.** An index covering one venue is a
+  reading of that venue, not a market average.
 
 Machine-readable context and the full integration policy are at
 [llms.txt](https://sbor.xyz/llms.txt).
@@ -102,8 +131,13 @@ reference it for.
   market is excluded rather than filled in.
 - **Fixings are never rewritten.** Corrections appear as a new fixing with a
   note, or as a visible withdrawal record.
-- **Term averages** are compounded, actual/365, and publish only once the full
-  window of fixings exists.
+- **Term averages** over 30, 90 and 180 days are compounded, actual/365, and
+  publish only once the full window of fixings exists. They are the same three
+  windows the Federal Reserve Bank of New York publishes for SOFR, and the SOFR
+  averages are shown beside them.
+- **Incentive campaigns are not part of any rate.** Temporary programs that pay
+  borrowers or suppliers on top of the contract rate are marketing, not the
+  market. SBOR publishes the contract rate.
 - **Rate basis is converted, not assumed.** Both venues return nominal annual
   rates from their contracts, confirmed with Zest. Each is converted the same
   way to an effective APY, and every market also carries its nominal figure.
@@ -117,23 +151,35 @@ methodology at [sbor.xyz](https://sbor.xyz) and in
 
 ## Sources
 
-Lending rates from Zest and Granite contract state. Protocol yield from
-StackingDAO. The BTC to STX rate used for the staking reference from Bitflow.
-Depth read on-chain where available and from DefiLlama otherwise. Every source
-is named on the site and in the machine-readable documentation.
+Lending rates from Zest and Granite contract state. Protocol yield and staking
+context from StackingDAO. The BTC to STX rate used for the staking reference
+from Bitflow, quoted in both directions. Proof of Transfer rewards from Hiro.
+Depth read on-chain where available and from DefiLlama otherwise.
+
+The comparison chains, Ethereum, Base, Hyperliquid and Solana, come from
+DefiLlama rather than contract state, so small differences are expected. SOFR
+and its averages come from the Federal Reserve Bank of New York. Spot prices,
+recorded as context only, come from CoinGecko. Every source is named on the site
+and in the machine-readable documentation.
 
 ## How it runs
 
-A GitHub Action computes the fixing daily and commits it. The site serves
-directly from this repository, so the published record and the site are the same
-files. Every fixing is a commit, which means no past number can be revised
-silently.
+A GitHub Action computes the fixing and commits it. It is attempted four times
+a day, because the scheduler can drop runs, and any one landing is enough. The
+site serves directly from this repository, so the published record and the site
+are the same files. Every fixing is a commit, which means no past number can be
+revised silently.
 
 ```
 scripts/fetch.mjs       the fixing
-scripts/pox.mjs         PoX staking reference
-scripts/external.mjs    Aave V3 comparison
+scripts/pox.mjs         Proof of Transfer staking reference
+scripts/external.mjs    the comparison chains
+scripts/context.mjs     SOFR, prices, sBTC supply, block height
+scripts/inversion.mjs   cross venue monitor, every three hours
+scripts/post.mjs        drafts a post when something moves
+scripts/brief.mjs       the morning brief, written from the record
 scripts/weekly.mjs      weekly report
+mcp/                    the MCP server, published as sbor-mcp
 index.html              the site, bilingual EN/PT
 llms.txt                method and integration policy
 api/v1/                 published data
