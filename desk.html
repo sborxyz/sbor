@@ -350,11 +350,11 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
         flags.push(`${m.v} ${m.a} is ${F(m.u)}% utilized. Withdrawals may be constrained.`);
 
       /* A large move in utilization matters wherever it starts from. A jump of
-         five points in a day is somebody sizeable arriving or leaving, and the
+         500 bps in a day is somebody sizeable arriving or leaving, and the
          rate follows it. */
       const du = BPS(m.u, am?.u);
       if (du != null && Math.abs(du) >= 300)
-        flags.push(`${m.v} ${m.a} utilization moved ${du > 0 ? "+" : ""}${(du/100).toFixed(1)} points in a day, to ${F(m.u)}%.`);
+        flags.push(`${m.v} ${m.a} utilization moved ${du > 0 ? "+" : ""}${du} bps in a day, to ${F(m.u)}%.`);
 
       const dr = BPS(m.b, am?.b);
       if (dr != null && Math.abs(dr) >= 40)
