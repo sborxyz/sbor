@@ -80,12 +80,22 @@ const VENUE_NAME = {
   "loopscale":"Loopscale"
 };
 
-/* Aave keys its reserve pages on the underlying token address, which the pool
-   data carries, so each row links to the exact market it reports. */
-const AAVE_MARKET = "proto_mainnet_v3";
-const aaveUrl = underlying => underlying
-  ? `https://app.aave.com/reserve-overview/?underlyingAsset=${String(underlying).toLowerCase()}&marketName=${AAVE_MARKET}`
-  : "https://app.aave.com/markets/";
+/* Where each row links. Aave keys its reserve pages on the underlying token
+   address and a per-chain market name, so an Aave row links to the exact
+   market it reports. Every other venue links to its DefiLlama pool page,
+   which is always correct and links on to the venue. Until 22 September every
+   row was built as an Aave link, including Morpho, HyperLend and Kamino, and
+   Aave on Base carried the Ethereum market name, so those links were wrong. */
+const AAVE_MARKETS = {
+  Ethereum: "proto_mainnet_v3", Base: "proto_base_v3", Arbitrum: "proto_arbitrum_v3",
+  Optimism: "proto_optimism_v3", Polygon: "proto_polygon_v3", Avalanche: "proto_avalanche_v3"
+};
+function venueUrl(project, chain, underlying, pool){
+  const market = AAVE_MARKETS[chain];
+  if (project === "aave-v3" && market && underlying)
+    return `https://app.aave.com/reserve-overview/?underlyingAsset=${String(underlying).toLowerCase()}&marketName=${market}`;
+  return `https://defillama.com/yields/pool/${pool}`;
+}
 
 const round = (n, d = 2) => Number(Number(n).toFixed(d));
 const log = (...a) => console.error(...a);
@@ -168,7 +178,7 @@ export async function externalReference(){
       ...(utilization != null && { utilization }),
       depthUsd: Math.round(p.tvlUsd),
       pool: p.pool,
-      url: aaveUrl(underlying),
+      url: venueUrl(p.project, p.chain, underlying, p.pool),
       dataUrl: `https://defillama.com/yields/pool/${p.pool}`
     };
     log(`  external ${entry.asset} @ ${label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% util=${entry.utilization ?? "n/a"}% depth=${entry.depthUsd}`);
