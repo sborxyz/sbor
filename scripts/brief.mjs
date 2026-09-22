@@ -11,7 +11,7 @@
  * If the model is unreachable the brief still goes out, as the raw findings.
  * Silence would be the worst outcome.
  */
-import { writeFileSync } from "node:fs";
+import { writeFileSync, readFileSync } from "node:fs";
 
 const BASE = process.env.SBOR_BASE || "https://sbor.xyz";
 const MODEL = process.env.BRIEF_MODEL || "claude-sonnet-5";
@@ -26,7 +26,13 @@ const bps = (a, b) => (a == null || b == null || !Number.isFinite(a) || !Number.
   ? null : Math.round((a - b) * 100);
 const pctChg = (a, b) => (a == null || b == null || !b) ? null : Number((((a - b) / b) * 100).toFixed(1));
 
+/* Inside the fixing job the brief runs seconds after the commit, before the
+   site has rebuilt, so the website would still show yesterday. SBOR_LOCAL makes
+   it read the files the fixing just wrote. Run on its own, it reads the site. */
+const LOCAL = process.env.SBOR_LOCAL === "1";
+
 async function get(path){
+  if (LOCAL) return JSON.parse(readFileSync(path.replace(/^\//, ""), "utf8"));
   const r = await fetch(`${BASE}${path}`, {
     headers: { accept: "application/json" },
     signal: AbortSignal.timeout(TIMEOUT)
@@ -284,7 +290,7 @@ try {
     : `${ix}\n\nNothing crossed a threshold since the last fixing.`;
 }
 
-const msg = `SBOR morning brief, ${facts.date}\n\n${body}\n\n——— not part of any post ———\nsbor.xyz/desk.html`;
+const msg = `SBOR morning brief, ${facts.date}\n\n${body}\n\n--- not part of any post ---\nsbor.xyz/desk.html`;
 writeFileSync("brief.txt", msg + "\n");
 log(`brief written by ${wrote}, ${msg.length} chars`);
 
