@@ -412,7 +412,7 @@ const main = async () => {
     ...(external && { externalReference: external }),
     ...(context && { context }),
     notes:[
-      "One fixing a day, targeting 11:00 UTC. Publication runs on a scheduler that can be late, so the fixing timestamp is authoritative rather than the target hour.",
+      "One fixing a day, final at the first successful attempt. The scheduler can drop runs, so backup attempts follow until 17:00 UTC, but only if no fixing has landed that day. The fixing timestamp is authoritative, not the time of any attempt.",
       "Rates are read from contract state, not from any venue's published figure.",
       "Protocol yield belongs to the asset, not the loan, and is excluded from every fixing.",
       "Currencies are never blended into a single figure.",
@@ -425,12 +425,12 @@ const main = async () => {
       "Fixings before methodology 1.6.0 used Zest's nominal figures unconverted and are therefore a few basis points lower on the Zest-weighted portion. Past fixings are not rewritten; the version recorded on each one identifies the basis it used.",
       "Staking references before methodology 1.9.0 used a one sided Bitflow quote for the BTC to STX rate and are therefore slightly low, because price impact and the bid ask spread both cost the taker. From 1.9.0 the cross is quoted in both directions and midpointed. On 14 September the two sides differed by 74 basis points. Past fixings are not rewritten; the version recorded on each one identifies the basis it used.",
       "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
-      "The record is sharded by year at /api/v1/history-YYYY.json, indexed at /api/v1/history-index.json. history.json carries a rolling 400 day window for convenience.",
+      "The record is sharded by year at /api/v1/history-YYYY.json, indexed at /api/v1/history-index.json. history.json carries a rolling 200 day window for convenience.",
       "context records SOFR, spot prices, sBTC supply and the Bitcoin block height alongside each fixing. None of it enters an index or affects a rate. It is kept so a past fixing can be read in the conditions of its day.",
       "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
       "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
       "Protocol yield for stSTX and stSTXbtc is sourced from StackingDAO, which derives it from PoX reward claims net of pool commission over stSTX supply. Where a source cannot be reached, the index is marked allInSupplyIncomplete and the yield is left out rather than estimated.",
-      "The stBTC figure published by StackingDAO is a placeholder until bond rewards begin streaming, so it is deliberately not read here."
+      "StackingDAO's stBTC figure is recorded in context as their estimated net yield on the Bitcoin Staking bond, per the method they published on 15 September 2026: 3.0% on bonded sBTC, diluted by an unbonded liquidity buffer, less commission and a payment to stSTX holders for STX locked in the bond. It is a staking yield, not a lending rate, and enters no index."
     ]
   };
 
