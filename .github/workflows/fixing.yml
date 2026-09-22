@@ -4,13 +4,15 @@ on:
   schedule:
     # GitHub drops scheduled runs on free public repos under load. It dropped
     # the fixing entirely on 14 September and ran three hours late on others.
-    # So ask several times instead of once. Re-running is harmless: a fixing
-    # replaces that day's row rather than adding another, and the first one to
-    # land is usually the one that stands. Every time is off the hour, because
-    # the top of the hour is the most contended minute on the platform.
-    - cron: "23 8 * * *"     # target, 11:00 UTC allowing for delay
-    - cron: "41 10 * * *"    # if the first was dropped
-    - cron: "17 13 * * *"    # if both were
+    # So it is asked several times, and THE FIRST SUCCESSFUL FIXING OF THE DAY IS
+    # FINAL. The later times are backups: each checks whether today has already
+    # been fixed and stops if so. A benchmark is fixed once, the way SOFR is.
+    # Until 22 September every attempt overwrote the last, so a day's number
+    # could change until the afternoon. Times are off the hour, because the top
+    # of the hour is the most contended minute on the platform.
+    - cron: "23 8 * * *"     # the fixing, 05:23 in Brazil
+    - cron: "41 10 * * *"    # backup, only if the first was dropped
+    - cron: "17 13 * * *"    # backup, only if both were
     - cron: "52 16 * * *"    # last chance before the day is lost
   workflow_dispatch:
 
@@ -23,26 +25,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # A scheduled backup stops here if today already has its fixing. A manual
+      # run always proceeds, because running it by hand is a deliberate choice;
+      # it is a public commit either way, so any replacement stays visible.
+      - name: Has today already been fixed
+        id: guard
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          LAST=$(node -e 'try{console.log(JSON.parse(require("fs").readFileSync("api/v1/latest.json","utf8")).fixing.slice(0,10))}catch(e){console.log("")}')
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$LAST" = "$TODAY" ]; then
+            echo "Today was already fixed ($LAST). This backup attempt is not needed."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Fixing today ($TODAY). Last fixing on record: ${LAST:-none}. Trigger: ${{ github.event_name }}."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-node@v4
+        if: steps.guard.outputs.skip != 'true'
         with:
           node-version: "22"
 
       - name: Install dependencies
+        if: steps.guard.outputs.skip != 'true'
         run: npm install --no-audit --no-fund
 
       - name: Compute fixing
+        if: steps.guard.outputs.skip != 'true'
         env:
-          # Every scheduled run is the daily fixing.
-          # Manual runs count too, so you can force one when testing.
+          # Every run that gets past the guard is the daily fixing.
           SBOR_FIXING: "1"
         run: node scripts/fetch.mjs
 
       - name: Draft a post if something moved
+        if: steps.guard.outputs.skip != 'true'
         id: draft
         run: node scripts/post.mjs
         continue-on-error: true
 
       - name: Commit if changed
+        if: steps.guard.outputs.skip != 'true'
         run: |
           git config user.name  "sbor-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -54,10 +76,40 @@ jobs:
             git push
           fi
 
+      # The morning brief, straight after the fixing rather than on its own
+      # schedule, so it cannot be delayed twice. It reads the files the fixing
+      # just wrote, because the site has not rebuilt yet. If it fails, the
+      # fixing still stands, so it does not mark the job as failed.
+      - name: Morning brief
+        id: brief
+        if: steps.guard.outputs.skip != 'true'
+        continue-on-error: true
+        env:
+          SBOR_LOCAL: "1"
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Change to claude-haiku-4-5-20251001 for a cheaper, terser brief.
+          BRIEF_MODEL: claude-sonnet-5
+        run: node scripts/brief.mjs
+
+      - name: Say so if the brief failed
+        if: steps.brief.outcome == 'failure'
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ]; then exit 0; fi
+          MSG=$(printf 'SBOR morning brief FAILED on %s.\n\nThe fixing itself was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
+          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TG_CHAT" \
+            --data-urlencode "disable_web_page_preview=true" \
+            --data-urlencode "text=$MSG" > /dev/null
+
       # Only pings when something actually moved. A quiet day stays quiet.
       # One message per draft, so each arrives ready to copy and paste.
       - name: Notify if there is something to post
-        if: steps.draft.outputs.has_drafts == 'true'
+        if: steps.guard.outputs.skip != 'true' && steps.draft.outputs.has_drafts == 'true'
         env:
           TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -73,7 +125,7 @@ jobs:
             /* Everything below the rule is for the reader, not for the post.
                Copy stops at the rule. */
             const extra = d.otherCount
-              ? `\n\n\u2014\u2014\u2014 not part of the post \u2014\u2014\u2014\n${d.otherCount} other thing${d.otherCount>1?"s":""} moved: sbor.xyz/post.txt`
+              ? `\n\n--- not part of the post ---\n${d.otherCount} other thing${d.otherCount>1?"s":""} moved: sbor.xyz/post.txt`
               : "";
             fetch(`https://api.telegram.org/bot${process.env.TG_TOKEN}/sendMessage`, {
               method: "POST",
