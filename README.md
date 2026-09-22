@@ -164,8 +164,9 @@ and in the machine-readable documentation.
 
 ## How it runs
 
-A GitHub Action computes the fixing and commits it. It is attempted four times
-a day, because the scheduler can drop runs, and any one landing is enough. The
+A GitHub Action computes the fixing and commits it. It is attempted up to four
+times a day, because the scheduler can drop runs, and the first to land is
+final: later attempts are backups that run only if the day has no fixing yet. The
 site serves directly from this repository, so the published record and the site
 are the same files. Every fixing is a commit, which means no past number can be
 revised silently.
