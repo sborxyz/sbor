@@ -1,10 +1,10 @@
 {
   "name": "sbor-mcp",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "Check a lending rate before your agent borrows. The benchmark rate for Stacks, read from contract state. Free, no key, no rate limit.",
   "type": "module",
   "bin": {
-    "sbor-mcp": "./server.mjs"
+    "sbor-mcp": "server.mjs"
   },
   "main": "./server.mjs",
   "license": "MIT",
