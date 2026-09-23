@@ -1,10 +1,26 @@
-SBOR post drafts, fixing 2026-09-22T21:07:28Z
-Compared with 2026-09-21
+SBOR post drafts, fixing 2026-09-23T12:20:09Z
+Compared with 2026-09-22
 
-Nothing moved enough to be worth posting.
+2 things worth saying. Pick one. Do not post more than one a day.
 
-Thresholds: a rate moving 25 bps, the staking yield moving 50 bps or
-changing cycle, an index appearing or dropping out, utilization
-crossing 80% or 20% in either direction, an inversion, or a term
-average publishing. A level that has not moved since yesterday is
-not news and is deliberately not flagged.
+--- 1. SBOR-STX supply moved -68 bps (149 chars)
+
+SBOR-STX supply rate: 1.14% to 0.46%.
+
+-68 bps in a day.
+
+Cheapest constituent now Zest V2 STX at 0.92%, utilization 50.24%.
+
+sbor.xyz
+
+--- 2. Zest V2 STX utilization fell back below 80% (135 chars)
+
+Zest V2 STX is back to 50.24% utilized, down from 80.59%.
+
+Borrow 2.08%, supply 0.92%.
+
+The squeeze has eased.
+
+sbor.xyz
+
+Check the numbers against the site before posting. Never state a cause.
