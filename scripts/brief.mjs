@@ -167,6 +167,33 @@ if (stx?.published){
 }
 facts.flags = flags;
 
+/* Every move written out whole: what moved, from where, to where. On 23
+   September the model paired the Zest STX market's 150 bps fall with the
+   SBOR-STX index level of 0.46%, when the market was at 0.92%. It had both
+   numbers side by side and still crossed them, so it is no longer asked to pair
+   anything: it quotes a phrase that already carries its own start and end. */
+const moves = [];
+function addMove(subject, field, now, changeBps){
+  if (now == null || changeBps == null || changeBps === 0) return;
+  const was = Number((now - changeBps / 100).toFixed(2));
+  moves.push({
+    subject, field, fromPct: was, toPct: now, changeBps,
+    phrase: `${subject} ${field} ${changeBps > 0 ? "up" : "down"} ${Math.abs(changeBps)} basis points, from ${was.toFixed(2)}% to ${Number(now).toFixed(2)}%`
+  });
+}
+for (const ix of facts.indices){
+  if (!ix.published) continue;
+  addMove(`${ix.label} index`, "borrow", ix.borrowPct, ix.borrowChange1dBps);
+  addMove(`${ix.label} index`, "supply", ix.supplyPct, ix.supplyChange1dBps);
+  addMove(`${ix.label} index`, "utilization", ix.utilizationPct, ix.utilizationChange1dBps);
+  for (const m of ix.markets){
+    addMove(`${m.venue} ${m.asset} market`, "borrow", m.borrowPct, m.borrowChange1dBps);
+    addMove(`${m.venue} ${m.asset} market`, "supply", m.supplyPct, m.supplyChange1dBps);
+    addMove(`${m.venue} ${m.asset} market`, "utilization", m.utilizationPct, m.utilizationChange1dBps);
+  }
+}
+facts.moves = moves;
+
 log(`brief for ${facts.date}: ${flags.length} flag(s)`);
 
 /* ---------- write ---------- */
@@ -186,6 +213,8 @@ A field ending **Percent** is a percentage change, so write it with a percent si
 A field ending **Pct** is a level already expressed as a percentage: borrow 4.05%.
 
 Before you send, reread every number you wrote and check its unit against the field it came from.
+
+0b. LEVELS. Every change you mention must come from the "moves" list, stated with that entry's own subject and its own fromPct and toPct. An index and each of its markets have different levels. A market's change never takes the index's level, and the index's change never takes a market's. On 23 September a brief said the Zest STX market's supply fell 150 basis points "to 0.46%": the market was at 0.92%, and 0.46% was the whole SBOR-STX index. Copy the numbers from the phrase. Do not pair a change and a level yourself.
 
 1. Every number you write must appear in the JSON you are given. You cannot fetch anything, and any figure not in the payload does not exist. If you are unsure of a number, leave it out. A benchmark that publishes an invented figure has failed at the only thing it does.
 
