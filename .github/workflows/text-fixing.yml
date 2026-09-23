@@ -1,0 +1,44 @@
+name: Test a full fixing without publishing
+
+# Runs the whole fixing, the Aave contract reads and the change feed exactly as
+# the morning job does, then prints what they produced. Manual only. It has no
+# permission to push and commits nothing: everything it writes disappears with
+# the runner. Run it before any change to fetch.mjs goes live.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Compute a fixing, not published
+        run: node scripts/fetch.mjs
+
+      - name: Record parameter changes, twice
+        run: |
+          node scripts/changes.mjs
+          node scripts/changes.mjs
+
+      - name: Show what was produced
+        run: |
+          node -e '
+          const d = require("./api/v1/latest.json");
+          console.log("\nPARAMETERS READ FROM THE CONTRACTS");
+          for (const [m, f] of Object.entries(d.parameters?.markets || {})) console.log("  " + m.padEnd(18) + JSON.stringify(f));
+          console.log("\nCOMPARISON, WHERE EACH MARKET CAME FROM");
+          for (const m of d.externalReference?.markets || []) console.log("  " + (m.venue + " " + m.asset).padEnd(34) + "borrow " + String(m.borrow).padStart(5) + "  source " + (m.source || "none"));
+          const c = require("./api/v1/changes.json");
+          console.log("\nCHANGE FEED: baseline holds " + Object.keys(c.baseline?.markets || {}).length + " markets, " + c.changes.length + " changes recorded\n");
+          '
