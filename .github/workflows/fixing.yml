@@ -71,6 +71,17 @@ jobs:
           SBOR_FIXING: "1"
         run: node scripts/fetch.mjs
 
+      # The change feed: compares the protocol parameters this fixing read
+      # with the last known ones and records any difference in
+      # api/v1/changes.json. Before the drafter and the commit, so the change
+      # is committed with the fixing and the brief can see it. Like the
+      # drafter, it can never stop the fixing publishing, and reports itself.
+      - name: Record parameter changes
+        if: steps.guard.outputs.skip != 'true'
+        id: changes
+        continue-on-error: true
+        run: node scripts/changes.mjs
+
       # continue-on-error means a crashing drafter can never stop the fixing
       # from publishing. But until 23 September a crash was also silent: no
       # draft and no alert, so an inversion could have gone unannounced. Four
@@ -133,6 +144,19 @@ jobs:
         run: |
           if [ -z "$TG_TOKEN" ]; then exit 0; fi
           MSG=$(printf 'SBOR post draft FAILED on %s.\n\nThe fixing itself was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
+          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TG_CHAT" \
+            --data-urlencode "disable_web_page_preview=true" \
+            --data-urlencode "text=$MSG" > /dev/null
+
+      - name: Say so if the change feed failed
+        if: steps.changes.outcome == 'failure'
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ]; then exit 0; fi
+          MSG=$(printf 'SBOR change feed FAILED on %s.\n\nThe fixing itself was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
           curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
             --data-urlencode "chat_id=$TG_CHAT" \
             --data-urlencode "disable_web_page_preview=true" \
