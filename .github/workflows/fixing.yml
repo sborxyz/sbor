@@ -71,9 +71,14 @@ jobs:
           SBOR_FIXING: "1"
         run: node scripts/fetch.mjs
 
+      # The drafter runs before the commit, so if it crashed the day's fixing
+      # would never be published. It must never be able to do that: a failed
+      # draft is reported, and the fixing commits regardless. Four crashes of
+      # exactly this kind were found in it on 23 September.
       - name: Draft a post if something moved
         if: steps.guard.outputs.skip != 'true'
         id: draft
+        continue-on-error: true
         run: node scripts/post.mjs
         continue-on-error: true
 
@@ -115,6 +120,19 @@ jobs:
         run: |
           if [ -z "$TG_TOKEN" ]; then exit 0; fi
           MSG=$(printf 'SBOR morning brief FAILED on %s.\n\nThe fixing itself was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
+          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TG_CHAT" \
+            --data-urlencode "disable_web_page_preview=true" \
+            --data-urlencode "text=$MSG" > /dev/null
+
+      - name: Say so if the draft failed
+        if: steps.draft.outcome == 'failure'
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ]; then exit 0; fi
+          MSG=$(printf 'SBOR post draft FAILED on %s.\n\nThe fixing itself was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
           curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
             --data-urlencode "chat_id=$TG_CHAT" \
             --data-urlencode "disable_web_page_preview=true" \
