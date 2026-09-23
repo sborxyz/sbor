@@ -52,6 +52,13 @@ header{border-bottom:1px solid var(--rule)}
 .switch button .tabnum i{font-style:normal;color:var(--ink-soft);margin:0 2px}
 .switch button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 .switch button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tabs{display:flex;gap:30px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--rule-soft)}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{flex:0 0 auto;font-size:14.5px;color:var(--ink-soft);text-decoration:none;padding:12px 0 10px;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tabs-ready [data-tabpage]:not(.tab-on){display:none!important}
 
 .fixing{padding:46px 0 42px;border-bottom:1px solid var(--rule)}
 .fixing h1{font-size:clamp(19px,2.4vw,25px);font-weight:450;line-height:1.35;max-width:38ch}
@@ -235,7 +242,16 @@ a{color:var(--accent)}
   </div>
 </header>
 
-<div class="intro">
+<div class="wrap">
+  <nav class="tabs" id="tabs" aria-label="Sections">
+    <a href="#rates" data-tab="rates" id="tab-rates">Rates</a>
+    <a href="#staking" data-tab="staking" id="tab-staking">Staking</a>
+    <a href="#agents" data-tab="agents" id="tab-agents">For agents</a>
+    <a href="#method" data-tab="method" id="tab-method">Method</a>
+  </nav>
+</div>
+
+<div class="intro" data-tabpage="rates">
   <div class="wrap intro-in">
     <h2 id="t-introH"></h2>
     <p id="t-introP"></p>
@@ -243,14 +259,14 @@ a{color:var(--accent)}
   </div>
 </div>
 
-<div class="wrap">
+<div class="wrap" data-tabpage="rates">
   <nav class="switch" id="switch" aria-label="Index currency"></nav>
 </div>
 
 <main>
   <div class="wrap">
 
-    <div class="fixing">
+    <div class="fixing" data-tabpage="rates">
       <h1 id="hl"></h1>
       <p class="stamp" id="stamp"></p>
       <div class="rates">
@@ -267,7 +283,7 @@ a{color:var(--accent)}
       </div>
     </div>
 
-    <section id="terms-sec">
+    <section id="terms-sec" data-tabpage="rates">
       <div class="sec-h">
         <div>
           <h2 id="t-termsH"></h2>
@@ -282,7 +298,7 @@ a{color:var(--accent)}
       </div>
     </section>
 
-    <section id="ext-sec" hidden>
+    <section id="ext-sec" data-tabpage="rates" hidden>
       <div class="sec-h">
         <div>
           <h2 id="t-extH"></h2>
@@ -310,7 +326,7 @@ a{color:var(--accent)}
       </div>
     </section>
 
-    <section id="pox-sec" hidden>
+    <section id="pox-sec" data-tabpage="staking" hidden>
       <div class="sec-h">
         <div>
           <h2 id="t-poxH"></h2>
@@ -326,7 +342,7 @@ a{color:var(--accent)}
       <p class="coverage" id="poxChartNote" style="margin:10px 0 0"></p>
     </section>
 
-    <section>
+    <section data-tabpage="rates">
       <div class="sec-h">
         <div>
           <h2 id="t-hist-h"></h2>
@@ -344,7 +360,7 @@ a{color:var(--accent)}
       <div class="legend" id="legend"></div>
     </section>
 
-    <section>
+    <section data-tabpage="rates">
       <div class="sec-h">
         <div>
           <h2 id="t-cons-h"></h2>
@@ -361,7 +377,7 @@ a{color:var(--accent)}
       <p class="foot-note" id="t-cons-foot"></p>
     </section>
 
-    <section id="inv-sec">
+    <section id="inv-sec" data-tabpage="rates">
       <div class="sec-h">
         <div>
           <h2 id="t-invH"></h2>
@@ -373,7 +389,7 @@ a{color:var(--accent)}
     </section>
 
 
-    <section>
+    <section data-tabpage="method">
       <div class="sec-h"><div><h2 id="t-method-h"></h2></div></div>
       <div class="method">
         <div id="method-a"></div>
@@ -382,7 +398,7 @@ a{color:var(--accent)}
       <p class="foot-note" id="t-sources"></p>
     </section>
 
-    <section id="dev">
+    <section id="dev" data-tabpage="agents">
       <div class="sec-h">
         <div>
           <h2 id="t-devH"></h2>
@@ -395,6 +411,7 @@ a{color:var(--accent)}
           <pre class="code"><a href="/api/v1/latest.json">/api/v1/latest.json</a>     current fixing, with constituents
 <a href="/api/v1/history.json">/api/v1/history.json</a>    daily series since the index began
 <a href="/api/v1/backfill.json">/api/v1/backfill.json</a>   reconstructed context, not the record
+<a href="/api/v1/inversions.json">/api/v1/inversions.json</a> cross venue spread, every three hours
 <a href="/latest.txt">/latest.txt</a>             plain text, one line per currency
 <a href="/weekly.txt">/weekly.txt</a>             weekly report, plain text
 <a href="/llms.txt">/llms.txt</a>               method and integration policy</pre>
@@ -410,6 +427,9 @@ a{color:var(--accent)}
 }</pre>
         </div>
       </div>
+      <div class="devk" id="t-devMcpH" style="margin-top:26px"></div>
+      <p class="coverage" id="t-devMcpP" style="margin:6px 0 10px"></p>
+      <pre class="code">npx -y sbor-mcp</pre>
       <div class="devk" id="t-contractsH" style="margin-top:26px"></div>
       <div class="contracts" id="contracts"></div>
     </section>
@@ -511,6 +531,9 @@ en:{
   poxCycleMark:c=>`cycle ${c} settled`,
   poxMeta:(c,btc,stx,x,w)=>`Read fresh each day from the bitcoin actually paid out in completed reward cycle ${c}${w} · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over 7 days`,
   csv:"Download CSV",
+  tabRates:"Rates", tabStaking:"Staking", tabAgents:"For agents", tabMethod:"Method",
+  devMcpH:"As an MCP tool",
+  devMcpP:"Before your agent borrows, check the rate. If an offer is more than 50 basis points above the benchmark, stop and ask a human. Works in Claude Desktop, Cursor and any MCP client.",
   devH:"Use the data",
   devP:"Everything on this page is available as JSON and plain text. The published fixing is free to read: no key, no rate limit, no registration. Build against v1 and it will not change shape under you.",
   devEndpoints:"Endpoints",
@@ -601,6 +624,9 @@ pt:{
   poxCycleMark:c=>`ciclo ${c} fechou`,
   poxMeta:(c,btc,stx,x,w)=>`Lido todo dia a partir do bitcoin efetivamente pago no ciclo de recompensa ${c}, já concluído${w} · ${btc} BTC pagos a stakers · ${stx} STX travados · convertido a ${x} STX por BTC, média de 7 dias`,
   csv:"Baixar CSV",
+  tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes", tabMethod:"Metodologia",
+  devMcpH:"Como ferramenta MCP",
+  devMcpP:"Antes de o seu agente tomar um empréstimo, confira a taxa. Se uma oferta estiver mais de 50 pontos-base acima do benchmark, pare e pergunte a um humano. Funciona no Claude Desktop, no Cursor e em qualquer cliente MCP.",
   devH:"Use os dados",
   devP:"Tudo nesta página está disponível em JSON e texto puro. O fixing publicado é livre para leitura: sem chave, sem limite de requisições, sem cadastro. Construa sobre a v1 e o formato não muda embaixo de você.",
   devEndpoints:"Endpoints",
@@ -814,6 +840,8 @@ function renderChrome(){
   set("t-method-h", t.methodH);
   set("t-signup-h", t.signupH); set("t-signup-p", t.signupP);
   set("t-devH", t.devH); set("t-devP", t.devP);
+  set("tab-rates", t.tabRates); set("tab-staking", t.tabStaking); set("tab-agents", t.tabAgents); set("tab-method", t.tabMethod);
+  set("t-devMcpH", t.devMcpH); set("t-devMcpP", t.devMcpP);
   set("t-devEndpoints", t.devEndpoints); set("t-devExample", t.devExample);
   set("t-contractsH", t.contractsH);
   set("contracts", CONTRACTS.map(c =>
@@ -1135,6 +1163,34 @@ async function boot(){
   }catch(e){ console.warn("Live fixing unavailable, showing bundled snapshot.", e); }
   renderChrome(); render();
 }
+
+/* Sections as tabs, each with its own link: sbor.xyz/#method and so on. The
+   page stays one file, so every tab draws on the same data and translations,
+   and the tabs only choose what is shown. The hiding rule applies only once
+   tabs-ready is set, so if this ever failed the page would show everything
+   rather than nothing, and readers that do not run scripts see it all. */
+const TABS = ["rates", "staking", "agents", "method"];
+function currentTab(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (TABS.includes(h)) return h;
+  if (h){
+    const el = document.getElementById(h);
+    const page = el && el.closest("[data-tabpage]");
+    if (page) return page.dataset.tabpage;
+  }
+  return "rates";
+}
+function showTab(){
+  const tab = currentTab();
+  document.querySelectorAll("[data-tabpage]").forEach(el => el.classList.toggle("tab-on", el.dataset.tabpage === tab));
+  document.querySelectorAll("#tabs a").forEach(a => a.setAttribute("aria-current", a.dataset.tab === tab ? "page" : "false"));
+  document.body.classList.add("tabs-ready");
+}
+window.addEventListener("hashchange", () => {
+  showTab();
+  if (TABS.includes(location.hash.slice(1))) window.scrollTo(0, 0);
+});
+showTab();
 boot();
 </script>
 </body>
