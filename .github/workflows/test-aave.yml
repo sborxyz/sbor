@@ -1,7 +1,8 @@
 name: Test Aave contract reads
 
 # Reads Aave V3 on Ethereum and Base straight from the contracts and prints the
-# result beside the DefiLlama figures SBOR publishes today. Manual only. It
+# result beside the DefiLlama figures SBOR publishes today. Then lists every
+# Stacks pool on DefiLlama, to show where SBOR's depth figures come from. Manual only. It
 # commits nothing and changes nothing: it exists to prove the reads are right
 # before they are allowed anywhere near the fixing.
 on:
@@ -23,5 +24,10 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      # continue-on-error so the depth check below still runs if Aave disagrees.
       - name: Read Aave from the contracts and compare
+        continue-on-error: true
         run: node scripts/aave.mjs
+
+      - name: Show how DefiLlama reports Stacks depth
+        run: node scripts/check-depth.mjs
