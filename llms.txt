@@ -97,6 +97,15 @@ which is what this comparison exists for. It is published so
 a reader can see what comparable capital costs elsewhere. It is never a
 constituent of any index and never affects a fixing.
 
+Aave on Ethereum and on Base is read from Aave's own contracts and converted to
+effective APY, the same basis as the SBOR indices, with the simple annual rate
+kept as nominalBorrow and nominalSupply. The other venues come from DefiLlama
+and are shown as it publishes them. Each market's source field says which.
+Note that DefiLlama reports Aave as a simple annual rate, so before 23 September
+2026 the Aave figures here were about 10 basis points lower than on SBOR's
+basis. depthUsd comes from DefiLlama for every venue and only decides which
+venue is shown for a chain.
+
 ## What SBOR is not
 
 SBOR is not an investment, a yield opportunity, or a product to deposit into.
