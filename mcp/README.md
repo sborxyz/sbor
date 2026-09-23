@@ -1,4 +1,4 @@
-<!-- mcp-name: io.github.sborxyz/sbor -->
+<!-- mcp-name: xyz.sbor/sbor -->
 
 # SBOR MCP server
 
