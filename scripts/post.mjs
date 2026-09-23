@@ -27,6 +27,7 @@ const POX_MOVE_BPS = 50;       // the staking yield moving this much
 const UTIL_HIGH = 80;          // utilization crossing up through this
 const UTIL_LOW = 20;           // or down through this
 
+const log = (...a) => console.error(...a);
 const bps = (a, b) => Math.round((a - b) * 100);
 const sign = n => (n > 0 ? "+" : "") + n;
 const pct = n => n.toFixed(2) + "%";
@@ -81,14 +82,14 @@ if (prior){
 
     drafts.push({
       rank: 50,
-      key: `ratemove:${moved.label}:${moved.key}`,
+      key: `ratemove:${label}:${moved.key}`,
       why: `${label} ${moved.key} moved ${sign(moved.d)} bps`,
       text:
 `${label} ${moved.key} rate: ${pct(moved.then)} to ${pct(moved.now)}.
 
 ${sign(moved.d)} bps in a day.
 
-Cheapest constituent now ${best.venue} ${best.asset} at ${pct(best[moved.key])}, utilization ${pct(best.utilization)}.
+${moved.key === "borrow" ? "Cheapest to borrow" : "Best paying to supply"} now: ${best.venue} ${best.asset} at ${pct(best[moved.key])}, utilization ${pct(best.utilization)}.
 
 ${LINK}`
     });
@@ -136,7 +137,7 @@ ${LINK}`
     if (Math.abs(d) >= POX_MOVE_BPS || cycleChanged){
       drafts.push({
         rank: cycleChanged ? 30 : 60,
-        key: cycleChanged ? `poxsettled:${pox.cycle}` : `poxdrift:${new Date().toISOString().slice(0,10)}`,
+        key: cycleChanged ? `poxsettled:${now.cycle}` : `poxdrift:${new Date().toISOString().slice(0,10)}`,
         why: cycleChanged ? `PoX cycle ${was.cycle} to ${now.cycle}` : `PoX moved ${sign(d)} bps`,
         text: cycleChanged
 ? `Reward cycle ${now.cycle} settled.
@@ -250,7 +251,7 @@ ${LINK}`
 
     drafts.push({
       rank: 10,
-      key: `inversion:${f.asset}:${f.borrowVenue}:${f.supplyVenue}`,
+      key: `inversion:${asset}:${best.borrowAt.venue}:${best.supplyAt.venue}`,
       why: `INVERSION on ${asset}: supply ${best.supplyAt.venue} ${best.supplyAt.supply}% vs borrow ${best.borrowAt.venue} ${best.borrowAt.borrow}%`,
       text:
 `${asset} is inverted across venues.
@@ -273,7 +274,7 @@ for (const [label, ix] of Object.entries(latest.indices)){
     if (wasIx && wasIx[`avg${days}`]) continue;   // only announce once
     drafts.push({
       rank: 40,
-      key: `poxcycle:${pox.cycle}`,
+      key: `termavg:${label}:${k}`,
       why: `${label} ${days}-day average first published`,
       text:
 `${label} now has a ${days} day average.
