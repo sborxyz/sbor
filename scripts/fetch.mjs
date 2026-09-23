@@ -158,6 +158,17 @@ const IS_FIXING = process.env.SBOR_FIXING === "1";
 const log = (...a) => console.error(...a);
 let LAST_READER = null;   // which Zest data contract answered most recently
 
+/* Protocol parameters met along the way, recorded for the change feed. Only
+   what SBOR already reads to compute a rate; nothing extra is fetched. Every
+   write is guarded, so recording a parameter can never stop a fixing. A value
+   that could not be read is stored as null, and the change feed never treats
+   a null as a change. */
+const PARAMS = {};
+const fin = (x, d = 4) => Number.isFinite(x) ? round(x, d) : null;
+function param(market, fields){
+  try { PARAMS[market] = { ...(PARAMS[market] || {}), ...fields }; } catch {}
+}
+
 async function depthBySymbol(){
   const r = await fetch(POOLS_URL, { headers:{ accept:"application/json" } });
   if(!r.ok) throw new Error(`pools responded ${r.status}`);
@@ -205,6 +216,19 @@ async function apysFor(asset){
   const utilization = Number.isFinite(utilRaw) ? utilRaw / 100 : null;
   if (!Number.isFinite(supply) || !Number.isFinite(borrow))
     throw new Error(`unexpected shape: ${JSON.stringify(v).slice(0,200)}`);
+  /* fee-reserve is the reserve factor in basis points: the share of interest
+     Zest keeps rather than paying to suppliers. 9999 on USDh is why USDh
+     suppliers earn nothing. */
+  try {
+    const feeRaw = Number(t["fee-reserve"]?.value ?? t["fee-reserve"]);
+    const plain = x => (x == null ? null : String(x?.value ?? x));
+    param("Zest V2", { dataContract: used });
+    param(`Zest V2 ${asset.symbol}`, {
+      reserveFactor: fin(feeRaw / 100, 2),
+      vaultId: plain(t["vault-id"]),
+      underlying: plain(t["underlying"])
+    });
+  } catch {}
   return { supply, borrow, utilization, supplyNominal, borrowNominal };
 }
 
@@ -253,6 +277,14 @@ async function graniteMarket(){
      SCALING-FACTOR of 1e8 */
   const ONE8 = 1e8;
   const reservePct = numOf(st["protocol-reserve-percentage"]) / ONE8;
+
+  /* The whole rate curve, in percent: the rate at zero utilization, the slope
+     up to the kink, the steeper slope after it, where the kink sits, and the
+     share of interest Granite keeps. */
+  param(`Granite ${GRANITE.asset}`, {
+    baseRate: fin(baseIR * 100), slope1: fin(slope1 * 100), slope2: fin(slope2 * 100),
+    kink: fin(kink * 100), reserveShare: fin(reservePct * 100)
+  });
 
   const ur = totalAssets > 0 ? openInterest / totalAssets : 0;
   const apr = ur < kink
@@ -405,6 +437,10 @@ const main = async () => {
     isDailyFixing: IS_FIXING,
     basis:"APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
     ...(LAST_READER && { zestDataContract: LAST_READER }),
+    ...(Object.keys(PARAMS).length && { parameters: {
+      note: "Protocol parameters read from contract state while producing this fixing, in percent. For Granite, its interest rate curve: the rate at zero utilization, the slope up to the kink, the slope after it, where the kink sits, and the share of interest it keeps. For each Zest market, its reserve factor, the share of interest Zest keeps, plus its vault and underlying token, and which Zest data contract answered. Any change from one fixing to the next is published in api/v1/changes.json. A value that could not be read is null, never estimated.",
+      markets: PARAMS
+    } }),
     method:"https://sbor.xyz/llms.txt",
     source:"Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
     indices,
