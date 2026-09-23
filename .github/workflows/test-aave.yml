@@ -1,0 +1,27 @@
+name: Test Aave contract reads
+
+# Reads Aave V3 on Ethereum and Base straight from the contracts and prints the
+# result beside the DefiLlama figures SBOR publishes today. Manual only. It
+# commits nothing and changes nothing: it exists to prove the reads are right
+# before they are allowed anywhere near the fixing.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Read Aave from the contracts and compare
+        run: node scripts/aave.mjs
