@@ -58,6 +58,7 @@ No key, no registration, no rate limit, no fee. CORS open.
 | [`/api/v1/archive-index.json`](https://sbor.xyz/api/v1/archive-index.json) | every date available, for per date lookup |
 | [`/api/v1/inversions.json`](https://sbor.xyz/api/v1/inversions.json) | cross venue spread, checked every three hours |
 | [`/api/v1/inversion-log.json`](https://sbor.xyz/api/v1/inversion-log.json) | append-only record of every inversion found |
+| [`/api/v1/changes.json`](https://sbor.xyz/api/v1/changes.json) | protocol parameter changes, newest first, from 24 September 2026 |
 | [`/api/v1/archive/`](https://sbor.xyz/api/v1/archive/) | immutable daily snapshots |
 | [`/latest.txt`](https://sbor.xyz/latest.txt) | current fixing, plain text |
 | [`/weekly.txt`](https://sbor.xyz/weekly.txt) | weekly report, plain text |
