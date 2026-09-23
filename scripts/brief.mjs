@@ -165,6 +165,19 @@ if (stx?.published){
       if (l.netBps > 0) flags.push(`Same exposure: ${l.leg} nets +${l.netBps} bps after the protocol yield. Worth checking whether it is real.`);
   }
 }
+
+/* A protocol changing its own parameters is always worth a line, because it
+   moves rates without any borrower doing anything. Read from the change feed
+   the fixing just wrote. A missing or unreadable feed is simply skipped. */
+try {
+  const feed = await get("/api/v1/changes.json");
+  const show = v => (typeof v === "number" ? `${v}` : v ?? "none");
+  for (const c of (feed.changes || []).filter(c => c.date === facts.date)){
+    flags.push(c.parameter === "market"
+      ? `New market in the fixing for the first time: ${c.market}.`
+      : `Parameter change read from the contract: ${c.market}, ${c.label}, from ${show(c.from)} to ${show(c.to)}. The protocol changed this itself; it is not a market move.`);
+  }
+} catch (e) { log(`change feed not read: ${e.message}`); }
 facts.flags = flags;
 
 /* Every move written out whole: what moved, from where, to where. On 23
