@@ -167,6 +167,7 @@ fixing with a note.
 - https://sbor.xyz/api/v1/archive/YYYY-MM-DD.json  the fixing for one specific date
 - https://sbor.xyz/api/v1/archive-index.json  every date available, first and last
 - https://sbor.xyz/api/v1/inversion-log.json  every inversion episode ever detected
+- https://sbor.xyz/api/v1/changes.json    protocol parameter changes, newest first
 - https://sbor.xyz/latest.txt            current fixing as plain text
 - https://sbor.xyz/weekly.txt            weekly report as plain text
 
@@ -218,9 +219,9 @@ moves it considerably. Read the cycle number before comparing two fixings.
 
 An inversion is the same asset costing less to borrow at one venue than it pays
 to supply at another. It should not happen, because that spread is how a lending
-protocol earns, but an incentivised market can cause it.
+protocol earns, but an incentivized market can cause it.
 
-SBOR checks hourly and publishes what it finds at
+SBOR checks every three hours and publishes what it finds at
 https://sbor.xyz/api/v1/inversions.json, to everyone at once and never to a
 private channel. Each detection carries the asset, both venues, both rates, the
 utilization on each side and the edge in basis points.
@@ -276,9 +277,22 @@ that day, unabridged. If the series and the archive ever disagree, the archive
 is authoritative.
 
 inversion-log.json is append only. Each entry is an episode rather than a
-reading, with firstSeen, lastSeen, how many hourly checks saw it, and the
+reading, with firstSeen, lastSeen, how many checks saw it (one every three hours), and the
 largest edge observed. An inversion that opens and closes inside a day still
 exists there tomorrow.
+
+changes.json records when a lending protocol changes its own parameters. A rate
+can move because borrowers moved, or because the protocol changed the curve
+under them, and from the rate alone the two look the same; this is the record
+that tells them apart. Every fixing carries a parameters block with what SBOR
+reads from contract state: Granite's interest rate curve (the rate at zero
+utilization, the slope up to the kink, the slope after it, where the kink sits,
+and the share of interest it keeps), and for each Zest market its reserve
+factor, vault and underlying token, plus which Zest data contract answered.
+Each fixing is compared with the last known values and any difference is
+appended, newest first, with the value before and after. A parameter that could
+not be read is never recorded as a change. Recording began on 24 September
+2026.
 
 Every fixing records the methodology version it was produced under, so a figure
 can always be traced to the rules that made it. Published fixings are never
