@@ -4,14 +4,14 @@
  * An inversion is the same asset costing less to borrow at one venue than it
  * pays to supply at another. It should not happen: the spread between borrow
  * and supply is how a lending protocol earns. It can happen when a market is
- * incentivised, because rewards can push the effective cost of capital below
+ * incentivized, because rewards can push the effective cost of capital below
  * what supply pays elsewhere.
  *
  * Nothing here trades. SBOR does not take a position on its own rate. This
  * detects and publishes, and during validation it also pings the maintainer so
  * the detection can be checked against reality before anyone relies on it.
  *
- * Runs hourly, separately from the daily fixing, because an inversion can open
+ * Runs every three hours, separately from the daily fixing, because an inversion can open
  * and close inside a day. It never writes a fixing and never touches history.
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -104,14 +104,14 @@ writeFileSync("api/v1/inversions.json", JSON.stringify(payload, null, 2) + "\n")
 
 /* Append-only log. The file above is the current state; this is the record.
    An inversion that opens and closes inside an hour would otherwise leave no
-   trace, and the whole point of watching hourly is to catch exactly that. */
+   trace, and the whole point of watching through the day is to catch exactly that. */
 if (found.length){
   let log_ = [];
   try { log_ = JSON.parse(readFileSync("api/v1/inversion-log.json", "utf8")); } catch {}
   for (const f of found){
     const last = [...log_].reverse().find(e =>
       e.asset === f.asset && e.borrowVenue === f.borrowVenue && e.supplyVenue === f.supplyVenue);
-    /* Extend an open episode rather than writing a row every hour. */
+    /* Extend an open episode rather than writing a row on every check. */
     const oneHourAgo = Date.now() - 75 * 60 * 1000;
     if (last && Date.parse(last.lastSeen) > oneHourAgo){
       last.lastSeen = stamp;
