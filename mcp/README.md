@@ -1,3 +1,5 @@
+<!-- mcp-name: io.github.sborxyz/sbor -->
+
 # SBOR MCP server
 
 Check a lending rate before your agent borrows.
