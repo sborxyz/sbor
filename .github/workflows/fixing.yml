@@ -71,16 +71,16 @@ jobs:
           SBOR_FIXING: "1"
         run: node scripts/fetch.mjs
 
-      # The drafter runs before the commit, so if it crashed the day's fixing
-      # would never be published. It must never be able to do that: a failed
-      # draft is reported, and the fixing commits regardless. Four crashes of
-      # exactly this kind were found in it on 23 September.
+      # continue-on-error means a crashing drafter can never stop the fixing
+      # from publishing. But until 23 September a crash was also silent: no
+      # draft and no alert, so an inversion could have gone unannounced. Four
+      # crashes of exactly that kind were found in it that day. The next step
+      # now reports a failed draft.
       - name: Draft a post if something moved
         if: steps.guard.outputs.skip != 'true'
         id: draft
         continue-on-error: true
         run: node scripts/post.mjs
-        continue-on-error: true
 
       - name: Commit if changed
         if: steps.guard.outputs.skip != 'true'
