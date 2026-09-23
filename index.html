@@ -59,6 +59,7 @@ header{border-bottom:1px solid var(--rule)}
 .tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
 .tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tabs-ready [data-tabpage]:not(.tab-on){display:none!important}
+.sofrtop{margin:18px 0 0;padding-left:12px;border-left:2px solid var(--accent);font-size:14.5px;color:var(--ink-soft);max-width:62ch}
 
 .fixing{padding:46px 0 42px;border-bottom:1px solid var(--rule)}
 .fixing h1{font-size:clamp(19px,2.4vw,25px);font-weight:450;line-height:1.35;max-width:38ch}
@@ -247,7 +248,7 @@ a{color:var(--accent)}
     <a href="#rates" data-tab="rates" id="tab-rates">Rates</a>
     <a href="#staking" data-tab="staking" id="tab-staking">Staking</a>
     <a href="#agents" data-tab="agents" id="tab-agents">For agents</a>
-    <a href="#method" data-tab="method" id="tab-method">Method</a>
+    <a href="#methodology" data-tab="methodology" id="tab-method">Methodology</a>
   </nav>
 </div>
 
@@ -281,6 +282,7 @@ a{color:var(--accent)}
           <div class="delta" id="supplyDelta"></div>
         </div>
       </div>
+      <p class="sofrtop" id="sofrTop" hidden></p>
     </div>
 
     <section id="terms-sec" data-tabpage="rates">
@@ -389,7 +391,7 @@ a{color:var(--accent)}
     </section>
 
 
-    <section data-tabpage="method">
+    <section data-tabpage="methodology">
       <div class="sec-h"><div><h2 id="t-method-h"></h2></div></div>
       <div class="method">
         <div id="method-a"></div>
@@ -509,6 +511,10 @@ en:{
   invValidating:"This monitor is being validated. Detections are published so the validation period is visible, but they have not yet been proven over a long enough run to be relied on.",
   invRow:(a,sv,sr,bv,br,e)=>`${a}: supplying at ${sv} pays ${sr}, borrowing the same asset at ${bv} costs ${br}. ${e} bps, before fees, gas and liquidation risk.`,
   invChecked:t=>`Checked ${t}, every three hours.`,
+  sofrTop:(sbor,sofr,bps)=> bps < 0
+    ? `Borrowing a dollar on Stacks costs ${sbor}. Against US Treasuries it costs ${sofr}. That is ${-bps} basis points cheaper here, because few people borrow yet, not because it is safer.`
+    : bps > 0 ? `Borrowing a dollar on Stacks costs ${sbor}. Against US Treasuries it costs ${sofr}. That is ${bps} basis points dearer here.`
+    : `Borrowing a dollar on Stacks costs ${sbor}, the same as against US Treasuries.`,
   sofrH:"Secured by Treasuries",
   sofrLine:(r,d)=>`SOFR ${r}, the overnight cost of a dollar in the US repo market, secured by US government debt. Published by the Federal Reserve Bank of New York for ${d}.`,
   sofrCompare:(sbor,sofr,bps)=>`A dollar borrowed against crypto collateral on Stacks costs ${sbor}. A dollar secured by US government debt costs ${sofr}. That is ${Math.abs(bps)} basis points ${bps < 0 ? "cheaper on Stacks" : "dearer on Stacks"}.`,
@@ -531,7 +537,7 @@ en:{
   poxCycleMark:c=>`cycle ${c} settled`,
   poxMeta:(c,btc,stx,x,w)=>`Read fresh each day from the bitcoin actually paid out in completed reward cycle ${c}${w} · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over 7 days`,
   csv:"Download CSV",
-  tabRates:"Rates", tabStaking:"Staking", tabAgents:"For agents", tabMethod:"Method",
+  tabRates:"Rates", tabStaking:"Staking", tabAgents:"For agents", tabMethod:"Methodology",
   devMcpH:"As an MCP tool",
   devMcpP:"Before your agent borrows, check the rate. If an offer is more than 50 basis points above the benchmark, stop and ask a human. Works in Claude Desktop, Cursor and any MCP client.",
   devH:"Use the data",
@@ -588,8 +594,8 @@ en:{
 },
 pt:{
   fullname:"Taxa de Referência de Bitcoin da Stacks",
-  introH:"Quanto o dinheiro custa de verdade na Stacks.",
-  introP:"Cada mercado de crédito cobra o seu preço. O SBOR publica uma taxa de mercado por moeda, ponderada pelo tamanho e lida direto dos contratos, para você ver o mercado em vez do número de uma plataforma só.",
+  introH:"O custo real do crédito no Bitcoin DeFi.",
+  introP:"Não existe taxa de referência para o crédito no Bitcoin DeFi. Cada plataforma mostra só o próprio número. O SBOR é essa referência, começando pela Stacks: uma taxa de mercado por moeda, lida direto dos contratos, todo dia.",
   introUse:"Use como régua. Tomar emprestado acima do SBOR significa pagar mais que o mercado. Depositar abaixo dele significa ganhar menos. Todo empréstimo aqui é sobrecolateralizado, e a garantia é o que você depositou, não um ativo específico, então um dólar tomado emprestado na Stacks é garantido por colateral cripto e não por bitcoin especificamente.",
   stamp:d=>`Taxa em <span class="num">${d}</span> · lida do estado dos contratos da Zest · atualizada diariamente`,
   borrowK:"APY de empréstimo", supplyK:"APY de depósito",
@@ -602,6 +608,10 @@ pt:{
   invValidating:"Este monitor está em validação. As detecções são publicadas para que o período de validação fique visível, mas ainda não foram comprovadas por tempo suficiente para servirem de base.",
   invRow:(a,sv,sr,bv,br,e)=>`${a}: depositar na ${sv} paga ${sr}, tomar o mesmo ativo emprestado na ${bv} custa ${br}. ${e} pontos-base, antes de taxas, gas e risco de liquidação.`,
   invChecked:t=>`Verificado ${t}, a cada três horas.`,
+  sofrTop:(sbor,sofr,bps)=> bps < 0
+    ? `Tomar um dólar emprestado na Stacks custa ${sbor}. Com garantia de títulos do Tesouro americano, custa ${sofr}. São ${-bps} pontos-base mais barato aqui, porque ainda pouca gente toma emprestado, não porque seja mais seguro.`
+    : bps > 0 ? `Tomar um dólar emprestado na Stacks custa ${sbor}. Com garantia de títulos do Tesouro americano, custa ${sofr}. São ${bps} pontos-base mais caro aqui.`
+    : `Tomar um dólar emprestado na Stacks custa ${sbor}, o mesmo que com garantia de títulos do Tesouro americano.`,
   sofrH:"Garantido por títulos do Tesouro",
   sofrLine:(r,d)=>`SOFR ${r}, o custo overnight de um dólar no mercado de repo dos Estados Unidos, garantido por dívida do governo americano. Publicado pelo Federal Reserve Bank of New York para ${d}.`,
   sofrCompare:(sbor,sofr,bps)=>`Um dólar tomado emprestado contra colateral cripto na Stacks custa ${sbor}. Um dólar garantido por dívida do governo americano custa ${sofr}. São ${Math.abs(bps)} pontos-base ${bps < 0 ? "mais barato na Stacks" : "mais caro na Stacks"}.`,
@@ -1053,7 +1063,14 @@ function render(){
     const d = Math.round((ix.borrow - sr.rate) * 100);
     set("sofrCompare", t.sofrCompare(fmt(ix.borrow)+"%", fmt(sr.rate)+"%", d));
     set("sofrWhy", d < 0 ? t.sofrWhy : "");
-  } else { sbox.hidden = true; }
+    /* The same comparison, one line, where nobody has to look for it. */
+    const top = document.getElementById("sofrTop");
+    top.hidden = false;
+    set("sofrTop", t.sofrTop(fmt(ix.borrow)+"%", fmt(sr.rate)+"%", d));
+  } else {
+    sbox.hidden = true;
+    document.getElementById("sofrTop").hidden = true;
+  }
   settle(document.getElementById("borrowVal"), ix.borrow);
   settle(document.getElementById("supplyVal"), ix.supply);
   /* What a supplier actually receives, where protocol yield applies. The
@@ -1164,14 +1181,15 @@ async function boot(){
   renderChrome(); render();
 }
 
-/* Sections as tabs, each with its own link: sbor.xyz/#method and so on. The
+/* Sections as tabs, each with its own link: sbor.xyz/#methodology and so on. The
    page stays one file, so every tab draws on the same data and translations,
    and the tabs only choose what is shown. The hiding rule applies only once
    tabs-ready is set, so if this ever failed the page would show everything
    rather than nothing, and readers that do not run scripts see it all. */
-const TABS = ["rates", "staking", "agents", "method"];
+const TABS = ["rates", "staking", "agents", "methodology"];
 function currentTab(){
   const h = decodeURIComponent(location.hash.slice(1));
+  if (h === "method") return "methodology";   // the first name, kept working
   if (TABS.includes(h)) return h;
   if (h){
     const el = document.getElementById(h);
