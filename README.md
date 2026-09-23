@@ -156,8 +156,9 @@ context from StackingDAO. The BTC to STX rate used for the staking reference
 from Bitflow, quoted in both directions. Proof of Transfer rewards from Hiro.
 Depth read on-chain where available and from DefiLlama otherwise.
 
-The comparison chains, Ethereum, Base, Hyperliquid and Solana, come from
-DefiLlama rather than contract state, so small differences are expected. SOFR
+In the comparison, Aave on Ethereum and Base is read from Aave's contracts, on
+the same basis as SBOR. The other chains, Hyperliquid and Solana, and Morpho on
+Base, come from DefiLlama, so small differences are expected for those. SOFR
 and its averages come from the Federal Reserve Bank of New York. Spot prices,
 recorded as context only, come from CoinGecko. Every source is named on the site
 and in the machine-readable documentation.
