@@ -8,7 +8,15 @@
  *
  * Source: DefiLlama pools and lend/borrow datasets. No key required.
  */
+import { readAaveReserve } from "./aave.mjs";
+
 const POOLS = "https://yields.llama.fi/pools";
+
+/* Chains where Aave is read from its contracts rather than from DefiLlama,
+   from 23 September 2026. DefiLlama reports Aave as a simple annual rate;
+   the contracts give the same rate, which is converted here to effective APY,
+   the basis every SBOR index uses, so the comparison is like for like. */
+const AAVE_CONTRACT_CHAINS = new Set(["Ethereum", "Base"]);
 const BORROW_URLS = [
   "https://yields.llama.fi/lendBorrow",
   "https://yields.llama.fi/poolsBorrow"
@@ -113,7 +121,9 @@ function borrowAprOf(rec){
   return null;
 }
 
-export async function externalReference(){
+/* contracts: false returns the DefiLlama figures alone. Used only by the test
+   in aave.mjs, which needs something independent to compare against. */
+export async function externalReference({ contracts = true } = {}){
   const { data = [] } = await getJson(POOLS);
 
   let borrowRes = null;
@@ -179,15 +189,33 @@ export async function externalReference(){
       depthUsd: Math.round(p.tvlUsd),
       pool: p.pool,
       url: venueUrl(p.project, p.chain, underlying, p.pool),
-      dataUrl: `https://defillama.com/yields/pool/${p.pool}`
+      dataUrl: `https://defillama.com/yields/pool/${p.pool}`,
+      source: "DefiLlama"
     };
-    log(`  external ${entry.asset} @ ${label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% util=${entry.utilization ?? "n/a"}% depth=${entry.depthUsd}`);
+
+    /* Read Aave from the contract where we can. If the read fails for any
+       reason, the DefiLlama figure stands and the entry says so: the
+       comparison is never lost to a failed read. */
+    if (contracts && p.project === "aave-v3" && AAVE_CONTRACT_CHAINS.has(p.chain) && underlying){
+      try {
+        const c = await readAaveReserve(p.chain, underlying);
+        entry.borrow = c.borrow;
+        entry.supply = c.supply;
+        entry.nominalBorrow = round(c.borrowApr);
+        entry.nominalSupply = round(c.supplyApr);
+        if (c.utilization != null) entry.utilization = c.utilization;
+        entry.source = "contract";
+      } catch (e) {
+        log(`  external ${entry.asset} @ ${label}: contract read failed, using DefiLlama. ${e.message}`);
+      }
+    }
+    log(`  external ${entry.asset} @ ${label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% util=${entry.utilization ?? "n/a"}% depth=${entry.depthUsd} (${entry.source})`);
     out.push(entry);
   }
   if (!out.length) throw new Error("no external reference pools resolved");
   return {
-    note: "Reference rates from the largest lending markets off this chain, published for comparison only. One market is selected per chain: a venue that publishes a borrow rate and utilization is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. These are not constituents of any SBOR index and never enter a fixing. Rates come from DefiLlama rather than from contract state, and are shown as the source publishes them, so they are not on the same basis as the SBOR indices.",
-    source: "DefiLlama",
+    note: "Reference rates from the largest lending markets off this chain, published for comparison only. One market is selected per chain: a venue that publishes a borrow rate and utilization is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. These are not constituents of any SBOR index and never enter a fixing. Aave on Ethereum and on Base is read from Aave's contracts and converted to effective APY, the same basis as the SBOR indices, with the simple annual rate kept as nominalBorrow and nominalSupply. The other venues come from DefiLlama and are shown as it publishes them, so they are not on quite the same basis. Each market's source field says which. depthUsd comes from DefiLlama for every venue and is used only to choose between venues.",
+    source: "Aave contracts on Ethereum and Base; DefiLlama for the other venues",
     markets: out
   };
 }
