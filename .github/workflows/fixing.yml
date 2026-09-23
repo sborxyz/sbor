@@ -14,7 +14,17 @@ on:
     - cron: "41 10 * * *"    # backup, only if the first was dropped
     - cron: "17 13 * * *"    # backup, only if both were
     - cron: "52 16 * * *"    # last chance before the day is lost
+  # The outside scheduler, cron-job.org, calls this at 08:30 UTC with
+  # trigger=scheduled, because GitHub's own schedule was dropped entirely on 14
+  # and 23 September. By hand, leave it on manual.
   workflow_dispatch:
+    inputs:
+      trigger:
+        description: "Leave as manual when running by hand. The outside scheduler sends scheduled."
+        required: false
+        default: manual
+        type: choice
+        options: [manual, scheduled]
 
 permissions:
   contents: write
@@ -25,19 +35,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # A scheduled backup stops here if today already has its fixing. A manual
-      # run always proceeds, because running it by hand is a deliberate choice;
-      # it is a public commit either way, so any replacement stays visible.
+      # A scheduled run stops here if today already has its fixing. "Scheduled"
+      # means GitHub's own cron or the outside scheduler, whichever reaches it
+      # first; the other then finds today fixed and stops. A manual run always
+      # proceeds, because running it by hand is a deliberate choice; it is a
+      # public commit either way, so any replacement stays visible.
       - name: Has today already been fixed
         id: guard
         run: |
           TODAY=$(date -u +%Y-%m-%d)
           LAST=$(node -e 'try{console.log(JSON.parse(require("fs").readFileSync("api/v1/latest.json","utf8")).fixing.slice(0,10))}catch(e){console.log("")}')
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "$LAST" = "$TODAY" ]; then
+          SCHEDULED=false
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.trigger }}" = "scheduled" ]; then SCHEDULED=true; fi
+          if [ "$SCHEDULED" = "true" ] && [ "$LAST" = "$TODAY" ]; then
             echo "Today was already fixed ($LAST). This backup attempt is not needed."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Fixing today ($TODAY). Last fixing on record: ${LAST:-none}. Trigger: ${{ github.event_name }}."
+            echo "Fixing today ($TODAY). Last fixing on record: ${LAST:-none}. Trigger: ${{ github.event_name }}, ${{ inputs.trigger || 'cron' }}."
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
