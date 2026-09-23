@@ -268,8 +268,8 @@ unbonded liquidity buffer, less their commission, less a payment to stSTX holder
 for STX locked in the bond. It moves with the STX yield and STX price. None of it enters an
 index or affects a rate. It is recorded so a past fixing can be read in the
 conditions of its day, and because SBOR-USD against SOFR is the comparison this
-benchmark is modelled on: a dollar secured by bitcoin on a Bitcoin layer against
-a dollar secured by US government debt.
+benchmark is modeled on: a dollar borrowed against crypto collateral on a
+Bitcoin layer, against a dollar secured by US government debt.
 
 archive/YYYY-MM-DD.json is the complete record: the entire payload as published
 that day, unabridged. If the series and the archive ever disagree, the archive
