@@ -131,7 +131,7 @@ const MARKETS = [
 
 async function compare(){
   const { externalReference } = await import("./external.mjs");
-  const ext = await externalReference();
+  const ext = await externalReference({ contracts: false });   // DefiLlama alone, to compare against
   const published = m => ext.markets.find(x => x.venue === `Aave V3, ${m.chain}` && x.asset === m.asset);
 
   const fmt = n => (n == null ? "n/a" : Number(n).toFixed(2).padStart(6));
