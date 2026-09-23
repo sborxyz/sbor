@@ -198,7 +198,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
   out += `</table></div>`;
 
   /* ---- off Stacks ---- */
-  out += `<h2>Off Stacks</h2><div class="hint">Context only, never a constituent. From <a href="https://defillama.com/yields" target="_blank" rel="noopener">DefiLlama</a> rather than contract state, so small differences are expected.</div><div class="scroll"><table>
+  out += `<h2>Off Stacks</h2><div class="hint">Context only, never a constituent. Aave on Ethereum and Base is read from its contracts, on the same basis as SBOR. The other venues come from <a href="https://defillama.com/yields" target="_blank" rel="noopener">DefiLlama</a>, so small differences are expected for those.</div><div class="scroll"><table>
     <tr><th>Market</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>Util</th><th>1d</th><th>Depth</th></tr>`;
   for (const m of (today.external || [])){
     const find = row => (row.external || []).find(x => x.v === m.v && x.a === m.a);
