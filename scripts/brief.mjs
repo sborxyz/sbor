@@ -91,7 +91,9 @@ const facts = {
   }),
 
   staking: {
-    poxApyPct: F(px(today).apy), poxApyChange1dBps: bps(px(today).apy, px(d1).apy),
+    poxApyPct: F(px(today).apy),
+    /* No change across a measurement correction: it would read as a market move. */
+    poxApyChange1dBps: (px(today).measurement ?? 1) === (px(d1).measurement ?? 1) ? bps(px(today).apy, px(d1).apy) : null,
     cycle: px(today).cycle ?? null,
     crossSmoothed: px(today).stxPerBtcSmoothed ?? null,
     crossSpot: px(today).stxPerBtc ?? null,
@@ -139,6 +141,8 @@ for (const ix of facts.indices){
 }
 if (facts.world.sofrChange1dBps != null && Math.abs(facts.world.sofrChange1dBps) >= 10)
   flags.push(`SOFR moved ${facts.world.sofrChange1dBps > 0 ? "+" : ""}${facts.world.sofrChange1dBps} bps to ${facts.world.sofrPct}%, which is large for an overnight rate.`);
+if ((px(today).measurement ?? 1) !== (px(d1).measurement ?? 1))
+  flags.push(`SBOR-PoX is measured the corrected way from today: the chain's exact cycle window and that cycle's own STX locked. Today's figure is not comparable with yesterday's, so no change is reported.`);
 if (facts.staking.crossSpotChange1dPercent != null && Math.abs(facts.staking.crossSpotChange1dPercent) >= 5)
   flags.push(`The BTC to STX cross moved ${facts.staking.crossSpotChange1dPercent}% on spot. The seven day mean absorbs most of it.`);
 if (today.methodologyVersion !== d1.methodologyVersion)
