@@ -43,7 +43,9 @@ const SECONDS_PER_YEAR = 31536000;
 const RAY = 1e27;
 const TIMEOUT = 10_000;
 
-async function call(chain, to, data){
+/* Exported so other contract readers, such as morpho.mjs, share one set of
+   endpoints and one failover. */
+export async function call(chain, to, data){
   const urls = RPC[chain];
   if (!urls) throw new Error(`no RPC configured for ${chain}`);
   let last;
