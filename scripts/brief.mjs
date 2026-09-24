@@ -26,6 +26,16 @@ const bps = (a, b) => (a == null || b == null || !Number.isFinite(a) || !Number.
   ? null : Math.round((a - b) * 100);
 const pctChg = (a, b) => (a == null || b == null || !b) ? null : Number((((a - b) / b) * 100).toFixed(1));
 
+/* Depth in the asset itself. Dollar depth also moves with the asset's price,
+   so a falling price can look like suppliers leaving: on 24 September STX fell
+   9% while STX supplied on Zest was flat. Bitcoin markets are counted in BTC,
+   the STX family in STX terms; dollar markets are already in dollars. */
+const unitOf  = a => (a === "sBTC" || a === "SBOR-BTC") ? "BTC"
+                   : /^(STX|stSTX|stSTXbtc|SBOR-STX)$/.test(a) ? "STX" : null;
+const pxOf    = (row, u) => u === "BTC" ? row?.ctx?.btcUsd : u === "STX" ? row?.ctx?.stxUsd : null;
+const inUnits = (usd, row, u) => { const p = pxOf(row, u); return (u && usd != null && p) ? usd / p : null; };
+const unitRound = (n, u) => n == null ? null : Number(n.toFixed(u === "BTC" ? 2 : 0));
+
 /* Inside the fixing job the brief runs seconds after the commit, before the
    site has rebuilt, so the website would still show yesterday. SBOR_LOCAL makes
    it read the files the fixing just wrote. Run on its own, it reads the site. */
@@ -75,6 +85,9 @@ const facts = {
       supplyPct: F(n.supply), supplyChange1dBps: bps(n.supply, a?.supply),
       utilizationPct: F(n.utilization), utilizationChange1dBps: bps(n.utilization, a?.utilization),
       depthUsd: n.depthUsd, depthChange1dPercent: pctChg(n.depthUsd, a?.depthUsd),
+      depthUnit: unitOf(label),
+      depthNative: unitRound(inUnits(n.depthUsd, today, unitOf(label)), unitOf(label)),
+      depthChange1dNativePercent: pctChg(inUnits(n.depthUsd, today, unitOf(label)), inUnits(a?.depthUsd, d1, unitOf(label))),
       venues: n.venues ?? null,
       markets: (n.markets || []).map(m => {
         const am = (a?.markets || []).find(x => x.v === m.v && x.a === m.a);
@@ -84,6 +97,9 @@ const facts = {
           supplyPct: F(m.s), supplyChange1dBps: bps(m.s, am?.s),
           utilizationPct: F(m.u), utilizationChange1dBps: bps(m.u, am?.u),
           depthUsd: m.d, depthChange1dPercent: pctChg(m.d, am?.d),
+          depthUnit: unitOf(m.a),
+          depthNative: unitRound(inUnits(m.d, today, unitOf(m.a)), unitOf(m.a)),
+          depthChange1dNativePercent: pctChg(inUnits(m.d, today, unitOf(m.a)), inUnits(am?.d, d1, unitOf(m.a))),
           protocolYieldPct: F(m.py)
         };
       })
@@ -135,8 +151,13 @@ for (const ix of facts.indices){
       flags.push(`${m.venue} ${m.asset} utilization moved ${m.utilizationChange1dBps > 0 ? "+" : ""}${m.utilizationChange1dBps} basis points to ${m.utilizationPct}%.`);
     if (m.borrowChange1dBps != null && Math.abs(m.borrowChange1dBps) >= 40)
       flags.push(`${m.venue} ${m.asset} borrow moved ${m.borrowChange1dBps > 0 ? "+" : ""}${m.borrowChange1dBps} bps to ${m.borrowPct}%.`);
-    if (m.depthChange1dPercent != null && Math.abs(m.depthChange1dPercent) >= 8)
-      flags.push(`${m.venue} ${m.asset} depth moved ${m.depthChange1dPercent > 0 ? "+" : ""}${m.depthChange1dPercent}%.`);
+    /* Flag real flows: the change in the asset itself where there is one. */
+    const sg = x => (x > 0 ? "+" : "") + x;
+    const dn = m.depthChange1dNativePercent, dd = m.depthChange1dPercent;
+    if (dn != null ? Math.abs(dn) >= 8 : (dd != null && Math.abs(dd) >= 8))
+      flags.push(dn != null
+        ? `${m.venue} ${m.asset} depth moved ${sg(dn)}% in ${m.depthUnit}${dd != null ? ` (${sg(dd)}% in dollars)` : ""}.`
+        : `${m.venue} ${m.asset} depth moved ${sg(dd)}%.`);
   }
 }
 if (facts.world.sofrChange1dBps != null && Math.abs(facts.world.sofrChange1dBps) >= 10)
@@ -241,7 +262,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 4. Utilization explains the rate. A cheap rate at low utilization means nobody is borrowing. A cheap rate above 90% means the pool is nearly empty and withdrawals may be constrained. Say which when it matters.
 
-5. Depth and utilization together say who moved. Depth rising means suppliers arrived. Utilization rising means borrowers did. Both rising means the market grew on both sides. Utilization rising while depth falls means suppliers left, which is the one worth being plain about.
+5. Depth and utilization together say who moved. Read depth in the asset itself, depthChange1dNativePercent, wherever it exists: dollar depth also moves with the asset's price, so a price fall is not suppliers leaving. Native depth rising means suppliers arrived. Utilization rising means borrowers did. Both rising means the market grew on both sides. Utilization rising while native depth falls means suppliers left, which is the one worth being plain about. Utilization falling while native depth holds means borrowers repaid.
 
 6. A single venue is not a market. When an index covers one venue, its rate is a reading of that venue. SBOR-BTC covers one venue today.
 
