@@ -134,12 +134,32 @@ export async function poxReference(){
   const stackedUstx = Number(cur.stacked_ustx);
   log(`pox: cycle ${cycleId}, length ${cycleLen} blocks, stacked ${(stackedUstx/1e6).toFixed(0)} STX`);
 
-  /* 2. the last completed cycle, so the figure is not a partial period */
-  const target   = cycleId - 1;
-  const firstBlk = pox.first_burnchain_block_height + (target - pox.first_burnchain_block_height/cycleLen|0)*0; // placeholder, computed below
-  const startBlk = pox.first_burnchain_block_height + (target * cycleLen) - (pox.first_burnchain_block_height % cycleLen);
-  const endBlk   = startBlk + cycleLen - 1;
-  log(`measuring completed cycle ${target}, burn blocks ${startBlk} to ${endBlk}`);
+  /* 2. the last completed cycle, so the figure is not a partial period.
+     Its boundaries come from the API's own report of where the next cycle's
+     reward phase starts, stepped back two cycle lengths, so they follow the
+     chain's convention rather than arithmetic of ours. The protocol formula,
+     first burn block plus cycle times length, is kept as a cross-check.
+     Until 24 September 2026 the window came from a formula that started 350
+     blocks early, so one paying block in eight belonged to the previous
+     cycle. */
+  const target     = cycleId - 1;
+  const protoStart = pox.first_burnchain_block_height + target * cycleLen;
+  const nextStart  = Number(pox.next_cycle?.reward_phase_start_block_height);
+  const startBlk   = Number.isFinite(nextStart) ? nextStart - 2 * cycleLen : protoStart;
+  const endBlk     = startBlk + cycleLen - 1;
+  if (Math.abs(startBlk - protoStart) > 1)
+    log(`  WARNING: the API puts cycle ${target} at ${startBlk}, the protocol formula at ${protoStart}`);
+  log(`measuring completed cycle ${target}, burn blocks ${startBlk} to ${endBlk} (protocol formula start ${protoStart})`);
+
+  /* The STX that earned those rewards: the completed cycle's own stacked
+     amount, not the current cycle's. Until 24 September 2026 the current
+     cycle's was used, dividing one cycle's payout by the next cycle's stake.
+     If it cannot be read, the reference is left out rather than estimated. */
+  const tc = await getJson(`${HIRO}/extended/v2/pox/cycles/${target}`);
+  const targetStackedUstx = Number(tc.total_stacked_amount);
+  if (!Number.isFinite(targetStackedUstx) || targetStackedUstx <= 0)
+    throw new Error(`No stacked amount for cycle ${target}: ${JSON.stringify(tc).slice(0, 200)}`);
+  log(`cycle ${target} stacked ${(targetStackedUstx/1e6).toFixed(0)} STX (current cycle ${cycleId}: ${(stackedUstx/1e6).toFixed(0)})`);
 
   /* 3. sum the BTC miners paid out across that window */
   let sats = 0, seen = 0, offset = 0, pages = 0;
@@ -184,7 +204,7 @@ export async function poxReference(){
   log(`cross: spot ${Math.round(rate)}, ${window.length} day mean ${Math.round(smoothed)} STX per BTC`);
 
   const btcPaid    = sats/1e8;
-  const stxLocked  = stackedUstx/1e6;
+  const stxLocked  = targetStackedUstx/1e6;
   const cycleYield = (btcPaid * smoothed) / stxLocked;
   const cyclesPerYear = 52560 / cycleLen;   // ~52560 bitcoin blocks a year
   const apy = ((1 + cycleYield) ** cyclesPerYear - 1) * 100;
@@ -210,6 +230,10 @@ export async function poxReference(){
     annualisation: "Bitcoin paid over one reward cycle divided by STX locked, annualized over the cycles in a year.",
     apy: round(apy),
     cycle: target,
+    /* Version of how the cycle is measured. 2 from 24 September 2026: the
+       API's exact cycle window and the cycle's own stacked STX. Figures with
+       different versions are never compared as if the market had moved. */
+    measurement: 2,
     cycleStartBurnBlock: startBlk,
     cycleEndBurnBlock: endBlk,
     cycleStartApprox: blockDate(startBlk),
@@ -229,7 +253,7 @@ export async function poxReference(){
     crossWindowDays: window.length,
     rateSource,
     ...(priceImpactBps != null && { rateQuoteImpactBps: priceImpactBps }),
-    note: "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualized. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over a short window rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. It is a staking yield, not a lending rate, and is never blended into the lending indices."
+    note: "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualized. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over a short window rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. It is a staking yield, not a lending rate, and is never blended into the lending indices. From 24 September 2026 (measurement 2) the cycle window is the chain's own and the STX locked is that cycle's; before that the window started 350 blocks early and the STX locked was the following cycle's, so earlier figures are close but not exact."
   };
 }
 
