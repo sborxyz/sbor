@@ -43,6 +43,13 @@ jobs:
           console.log("\nSBOR-PoX");
           if (!p) console.log("  NOT PUBLISHED: the PoX calculation failed, see the Compute step log");
           else console.log("  cycle " + p.cycle + ", burn blocks " + p.cycleStartBurnBlock + " to " + p.cycleEndBurnBlock + ", measurement " + (p.measurement ?? "none") + "\n  " + p.btcPaid + " BTC paid on " + p.stxLocked.toLocaleString("en-US") + " STX locked, APY " + p.apy + "%");
+          const bu = d.bitcoinCollateralUsdc;
+          console.log("\nBITCOIN-COLLATERAL USDC, MORPHO");
+          if (!bu) console.log("  NOT PUBLISHED: see the Compute step log");
+          else {
+            for (const m of bu.markets) console.log("  " + (m.chain + " " + m.collateral + "/USDC").padEnd(22) + "borrow " + String(m.borrow).padStart(5) + "%  supply " + String(m.supply).padStart(5) + "%  util " + String(m.utilization).padStart(6) + "%  depth $" + (m.depthUsd/1e6).toFixed(1) + "M  lltv " + m.lltv + "%");
+            console.log(bu.borrow != null ? "  reference: borrow " + bu.borrow + "%, supply " + bu.supply + "%, depth $" + (bu.depthUsd/1e6).toFixed(0) + "M" : "  reference withheld, not every market was read: " + JSON.stringify(bu.notRead));
+          }
           const c = require("./api/v1/changes.json");
           console.log("\nCHANGE FEED: baseline holds " + Object.keys(c.baseline?.markets || {}).length + " markets, " + c.changes.length + " changes recorded\n");
           '
