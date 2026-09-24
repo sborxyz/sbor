@@ -134,7 +134,10 @@ ${LINK}`
   if (now && was && typeof was.apy === "number"){
     const d = bps(now.apy, was.apy);
     const cycleChanged = was.cycle && now.cycle !== was.cycle;
-    if (Math.abs(d) >= POX_MOVE_BPS || cycleChanged){
+    /* Figures measured differently are never compared as if the market had
+       moved. Rows before measurement 2 carry no version and count as 1. */
+    const sameMeasure = (now.measurement ?? 1) === (was.measurement ?? 1);
+    if (sameMeasure ? (Math.abs(d) >= POX_MOVE_BPS || cycleChanged) : cycleChanged){
       drafts.push({
         rank: cycleChanged ? 30 : 60,
         key: cycleChanged ? `poxsettled:${now.cycle}` : `poxdrift:${new Date().toISOString().slice(0,10)}`,
@@ -144,7 +147,9 @@ ${LINK}`
 
 ${now.btcPaid.toFixed(2)} BTC paid to STX stackers, against ${now.stxLocked.toLocaleString("en-US")} STX locked.
 
-SBOR-PoX: ${pct(was.apy)} to ${pct(now.apy)}.
+${sameMeasure
+  ? `SBOR-PoX: ${pct(was.apy)} to ${pct(now.apy)}.`
+  : `SBOR-PoX: ${pct(now.apy)}. The first cycle measured over the chain's exact cycle window, so it is not compared with earlier cycles.`}
 
 ${LINK}`
 : `SBOR-PoX: ${pct(was.apy)} to ${pct(now.apy)}, ${sign(d)} bps.
