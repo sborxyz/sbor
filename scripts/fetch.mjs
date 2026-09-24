@@ -9,6 +9,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { fetchCallReadOnlyFunction, contractPrincipalCV, cvToValue } from "@stacks/transactions";
 import { poxReference } from "./pox.mjs";
 import { externalReference } from "./external.mjs";
+import { bitcoinCollateralUsdc } from "./morpho.mjs";
 import { contextBlock } from "./context.mjs";
 
 const POOLS_URL = "https://yields.llama.fi/pools";
@@ -411,6 +412,13 @@ const main = async () => {
   try { pox = await poxReference(); log(`  PoX reference: ${pox.apy}% APY (cycle ${pox.cycle})`); }
   catch(e){ log(`  PoX reference unavailable, omitted. ${e.message}`); }
 
+  /* What it costs to borrow USDC against bitcoin, from Morpho on Base and
+     Ethereum. A reference, not an index. A failure here must not stop the
+     fixing. */
+  let btcUsdc = null;
+  try { btcUsdc = await bitcoinCollateralUsdc(); }
+  catch(e){ log(`  bitcoin-collateral USDC unavailable, omitted. ${e.message}`); }
+
   /* Reference rates from outside Stacks. Context only, never a constituent.
      A failure here must not stop the fixing. */
   let external = null;
@@ -445,6 +453,7 @@ const main = async () => {
     source:"Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
     indices,
     ...(pox && { poxReference: pox }),
+    ...(btcUsdc && { bitcoinCollateralUsdc: btcUsdc }),
     ...(external && { externalReference: external }),
     ...(context && { context }),
     notes:[
@@ -507,6 +516,12 @@ const main = async () => {
       date: day,
       fixedAt: stamp,
       methodologyVersion: METHODOLOGY_VERSION,
+      /* The bitcoin-collateral USDC reading, kept daily from its first day:
+         the track record is the point. Compact, as the rest of the row. */
+      ...(btcUsdc && { btcUsdc: {
+        b: btcUsdc.borrow ?? null, s: btcUsdc.supply ?? null, u: btcUsdc.utilization ?? null, d: btcUsdc.depthUsd ?? null,
+        markets: btcUsdc.markets.map(m => ({ c: m.chain, a: m.collateral, b: m.borrow, s: m.supply, u: m.utilization, d: m.depthUsd }))
+      } }),
       ...(pox && { "SBOR-PoX": {
         apy: pox.apy, cycle: pox.cycle, measurement: pox.measurement ?? null,
         cycleStart: pox.cycleStartApprox ?? null,
