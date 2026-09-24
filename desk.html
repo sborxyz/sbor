@@ -120,6 +120,15 @@ const BPS = (now, then) =>
 const PCT = (now, then) =>
   now == null || then == null || !then ? null : ((now - then) / then) * 100;
 
+/* Depth in the asset itself, beside dollars. Dollar depth moves with price, so
+   on its own a falling price looks like suppliers leaving. Bitcoin markets in
+   BTC, the STX family in STX terms; dollar markets are already dollars. */
+const UNIT_OF = a => (a === "sBTC" || a === "SBOR-BTC") ? "BTC"
+                   : /^(STX|stSTX|stSTXbtc|SBOR-STX)$/.test(a) ? "STX" : null;
+const PX_OF    = (row, u) => u === "BTC" ? row?.ctx?.btcUsd : u === "STX" ? row?.ctx?.stxUsd : null;
+const IN_UNITS = (usd, row, u) => { const p = PX_OF(row, u); return (u && usd != null && p) ? usd / p : null; };
+const UNITS_TXT = (n, u) => n == null ? "" : ` · ${n >= 1e6 ? (n/1e6).toFixed(2) + "M" : n >= 1e4 ? (n/1e3).toFixed(0) + "k" : n.toFixed(0)} ${u}`;
+
 /* A change cell. Threshold decides what gets shaded, so each table can set its
    own idea of what counts as a move. */
 function chg(v, unit, thresh, label){
@@ -175,13 +184,13 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
       <td class="num" data-l="Borrow">${F(n.borrow)}%</td>${chg(BPS(n.borrow, a?.borrow),"bps",15,"Borrow 1d")}${chg(BPS(n.borrow, b?.borrow),"bps",15,"Borrow 7d")}
       <td class="num" data-l="Supply">${F(n.supply)}%</td>${chg(BPS(n.supply, a?.supply),"bps",15,"Supply 1d")}${chg(BPS(n.supply, b?.supply),"bps",15,"Supply 7d")}
       <td class="num" data-l="Utilization">${F(n.utilization)}%</td>${chg(BPS(n.utilization, a?.utilization),"bps",200,"Util 1d")}
-      <td class="num dim" data-l="Depth">$${((n.depthUsd||0)/1e6).toFixed(1)}M</td>
+      <td class="num dim" data-l="Depth">$${((n.depthUsd||0)/1e6).toFixed(1)}M${UNITS_TXT(IN_UNITS(n.depthUsd, today, UNIT_OF(label)), UNIT_OF(label))}</td>
       <td class="spark" data-l="7 fixings">${spark(win.map(r => r[label]?.borrow))}</td></tr>`;
   }
   out += `</table></div>`;
 
   /* ---- constituents ---- */
-  out += `<h2>Constituents, on Stacks</h2><div class="hint">Read from Zest and Granite contract state on Stacks mainnet. Protocol yield from StackingDAO. Highlighted above 15 bps on a rate, 200 bps on utilization. This is where a move in an index comes from.</div><div class="scroll"><table>
+  out += `<h2>Constituents, on Stacks</h2><div class="hint">Read from Zest and Granite contract state on Stacks mainnet. Protocol yield from StackingDAO. Highlighted above 15 bps on a rate, 200 bps on utilization. This is where a move in an index comes from. Depth shows dollars and, for bitcoin and STX markets, the amount in the asset itself; its 1d change is in the asset, so a price move does not look like suppliers leaving.</div><div class="scroll"><table>
     <tr><th>Market</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>1d</th><th>Util</th><th>1d</th><th>Depth</th><th>1d</th><th>Proto</th></tr>`;
   for (const label of ["SBOR-USD","SBOR-BTC","SBOR-STX"]){
     for (const m of (today[label]?.markets || [])){
@@ -191,7 +200,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
         <td class="num" data-l="Borrow">${F(m.b)}%</td>${chg(BPS(m.b, a?.b),"bps",15,"Borrow 1d")}${chg(BPS(m.b, b?.b),"bps",15,"Borrow 7d")}
         <td class="num" data-l="Supply">${F(m.s)}%</td>${chg(BPS(m.s, a?.s),"bps",15,"Supply 1d")}
         <td class="num" data-l="Utilization">${F(m.u)}%</td>${chg(BPS(m.u, a?.u),"bps",200,"Util 1d")}
-        <td class="num dim" data-l="Depth">$${((m.d||0)/1e6).toFixed(1)}M</td>${chg(PCT(m.d, a?.d),"pct",5,"Depth 1d")}
+        <td class="num dim" data-l="Depth">$${((m.d||0)/1e6).toFixed(1)}M${UNITS_TXT(IN_UNITS(m.d, today, UNIT_OF(m.a)), UNIT_OF(m.a))}</td>${chg(UNIT_OF(m.a) && IN_UNITS(a?.d, d1, UNIT_OF(m.a)) != null ? PCT(IN_UNITS(m.d, today, UNIT_OF(m.a)), IN_UNITS(a?.d, d1, UNIT_OF(m.a))) : PCT(m.d, a?.d),"pct",5,"Depth 1d, in the asset")}
         <td class="num dim" data-l="Protocol yield">${m.py == null ? "." : F(m.py)+"%"}</td></tr>`;
     }
   }
@@ -360,9 +369,14 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
       if (dr != null && Math.abs(dr) >= 40)
         flags.push(`${m.v} ${m.a} borrow moved ${dr > 0 ? "+" : ""}${dr} bps in a day, to ${F(m.b)}%.`);
 
-      const dd = PCT(m.d, am?.d);
-      if (dd != null && Math.abs(dd) >= 8)
-        flags.push(`${m.v} ${m.a} depth moved ${dd > 0 ? "+" : ""}${dd.toFixed(0)}% in a day, to $${((m.d||0)/1e6).toFixed(1)}M.`);
+      /* Flag real flows: the change in the asset itself where there is one. */
+      const u = UNIT_OF(m.a), dd = PCT(m.d, am?.d);
+      const dn = u ? PCT(IN_UNITS(m.d, today, u), IN_UNITS(am?.d, d1, u)) : null;
+      const sg = x => (x > 0 ? "+" : "") + x.toFixed(0);
+      if (dn != null ? Math.abs(dn) >= 8 : (dd != null && Math.abs(dd) >= 8))
+        flags.push(dn != null
+          ? `${m.v} ${m.a} depth moved ${sg(dn)}% in ${u} in a day${dd != null ? ` (${sg(dd)}% in dollars)` : ""}, to $${((m.d||0)/1e6).toFixed(1)}M.`
+          : `${m.v} ${m.a} depth moved ${sg(dd)}% in a day, to $${((m.d||0)/1e6).toFixed(1)}M.`);
     }
   }
   for (const pair of sameExposure){
