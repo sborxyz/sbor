@@ -1,22 +1,7 @@
 {
-  "fixing": "2026-09-23T12:20:09Z",
-  "comparedWith": "2026-09-22",
-  "top": {
-    "why": "SBOR-STX supply moved -68 bps",
-    "chars": 149,
-    "text": "SBOR-STX supply rate: 1.14% to 0.46%.\n\n-68 bps in a day.\n\nCheapest constituent now Zest V2 STX at 0.92%, utilization 50.24%.\n\nsbor.xyz"
-  },
-  "otherCount": 1,
-  "drafts": [
-    {
-      "why": "SBOR-STX supply moved -68 bps",
-      "chars": 149,
-      "text": "SBOR-STX supply rate: 1.14% to 0.46%.\n\n-68 bps in a day.\n\nCheapest constituent now Zest V2 STX at 0.92%, utilization 50.24%.\n\nsbor.xyz"
-    },
-    {
-      "why": "Zest V2 STX utilization fell back below 80%",
-      "chars": 135,
-      "text": "Zest V2 STX is back to 50.24% utilized, down from 80.59%.\n\nBorrow 2.08%, supply 0.92%.\n\nThe squeeze has eased.\n\nsbor.xyz"
-    }
-  ]
+  "fixing": "2026-09-24T08:30:29Z",
+  "comparedWith": "2026-09-23",
+  "top": null,
+  "otherCount": 0,
+  "drafts": []
 }
