@@ -508,7 +508,7 @@ const main = async () => {
       fixedAt: stamp,
       methodologyVersion: METHODOLOGY_VERSION,
       ...(pox && { "SBOR-PoX": {
-        apy: pox.apy, cycle: pox.cycle,
+        apy: pox.apy, cycle: pox.cycle, measurement: pox.measurement ?? null,
         cycleStart: pox.cycleStartApprox ?? null,
         cycleEnd: pox.cycleEndApprox ?? null,
         btcPaid: pox.btcPaid, stxLocked: pox.stxLocked,
