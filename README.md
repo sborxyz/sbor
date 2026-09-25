@@ -1,14 +1,16 @@
 # SBOR
 
-**Bitcoin DeFi has no benchmark lending rate. SBOR starts with Stacks, where the
-market is.**
+**Bitcoin DeFi has no benchmark lending rate. SBOR is building it from contract
+state, on Stacks, Base and Ethereum.**
 
 Every venue publishes its own number, so nobody, human or agent, can tell
 whether the rate they are offered is fair. SBOR, the Stacks Bitcoin Offered
-Rate, is that benchmark, starting with Stacks: one borrow and one supply rate
-per currency, read from lending contract state and published daily, alongside
-the same markets on Ethereum, Base, Solana and Hyperliquid. Free, no key, no
-rate limit, open to any agent on any chain.
+Rate, is that benchmark. On Stacks, where it started, it publishes one borrow
+and one supply rate per currency: the SBOR indices. On Base and Ethereum, it
+publishes what it costs to borrow USDC against bitcoin, read from the Morpho
+contracts. All of it is read from contract state and published daily, beside
+the largest lending markets on Ethereum, Base, Solana and Hyperliquid for
+comparison. Free, no key, no rate limit, open to any agent on any chain.
 
 Live at **[sbor.xyz](https://sbor.xyz)**
 
@@ -255,4 +257,4 @@ any.
 [sbor.xyz](https://sbor.xyz) · [@SBORindex](https://x.com/SBORindex) ·
 contact@sbor.xyz · sbor.btc · sbor.stx
 
-*Last updated 24 September 2026.*
+*Last updated 25 September 2026.*
