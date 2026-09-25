@@ -262,7 +262,7 @@ a{color:var(--accent)}
   <nav class="tabs" id="tabs" aria-label="Sections">
     <a href="#rates" data-tab="rates" id="tab-rates">Rates</a>
     <a href="#staking" data-tab="staking" id="tab-staking">Staking</a>
-    <a href="#agents" data-tab="agents" id="tab-agents">For agents</a>
+    <a href="#agents" data-tab="agents" id="tab-agents">For AI agents</a>
     <a href="#methodology" data-tab="methodology" id="tab-method">Methodology</a>
   </nav>
 </div>
@@ -557,7 +557,7 @@ en:{
   poxCycleMark:c=>`cycle ${c} settled`,
   poxMeta:(c,btc,stx,x,w)=>`Read fresh each day from the bitcoin actually paid out in completed reward cycle ${c}${w} · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over 7 days`,
   csv:"Download CSV",
-  tabRates:"Rates", tabStaking:"Staking", tabAgents:"For agents", tabMethod:"Methodology",
+  tabRates:"Rates", tabStaking:"Staking", tabAgents:"For AI agents", tabMethod:"Methodology",
   devMcpH:"As an MCP tool",
   devRemote:`Or connect by address, with nothing to install: Claude on the web, ChatGPT, and any client that accepts a URL. No key and no sign-in. The short version for agents is <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>.`,
   govern:`Independent: no token, and no stake in or payment from any venue SBOR measures. Published fixings are never rewritten; corrections to published figures are listed in <a href="https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>. How SBOR measures up to the IOSCO Principles for Financial Benchmarks: <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" target="_blank" rel="noopener">self-assessment</a>.`,
@@ -567,7 +567,7 @@ en:{
   devEndpoints:"Endpoints",
   devExample:"Example",
   contractsH:"Contracts and sources read",
-  indep:'SBOR is an independent benchmark for the <a href="https://www.stacks.co" target="_blank" rel="noopener">Stacks</a> ecosystem. It is not affiliated with Stacks, the Stacks Foundation, or any venue it measures.',
+  indep:'SBOR is an independent benchmark of lending rates for Bitcoin DeFi, starting with <a href="https://www.stacks.co" target="_blank" rel="noopener">Stacks</a>: no token, and no stake in or payment from any venue it measures. It is not affiliated with Stacks or the Stacks Foundation.',
   footMethod:v=>`Methodology ${v}`,
   footSource:"Source on GitHub",
   footLicense:"Data license",
@@ -582,7 +582,7 @@ en:{
   consH:"Constituents",
   thead:["Market","Borrow APY","Supply APY","Utilization","Protocol yield","Depth","Weight",""],
   coverage:(n,pct)=>`${n} ${n===1?"venue":"venues"} in this index · largest constituent ${pct}% of depth`,
-  sources:"Lending rates are read from Zest and Granite contract state on Stacks mainnet. Depth is read on-chain where available and from DefiLlama otherwise. Protocol yield comes from StackingDAO. The BTC to STX rate used for the staking yield is quoted from Bitflow.",
+  sources:"Lending rates are read from Zest and Granite contract state on Stacks mainnet, and from Aave and Morpho contract state on Ethereum and Base. Depth is read on-chain where available and from DefiLlama otherwise, as are the other chains in the comparison. Protocol yield comes from StackingDAO. The BTC to STX rate used for the staking yield is quoted from Bitflow. SOFR comes from the Federal Reserve Bank of New York.",
   consFoot:"Hatched weights are phasing in. A market becomes eligible once its lending depth stays above the inclusion floor for 30 consecutive days. Protocol yield is yield carried by the asset itself rather than by the loan. It is displayed but excluded from the fixing.",
   methodH:"Methodology",
   methodA:[
@@ -592,7 +592,7 @@ en:{
     "Weight <strong>wᵢ</strong> is the lending depth of market <strong>i</strong> in that currency. Rates are read from contract state, not from any venue's published figure."
   ],
   methodB:[
-    "<strong>Daily fixing.</strong> One fixing a day, targeting 11:00 UTC. Publication runs on a scheduler that can be late under load, so the timestamp carried by each fixing is authoritative rather than the target hour. Every fixing enters the historical record.",
+    "<strong>Daily fixing.</strong> One fixing a day, targeting 08:30 UTC. Publication runs on a scheduler that can be late under load, so the timestamp carried by each fixing is authoritative rather than the target hour. Every fixing enters the historical record.",
     "<strong>What moves the staking figure day to day.</strong> The reward cycle it measures is fixed, and so is the bitcoin paid in it. Both are read again every morning, so the cycle figures only change when a cycle settles. What moves in between is the BTC to STX rate used to convert them, which is why the published yield drifts on days when nothing about staking changed.",
     "<strong>PoX needs an exchange rate, not a price.</strong> The staking yield is paid in bitcoin against a position locked in STX, so the figure depends on the BTC to STX rate rather than on either dollar price, which cancels. That rate is quoted from Bitflow, the deepest venue for the pair on Stacks, so the input stays native to the market being measured.",
     "<strong>Rate basis.</strong> Every rate here is an effective APY, continuously compounded. Both venues return nominal annual rates from their contracts, despite Zest naming its fields apy, which the venue has confirmed. Each is converted the same way so constituents are comparable, and every market also carries its nominal figure so the raw value stays visible. At current levels the conversion is a few basis points; on a market above its utilization kink it is very large, which is why it is done rather than ignored.",
@@ -601,9 +601,9 @@ en:{
     "<strong>Protocol yield excluded.</strong> Some assets carry yield from the asset itself rather than from lending. sBTC carries Bitcoin protocol yield through dual stacking, and stSTX carries PoX staking yield managed by StackingDAO. That yield belongs to the asset, not the loan, so it never enters the fixing.",
     "<strong>Phase-in.</strong> A newly eligible market enters at zero weight and ramps to full weight linearly over 30 days, so adding a venue cannot step the rate.",
     "<strong>Utilization explains the rate.</strong> Utilization is the share of supplied capital currently borrowed. It is the reason a rate sits where it does: a market with little borrowing pays its suppliers little, however large that market is. It is published beside every rate so no figure has to be taken on trust.",
-    "<strong>Outside Stacks is context, not a constituent.</strong> Reference rates from the largest lending market elsewhere are published beside the indices so a reader can see what the same asset class costs off this chain. They are never weighted into a fixing and never move an SBOR number.",
+    "<strong>Outside Stacks is context, not a constituent.</strong> Two references are published beside the indices. The largest lending markets on Ethereum, Base, Hyperliquid and Solana show what the same asset class costs off this chain: Aave on Ethereum and Base is read from its contracts, the others from DefiLlama. And the cost of borrowing USDC against bitcoin comes from the Morpho markets on Base and Ethereum whose only collateral is cbBTC or WBTC, read from the contracts and published only when every market was read. Neither is ever weighted into a fixing or moves an SBOR number.",
     "<strong>Term averages.</strong> The 30, 90 and 180 day figures are compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window exists. A 180 day average appears on day 180, not before.",
-    "<strong>Stale or implausible data.</strong> If a market's state cannot be read, its weight is zero for that fixing and the omission is recorded. A funded market whose borrow and supply rates both read below 0.05% is treated the same way, because a market with real depth does not price money at nothing on both sides at once.",
+    "<strong>Stale or implausible data.</strong> If a market's state cannot be read, its weight is zero for that fixing and the omission is recorded. A funded market whose borrow and supply rates both read below 0.05% is treated the same way, because lenders and borrowers do not set such a rate: it is either a reporting failure or a rate the protocol holds down by design.",
     "<strong>Revisions.</strong> Published fixings are never rewritten. Corrections appear as a new fixing with a note."
   ],
   signupH:"Weekly rate report",
@@ -657,7 +657,7 @@ pt:{
   poxCycleMark:c=>`ciclo ${c} fechou`,
   poxMeta:(c,btc,stx,x,w)=>`Lido todo dia a partir do bitcoin efetivamente pago no ciclo de recompensa ${c}, já concluído${w} · ${btc} BTC pagos a stakers · ${stx} STX travados · convertido a ${x} STX por BTC, média de 7 dias`,
   csv:"Baixar CSV",
-  tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes", tabMethod:"Metodologia",
+  tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes de IA", tabMethod:"Metodologia",
   devMcpH:"Como ferramenta MCP",
   devRemote:`Ou conecte pelo endereço, sem instalar nada: Claude na web, ChatGPT e qualquer cliente que aceite um URL. Sem chave e sem login. A versão curta para agentes está em <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>.`,
   govern:`Independente: sem token, sem participação em nenhuma plataforma que o SBOR mede e sem receber pagamento delas. Fixings publicados nunca são reescritos; as correções de valores publicados estão em <a href="https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>. Como o SBOR se compara aos Princípios da IOSCO para benchmarks financeiros: <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" target="_blank" rel="noopener">autoavaliação</a>.`,
@@ -667,7 +667,7 @@ pt:{
   devEndpoints:"Endpoints",
   devExample:"Exemplo",
   contractsH:"Contratos e fontes lidos",
-  indep:'O SBOR é uma referência independente para o ecossistema <a href="https://www.stacks.co" target="_blank" rel="noopener">Stacks</a>. Não tem vínculo com a Stacks, com a Stacks Foundation nem com qualquer plataforma que mede.',
+  indep:'O SBOR é uma referência independente de taxas de crédito para o Bitcoin DeFi, começando pela <a href="https://www.stacks.co" target="_blank" rel="noopener">Stacks</a>: sem token, sem participação em nenhuma plataforma que mede e sem receber pagamento delas. Não tem vínculo com a Stacks nem com a Stacks Foundation.',
   footMethod:v=>`Metodologia ${v}`,
   footSource:"Código no GitHub",
   footLicense:"Licença dos dados",
@@ -682,7 +682,7 @@ pt:{
   consH:"Componentes",
   thead:["Mercado","APY de empréstimo","APY de depósito","Utilização","Rendimento do protocolo","Profundidade","Peso",""],
   coverage:(n,pct)=>`${n} ${n===1?"plataforma":"plataformas"} neste índice · maior componente com ${pct}% da profundidade`,
-  sources:"As taxas de crédito são lidas do estado dos contratos da Zest e da Granite na mainnet da Stacks. A profundidade é lida on-chain quando disponível e vem da DefiLlama nos demais casos. O rendimento do protocolo vem da StackingDAO. A relação BTC para STX usada no rendimento do staking é cotada na Bitflow.",
+  sources:"As taxas de crédito são lidas do estado dos contratos da Zest e da Granite na mainnet da Stacks, e dos contratos da Aave e da Morpho na Ethereum e na Base. A profundidade é lida on-chain quando disponível e vem da DefiLlama nos demais casos, assim como as outras redes da comparação. O rendimento do protocolo vem da StackingDAO. A relação BTC para STX usada no rendimento do staking é cotada na Bitflow. O SOFR vem do Federal Reserve Bank of New York.",
   consFoot:"Pesos hachurados estão em entrada gradual. Um mercado se torna elegível quando sua profundidade de crédito permanece acima do piso de inclusão por 30 dias consecutivos. Rendimento do protocolo é o rendimento gerado pelo próprio ativo, e não pelo empréstimo. Ele é exibido, mas fica fora do fixing.",
   methodH:"Metodologia",
   methodA:[
@@ -692,7 +692,7 @@ pt:{
     "O peso <strong>wᵢ</strong> é a profundidade de crédito do mercado <strong>i</strong> naquela moeda. As taxas são lidas do estado dos contratos, e não do número divulgado por qualquer plataforma."
   ],
   methodB:[
-    "<strong>Fixing diário.</strong> Um fixing por dia, com alvo às 11:00 UTC. A publicação depende de um agendador que pode atrasar sob carga, então vale o horário registrado em cada fixing, não o horário alvo. Todo fixing entra no registro histórico.",
+    "<strong>Fixing diário.</strong> Um fixing por dia, com alvo às 08:30 UTC. A publicação depende de um agendador que pode atrasar sob carga, então vale o horário registrado em cada fixing, não o horário alvo. Todo fixing entra no registro histórico.",
     "<strong>O que move o número do staking de um dia para o outro.</strong> O ciclo de recompensa medido é fixo, e o bitcoin pago nele também. Os dois são lidos de novo toda manhã, então os números do ciclo só mudam quando um ciclo fecha. O que muda no meio é a relação BTC para STX usada na conversão, e é por isso que o rendimento publicado oscila em dias nos quais nada do staking mudou.",
     "<strong>O PoX depende de uma taxa de câmbio, não de um preço.</strong> O rendimento do staking é pago em bitcoin sobre uma posição travada em STX, então o número depende da relação BTC para STX, e não de qualquer preço em dólar, que se cancela. Essa relação é cotada na Bitflow, a maior liquidez do par na Stacks, o que mantém a entrada nativa ao mercado medido.",
     "<strong>Base das taxas.</strong> Toda taxa aqui é um APY efetivo, com capitalização contínua. As duas plataformas devolvem taxas nominais anuais nos contratos, apesar de a Zest nomear seus campos como apy, o que a própria plataforma confirmou. Cada uma é convertida da mesma forma para que os componentes sejam comparáveis, e cada mercado também carrega seu número nominal, para que o valor bruto continue visível. Nos níveis atuais a conversão vale alguns pontos-base; em um mercado acima do ponto de inflexão da utilização ela é enorme, e é por isso que é feita em vez de ignorada.",
@@ -701,9 +701,9 @@ pt:{
     "<strong>Rendimento do protocolo fica de fora.</strong> Alguns ativos rendem por si mesmos, e não pelo empréstimo. O sBTC carrega rendimento do protocolo Bitcoin via dual stacking, e o stSTX carrega rendimento de staking PoX administrado pela StackingDAO. Esse rendimento pertence ao ativo, não ao empréstimo, então nunca entra no fixing.",
     "<strong>Entrada gradual.</strong> Um mercado recém-elegível entra com peso zero e sobe linearmente até o peso cheio ao longo de 30 dias, de modo que incluir uma plataforma nunca provoca um salto na taxa.",
     "<strong>A utilização explica a taxa.</strong> Utilização é a parcela do capital depositado que está emprestada. É a razão de uma taxa estar onde está: um mercado com pouco crédito tomado paga pouco a quem deposita, por maior que ele seja. Ela é publicada ao lado de cada taxa para que nenhum número precise ser aceito sem explicação.",
-    "<strong>Fora da Stacks é contexto, não componente.</strong> Taxas de referência do maior mercado de crédito fora daqui são publicadas ao lado dos índices para que o leitor veja quanto custa a mesma classe de ativo em outra rede. Elas nunca entram no cálculo de um fixing e nunca movem um número do SBOR.",
+    "<strong>Fora da Stacks é contexto, não componente.</strong> Duas referências são publicadas ao lado dos índices. Os maiores mercados de crédito na Ethereum, na Base, na Hyperliquid e na Solana mostram quanto custa a mesma classe de ativo fora daqui: a Aave na Ethereum e na Base é lida dos contratos, os demais vêm da DefiLlama. E o custo de tomar USDC emprestado com bitcoin como garantia vem dos mercados da Morpho na Base e na Ethereum cuja única garantia é cbBTC ou WBTC, lido dos contratos e publicado só quando todos os mercados foram lidos. Nenhuma das duas entra no cálculo de um fixing nem move um número do SBOR.",
     "<strong>Médias de prazo.</strong> As médias de 30, 90 e 180 dias são compostas a partir dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa. Uma média de 180 dias aparece no dia 180, não antes.",
-    "<strong>Dados indisponíveis ou implausíveis.</strong> Se o estado de um mercado não puder ser lido, seu peso é zero naquele fixing e a omissão fica registrada. Um mercado com liquidez cujas taxas de empréstimo e de depósito ficam ambas abaixo de 0,05% recebe o mesmo tratamento, porque um mercado com profundidade real não precifica o dinheiro a zero dos dois lados ao mesmo tempo.",
+    "<strong>Dados indisponíveis ou implausíveis.</strong> Se o estado de um mercado não puder ser lido, seu peso é zero naquele fixing e a omissão fica registrada. Um mercado com liquidez cujas taxas de empréstimo e de depósito ficam ambas abaixo de 0,05% recebe o mesmo tratamento, porque quem empresta e quem toma emprestado não define uma taxa assim: ou é uma falha de leitura, ou é uma taxa que o próprio protocolo mantém baixa de propósito.",
     "<strong>Revisões.</strong> Fixings publicados nunca são reescritos. Correções aparecem como um novo fixing, com nota."
   ],
   signupH:"Relatório semanal de taxas",
