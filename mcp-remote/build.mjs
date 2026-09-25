@@ -107,6 +107,7 @@ function toolList(){
     }
     return {
       name, title: cfg.title, description: cfg.description,
+      ...(cfg.annotations && { annotations: cfg.annotations }),
       inputSchema: { type: "object", properties: props, ...(required.length && { required }), additionalProperties: false }
     };
   });
