@@ -111,7 +111,7 @@ const SECONDS_IN_YEAR = 31_536_000;
    was produced under, so any historical figure can be traced to its method. */
 const METHODOLOGY_VERSION = "1.9.0";
 
-/* Below this, on both sides at once, a funded market is not reporting. */
+/* Below this, on both sides at once, a funded market is not showing a market rate. */
 const RATE_FLOOR = 0.05;
 
 /* Term averages, in days. Published only once the full window exists. */
@@ -331,10 +331,12 @@ const main = async () => {
       log(`  ${a.symbol}: supply=${round(supply)}% borrow=${round(borrow)}% (nominal ${round(supplyNominal)}/${round(borrowNominal)}) util=${utilization == null ? "n/a" : round(utilization)+"%"} depth=${d}`);
       if (!a.currency){ log(`    (collateral only, excluded from fixings)`); continue; }
       if (d <= 0){ log(`    (no depth, skipped)`); continue; }
-      /* Plausibility floor. A funded lending market does not price money at
-         effectively nothing on both sides. When it reads that way the venue is
-         not reporting, so the market is treated as unreadable rather than as
-         a real rate of zero. */
+      /* Plausibility floor. Lenders and borrowers do not price money at
+         effectively nothing on both sides of a funded market. When it reads
+         that way, either the venue is not reporting or the protocol is holding
+         the rate down by design, as Zest did with sBTC in September 2026
+         pending the first bond reward. Neither is a market rate, so the market
+         is left out rather than published as a rate of zero. */
       if (borrow < RATE_FLOOR && supply < RATE_FLOOR){
         log(`    (both rates below the ${RATE_FLOOR}% plausibility floor, treated as unreadable and excluded)`);
         continue;
@@ -469,7 +471,7 @@ const main = async () => {
       "Zest returns nominal annual rates despite its field names, confirmed with the venue. They are converted here to effective APY, e^r - 1, the same basis Granite's per-second compounding produces. Every market also carries nominalBorrow and nominalSupply so the raw figure is visible.",
       "Fixings before methodology 1.6.0 used Zest's nominal figures unconverted and are therefore a few basis points lower on the Zest-weighted portion. Past fixings are not rewritten; the version recorded on each one identifies the basis it used.",
       "Staking references before methodology 1.9.0 used a one sided Bitflow quote for the BTC to STX rate and are therefore slightly low, because price impact and the bid ask spread both cost the taker. From 1.9.0 the cross is quoted in both directions and midpointed. On 14 September the two sides differed by 74 basis points. Past fixings are not rewritten; the version recorded on each one identifies the basis it used.",
-      "A funded market whose borrow and supply rates both read below 0.05% is treated as not reporting and excluded from the fixing, rather than published as a rate of effectively zero.",
+      "A funded market whose borrow and supply rates both read below 0.05% is excluded from the fixing rather than published as a rate of effectively zero: lenders and borrowers do not set such a rate, so it is either a reporting failure or a rate held down by the protocol by design.",
       "The record is sharded by year at /api/v1/history-YYYY.json, indexed at /api/v1/history-index.json. history.json carries a rolling 200 day window for convenience.",
       "context records SOFR, spot prices, sBTC supply and the Bitcoin block height alongside each fixing. None of it enters an index or affects a rate. It is kept so a past fixing can be read in the conditions of its day.",
       "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses. An average is null until its full window of fixings exists.",
