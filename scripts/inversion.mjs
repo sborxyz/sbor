@@ -103,30 +103,34 @@ mkdirSync("api/v1", { recursive: true });
 writeFileSync("api/v1/inversions.json", JSON.stringify(payload, null, 2) + "\n");
 
 /* Append-only log. The file above is the current state; this is the record.
-   An inversion that opens and closes inside an hour would otherwise leave no
-   trace, and the whole point of watching through the day is to catch exactly that. */
-if (found.length){
-  let log_ = [];
-  try { log_ = JSON.parse(readFileSync("api/v1/inversion-log.json", "utf8")); } catch {}
-  for (const f of found){
-    const last = [...log_].reverse().find(e =>
-      e.asset === f.asset && e.borrowVenue === f.borrowVenue && e.supplyVenue === f.supplyVenue);
-    /* Extend an open episode rather than writing a row on every check. */
-    const oneHourAgo = Date.now() - 75 * 60 * 1000;
-    if (last && Date.parse(last.lastSeen) > oneHourAgo){
-      last.lastSeen = stamp;
-      last.checks = (last.checks || 1) + 1;
-      last.maxEdgeBps = Math.max(last.maxEdgeBps ?? last.edgeBps, f.edgeBps);
-      last.lastEdgeBps = f.edgeBps;
-    } else {
-      log_.push({ firstSeen: stamp, lastSeen: stamp, checks: 1,
-                  maxEdgeBps: f.edgeBps, lastEdgeBps: f.edgeBps,
-                  status: STATUS, ...f });
-    }
+   An inversion that opens and closes between two fixings would otherwise leave
+   no trace, and the whole point of watching through the day is to catch
+   exactly that. The file always exists, empty until the first episode, so its
+   published address never returns nothing. */
+let log_ = [];
+try { log_ = JSON.parse(readFileSync("api/v1/inversion-log.json", "utf8")); } catch {}
+/* A sighting extends an open episode when the previous one was at most one
+   check ago. The check runs every three hours, and GitHub can start a
+   scheduled run late, so the window is three and a half hours. Until 24
+   September it was 75 minutes, left from when the check ran hourly, which
+   would have split every inversion into one-check episodes. */
+const EXTEND_WITHIN_MS = 210 * 60 * 1000;
+for (const f of found){
+  const last = [...log_].reverse().find(e =>
+    e.asset === f.asset && e.borrowVenue === f.borrowVenue && e.supplyVenue === f.supplyVenue);
+  if (last && Date.parse(stamp) - Date.parse(last.lastSeen) <= EXTEND_WITHIN_MS){
+    last.lastSeen = stamp;
+    last.checks = (last.checks || 1) + 1;
+    last.maxEdgeBps = Math.max(last.maxEdgeBps ?? last.edgeBps, f.edgeBps);
+    last.lastEdgeBps = f.edgeBps;
+  } else {
+    log_.push({ firstSeen: stamp, lastSeen: stamp, checks: 1,
+                maxEdgeBps: f.edgeBps, lastEdgeBps: f.edgeBps,
+                status: STATUS, ...f });
   }
-  writeFileSync("api/v1/inversion-log.json", JSON.stringify(log_, null, 2) + "\n");
-  log(`inversion log now has ${log_.length} episode(s)`);
 }
+writeFileSync("api/v1/inversion-log.json", JSON.stringify(log_, null, 2) + "\n");
+log(`inversion log has ${log_.length} episode(s)`);
 
 if (!found.length){
   log(`no inversion at ${stamp} (status: ${STATUS})`);
