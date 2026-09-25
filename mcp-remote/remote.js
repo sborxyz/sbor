@@ -451,6 +451,13 @@ function toolList(){
   });
 }
 
+/* Usage, counted without anything personal: which app connected, which tool
+   it called, and for which benchmark. No addresses, no identities, and never
+   the rate or the question itself. Visible in the worker's logs. */
+function usage(event, fields){
+  try { console.log(JSON.stringify({ event, ...fields })); } catch {}
+}
+
 async function handle(msg){
   if (!msg || msg.jsonrpc !== "2.0" || typeof msg.method !== "string")
     return err(msg?.id, -32600, "Invalid request");
@@ -458,6 +465,7 @@ async function handle(msg){
   switch (msg.method){
     case "initialize": {
       const asked = msg.params?.protocolVersion;
+      usage("connect", { client: String(msg.params?.clientInfo?.name ?? "unknown").slice(0, 40) });
       return ok(msg.id, {
         protocolVersion: PROTOCOLS.includes(asked) ? asked : PROTOCOLS[0],
         capabilities: { tools: { listChanged: false } },
@@ -471,6 +479,7 @@ async function handle(msg){
       const name = msg.params?.name, args = msg.params?.arguments ?? {};
       const t = server.tools.get(name);
       if (!t) return err(msg.id, -32602, `Unknown tool: ${name}`);
+      usage("tool", { tool: name, benchmark: typeof args.index === "string" ? args.index.slice(0, 30) : null });
       for (const [k, s] of Object.entries(t.cfg.inputSchema || {})){
         const problem = s.check(k, args[k]);
         if (problem) return ok(msg.id, { isError: true, content: [{ type: "text", text: `Invalid arguments for ${name}: ${problem}` }] });
