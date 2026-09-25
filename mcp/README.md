@@ -4,10 +4,11 @@
 
 Check a lending rate before your agent borrows.
 
-Bitcoin DeFi has no benchmark lending rate. [SBOR](https://sbor.xyz) starts with
-Stacks, where the market is: one borrow and one supply rate per currency, read
-from lending contract state and published daily. This server exposes it as tools
-for Claude, Cowork, Cursor or any MCP client.
+Bitcoin DeFi has no benchmark lending rate. [SBOR](https://sbor.xyz) publishes
+one, read from lending contract state and published daily: one borrow and one
+supply rate per currency on Stacks, and what it costs to borrow USDC against
+bitcoin on Base and Ethereum. This server exposes it as tools for Claude, Cowork,
+Cursor or any MCP client.
 
 ## Quick check
 
