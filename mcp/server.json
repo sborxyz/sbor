@@ -7,17 +7,23 @@
     "source": "github",
     "subfolder": "mcp"
   },
-  "version": "1.1.4",
+  "version": "1.2.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "sbor-mcp",
-      "version": "1.1.4",
+      "version": "1.2.0",
       "transport": {
         "type": "stdio"
       }
     }
   ],
   "title": "SBOR",
-  "websiteUrl": "https://sbor.xyz"
+  "websiteUrl": "https://sbor.xyz",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.sbor.xyz/mcp"
+    }
+  ]
 }
