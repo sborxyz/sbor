@@ -1,8 +1,8 @@
 # SBOR AGENTS.md
 
-*Created 24 September 2026. Last updated 24 September 2026.*
+*Created 24 September 2026. Last updated 25 September 2026.*
 
-> SBOR publishes the benchmark lending rate for Stacks: what it costs to borrow, and what supplying earns, in each currency, read from lending contract state and published once a day. Free to use, including commercially.
+> SBOR publishes benchmark lending rates for Bitcoin DeFi, read from lending contract state and published once a day: what it costs to borrow, and what supplying earns, in each currency on Stacks, and what it costs to borrow USDC against bitcoin on Base and Ethereum. Free to use, including commercially.
 
 This is the entry point for agents. It holds routes and rules only, never numbers: every figure lives at the endpoints below, which always carry the current fixing. The full methodology is in [llms.txt](https://sbor.xyz/llms.txt).
 
@@ -24,7 +24,7 @@ The remote and local servers are built from the same code and give the same answ
 | Which markets make up a rate? | `latest.json`, or `list_markets` |
 | How has a rate moved? | [api/v1/history.json](https://sbor.xyz/api/v1/history.json), or `get_history` |
 | What does the same asset cost on other chains? | `externalReference` in `latest.json`, or `compare_chains` |
-| What does it cost to borrow USDC against bitcoin? | `bitcoinCollateralUsdc` in `latest.json`, from the fixing of 25 September 2026 |
+| What does it cost to borrow USDC against bitcoin? | `bitcoinCollateralUsdc` in `latest.json`, or the MCP tools with `BTC-COLLATERAL-USDC` |
 | Did a lending protocol change its own parameters? | [api/v1/changes.json](https://sbor.xyz/api/v1/changes.json) |
 | Where does supplying an asset at one venue pay more than borrowing it at another? | [api/v1/inversions.json](https://sbor.xyz/api/v1/inversions.json) and [api/v1/inversion-log.json](https://sbor.xyz/api/v1/inversion-log.json) |
 | How is it all calculated? | [llms.txt](https://sbor.xyz/llms.txt), or `get_methodology` |
