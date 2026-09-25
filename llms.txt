@@ -22,8 +22,11 @@ never to start. A wrong reading under that rule costs a pause, not a trade.
 
 How to call it:
 
-- MCP: `npx -y sbor-mcp`, then the `compare_rate` tool
+- MCP, remote: `https://mcp.sbor.xyz/mcp`, Streamable HTTP, no key, no sign-in,
+  then the `compare_rate` tool
+- MCP, local: `npx -y sbor-mcp`, the same tools and the same answers
 - HTTP: `GET https://sbor.xyz/api/v1/latest.json`, no key, CORS open
+- The short version for agents: https://github.com/sborxyz/sbor/blob/main/AGENTS.md
 
 Four things to get right:
 
@@ -105,6 +108,18 @@ Note that DefiLlama reports Aave as a simple annual rate, so before 23 September
 2026 the Aave figures here were about 10 basis points lower than on SBOR's
 basis. depthUsd comes from DefiLlama for every venue and only decides which
 venue is shown for a chain.
+
+From the fixing of 25 September 2026, each fixing also carries
+bitcoinCollateralUsdc: what it costs to borrow USDC against bitcoin. It reads
+the Morpho Blue markets on Base and Ethereum whose only collateral is cbBTC or
+WBTC, bitcoin wrapped by a custodian. Morpho markets are isolated, one
+collateral each, so their rate is the cost of a dollar borrowed against bitcoin
+and nothing else; Aave cannot give that number, because it pools all
+collateral. Each market is read from the Morpho contracts: its tokens, checked
+so a wrong market is refused, its totals, and its borrow rate from its own
+interest rate model, as effective APY. The reference weights each market by the
+USDC supplied to it and is published only when every market was read. It is a
+reference, not an SBOR index, and never enters a fixing.
 
 ## What SBOR is not
 
@@ -214,6 +229,13 @@ and the spot midpoint (stxPerBtc) are published.
 
 Because it annualizes a single two week cycle, a change in one cycle's payout
 moves it considerably. Read the cycle number before comparing two fixings.
+
+From the fixing of 25 September 2026 (measurement 2), each cycle is measured
+over the chain's own cycle boundaries and against that cycle's own STX locked.
+Before that, the window started 350 bitcoin blocks early and the STX locked was
+the following cycle's, which understated the yield by roughly five percent of
+its value. Figures with different measurement versions are not comparable; see
+CORRECTIONS.md.
 
 ## Inversions
 
@@ -359,6 +381,15 @@ A low borrow rate means capital is cheap to borrow, which reflects abundant
 supply relative to borrow demand. It is a statement about market stage, not
 about the quality of any protocol or chain. SBOR reports what the market did.
 It does not rank, rate, endorse, or advise.
+
+## Governance
+
+Independent: no token, and no stake in or payment from any venue SBOR measures.
+Published fixings are never rewritten.
+
+- Corrections to published figures: https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md
+- Self-assessment against the IOSCO Principles for Financial Benchmarks: https://github.com/sborxyz/sbor/blob/main/IOSCO.md
+- Data license, free including commercially: https://github.com/sborxyz/sbor/blob/main/LICENSE-DATA.md
 
 ## Contact
 
