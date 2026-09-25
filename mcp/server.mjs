@@ -18,12 +18,23 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-const VERSION = "1.1.4";
+const VERSION = "1.2.0";
 const BASE = process.env.SBOR_BASE || "https://sbor.xyz";
 const UA = `sbor-mcp/${VERSION}`;
 const TIMEOUT_MS = 10_000;
 const STALE_AFTER_HOURS = 48;
 const INDICES = ["SBOR-USD", "SBOR-BTC", "SBOR-STX"];
+
+/* The cost of borrowing USDC against bitcoin, from the Morpho Blue markets on
+   Base and Ethereum whose only collateral is cbBTC or WBTC. A reference, not an
+   SBOR index, published from 25 September 2026. It is a benchmark an agent can
+   compare against, so the tools that take a benchmark accept it too. */
+const BTC_REF = "BTC-COLLATERAL-USDC";
+const BENCHMARKS = [...INDICES, BTC_REF];
+const BTC_REF_WHAT = "a reference, not an SBOR index: what it costs to borrow USDC against bitcoin wrapped by a custodian (cbBTC, WBTC), from the Morpho markets on Base and Ethereum whose only collateral is that bitcoin";
+
+/* All SBOR tools only read published data. */
+const READ_ONLY = { readOnlyHint: true, openWorldHint: false };
 
 /* Small cache so an agent asking three questions in a row makes one request. */
 const cache = new Map();
@@ -72,6 +83,7 @@ const server = new McpServer({ name: "sbor", version: VERSION });
 /* ------------------------------------------------------------------ */
 server.registerTool("get_rate", {
   title: "Get the current SBOR fixing",
+  annotations: READ_ONLY,
   description:
     "The benchmark borrow and supply rate for lending on Stacks, read from " +
     "lending contract state. Use this to judge whether a lending offer is good: " +
@@ -79,15 +91,22 @@ server.registerTool("get_rate", {
     "supplying below the supply rate means earning less. Returns every currency " +
     "index unless one is named. Always read the freshness line first.",
   inputSchema: {
-    index: z.enum(INDICES).optional().describe("Currency index. Omit for all of them.")
+    index: z.enum(BENCHMARKS).optional().describe(`Currency index, or ${BTC_REF} for borrowing USDC against bitcoin on Base and Ethereum. Omit for all of them.`)
   }
 }, async ({ index }) => {
   try {
     const d = await getJson("/api/v1/latest.json");
+    const ref = d.bitcoinCollateralUsdc;
+    const refLine = ref && typeof ref.borrow === "number"
+      ? `${BTC_REF}: borrow ${pct(ref.borrow)}, supply ${pct(ref.supply)}, depth ${usd(ref.depthUsd)}. This is ${BTC_REF_WHAT}.`
+      : `${BTC_REF}: not published in the current fixing${ref ? ", because not every market could be read" : ""}. Treat it as unknown, never as zero.`;
+    if (index === BTC_REF)
+      return text([freshness(d), refLine, `Source: ${BASE}/api/v1/latest.json`].join("\n"));
     if (index && !d.indices[index])
       return text(`${index} is not published in the current fixing. `
-        + `When a market cannot be read, SBOR omits the index rather than publishing `
-        + `a figure that is not real. Treat it as unknown, never as zero. `
+        + `When a market cannot be read, or its rate is not set by the market, SBOR `
+        + `omits the index rather than publishing a figure it cannot stand behind. `
+        + `Treat it as unknown, never as zero. `
         + `Published today: ${Object.keys(d.indices).join(", ")}.`);
 
     const wanted = index ? { [index]: d.indices[index] } : d.indices;
@@ -104,6 +123,7 @@ server.registerTool("get_rate", {
       freshness(d),
       ...lines,
       omitted.length ? `Not published: ${omitted.join(", ")}. A market that cannot be read is omitted, not estimated.` : "",
+      index ? "" : refLine,
       d.poxReference ? `Proof of Transfer staking yield ${pct(d.poxReference.apy)}. A staking yield, not a lending rate. Never add it to one.` : "",
       `Basis: ${d.basis}`,
       `Source: ${BASE}/api/v1/latest.json`
@@ -116,18 +136,21 @@ server.registerTool("get_rate", {
 /* ------------------------------------------------------------------ */
 server.registerTool("compare_rate", {
   title: "Compare a rate against the SBOR benchmark",
+  annotations: READ_ONLY,
   description:
     "Given a rate you have been offered, say whether it is above or below the " +
     "market for that currency, and by how much. This is the main reason SBOR exists. " +
     "Recommended use: if a borrow offer is more than 50 basis points above the " +
     "benchmark, stop and ask a human. Use SBOR to stop, never to start. " +
+    `For a USDC loan against bitcoin (cbBTC or WBTC) on Base or Ethereum, compare with ${BTC_REF}; ` +
+    "for lending on Stacks, with the index for the currency. " +
     "This tool refuses rather than guesses: an error result means there is no " +
     "trustworthy answer, not that the rate is bad.",
   inputSchema: {
     rate: z.number().gt(0).lte(100)
       .describe("The rate offered, as a percentage between 0 and 100. 4.2 means 4.2%, not 0.042."),
     side: z.enum(["borrow", "supply"]).describe("Whether you would be borrowing or supplying."),
-    index: z.enum(INDICES).describe("Which currency.")
+    index: z.enum(BENCHMARKS).describe(`Which benchmark: a Stacks currency index, or ${BTC_REF} for borrowing USDC against bitcoin on Base and Ethereum.`)
   }
 }, async ({ rate, side, index }) => {
   try {
@@ -143,7 +166,16 @@ server.registerTool("compare_rate", {
     if (a > STALE_AFTER_HOURS)
       return refuse(`The last fixing is ${a.toFixed(1)} hours old, past the ${STALE_AFTER_HOURS} hour limit. No verdict on stale data. Fall back to your own logic.`);
 
-    const ix = d.indices[index];
+    /* The bitcoin-collateral reference has the same shape where it matters:
+       a borrow and supply rate, and markets. */
+    const isRef = index === BTC_REF;
+    const ref = d.bitcoinCollateralUsdc;
+    const ix = isRef
+      ? (ref && typeof ref.borrow === "number"
+          ? { borrow: ref.borrow, supply: ref.supply, venues: ref.markets.map(m => m.chain),
+              markets: ref.markets.map(m => ({ ...m, venue: `Morpho on ${m.chain}`, asset: `${m.collateral}/USDC` })) }
+          : null)
+      : d.indices[index];
     if (!ix)
       return refuse(`${index} is not published in the current fixing, so there is no benchmark to compare against. `
         + `Treat this as unknown, not as zero. Published today: ${Object.keys(d.indices).join(", ")}.`);
@@ -185,7 +217,8 @@ server.registerTool("compare_rate", {
       `${index} ${side} benchmark is ${pct(bench)}. Your ${rate.toFixed(2)}% is ${verdict}.`,
       stop,
       best ? `Best constituent today: ${best.venue} ${best.asset} at ${pct(best[side])}, utilization ${pct(best.utilization)}.` : "",
-      ix.venues.length === 1 ? `Note: this index covers one venue, so it is a reading of that venue rather than a market average.` : "",
+      !isRef && ix.venues.length === 1 ? `Note: this index covers one venue, so it is a reading of that venue rather than a market average.` : "",
+      isRef ? `${BTC_REF} is ${BTC_REF_WHAT}.` : "",
       freshness(d)
     ].filter(Boolean).join("\n"));
   } catch (e) { return fail(e); }
@@ -196,15 +229,26 @@ server.registerTool("compare_rate", {
 /* ------------------------------------------------------------------ */
 server.registerTool("list_markets", {
   title: "List the lending markets behind a rate",
+  annotations: READ_ONLY,
   description:
     "Every venue and asset in an index, with its borrow rate, supply rate, " +
     "utilization, depth and weight. Utilization explains why a rate sits where it does.",
   inputSchema: {
-    index: z.enum(INDICES).optional().describe("Currency index. Omit for all of them.")
+    index: z.enum(BENCHMARKS).optional().describe(`Currency index, or ${BTC_REF}. Omit for the Stacks indices.`)
   }
 }, async ({ index }) => {
   try {
     const d = await getJson("/api/v1/latest.json");
+    if (index === BTC_REF){
+      const ref = d.bitcoinCollateralUsdc;
+      if (!ref?.markets?.length) return text(`${BTC_REF} is not published in the current fixing. Treat it as unknown, not as zero.`);
+      return text([freshness(d), "", `${BTC_REF}, ${BTC_REF_WHAT}.`, ...ref.markets.map(m =>
+        `  Morpho on ${m.chain}, ${m.collateral}/USDC: borrow ${pct(m.borrow)}, supply ${pct(m.supply)}, `
+        + `utilization ${pct(m.utilization)}, depth ${usd(m.depthUsd)}`
+        + (typeof m.weight === "number" ? `, weight ${(m.weight * 100).toFixed(1)}%` : "")),
+        ref.notRead ? `Not read today: ${ref.notRead.join("; ")}. The reference is withheld until every market is read.` : "",
+        "", `Source: ${BASE}/api/v1/latest.json`].filter(Boolean).join("\n"));
+    }
     const entries = index
       ? (d.indices[index] ? [[index, d.indices[index]]] : [])
       : Object.entries(d.indices);
@@ -225,6 +269,7 @@ server.registerTool("list_markets", {
 /* ------------------------------------------------------------------ */
 server.registerTool("get_history", {
   title: "Get the SBOR history",
+  annotations: READ_ONLY,
   description:
     "Daily fixings since the index began. Use this to see whether a rate is " +
     "unusual, or how the cost of capital has moved. Means are given per " +
@@ -279,11 +324,14 @@ server.registerTool("get_history", {
 /* ------------------------------------------------------------------ */
 server.registerTool("compare_chains", {
   title: "Compare Stacks rates against the same markets on other chains",
+  annotations: READ_ONLY,
   description:
     "The same asset classes on the largest lending markets on Ethereum, Base, " +
-    "Hyperliquid and Solana, plus SOFR, the US repo rate. Context only: none of " +
-    "these is ever a constituent of an SBOR index, and the other chains come from " +
-    "DefiLlama rather than contract state, so small differences are expected.",
+    "Hyperliquid and Solana, plus SOFR, the US repo rate, and what it costs to " +
+    "borrow USDC against bitcoin on Base and Ethereum. Context only: none of " +
+    "these is ever a constituent of an SBOR index. Aave on Ethereum and Base and " +
+    "the bitcoin-collateral markets are read from contract state; the other venues " +
+    "come from DefiLlama, so small differences are expected for those.",
   inputSchema: {
     index: z.enum(INDICES).optional().describe("Only markets comparable to this index. Omit for all.")
   }
@@ -306,9 +354,15 @@ server.registerTool("compare_chains", {
         + ` A cheaper rate on Stacks reflects lower utilization, not lower risk.`
       : "";
 
+    const ref = d.bitcoinCollateralUsdc;
+    const refLine = ref && typeof ref.borrow === "number" && (!index || index === "SBOR-USD")
+      ? `Borrowing USDC against bitcoin (${BTC_REF}): ${pct(ref.borrow)}, depth ${usd(ref.depthUsd)}, from Morpho on Base and Ethereum, read from the contracts. A dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.`
+      : "";
+
     return text([
       freshness(d), "",
       "Stacks", ...stacks, "",
+      ...(refLine ? [refLine, ""] : []),
       ext.length ? "Elsewhere" : "", ...ext, ext.length ? "" : "",
       sofr,
       d.externalReference?.note ?? ""
@@ -321,6 +375,7 @@ server.registerTool("compare_chains", {
 /* ------------------------------------------------------------------ */
 server.registerTool("get_methodology", {
   title: "How SBOR is calculated",
+  annotations: READ_ONLY,
   description:
     "The full methodology and integration policy: how the fixing is built, " +
     "what is excluded and why, and what SBOR will and will not do. Read this " +
