@@ -133,12 +133,33 @@ const facts = {
     const a = (d1.external || []).find(x => x.v === m.v && x.a === m.a);
     return { venue: m.v, asset: m.a, borrowPct: F(m.b), borrowChange1dBps: bps(m.b, a?.b),
              supplyPct: F(m.s), utilizationPct: F(m.u), depthUsd: m.d };
-  })
+  }),
+
+  /* What it costs to borrow USDC against bitcoin, from Morpho on Base and
+     Ethereum, recorded from 25 September 2026. A reference, not an SBOR index:
+     reported on its own, never blended with the Stacks indices. */
+  bitcoinCollateralUsdc: today.btcUsdc ? {
+    published: today.btcUsdc.b != null,
+    borrowPct: F(today.btcUsdc.b), borrowChange1dBps: bps(today.btcUsdc.b, d1.btcUsdc?.b),
+    supplyPct: F(today.btcUsdc.s), utilizationPct: F(today.btcUsdc.u), depthUsd: today.btcUsdc.d,
+    markets: (today.btcUsdc.markets || []).map(m => {
+      const a = (d1.btcUsdc?.markets || []).find(x => x.c === m.c && x.a === m.a);
+      return { chain: m.c, collateral: m.a, borrowPct: F(m.b), borrowChange1dBps: bps(m.b, a?.b),
+               utilizationPct: F(m.u), depthUsd: m.d };
+    })
+  } : null
 };
 
 /* ---------- what crossed a threshold ---------- */
 
 const flags = [];
+{
+  const bc = facts.bitcoinCollateralUsdc;
+  if (bc && !bc.published)
+    flags.push(`The bitcoin-collateral USDC reference is withheld today: not every Morpho market could be read.`);
+  if (bc?.published && bc.borrowChange1dBps != null && Math.abs(bc.borrowChange1dBps) >= 25)
+    flags.push(`Borrowing USDC against bitcoin on Morpho, Base and Ethereum, moved ${bc.borrowChange1dBps > 0 ? "+" : ""}${bc.borrowChange1dBps} bps to ${bc.borrowPct}%.`);
+}
 for (const ix of facts.indices){
   if (!ix.published && ix.publishedYesterday) flags.push(`${ix.label} is not published today. It was yesterday.`);
   if (!ix.published) continue;
@@ -268,7 +289,9 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 7. Some inputs are unreliable and you should say so rather than reporting them flatly. The stSTX protocol yield from StackingDAO has moved 6.81, 3.14, 4.21, 4.33 within a week, which is not how a staking yield behaves. Any figure that depends on it, including the same exposure legs and the all in supply rate, inherits that. If you cite one, say the input moves.
 
-8. If nothing crossed a threshold, say so in one line and stop. Most days are quiet and a brief that manufactures drama is worse than no brief.
+8. bitcoinCollateralUsdc is a reference, not an SBOR index: what it costs to borrow USDC against wrapped bitcoin on Morpho, on Base and Ethereum. Report it on its own when it is flagged. Never average it with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
+
+9. If nothing crossed a threshold, say so in one line and stop. Most days are quiet and a brief that manufactures drama is worse than no brief.
 
 STYLE.
 
