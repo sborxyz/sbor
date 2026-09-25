@@ -398,6 +398,7 @@ a{color:var(--accent)}
         <div id="method-b"></div>
       </div>
       <p class="foot-note" id="t-sources"></p>
+      <p class="foot-note" id="t-govern"></p>
     </section>
 
     <section id="dev" data-tabpage="agents">
@@ -432,6 +433,8 @@ a{color:var(--accent)}
       <div class="devk" id="t-devMcpH" style="margin-top:26px"></div>
       <p class="coverage" id="t-devMcpP" style="margin:6px 0 10px"></p>
       <pre class="code">npx -y sbor-mcp</pre>
+      <p class="coverage" id="t-devRemote" style="margin:6px 0 10px"></p>
+      <pre class="code">https://mcp.sbor.xyz/mcp</pre>
       <div class="devk" id="t-contractsH" style="margin-top:26px"></div>
       <div class="contracts" id="contracts"></div>
     </section>
@@ -539,6 +542,8 @@ en:{
   csv:"Download CSV",
   tabRates:"Rates", tabStaking:"Staking", tabAgents:"For agents", tabMethod:"Methodology",
   devMcpH:"As an MCP tool",
+  devRemote:`Or connect by address, with nothing to install: Claude on the web, ChatGPT, and any client that accepts a URL. No key and no sign-in. The short version for agents is <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>.`,
+  govern:`Independent: no token, and no stake in or payment from any venue SBOR measures. Published fixings are never rewritten; corrections to published figures are listed in <a href="https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>. How SBOR measures up to the IOSCO Principles for Financial Benchmarks: <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" target="_blank" rel="noopener">self-assessment</a>.`,
   devMcpP:"Before your agent borrows, check the rate. If an offer is more than 50 basis points above the benchmark, stop and ask a human. Works in Claude Desktop, Cursor and any MCP client.",
   devH:"Use the data",
   devP:"Everything on this page is available as JSON and plain text. The published fixing is free to read: no key, no rate limit, no registration. Build against v1 and it will not change shape under you.",
@@ -636,6 +641,8 @@ pt:{
   csv:"Baixar CSV",
   tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes", tabMethod:"Metodologia",
   devMcpH:"Como ferramenta MCP",
+  devRemote:`Ou conecte pelo endereço, sem instalar nada: Claude na web, ChatGPT e qualquer cliente que aceite um URL. Sem chave e sem login. A versão curta para agentes está em <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>.`,
+  govern:`Independente: sem token, sem participação em nenhuma plataforma que o SBOR mede e sem receber pagamento delas. Fixings publicados nunca são reescritos; as correções de valores publicados estão em <a href="https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>. Como o SBOR se compara aos Princípios da IOSCO para benchmarks financeiros: <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" target="_blank" rel="noopener">autoavaliação</a>.`,
   devMcpP:"Antes de o seu agente tomar um empréstimo, confira a taxa. Se uma oferta estiver mais de 50 pontos-base acima do benchmark, pare e pergunte a um humano. Funciona no Claude Desktop, no Cursor e em qualquer cliente MCP.",
   devH:"Use os dados",
   devP:"Tudo nesta página está disponível em JSON e texto puro. O fixing publicado é livre para leitura: sem chave, sem limite de requisições, sem cadastro. Construa sobre a v1 e o formato não muda embaixo de você.",
@@ -852,6 +859,7 @@ function renderChrome(){
   set("t-devH", t.devH); set("t-devP", t.devP);
   set("tab-rates", t.tabRates); set("tab-staking", t.tabStaking); set("tab-agents", t.tabAgents); set("tab-method", t.tabMethod);
   set("t-devMcpH", t.devMcpH); set("t-devMcpP", t.devMcpP);
+  set("t-devRemote", t.devRemote); set("t-govern", t.govern);
   set("t-devEndpoints", t.devEndpoints); set("t-devExample", t.devExample);
   set("t-contractsH", t.contractsH);
   set("contracts", CONTRACTS.map(c =>
