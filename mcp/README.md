@@ -32,16 +32,36 @@ It starts and waits silently. That is success. Ctrl+C to exit.
 
 Claude Desktop: add that to `claude_desktop_config.json` and restart.
 
+## Or connect by address, with nothing to install
+
+```
+https://mcp.sbor.xyz/mcp
+```
+
+Streamable HTTP, no key, no sign-in. Works as a custom connector in Claude on
+the web and in any MCP client that accepts a URL. The remote server is generated
+from this one, so both give the same answers.
+
 ## Tools
 
 | Tool | What it answers |
 |---|---|
-| `get_rate` | What does capital cost on Stacks right now |
+| `get_rate` | What does capital cost on Stacks right now, and what does borrowing USDC against bitcoin cost |
 | `compare_rate` | Is this offer above or below the market, and by how much |
 | `list_markets` | Which venues make up the rate, with utilization and depth |
 | `get_history` | How has the rate moved |
 | `compare_chains` | How Stacks compares with Ethereum, Base, Hyperliquid, Solana and SOFR |
 | `get_methodology` | How the number is built, and what it excludes |
+
+All six tools are read-only.
+
+## Benchmarks
+
+`SBOR-USD`, `SBOR-BTC` and `SBOR-STX` are the Stacks indices. `BTC-COLLATERAL-USDC`
+is a reference, not an SBOR index: what it costs to borrow USDC against bitcoin
+wrapped by a custodian (cbBTC, WBTC), from the Morpho markets on Base and
+Ethereum whose only collateral is that bitcoin. Use it to check a USDC loan
+against bitcoin on those chains.
 
 ## Recommended use
 
@@ -81,3 +101,5 @@ writes, no telemetry. Set `SBOR_BASE` to point at a different host.
 
 MIT. The published fixing is free to read. See
 [llms.txt](https://sbor.xyz/llms.txt) for the full integration policy.
+
+*Last updated 25 September 2026.*
