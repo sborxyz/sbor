@@ -124,7 +124,7 @@ async function handle(msg){
         protocolVersion: PROTOCOLS.includes(asked) ? asked : PROTOCOLS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "sbor", title: "SBOR", version: VERSION },
-        instructions: "SBOR is the benchmark lending rate for Stacks, read from contract state and published daily. Before borrowing, call compare_rate: if an offer is well above the benchmark, stop. Every tool refuses rather than guesses; an error means there is no trustworthy answer."
+        instructions: "SBOR publishes benchmark lending rates for Bitcoin DeFi, read from contract state and published daily: an index per currency on Stacks, and BTC-COLLATERAL-USDC for borrowing USDC against bitcoin on Base and Ethereum. Before borrowing, call compare_rate: if an offer is well above the benchmark, stop. Every tool refuses rather than guesses; an error means there is no trustworthy answer."
       });
     }
     case "ping": return ok(msg.id, {});
@@ -148,7 +148,7 @@ async function handle(msg){
   }
 }
 
-const ABOUT = \`SBOR MCP server. The benchmark lending rate for Stacks, for agents.
+const ABOUT = \`SBOR MCP server. Benchmark lending rates for Bitcoin DeFi, for agents.
 
 Connect an MCP client to https://mcp.sbor.xyz/mcp (Streamable HTTP, no key).
 Tools: \${[...server.tools.keys()].join(", ")}.
