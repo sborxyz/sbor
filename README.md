@@ -46,6 +46,15 @@ Published beside them, never inside them: a Proof of Transfer staking
 reference, and the same asset classes on the largest lending markets on
 Ethereum, Base, Hyperliquid and Solana, for comparison.
 
+### Beyond Stacks: borrowing USDC against bitcoin
+
+From the fixing of 25 September 2026, each fixing also carries
+`bitcoinCollateralUsdc`: what it costs to borrow USDC against bitcoin, read from
+the Morpho Blue markets on Base and Ethereum whose only collateral is cbBTC or
+WBTC. Each market is published with its rate, utilization and depth, and a
+reference weighted by depth when every market was read. It is a reference, not
+an SBOR index, and never enters a fixing.
+
 ## Data
 
 No key, no registration, no rate limit, no fee. CORS open.
@@ -89,7 +98,17 @@ wrong reading under that rule costs a pause, not a trade.
 npx -y sbor-mcp
 ```
 
-Then call `compare_rate`. Setup for each client is in [mcp/](mcp/).
+**As a remote MCP server**, for Claude on the web, ChatGPT and any client that
+connects by address, with nothing to install:
+
+```
+https://mcp.sbor.xyz/mcp
+```
+
+No key and no sign-in. The remote server is built from the same code as the
+local one, so both give the same answers. Then call `compare_rate`. Setup for
+each client is in [mcp/](mcp/), and the short version for agents is
+[AGENTS.md](AGENTS.md).
 
 **Over plain HTTP**, no key, no registration, no fee, CORS open. Licensed
 CC BY 4.0, so you can build on it commercially without asking.
@@ -190,11 +209,15 @@ api/v1/                 published data
 
 ## Independence
 
-SBOR takes no payment from any venue it measures and is not affiliated with
-Stacks, the Stacks Foundation, or any protocol in the index. It publishes
-whatever the market does, including numbers unfavorable to the ecosystem.
+**Independent:** no token, and no stake in or payment from any venue SBOR
+measures. It is not affiliated with Stacks, the Stacks Foundation, or any
+protocol in the index, and publishes whatever the market does, including numbers
+unfavorable to the ecosystem. It does not trade on its own rate. Grant funding,
+when received, is disclosed.
 
-It does not trade on its own rate.
+Published fixings are never rewritten. Corrections to published figures are
+listed in [CORRECTIONS.md](CORRECTIONS.md). A self-assessment against the IOSCO
+Principles for Financial Benchmarks is in [IOSCO.md](IOSCO.md).
 
 ## Contributing
 
@@ -231,3 +254,5 @@ any.
 
 [sbor.xyz](https://sbor.xyz) · [@SBORindex](https://x.com/SBORindex) ·
 contact@sbor.xyz · sbor.btc · sbor.stx
+
+*Last updated 24 September 2026.*
