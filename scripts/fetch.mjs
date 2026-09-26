@@ -80,13 +80,13 @@ const ZEST = {
   deployer: "SP1A27KFY4XERQCCRCARCYD1CC5N7M6688BSYADJ7",
   dataContracts: ["v0-5-data", "v0-1-data"],   // current first, previous as fallback
   assets: [
-    { symbol:"sBTC",     currency:"BTC", address:"SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4", contract:"sbtc-token" },
-    { symbol:"USDCx",    currency:"USD", address:"SP120SBRBQJ00MCWS7TM5R8WJNTTKD5K0HFRC2CNE", contract:"usdcx" },
-    { symbol:"USDh",     currency:"USD", address:"SPN5AKG35QZSK2M8GAMR4AFX45659RJHDW353HSG", contract:"usdh-token-v1" },
-    { symbol:"STX",      currency:"STX", address:"SP1A27KFY4XERQCCRCARCYD1CC5N7M6688BSYADJ7", contract:"wstx" },
-    { symbol:"stSTX",    currency:"STX", address:"SP4SZE494VC2YC5JYG7AYFQ44F5Q4PYV7DVMDPBG", contract:"ststx-token" },
+    { symbol:"sBTC",     currency:"BTC", decimals:8, address:"SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4", contract:"sbtc-token" },
+    { symbol:"USDCx",    currency:"USD", decimals:6, address:"SP120SBRBQJ00MCWS7TM5R8WJNTTKD5K0HFRC2CNE", contract:"usdcx" },
+    { symbol:"USDh",     currency:"USD", decimals:8, address:"SPN5AKG35QZSK2M8GAMR4AFX45659RJHDW353HSG", contract:"usdh-token-v1" },
+    { symbol:"STX",      currency:"STX", decimals:6, address:"SP1A27KFY4XERQCCRCARCYD1CC5N7M6688BSYADJ7", contract:"wstx" },
+    { symbol:"stSTX",    currency:"STX", decimals:6, address:"SP4SZE494VC2YC5JYG7AYFQ44F5Q4PYV7DVMDPBG", contract:"ststx-token" },
     /* collateral only, reported but never in a fixing */
-    { symbol:"stSTXbtc", currency:null,  address:"SP4SZE494VC2YC5JYG7AYFQ44F5Q4PYV7DVMDPBG", contract:"ststxbtc-token-v2" }
+    { symbol:"stSTXbtc", currency:null, decimals:6,  address:"SP4SZE494VC2YC5JYG7AYFQ44F5Q4PYV7DVMDPBG", contract:"ststxbtc-token-v2" }
   ]
 };
 
@@ -109,7 +109,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.9.0";
+const METHODOLOGY_VERSION = "1.10.0";
 
 /* Below this, on both sides at once, a funded market is not showing a market rate. */
 const RATE_FLOOR = 0.05;
@@ -302,6 +302,32 @@ async function graniteMarket(){
   return { borrow, supply, utilization: ur * 100, totalAssetsRaw: totalAssets };
 }
 
+/* A market's size in dollars from the contract's total assets, at the fixing's
+   own prices. Dollar markets are taken at par. stSTX is taken at the STX price,
+   which understates it slightly, since stSTX accrues yield above STX. A
+   fallback for when DefiLlama has no size, never the first source. */
+function contractDepthUsd(asset, totalAssetsRaw, context){
+  const raw = Number(totalAssetsRaw);
+  if (!Number.isFinite(raw) || raw <= 0 || asset.decimals == null) return 0;
+  const units = raw / 10 ** asset.decimals;
+  const price = asset.currency === "USD" ? 1
+    : asset.currency === "BTC" ? context?.prices?.btcUsd
+    : asset.currency === "STX" ? context?.prices?.stxUsd : null;
+  return Number.isFinite(price) && price > 0 ? Math.round(units * price) : 0;
+}
+
+/* Earlier compact rows, newest first, for the continuity guard. */
+function previousRows(){
+  try {
+    const h = JSON.parse(readFileSync("api/v1/history.json", "utf8"));
+    const today = new Date().toISOString().slice(0, 10);
+    return [...h].reverse().filter(r => r.date < today);
+  } catch { return []; }
+}
+
+/* An index missing this share or more of yesterday's depth is withheld. */
+const WITHHOLD_SHARE = 0.25;
+
 /* Fail fast if a helper is missing or wrong, rather than discovering it one
    market at a time as an exclusion. */
 function selfCheck(){
@@ -323,14 +349,39 @@ const main = async () => {
   const protoYield = { ...protoYieldRaw };
   delete protoYield._context;
 
+  /* Prices, fetched before the markets so a market size can be read from the
+     contract when DefiLlama has none. Context never enters an index and never
+     breaks a fixing. */
+  let context = null;
+  try { context = await contextBlock(); }
+  catch(e){ log(`  context unavailable, omitted. ${e.message}`); }
+
   const markets = [];
+  const dynamicNotes = [];   /* what happened on this fixing only */
   for (const a of ZEST.assets){
     try {
-      const { supply, borrow, utilization, supplyNominal, borrowNominal } = await apysFor(a);
-      const d = depth[a.symbol] ?? 0;
+      const { supply, borrow, utilization, supplyNominal, borrowNominal, totalAssetsRaw } = await apysFor(a);
+      let d = depth[a.symbol] ?? 0, depthSource = "DefiLlama";
       log(`  ${a.symbol}: supply=${round(supply)}% borrow=${round(borrow)}% (nominal ${round(supplyNominal)}/${round(borrowNominal)}) util=${utilization == null ? "n/a" : round(utilization)+"%"} depth=${d}`);
       if (!a.currency){ log(`    (collateral only, excluded from fixings)`); continue; }
-      if (d <= 0){ log(`    (no depth, skipped)`); continue; }
+      /* DefiLlama is the usual source of Zest market sizes, but it can return
+         nothing for a market that is alive, as it did for USDCx on 26
+         September 2026, when the largest dollar market dropped out of the
+         index unnoticed. The contract knows how much is supplied; use that,
+         at the fixing's own prices, rather than drop the market in silence. */
+      const est = contractDepthUsd(a, totalAssetsRaw, context);
+      if (d > 0 && est > 0) log(`    size check: DefiLlama $${d}, contract $${est}`);
+      if (d <= 0){
+        if (est > 0){
+          d = est; depthSource = "contract";
+          log(`    depth from DefiLlama missing; read from the contract instead: $${d}`);
+          dynamicNotes.push(`${ZEST.venue} ${a.symbol}: market size read from the Zest contract on this fixing, because DefiLlama returned none.`);
+        } else {
+          log(`    (no depth from DefiLlama or the contract, skipped)`);
+          dynamicNotes.push(`${ZEST.venue} ${a.symbol}: not in this fixing, its size could not be read from DefiLlama or the contract.`);
+          continue;
+        }
+      }
       /* Plausibility floor. Lenders and borrowers do not price money at
          effectively nothing on both sides of a funded market. When it reads
          that way, either the venue is not reporting or the protocol is holding
@@ -339,6 +390,7 @@ const main = async () => {
          is left out rather than published as a rate of zero. */
       if (borrow < RATE_FLOOR && supply < RATE_FLOOR){
         log(`    (both rates below the ${RATE_FLOOR}% plausibility floor, treated as unreadable and excluded)`);
+        dynamicNotes.push(`${ZEST.venue} ${a.symbol}: not in this fixing, both rates read below the plausibility floor.`);
         continue;
       }
       markets.push({
@@ -349,10 +401,11 @@ const main = async () => {
         nominalSupply: round(supplyNominal),
         ...(protoYield[a.symbol] != null && { protocolYield: protoYield[a.symbol] }),
         ...(YIELD_SOURCE[a.symbol] && { protocolYieldSource: YIELD_SOURCE[a.symbol] }),
-        depthUsd: d, phaseIn: 1
+        depthUsd: d, depthSource, phaseIn: 1
       });
     } catch(e){
       log(`  ${a.symbol}: read failed, excluded. ${e.message}`);
+      dynamicNotes.push(`${ZEST.venue} ${a.symbol}: not in this fixing, its contract could not be read.`);
     }
   }
   /* If every market at a venue fails, that is a fault on our side or a
@@ -371,7 +424,7 @@ const main = async () => {
         venue: GRANITE.venue, asset: GRANITE.asset, currency: GRANITE.currency,
         borrow: round(g.borrow), supply: round(g.supply),
         utilization: round(g.utilization),
-        depthUsd, phaseIn: 1
+        depthUsd, depthSource: "contract", phaseIn: 1
       });
     } else {
       log(`  Granite: implausible values, excluded. depth=${depthUsd} borrow=${g.borrow} supply=${g.supply}`);
@@ -408,6 +461,41 @@ const main = async () => {
     };
   }
 
+  /* Continuity guard. A market that was in an index the day before and is
+     missing today is a data event, not a market move. It is always noted, and
+     when the missing markets carried a quarter or more of the index's depth,
+     the index is withheld rather than published short. On 26 September 2026
+     the largest dollar market dropped out unnoticed and SBOR-USD printed 1.46%
+     against a market of 2.65%. */
+  const withheld = {};
+  const prevRows = previousRows();
+  if (prevRows.length){
+    for (const label of Object.keys(indices)){
+      /* The last day the index was actually published: a withdrawn or withheld
+         day is not a baseline. */
+      const was = prevRows.map(r => r[label]).find(x => x?.markets?.length && !x.withdrawn);
+      if (!was) continue;
+      const now = indices[label].markets;
+      const missing = was.markets.filter(m => !now.some(n => n.venue === m.v && n.asset === m.a));
+      if (!missing.length) continue;
+      const totalWas = was.markets.reduce((t, m) => t + (m.d || 0), 0);
+      const share = totalWas > 0 ? missing.reduce((t, m) => t + (m.d || 0), 0) / totalWas : 1;
+      const names = missing.map(m => `${m.v} ${m.a}`).join(", ");
+      const pctShare = Math.round(share * 100);
+      if (share >= WITHHOLD_SHARE){
+        withheld[label] = {
+          reason: `Withheld: ${names} could not be read on this fixing and carried ${pctShare}% of the index's depth on the last day it was published. An index missing that much of its market is not published.`,
+          missing: missing.map(m => ({ venue: m.v, asset: m.a, depthUsdBefore: m.d ?? null }))
+        };
+        log(`  ${label}: withheld, ${names} missing (${pctShare}% of the last published day's depth)`);
+        delete indices[label];
+      } else {
+        dynamicNotes.push(`${label}: published without ${names}, which could not be read on this fixing and carried ${pctShare}% of the index's depth on the last day it was published.`);
+        log(`  ${label}: ${names} missing (${pctShare}% of the last published day's depth), published with a note`);
+      }
+    }
+  }
+
   /* PoX staking yield. Published beside the lending indices, never inside them.
      A failure here must not stop the fixing. */
   let pox = null;
@@ -428,9 +516,6 @@ const main = async () => {
   catch(e){ log(`  external reference unavailable, omitted. ${e.message}`); }
 
   /* Context for the record. Never enters an index, never breaks a fixing. */
-  let context = null;
-  try { context = await contextBlock(); }
-  catch(e){ log(`  context unavailable, omitted. ${e.message}`); }
   if (stakingContext && Object.keys(stakingContext).length > 1)
     context = { ...(context || { note: "Context recorded alongside the fixing. None of this enters an index or affects a rate." }), staking: stakingContext };
 
@@ -458,7 +543,10 @@ const main = async () => {
     ...(btcUsdc && { bitcoinCollateralUsdc: btcUsdc }),
     ...(external && { externalReference: external }),
     ...(context && { context }),
+    ...(Object.keys(withheld).length && { withheld }),
     notes:[
+      ...dynamicNotes,
+      "Each market carries depthSource. Zest sizes come from DefiLlama, and when DefiLlama returns none for a live market the size is read from the Zest contract at the fixing's prices. A market that was in the index on its last published day and cannot be read today is noted on this fixing; when the missing markets carried a quarter or more of the index's depth, the index is withheld rather than published short.",
       "One fixing a day, final at the first successful attempt. The scheduler can drop runs, so backup attempts follow until 17:00 UTC, but only if no fixing has landed that day. The fixing timestamp is authoritative, not the time of any attempt.",
       "Rates are read from contract state, not from any venue's published figure.",
       "Protocol yield belongs to the asset, not the loan, and is excluded from every fixing.",
@@ -518,6 +606,7 @@ const main = async () => {
       date: day,
       fixedAt: stamp,
       methodologyVersion: METHODOLOGY_VERSION,
+      ...(Object.keys(withheld).length && { withheld: Object.fromEntries(Object.entries(withheld).map(([k, v]) => [k, v.reason])) }),
       /* The bitcoin-collateral USDC reading, kept daily from its first day:
          the track record is the point. Compact, as the rest of the row. */
       ...(btcUsdc && { btcUsdc: {
