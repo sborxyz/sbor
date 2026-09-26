@@ -60,50 +60,6 @@
   "method": "https://sbor.xyz/llms.txt",
   "source": "Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
   "indices": {
-    "SBOR-USD": {
-      "label": "SBOR-USD",
-      "currency": "USD",
-      "headline": "What money costs in dollars on Stacks.",
-      "borrow": 1.46,
-      "supply": 0.24,
-      "allInSupply": 0.24,
-      "allInSupplyDiffers": false,
-      "venues": [
-        "Granite",
-        "Zest V2"
-      ],
-      "largestConstituentWeight": 0.9417,
-      "markets": [
-        {
-          "venue": "Granite",
-          "asset": "USDCx",
-          "borrow": 1.44,
-          "supply": 0.25,
-          "utilization": 23.32,
-          "depthUsd": 5007123,
-          "phaseIn": 1,
-          "weight": 0.9417
-        },
-        {
-          "venue": "Zest V2",
-          "asset": "USDh",
-          "borrow": 1.76,
-          "supply": 0,
-          "utilization": 29.58,
-          "nominalBorrow": 1.74,
-          "nominalSupply": 0,
-          "depthUsd": 309804,
-          "phaseIn": 1,
-          "weight": 0.0583
-        }
-      ],
-      "termAverages": {
-        "d30": null,
-        "d90": null,
-        "d180": null
-      },
-      "seriesBegan": "2026-09-01"
-    },
     "SBOR-BTC": {
       "label": "SBOR-BTC",
       "currency": "BTC",
@@ -477,5 +433,13 @@
     "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
     "Protocol yield for stSTX and stSTXbtc is sourced from StackingDAO, which derives it from PoX reward claims net of pool commission over stSTX supply. Where a source cannot be reached, the index is marked allInSupplyIncomplete and the yield is left out rather than estimated.",
     "StackingDAO's stBTC figure is recorded in context as their estimated net yield on the Bitcoin Staking bond, per the method they published on 15 September 2026: 3.0% on bonded sBTC, diluted by an unbonded liquidity buffer, less commission and a payment to stSTX holders for STX locked in the bond. It is a staking yield, not a lending rate, and enters no index."
-  ]
+  ],
+  "withdrawn": {
+    "SBOR-USD": {
+      "withdrawnAt": "2026-09-26T13:44:43Z",
+      "publishedBorrow": 1.46,
+      "publishedSupply": 0.24,
+      "reason": "Withdrawn. Zest's USDCx market, 3.28% and $10.2 million supplied the day before, was left out of this fixing: DefiLlama, the source of Zest market sizes, returned no size for it, and the fixing published the index from the remaining two markets without saying so. 1.46% was not the market rate. From methodology 1.10.0, a Zest market size missing from DefiLlama is read from the Zest contract instead, and an index missing a constituent that carried a quarter or more of its depth the day before is withheld rather than published short."
+    }
+  }
 }
