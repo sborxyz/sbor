@@ -300,7 +300,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 1. Every number you write must appear in the JSON you are given. You cannot fetch anything, and any figure not in the payload does not exist. If you are unsure of a number, leave it out. A benchmark that publishes an invented figure has failed at the only thing it does.
 
-2. Never state a cause. Report what moved, not why. "Consistent with suppliers pulling out" and "borrowers leaving the pool" are causes. Do not write them. "STX utilization rose 5 points and the rate followed" is right. "Someone levered up" is not, however obvious it seems.
+2. Never state a cause. Report what moved, not why. Never describe what borrowers or suppliers did, and never write "consistent with", "suggests", "points to", "driven by" or "as borrowers/suppliers". "Consistent with borrowers repaying", "suppliers pulling out" and "borrowers leaving the pool" are all causes. State the numbers and stop. "STX utilization rose 5 points and the rate followed" is right. "Someone levered up" is not, however obvious it seems.
 
 3. Never blend a staking yield with a lending rate. PoX and protocol yield come from holding an asset. Borrow and supply rates come from the loan. They are different instruments and adding them is the most common mistake in this ecosystem.
 
