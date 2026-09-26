@@ -3130,35 +3130,11 @@
       }
     ],
     "SBOR-USD": {
-      "borrow": 1.46,
-      "supply": 0.24,
-      "allInSupply": 0.24,
-      "venues": 2,
-      "largestConstituentWeight": 0.9417,
-      "depthUsd": 5316927,
-      "utilization": 23.68,
-      "markets": [
-        {
-          "v": "Granite",
-          "a": "USDCx",
-          "b": 1.44,
-          "s": 0.25,
-          "u": 23.32,
-          "py": null,
-          "d": 5007123,
-          "w": 0.9417
-        },
-        {
-          "v": "Zest V2",
-          "a": "USDh",
-          "b": 1.76,
-          "s": 0,
-          "u": 29.58,
-          "py": null,
-          "d": 309804,
-          "w": 0.0583
-        }
-      ]
+      "withdrawn": true,
+      "withdrawnAt": "2026-09-26T13:44:43Z",
+      "publishedBorrow": 1.46,
+      "publishedSupply": 0.24,
+      "reason": "Withdrawn. Zest's USDCx market, 3.28% and $10.2 million supplied the day before, was left out of this fixing: DefiLlama, the source of Zest market sizes, returned no size for it, and the fixing published the index from the remaining two markets without saying so. 1.46% was not the market rate. From methodology 1.10.0, a Zest market size missing from DefiLlama is read from the Zest contract instead, and an index missing a constituent that carried a quarter or more of its depth the day before is withheld rather than published short."
     },
     "SBOR-BTC": {
       "borrow": 1.31,
