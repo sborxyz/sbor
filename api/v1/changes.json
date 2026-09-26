@@ -1,9 +1,9 @@
 {
   "schema": "sbor-changes-1",
   "note": "Changes to lending protocol parameters, detected by comparing each fixing with the last known values. Newest first. Each entry gives the fixing that first saw the change, the market, the parameter, and the value before and after. A parameter that could not be read is never recorded as a change. The baseline holds the last known value of every parameter. Recording began on 24 September 2026, so nothing before that date is covered.",
-  "updated": "2026-09-26T08:30:40Z",
+  "updated": "2026-09-26T14:22:19Z",
   "baseline": {
-    "fixing": "2026-09-26T08:30:40Z",
+    "fixing": "2026-09-26T14:22:19Z",
     "markets": {
       "Zest V2": {
         "dataContract": "v0-5-data"

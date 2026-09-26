@@ -1,16 +1,10 @@
-SBOR post drafts, fixing 2026-09-26T08:30:40Z
+SBOR post drafts, fixing 2026-09-26T14:22:19Z
 Compared with 2026-09-25
 
-1 thing worth saying. Pick one. Do not post more than one a day.
+Nothing moved enough to be worth posting.
 
---- 1. SBOR-USD borrow moved -119 bps (151 chars)
-
-SBOR-USD borrow rate: 2.65% to 1.46%.
-
--119 bps in a day.
-
-Cheapest to borrow now: Granite USDCx at 1.44%, utilization 23.32%.
-
-sbor.xyz
-
-Check the numbers against the site before posting. Never state a cause.
+Thresholds: a rate moving 25 bps, the staking yield moving 50 bps or
+changing cycle, an index appearing or dropping out, utilization
+crossing 80% or 20% in either direction, an inversion, or a term
+average publishing. A level that has not moved since yesterday is
+not news and is deliberately not flagged.
