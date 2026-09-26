@@ -50,6 +50,14 @@ jobs:
             for (const m of bu.markets) console.log("  " + (m.chain + " " + m.collateral + "/USDC").padEnd(22) + "borrow " + String(m.borrow).padStart(5) + "%  supply " + String(m.supply).padStart(5) + "%  util " + String(m.utilization).padStart(6) + "%  depth $" + (m.depthUsd/1e6).toFixed(1) + "M  lltv " + m.lltv + "%");
             console.log(bu.borrow != null ? "  reference: borrow " + bu.borrow + "%, supply " + bu.supply + "%, depth $" + (bu.depthUsd/1e6).toFixed(0) + "M" : "  reference withheld, not every market was read: " + JSON.stringify(bu.notRead));
           }
+          console.log("\nINDICES, each market and where its size came from");
+          for (const [label, ix] of Object.entries(d.indices || {})){
+            console.log("  " + label + ": borrow " + ix.borrow + "%  supply " + ix.supply + "%  " + ix.markets.length + " market(s)");
+            for (const m of ix.markets) console.log("     " + (m.venue + " " + m.asset).padEnd(18) + "borrow " + String(m.borrow).padStart(5) + "%  depth $" + (m.depthUsd/1e6).toFixed(2) + "M  size from " + (m.depthSource || "?") + "  weight " + m.weight);
+          }
+          for (const [label, w] of Object.entries(d.withheld || {})) console.log("  " + label + ": WITHHELD. " + w.reason);
+          const dyn = (d.notes || []).filter(n => /on this fixing/.test(n));
+          console.log(dyn.length ? "  notes about this fixing:\n" + dyn.map(n => "     " + n).join("\n") : "  no market missing, nothing read from a fallback");
           const c = require("./api/v1/changes.json");
           console.log("\nCHANGE FEED: baseline holds " + Object.keys(c.baseline?.markets || {}).length + " markets, " + c.changes.length + " changes recorded\n");
           '
