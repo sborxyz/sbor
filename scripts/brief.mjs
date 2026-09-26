@@ -153,6 +153,29 @@ const facts = {
 /* ---------- what crossed a threshold ---------- */
 
 const flags = [];
+
+/* Data events come first, and they are never market moves. On 26 September
+   2026 the largest dollar market dropped out of a fixing unread, the index
+   printed 119 bps lower, and the brief explained it as borrowers leaving. */
+{
+  for (const label of INDICES){
+    const was = d1[label], now = today[label];
+    if (now?.withdrawn) continue;
+    if (was?.markets?.length && !was.withdrawn && !now?.markets?.length){
+      const reason = latest.withheld?.[label]?.reason || "A market could not be read, so the index is left out rather than estimated.";
+      flags.push(`DATA EVENT: ${label} is not published today. ${reason} Report this in one sentence as a data event, not a market move.`);
+      continue;
+    }
+    if (was?.markets?.length && !was.withdrawn && now?.markets?.length){
+      const missing = was.markets.filter(m => !now.markets.some(n => n.v === m.v && n.a === m.a));
+      if (missing.length)
+        flags.push(`DATA EVENT: ${label} is published without ${missing.map(m => `${m.v} ${m.a}`).join(", ")}, which could not be read today. Any change in ${label} or its remaining markets today is a data event, not a market move. Say so, and do not interpret it.`);
+    }
+  }
+  for (const n of latest.notes || [])
+    if (/read from the Zest contract on this fixing/.test(n)) flags.push(`DATA NOTE: ${n}`);
+}
+
 {
   const bc = facts.bitcoinCollateralUsdc;
   if (bc && !bc.published)
@@ -277,7 +300,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 1. Every number you write must appear in the JSON you are given. You cannot fetch anything, and any figure not in the payload does not exist. If you are unsure of a number, leave it out. A benchmark that publishes an invented figure has failed at the only thing it does.
 
-2. Never state a cause. Report what moved, not why. "STX utilization rose 5 points and the rate followed" is right. "Someone levered up" is not, however obvious it seems.
+2. Never state a cause. Report what moved, not why. "Consistent with suppliers pulling out" and "borrowers leaving the pool" are causes. Do not write them. "STX utilization rose 5 points and the rate followed" is right. "Someone levered up" is not, however obvious it seems.
 
 3. Never blend a staking yield with a lending rate. PoX and protocol yield come from holding an asset. Borrow and supply rates come from the loan. They are different instruments and adding them is the most common mistake in this ecosystem.
 
@@ -291,7 +314,9 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 8. bitcoinCollateralUsdc is a reference, not an SBOR index: what it costs to borrow USDC against wrapped bitcoin on Morpho, on Base and Ethereum. Report it on its own when it is flagged. Never average it with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
 
-9. If nothing crossed a threshold, say so in one line and stop. Most days are quiet and a brief that manufactures drama is worse than no brief.
+9. A flag marked DATA EVENT comes first and is never a market move. Say the index is not published, or is missing a market, and why, in one sentence, and do not interpret any change in that index or its remaining markets. A DATA NOTE is one sentence, no interpretation.
+
+10. If nothing crossed a threshold, say so in one line and stop. Most days are quiet and a brief that manufactures drama is worse than no brief.
 
 STYLE.
 
