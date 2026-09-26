@@ -80,13 +80,13 @@ const ZEST = {
   deployer: "SP1A27KFY4XERQCCRCARCYD1CC5N7M6688BSYADJ7",
   dataContracts: ["v0-5-data", "v0-1-data"],   // current first, previous as fallback
   assets: [
-    { symbol:"sBTC",     currency:"BTC", decimals:8, address:"SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4", contract:"sbtc-token" },
-    { symbol:"USDCx",    currency:"USD", decimals:6, address:"SP120SBRBQJ00MCWS7TM5R8WJNTTKD5K0HFRC2CNE", contract:"usdcx" },
-    { symbol:"USDh",     currency:"USD", decimals:8, address:"SPN5AKG35QZSK2M8GAMR4AFX45659RJHDW353HSG", contract:"usdh-token-v1" },
-    { symbol:"STX",      currency:"STX", decimals:6, address:"SP1A27KFY4XERQCCRCARCYD1CC5N7M6688BSYADJ7", contract:"wstx" },
-    { symbol:"stSTX",    currency:"STX", decimals:6, address:"SP4SZE494VC2YC5JYG7AYFQ44F5Q4PYV7DVMDPBG", contract:"ststx-token" },
+    { symbol:"sBTC",     currency:"BTC", decimals:8, vault:"v0-vault-sbtc", address:"SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4", contract:"sbtc-token" },
+    { symbol:"USDCx",    currency:"USD", decimals:6, vault:"v0-vault-usdc", address:"SP120SBRBQJ00MCWS7TM5R8WJNTTKD5K0HFRC2CNE", contract:"usdcx" },
+    { symbol:"USDh",     currency:"USD", decimals:8, vault:"v0-vault-usdh", address:"SPN5AKG35QZSK2M8GAMR4AFX45659RJHDW353HSG", contract:"usdh-token-v1" },
+    { symbol:"STX",      currency:"STX", decimals:6, vault:"v0-vault-stx", address:"SP1A27KFY4XERQCCRCARCYD1CC5N7M6688BSYADJ7", contract:"wstx" },
+    { symbol:"stSTX",    currency:"STX", decimals:6, vault:"v0-vault-ststx", address:"SP4SZE494VC2YC5JYG7AYFQ44F5Q4PYV7DVMDPBG", contract:"ststx-token" },
     /* collateral only, reported but never in a fixing */
-    { symbol:"stSTXbtc", currency:null, decimals:6,  address:"SP4SZE494VC2YC5JYG7AYFQ44F5Q4PYV7DVMDPBG", contract:"ststxbtc-token-v2" }
+    { symbol:"stSTXbtc", currency:null, decimals:6, vault:"v0-vault-ststxbtc",  address:"SP4SZE494VC2YC5JYG7AYFQ44F5Q4PYV7DVMDPBG", contract:"ststxbtc-token-v2" }
   ]
 };
 
@@ -360,7 +360,17 @@ const main = async () => {
   const dynamicNotes = [];   /* what happened on this fixing only */
   for (const a of ZEST.assets){
     try {
-      const { supply, borrow, utilization, supplyNominal, borrowNominal, totalAssetsRaw } = await apysFor(a);
+      const { supply, borrow, utilization, supplyNominal, borrowNominal } = await apysFor(a);
+      /* The vault's own total assets, in the token's units: the true size,
+         used for the fallback below and for the daily size check. Each Zest
+         vault contract exposes get-total-assets. */
+      let totalAssetsRaw = null;
+      try {
+        let r = await readOnly(ZEST.deployer, a.vault, "get-total-assets");
+        for (let i = 0; i < 3 && r && typeof r === "object"; i++) r = r.value;   /* (ok uint), unwrapped */
+        totalAssetsRaw = r;
+      }
+      catch(e){ log(`    total assets unreadable from ${a.vault}: ${e.message}`); }
       let d = depth[a.symbol] ?? 0, depthSource = "DefiLlama";
       log(`  ${a.symbol}: supply=${round(supply)}% borrow=${round(borrow)}% (nominal ${round(supplyNominal)}/${round(borrowNominal)}) util=${utilization == null ? "n/a" : round(utilization)+"%"} depth=${d}`);
       if (!a.currency){ log(`    (collateral only, excluded from fixings)`); continue; }
