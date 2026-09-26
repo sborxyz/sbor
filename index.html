@@ -299,6 +299,7 @@ a{color:var(--accent)}
       </div>
       <p class="sofrtop" id="sofrTop" hidden></p>
       <p class="sofrtop" id="btcTop" hidden></p>
+      <p class="sofrtop" id="absentNote" hidden></p>
     </div>
 
     <section id="terms-sec" data-tabpage="rates">
@@ -535,6 +536,8 @@ en:{
     : bps > 0 ? `Borrowing a dollar on Stacks costs ${sbor}. Against US Treasuries it costs ${sofr}. That is ${bps} basis points dearer here.`
     : `Borrowing a dollar on Stacks costs ${sbor}, the same as against US Treasuries.`,
   btcTop:(r,dp)=>`Borrowing USDC against bitcoin on Base and Ethereum costs ${r}, across ${dp} of Morpho markets read from the contracts. A reference, not an SBOR index.`,
+  absentNote:(label,reason)=>`<strong>${label} is not published in this fixing.</strong> ${reason}`,
+  absentGeneric:"A market could not be read, so the index is left out rather than estimated. It returns on its own when the market can be read again.",
   sofrH:"Secured by Treasuries",
   sofrLine:(r,d)=>`SOFR ${r}, the overnight cost of a dollar in the US repo market, secured by US government debt. Published by the Federal Reserve Bank of New York for ${d}.`,
   sofrCompare:(sbor,sofr,bps)=>`A dollar borrowed against crypto collateral on Stacks costs ${sbor}. A dollar secured by US government debt costs ${sofr}. That is ${Math.abs(bps)} basis points ${bps < 0 ? "cheaper on Stacks" : "dearer on Stacks"}.`,
@@ -636,6 +639,8 @@ pt:{
     : `Tomar um dólar emprestado na Stacks custa ${sbor}, o mesmo que com garantia de títulos do Tesouro americano.`,
   sofrH:"Garantido por títulos do Tesouro",
   btcTop:(r,dp)=>`Tomar USDC emprestado com bitcoin como garantia na Base e na Ethereum custa ${r}, em ${dp} de mercados da Morpho lidos direto dos contratos. Uma referência, não um índice SBOR.`,
+  absentNote:(label,reason)=>`<strong>${label} não foi publicado neste fixing.</strong> ${reason}`,
+  absentGeneric:"Um mercado não pôde ser lido, então o índice fica de fora em vez de ser estimado. Ele volta sozinho quando o mercado puder ser lido de novo.",
   sofrLine:(r,d)=>`SOFR ${r}, o custo overnight de um dólar no mercado de repo dos Estados Unidos, garantido por dívida do governo americano. Publicado pelo Federal Reserve Bank of New York para ${d}.`,
   sofrCompare:(sbor,sofr,bps)=>`Um dólar tomado emprestado contra colateral cripto na Stacks custa ${sbor}. Um dólar garantido por dívida do governo americano custa ${sofr}. São ${Math.abs(bps)} pontos-base ${bps < 0 ? "mais barato na Stacks" : "mais caro na Stacks"}.`,
   sofrWhy:"O colateral cripto é o mais arriscado, então pela teoria isso está invertido. Sai mais barato aqui porque quase ninguém ainda toma emprestado, então a utilização é baixa e a taxa não foi disputada. A diferença mede o quanto este mercado ainda é inicial, não que ele seja mais seguro.",
@@ -743,6 +748,7 @@ const INDICES = {
 };
 
 let lang = "en", current = "USD", currentRange = 90, fixingDate = "2026-09-01";
+let ABSENT = [];   /* indices missing from the fixing, with the published reason if withdrawn */
 try { const s = localStorage.getItem("sbor-lang"); if (s === "pt" || s === "en") lang = s; } catch {}
 
 const T = () => I18N[lang];
@@ -892,9 +898,15 @@ function renderChrome(){
   document.getElementById("licLink").textContent = t.footLicense;
   document.getElementById("mailLink").textContent = t.footContact;
   document.getElementById("csvBtn").textContent = t.csv;
-  const usd = computed("USD");
-  document.getElementById("exB").textContent = fmt(usd.borrow);
-  document.getElementById("exS").textContent = fmt(usd.supply);
+  /* The example reads the dollar index, which can be absent from a fixing. */
+  const ex = INDICES.USD ? computed("USD") : null;
+  document.getElementById("exB").textContent = ex ? fmt(ex.borrow) : "null";
+  document.getElementById("exS").textContent = ex ? fmt(ex.supply) : "null";
+  const an = document.getElementById("absentNote");
+  if (ABSENT.length){
+    an.hidden = false;
+    set("absentNote", ABSENT.map(x => t.absentNote(x.label, x.reason || t.absentGeneric)).join("<br>"));
+  } else an.hidden = true;
   set("t-disclaimer", t.disclaimer);
   document.getElementById("t-signup-btn").textContent = t.signupBtn;
   document.getElementById("email").placeholder = t.signupPlaceholder;
@@ -1186,6 +1198,8 @@ async function boot(){
     const d = await r.json();
     const map = { "SBOR-USD":"USD", "SBOR-BTC":"BTC", "SBOR-STX":"STX" };
     const present = new Set(Object.keys(d.indices || {}));
+    ABSENT = Object.keys(map).filter(label => !present.has(label))
+      .map(label => ({ label, reason: d.withdrawn?.[label]?.reason || null }));
     for (const [label,k] of Object.entries(map))
       if (!present.has(label)) delete INDICES[k];
     if (!INDICES[current]) current = Object.keys(INDICES)[0];
