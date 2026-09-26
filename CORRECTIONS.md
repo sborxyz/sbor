@@ -1,10 +1,18 @@
 # SBOR corrections
 
-*Created 24 September 2026. Last updated 24 September 2026.*
+*Created 24 September 2026. Last updated 26 September 2026.*
 
 SBOR never rewrites a published fixing. When a published figure turns out to be wrong, the record keeps what was published, and this page says what was wrong, when it was found, and what changed. It lists corrections to published figures only; fixes to the site and documentation are visible in the repository's public history.
 
 Newest first.
+
+---
+
+### 26 September 2026: SBOR-USD published without its largest market, and withdrawn
+
+**What was wrong.** The fixing of 26 September published SBOR-USD at 1.46%, down from 2.65% the day before, with nothing in its notes. Zest's USDCx market, 3.28% and $10.2 million supplied the day before, two thirds of the index's depth, had been left out: DefiLlama, the source of Zest market sizes, returned no size for it, and a market without a size was dropped with only a line in the run log. The index was computed from the two remaining markets. The market itself had not changed.
+
+**What changed.** The figure was withdrawn the same day. The record keeps it, marked `withdrawn: true`, with the reason. Methodology 1.10.0, from the fixing of 27 September: a Zest market size missing from DefiLlama is read from the Zest contract; every market carries the source of its size; a market missing from an index it was in is noted on the fixing; and an index missing a quarter or more of its depth is withheld rather than published short. The morning brief and the post drafter now treat a missing market as a data event, never as a market move.
 
 ---
 
