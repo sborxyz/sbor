@@ -171,17 +171,19 @@ weight is set to zero for that fixing and the omission is recorded.
 
 Market size: Granite's size is read from its contract. Zest's sizes come from
 DefiLlama, and from methodology 1.10.0, when DefiLlama returns no size for a
-live Zest market, the size is read from the Zest contract at the fixing's own
-prices, and the market carries depthSource: contract. Before 1.10.0 such a
-market was left out of the fixing with no note, which on 26 September 2026
-removed the largest dollar market from SBOR-USD and produced a figure that was
-withdrawn the same day.
+live Zest market, the size is read from the Zest vault contract's total assets
+at the fixing's own prices, and the market carries depthSource: contract.
+Before 1.10.0 such a market was left out of the fixing with no note, which on
+26 September 2026 removed the largest dollar market from SBOR-USD. That figure
+was withdrawn and a corrected fixing published the same day. Every market
+carries depthSource, so the source of each weight is visible.
 
 Continuity: from methodology 1.10.0, a market that was in an index on its last
 published day and cannot be read today is noted on the fixing. When the missing
 markets carried a quarter or more of the index's depth, the index is withheld
 rather than published short, and the fixing records why under withheld. A
-withheld index returns on its own once the market can be read.
+withheld index returns on its own once the market can be read. Methodology
+1.10.0 applies from the corrected fixing of 26 September 2026, 14:22 UTC.
 
 Moving averages: an average is published only once the full window exists. A
 200-day average appears on day 200, not before.
