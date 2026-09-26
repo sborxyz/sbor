@@ -66,6 +66,13 @@ if (prior){
   for (const [label, ix] of Object.entries(latest.indices)){
     const was = prior[label];
     if (!was || was.withdrawn) continue;
+    /* An index missing a market it had the day before is a data event, not a
+       move. Never draft a "rate fell" post from it. */
+    if (was.markets?.length && ix.markets?.length
+        && was.markets.some(m => !ix.markets.some(n => n.venue === m.v && n.asset === m.a))){
+      log(`${label}: a market from the previous fixing is missing today, no move drafted`);
+      continue;
+    }
 
     const db = typeof was.borrow === "number" ? bps(ix.borrow, was.borrow) : null;
     const ds = typeof was.supply === "number" ? bps(ix.supply, was.supply) : null;
@@ -109,7 +116,7 @@ if (prior){
 
 Borrow ${pct(latest.indices[label].borrow)}, supply ${pct(latest.indices[label].supply)}.
 
-It was omitted while the market could not be read. SBOR leaves an index out rather than publish a figure that is not real.
+It was omitted while the market could not be read. SBOR leaves an index out rather than publish a figure it cannot stand behind.
 
 ${LINK}`
   });
@@ -120,7 +127,7 @@ ${LINK}`
     text:
 `${label} is not published today.
 
-The market could not be read, so the index is omitted rather than filled in with a number that is not real.
+The market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.
 
 It returns when the read does.
 
