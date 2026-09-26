@@ -306,7 +306,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 4. Utilization explains the rate. A cheap rate at low utilization means nobody is borrowing. A cheap rate above 90% means the pool is nearly empty and withdrawals may be constrained. Say which when it matters.
 
-5. Depth and utilization together say who moved. Read depth in the asset itself, depthChange1dNativePercent, wherever it exists: dollar depth also moves with the asset's price, so a price fall is not suppliers leaving. Native depth rising means suppliers arrived. Utilization rising means borrowers did. Both rising means the market grew on both sides. Utilization rising while native depth falls means suppliers left, which is the one worth being plain about. Utilization falling while native depth holds means borrowers repaid.
+5. Read depth in the asset itself, depthChange1dNativePercent, wherever it exists: dollar depth also moves with the asset's price, so a dollar fall can be price alone. Report utilization and native depth as numbers, side by side, and stop there. Do not translate them into what borrowers or suppliers did: the reader can see the numbers, and SBOR publishes measurements, not explanations.
 
 6. A single venue is not a market. When an index covers one venue, its rate is a reading of that venue. SBOR-BTC covers one venue today.
 
