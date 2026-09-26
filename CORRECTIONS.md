@@ -8,11 +8,13 @@ Newest first.
 
 ---
 
-### 26 September 2026: SBOR-USD published without its largest market, and withdrawn
+### 26 September 2026: SBOR-USD published without its largest market, withdrawn and republished
 
 **What was wrong.** The fixing of 26 September published SBOR-USD at 1.46%, down from 2.65% the day before, with nothing in its notes. Zest's USDCx market, 3.28% and $10.2 million supplied the day before, two thirds of the index's depth, had been left out: DefiLlama, the source of Zest market sizes, returned no size for it, and a market without a size was dropped with only a line in the run log. The index was computed from the two remaining markets. The market itself had not changed.
 
-**What changed.** The figure was withdrawn the same day. The record keeps it, marked `withdrawn: true`, with the reason. Methodology 1.10.0, from the fixing of 27 September: a Zest market size missing from DefiLlama is read from the Zest contract; every market carries the source of its size; a market missing from an index it was in is noted on the fixing; and an index missing a quarter or more of its depth is withheld rather than published short. The morning brief and the post drafter now treat a missing market as a data event, never as a market move.
+**What changed.** The figure was withdrawn at 13:44 UTC, and a corrected fixing was published at 14:22 UTC under methodology 1.10.0: SBOR-USD at 2.68%, with all three markets, Zest's USDCx sized from its own contract. The corrected rates were read at 14:22 UTC, not at 08:30. The fixing of 08:30, with 1.46%, remains in the repository's public history.
+
+Methodology 1.10.0 reads a Zest market's size from the Zest contract when DefiLlama returns none; every market carries the source of its size; a market missing from an index it was in is noted on the fixing; and an index missing a quarter or more of its depth, if even the contract cannot be read, is withheld rather than published short. The morning brief and the post drafter treat a missing market as a data event, never as a market move.
 
 ---
 
