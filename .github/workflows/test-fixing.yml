@@ -38,7 +38,7 @@ jobs:
           console.log("\nPARAMETERS READ FROM THE CONTRACTS");
           for (const [m, f] of Object.entries(d.parameters?.markets || {})) console.log("  " + m.padEnd(18) + JSON.stringify(f));
           console.log("\nCOMPARISON, WHERE EACH MARKET CAME FROM");
-          for (const m of d.externalReference?.markets || []) console.log("  " + (m.venue + " " + m.asset).padEnd(34) + "borrow " + String(m.borrow).padStart(5) + "  source " + (m.source || "none"));
+          for (const m of d.externalReference?.markets || []) console.log("  " + (m.venue + " " + m.asset).padEnd(34) + "borrow " + String(m.borrow).padStart(5) + "  depth $" + ((m.depthUsd||0)/1e6).toFixed(1) + "M  source " + (m.source || "none"));
           const p = d.poxReference;
           console.log("\nSBOR-PoX");
           if (!p) console.log("  NOT PUBLISHED: the PoX calculation failed, see the Compute step log");
