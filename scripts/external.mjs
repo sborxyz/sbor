@@ -54,14 +54,14 @@ const WANTED = [
   /* Base carries most cbBTC activity and is the closest comparison to the
      Stacks thesis: bitcoin on an Ethereum L2 against bitcoin on a Bitcoin L2. */
   { chain:"Base", symbol:"CBBTC", display:"cbBTC", against:"SBOR-BTC",
-    projects:["aave-v3","moonwell","morpho-blue","compound-v3"] },
+    projects:["aave-v3","moonwell","compound-v3"] },
   { chain:"Base", symbol:"USDC",  display:"USDC",  against:"SBOR-USD",
     projects:["aave-v3","moonwell","morpho-blue","compound-v3"] },
   /* Hyperliquid. UBTC is Unit's wrapped bitcoin on HyperEVM, lent on HyperLend
      and through Morpho. A chain with real traction and a bitcoin market, so the
      same comparison as cbBTC on Base. */
   { chain:"Hyperliquid L1", symbol:["UBTC","WBTC"], display:"UBTC", against:"SBOR-BTC",
-    projects:["hyperlend-pooled","hyperlend","hyperbeat","morpho-blue","hyperdrive","felix-cdp"] },
+    projects:["hyperlend-pooled","hyperlend","hyperbeat","hyperdrive","felix-cdp"] },
   { chain:"Hyperliquid L1", symbol:["USDC","USDT0","USDE"], display:"USDC", against:"SBOR-USD",
     projects:["hyperlend-pooled","hyperlend","hyperbeat","morpho-blue","hyperdrive","felix-cdp"] },
   /* Solana. Kamino is the largest BTC lending book there, mostly cbBTC. Worth
@@ -141,11 +141,29 @@ export async function externalReference({ contracts = true } = {}){
        because naming differs between sources and changes over time */
     const chains  = [].concat(w.chain);
     const symbols = [].concat(w.symbol).map(x => x.toUpperCase());
+    /* A listing where the asset is collateral, not the asset being lent, looks
+       like a market but is not one: its "borrow" rate is the rate for
+       borrowing something else against it. Until 28 September 2026 the Base
+       cbBTC row showed DefiLlama's Morpho listing of cbBTC as collateral,
+       4.90% at 46.53% utilization with 0.00% to suppliers: the USDC rate
+       against cbBTC, published as a bitcoin rate. Morpho is excluded from the
+       bitcoin rows above, and any listing whose lenders earn nothing at
+       meaningful utilization is refused here, since no lending market works
+       that way. */
+    const lentAsset = p => {
+      const rec = borrowBy[p.pool];
+      const sup = Number(rec?.totalSupplyUsd), bor = Number(rec?.totalBorrowUsd);
+      const util = Number.isFinite(sup) && Number.isFinite(bor) && sup > 0 ? bor / sup * 100 : null;
+      const ok = !(util != null && util >= 5 && !(Number(p.apyBase) > 0));
+      if (!ok) log(`  external: ${p.project} ${p.symbol} on ${p.chain} refused: ${util.toFixed(1)}% utilization with nothing paid to suppliers, so it is not the lent asset`);
+      return ok;
+    };
     const matches = data.filter(p =>
       w.projects.includes(p.project) &&
       chains.includes(p.chain) &&
       symbols.includes(String(p.symbol).toUpperCase()) &&
-      (p.tvlUsd || 0) > 0);
+      (p.tvlUsd || 0) > 0 &&
+      lentAsset(p));
     if (!matches.length){
       log(`  external: no ${symbols.join("/")} pool on ${chains.join("/")} among ${w.projects.join(", ")}`);
       continue;
