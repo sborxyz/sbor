@@ -143,6 +143,7 @@ tr.grp td{padding-top:18px;padding-bottom:6px;font-size:12px;letter-spacing:.04e
 tr.member td:first-child{padding-left:14px}
 tr.total td{font-weight:500;border-top:1px solid var(--ink-soft)}
 p.tnote{font-size:13px;color:var(--ink-soft);margin:10px 0 0}
+p.snapshot{font-size:14px;color:var(--ink-soft);margin:8px 0 0}
 tr.ownrow .venue{color:var(--accent)}
 .spreadbox{border:1px solid var(--rule);border-left:2px solid var(--rule);padding:14px 18px;margin-bottom:8px;font-size:15px;color:var(--ink-soft)}
 .spreadbox strong,.invbox strong{color:var(--ink);font-weight:500}
@@ -275,6 +276,7 @@ a{color:var(--accent)}
   <div class="wrap intro-in">
     <h2 id="t-introH"></h2>
     <p id="t-introP"></p>
+    <p class="snapshot" id="snapshot"><!-- snapshot:start -->SBOR fixing of 28 September 2026, 08:30 UTC. SBOR-USD: borrow 2.68%, supply 0.84%. SBOR-BTC: borrow 1.31%, supply 0.12%. SBOR-STX: borrow 1.43%, supply 0.27%. USDC against bitcoin on Base and Ethereum, a reference, not an SBOR index: borrow 4.94%, across $2.12B. Effective annual rates, read from lending contract state. Plain text: <a href="/latest.txt">latest.txt</a>. Data: <a href="/api/v1/latest.json">latest.json</a>.<!-- snapshot:end --></p>
     <p id="t-introUse"></p>
   </div>
 </div>
@@ -523,7 +525,7 @@ const I18N = {
 en:{
   fullname:"Stacks Bitcoin Offered Rate",
   introH:"What credit really costs in Bitcoin DeFi.",
-  introP:"Bitcoin DeFi has no benchmark lending rate. Every venue shows only its own number. SBOR is that benchmark, starting with Stacks: one market rate per currency, read straight from the contracts, every day.",
+  introP:"Every lending venue in Bitcoin DeFi quotes its own rate. SBOR publishes the market rate, starting with Stacks: one rate per currency, read straight from the contracts, every day.",
   introUse:"Use it as a yardstick. Borrow above SBOR and you are paying more than the market. Supply below it and you are earning less. Every loan here is overcollateralized, and the collateral is whatever you supplied rather than one particular asset, so a dollar borrowed on Stacks is secured by crypto collateral rather than by bitcoin specifically.",
   stamp:d=>`Rate as of <span class="num">${d}</span> · read from Zest contract state · updated daily`,
   borrowK:"Borrow APY", supplyK:"Supply APY",
@@ -629,7 +631,7 @@ en:{
 pt:{
   fullname:"Taxa de Referência de Bitcoin da Stacks",
   introH:"O custo real do crédito no Bitcoin DeFi.",
-  introP:"Não existe taxa de referência para o crédito no Bitcoin DeFi. Cada plataforma mostra só o próprio número. O SBOR é essa referência, começando pela Stacks: uma taxa de mercado por moeda, lida direto dos contratos, todo dia.",
+  introP:"Cada plataforma de crédito no Bitcoin DeFi mostra só a própria taxa. O SBOR publica a taxa de mercado, começando pela Stacks: uma taxa por moeda, lida direto dos contratos, todo dia.",
   introUse:"Use como régua. Tomar emprestado acima do SBOR significa pagar mais que o mercado. Depositar abaixo dele significa ganhar menos. Todo empréstimo aqui é sobrecolateralizado, e a garantia é o que você depositou, não um ativo específico, então um dólar tomado emprestado na Stacks é garantido por colateral cripto e não por bitcoin especificamente.",
   stamp:d=>`Taxa em <span class="num">${d}</span> · lida do estado dos contratos da Zest · atualizada diariamente`,
   borrowK:"APY de empréstimo", supplyK:"APY de depósito",
@@ -1276,6 +1278,9 @@ async function boot(){
     if (h.ok) HISTORY = await h.json();
   }catch(e){ console.warn("Live fixing unavailable, showing bundled snapshot.", e); }
   renderChrome(); render();
+  /* The plain-text rates are for readers that do not run this script, such
+     as many crawlers. Once the live table is drawn, they are not needed. */
+  if (INDICES && Object.keys(INDICES).length) document.getElementById("snapshot")?.setAttribute("hidden", "");
 }
 
 /* Sections as tabs, each with its own link: sbor.xyz/#methodology and so on. The
