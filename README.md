@@ -1,11 +1,11 @@
 # SBOR
 
-**Bitcoin DeFi has no benchmark lending rate. SBOR is building it from contract
-state, on Stacks, Base and Ethereum.**
+**Every lending venue in Bitcoin DeFi quotes its own rate. SBOR publishes the
+market rate, read from contract state on Stacks, Base and Ethereum.**
 
-Every venue publishes its own number, so nobody, human or agent, can tell
-whether the rate they are offered is fair. SBOR, the Stacks Bitcoin Offered
-Rate, is that benchmark. On Stacks, where it started, it publishes one borrow
+A single venue's number cannot tell anyone, human or agent, whether the rate
+they are offered is fair. SBOR, the Stacks Bitcoin Offered Rate, is a benchmark
+for exactly that. On Stacks, where it started, it publishes one borrow
 and one supply rate per currency: the SBOR indices. On Base and Ethereum, it
 publishes what it costs to borrow USDC against bitcoin, read from the Morpho
 contracts. All of it is read from contract state and published daily, beside
@@ -257,4 +257,4 @@ any.
 [sbor.xyz](https://sbor.xyz) · [@SBORindex](https://x.com/SBORindex) ·
 contact@sbor.xyz · sbor.btc · sbor.stx
 
-*Last updated 25 September 2026.*
+*Last updated 28 September 2026.*
