@@ -204,7 +204,15 @@ export async function externalReference({ contracts = true } = {}){
       supply: round(p.apyBase ?? 0),
       borrow: apr == null ? null : round(apr),
       ...(utilization != null && { utilization }),
-      depthUsd: Math.round(p.tvlUsd),
+      /* Depth means total supplied, as it does for every SBOR market. For a
+         lending pool, DefiLlama's tvlUsd is what remains available to
+         borrow, so Aave's USDC market on Ethereum showed $189M when billions
+         were supplied. Until 28 September 2026 this row used tvlUsd. */
+      depthUsd: Math.round(Number.isFinite(sup) && sup > 0 ? sup : p.tvlUsd),
+      /* What depthUsd means for this row. Readers show it only when it is the
+         total supplied, so a figure on another basis is never presented as
+         the size of a market. */
+      depthBasis: Number.isFinite(sup) && sup > 0 ? "supplied" : "available",
       pool: p.pool,
       url: venueUrl(p.project, p.chain, underlying, p.pool),
       dataUrl: `https://defillama.com/yields/pool/${p.pool}`,
