@@ -109,8 +109,11 @@ kept as nominalBorrow and nominalSupply. The other venues come from DefiLlama
 and are shown as it publishes them. Each market's source field says which.
 Note that DefiLlama reports Aave as a simple annual rate, so before 23 September
 2026 the Aave figures here were about 10 basis points lower than on SBOR's
-basis. depthUsd comes from DefiLlama for every venue and only decides which
-venue is shown for a chain. A listing where the asset is collateral rather than
+basis. depthUsd is the total supplied, as DefiLlama reports it, for every
+venue; until 28 September 2026 it was DefiLlama's tvlUsd, which for a lending
+pool is what remains available to borrow, not what is supplied. The comparison
+rows are not additive: each venue pools every kind of collateral, so they do
+not sum to a market. A listing where the asset is collateral rather than
 the asset being lent is refused: one whose lenders earn nothing at meaningful
 utilization is not a lending market for that asset. Morpho listings are left out
 of the bitcoin comparison for that reason; the cost of borrowing USDC against
