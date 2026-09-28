@@ -8,11 +8,11 @@ Newest first.
 
 ---
 
-### 28 September 2026: a dollar rate shown as a bitcoin rate in the comparison
+### 28 September 2026: a dollar rate shown as a bitcoin rate, and depth on a different basis, in the comparison
 
-**What was wrong.** The comparison of bitcoin borrowing across chains, published beside SBOR-BTC, showed Morpho on Base at 4.90% for cbBTC. That row came from DefiLlama's listing of cbBTC as collateral on Morpho, not as an asset being lent: its "borrow rate" was the rate for borrowing USDC against cbBTC. The signs were in the row itself: 0.00% to suppliers at 46.53% utilization, which no lending market pays. The comparison is context and never entered an SBOR index.
+**What was wrong.** The comparison of bitcoin borrowing across chains, published beside SBOR-BTC, showed Morpho on Base at 4.90% for cbBTC. That row came from DefiLlama's listing of cbBTC as collateral on Morpho, not as an asset being lent: its "borrow rate" was the rate for borrowing USDC against cbBTC. The signs were in the row itself: 0.00% to suppliers at 46.53% utilization, which no lending market pays. The same comparison also showed each other chain's depth as what remained available to borrow, as the source reports it for a lending pool, rather than what was supplied: Aave's USDC market on Ethereum appeared as $189 million. The comparison is context and never entered an SBOR index.
 
-**What changed.** From the fixing of 29 September, Morpho listings are excluded from the bitcoin comparison, and any listing whose lenders earn nothing at meaningful utilization is refused, since it is not the asset being lent. The cost of borrowing USDC against bitcoin is published separately, read from the Morpho contracts, as the bitcoin-collateral USDC reference.
+**What changed.** From the fixing of 29 September, Morpho listings are excluded from the bitcoin comparison, and any listing whose lenders earn nothing at meaningful utilization is refused, since it is not the asset being lent. The cost of borrowing USDC against bitcoin is published separately, read from the Morpho contracts, as the bitcoin-collateral USDC reference. Depth in the comparison is now total supplied, as it is for every SBOR market.
 
 ---
 
