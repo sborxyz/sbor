@@ -9,7 +9,10 @@
  *   <!-- snapshot:start --> ... <!-- snapshot:end -->
  *
  * The page hides it once the live table has loaded, so people do not see the
- * numbers twice. Run by the fixing workflow after scripts/fetch.mjs. It never
+ * numbers twice. It also writes the day's values into the page's other number
+ * slots (the headline rates, SOFR, SBOR-PoX, the developer example), which
+ * the script fills for people but a crawler would otherwise read as 0.00 or
+ * as an old sample. Run by the fixing workflow after scripts/fetch.mjs. It never
  * fails the fixing: on any problem it logs and leaves the page as it was.
  */
 import { readFileSync, writeFileSync } from "node:fs";
@@ -38,6 +41,26 @@ export function snapshotText(d){
   return esc(parts.join(" ")) + ' Plain text: <a href="/latest.txt">latest.txt</a>. Data: <a href="/api/v1/latest.json">latest.json</a>.';
 }
 
+/* Replace the text inside <span ... id="ID">...</span>, only if that exact
+   span exists once. */
+function setSpan(html, id, value){
+  const re = new RegExp(`(<span[^>]*\\bid="${id}"[^>]*>)([^<]*)(</span>)`);
+  const m = html.match(re);
+  if (!m) { log(`snapshot: slot ${id} not found, left as it was`); return html; }
+  return html.replace(re, `$1${value}$3`);
+}
+
+export function withValues(html, d){
+  const two = n => (typeof n === "number" && Number.isFinite(n)) ? n.toFixed(2) : "n/a";
+  const usd = d.indices?.["SBOR-USD"];
+  for (const [id, v] of [
+    ["borrowVal", two(usd?.borrow)], ["supplyVal", two(usd?.supply)],
+    ["exB", two(usd?.borrow)], ["exS", two(usd?.supply)],
+    ["sofrVal", two(d.context?.sofr?.rate)], ["poxVal", two(d.poxReference?.apy)]
+  ]) html = setSpan(html, id, v);
+  return html;
+}
+
 export function withSnapshot(html, text){
   const i = html.indexOf(START), j = html.indexOf(END);
   if (i < 0 || j < 0 || j < i) throw new Error("snapshot markers not found in index.html");
@@ -48,7 +71,7 @@ if (import.meta.url === `file://${process.argv[1]}`){
   try {
     const d = JSON.parse(readFileSync("api/v1/latest.json", "utf8"));
     const html = readFileSync("index.html", "utf8");
-    const next = withSnapshot(html, snapshotText(d));
+    const next = withValues(withSnapshot(html, snapshotText(d)), d);
     if (next !== html){ writeFileSync("index.html", next); log("snapshot: index.html updated"); }
     else log("snapshot: already current");
   } catch (e) {
