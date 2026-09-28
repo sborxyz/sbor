@@ -231,6 +231,24 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
   }
   out += `</table></div>`;
 
+  /* ---- bitcoin-collateral USDC: every market behind the reference ---- */
+  if (today.btcUsdc?.markets?.length){
+    const bc = r => r.btcUsdc || {};
+    out += `<h2>Bitcoin-collateral USDC</h2><div class="hint">A reference, not an SBOR index: the Morpho markets on Base and Ethereum whose only collateral is cbBTC or WBTC, read from the contracts, weighted by the USDC supplied to each. Withheld unless every market was read.</div><div class="scroll"><table>
+      <tr><th>Market</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>Util</th><th>1d</th><th>Depth</th></tr>`;
+    const row = (name, now, a, b) => `<tr><td class="nm">${name}</td>
+      <td class="num" data-l="Borrow">${now.b == null ? "n/a" : F(now.b)+"%"}</td>${chg(BPS(now.b, a?.b),"bps",15,"Borrow 1d")}${chg(BPS(now.b, b?.b),"bps",15,"Borrow 7d")}
+      <td class="num" data-l="Supply">${now.s == null ? "n/a" : F(now.s)+"%"}</td>
+      <td class="num" data-l="Utilization">${now.u == null ? "n/a" : F(now.u)+"%"}</td>${chg(BPS(now.u, a?.u),"bps",200,"Util 1d")}
+      <td class="num dim" data-l="Depth">$${((now.d||0)/1e9 >= 1 ? ((now.d/1e9).toFixed(2)+"B") : ((now.d||0)/1e6).toFixed(1)+"M")}</td></tr>`;
+    out += row(`Reference <span class="dim">weighted</span>`, bc(today), bc(d1), bc(d7));
+    for (const m of today.btcUsdc.markets){
+      const find = r => (bc(r).markets || []).find(x => x.c === m.c && x.a === m.a);
+      out += row(`Morpho ${m.c} <span class="dim">${m.a}/USDC</span>`, m, find(d1), find(d7));
+    }
+    out += `</table></div>`;
+  }
+
   /* ---- staking ---- */
   const px = r => r["SBOR-PoX"] || {};
   out += `<h2>Staking</h2><div class="hint">The cross is what moves PoX between cycles. Same cycle plus same bitcoin paid plus a moved rate means it is currency, not staking.</div><div class="scroll"><table>
