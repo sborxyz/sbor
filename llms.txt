@@ -1,8 +1,9 @@
 # SBOR
 
-> Bitcoin DeFi has no benchmark lending rate. Every venue publishes its own
-> number, so nobody, human or agent, can tell whether the rate they are offered
-> is fair. SBOR (Stacks Bitcoin Offered Rate) is that benchmark. On Stacks,
+> Every lending venue in Bitcoin DeFi publishes its own number, and a single
+> venue's number cannot tell anyone, human or agent, whether the rate they are
+> offered is fair. SBOR (Stacks Bitcoin Offered Rate) is a benchmark for exactly
+> that. On Stacks,
 > where it started, it publishes one borrow and one supply rate per currency:
 > the SBOR indices. On Base and Ethereum, it publishes what it costs to borrow
 > USDC against bitcoin, read from the Morpho contracts. All of it is read from
@@ -29,6 +30,7 @@ How to call it:
   then the `compare_rate` tool
 - MCP, local: `npx -y sbor-mcp`, the same tools and the same answers
 - HTTP: `GET https://sbor.xyz/api/v1/latest.json`, no key, CORS open
+- Plain text, today's fixing: https://sbor.xyz/latest.txt
 - The short version for agents: https://github.com/sborxyz/sbor/blob/main/AGENTS.md
 
 Four things to get right:
