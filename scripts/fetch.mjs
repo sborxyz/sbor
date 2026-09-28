@@ -647,7 +647,7 @@ const main = async () => {
       } }),
       ...(external && { external: external.markets.map(m => ({
         v: m.venue, a: m.asset, b: m.borrow, s: m.supply,
-        u: m.utilization ?? null, d: m.depthUsd, vs: m.comparableTo
+        u: m.utilization ?? null, d: m.depthUsd, db: m.depthBasis, vs: m.comparableTo
       })) }),
       ...Object.fromEntries(Object.entries(indices).map(([k,v]) => [k, {
         borrow: v.borrow, supply: v.supply,
