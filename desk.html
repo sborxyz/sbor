@@ -227,7 +227,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
       <td class="num" data-l="Borrow">${F(m.b)}%</td>${chg(BPS(m.b, a?.b),"bps",15,"Borrow 1d")}${chg(BPS(m.b, b?.b),"bps",15,"Borrow 7d")}
       <td class="num" data-l="Supply">${F(m.s)}%</td>
       <td class="num" data-l="Utilization">${F(m.u)}%</td>${chg(BPS(m.u, a?.u),"bps",200,"Util 1d")}
-      <td class="num dim" data-l="Depth">$${((m.d||0)/1e9 >= 1 ? ((m.d/1e9).toFixed(2)+"B") : ((m.d||0)/1e6).toFixed(1)+"M")}</td></tr>`;
+      <td class="num dim" data-l="Depth">${m.db !== "supplied" ? "n/a" : "$"+((m.d||0)/1e9 >= 1 ? ((m.d/1e9).toFixed(2)+"B") : ((m.d||0)/1e6).toFixed(1)+"M")}</td></tr>`;
   }
   out += `</table></div>`;
 
