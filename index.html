@@ -535,8 +535,7 @@ en:{
     ? `Borrowing a dollar on Stacks costs ${sbor}. Against US Treasuries it costs ${sofr}. That is ${-bps} basis points cheaper here, because few people borrow yet, not because it is safer.`
     : bps > 0 ? `Borrowing a dollar on Stacks costs ${sbor}. Against US Treasuries it costs ${sofr}. That is ${bps} basis points dearer here.`
     : `Borrowing a dollar on Stacks costs ${sbor}, the same as against US Treasuries.`,
-  btcGroup:"Borrowing USDC against bitcoin: a reference, not an SBOR index. Every market behind it, read from the contracts.",
-  btcRef:"Bitcoin-collateral USDC", btcRefSub:"reference, weighted by depth",
+  btcRef:"USDC against bitcoin", btcRefSub:"the three markets below, weighted by depth",
   btcTop:(r,dp)=>`Borrowing USDC against bitcoin on Base and Ethereum costs ${r}, across ${dp} of Morpho markets read from the contracts. A reference, not an SBOR index.`,
   absentNote:(label,reason)=>`<strong>${label} is not published in this fixing.</strong> ${reason}`,
   absentGeneric:"A market could not be read, so the index is left out rather than estimated. It returns on its own when the market can be read again.",
@@ -640,8 +639,7 @@ pt:{
     : bps > 0 ? `Tomar um dólar emprestado na Stacks custa ${sbor}. Com garantia de títulos do Tesouro americano, custa ${sofr}. São ${bps} pontos-base mais caro aqui.`
     : `Tomar um dólar emprestado na Stacks custa ${sbor}, o mesmo que com garantia de títulos do Tesouro americano.`,
   sofrH:"Garantido por títulos do Tesouro",
-  btcGroup:"Tomar USDC com bitcoin como garantia: uma referência, não um índice SBOR. Todos os mercados por trás dela, lidos dos contratos.",
-  btcRef:"USDC com garantia de bitcoin", btcRefSub:"referência, ponderada pela profundidade",
+  btcRef:"USDC com garantia de bitcoin", btcRefSub:"os três mercados abaixo, ponderados pela profundidade",
   btcTop:(r,dp)=>`Tomar USDC emprestado com bitcoin como garantia na Base e na Ethereum custa ${r}, em ${dp} de mercados da Morpho lidos direto dos contratos. Uma referência, não um índice SBOR.`,
   absentNote:(label,reason)=>`<strong>${label} não foi publicado neste fixing.</strong> ${reason}`,
   absentGeneric:"Um mercado não pôde ser lido, então o índice fica de fora em vez de ser estimado. Ele volta sozinho quando o mercado puder ser lido de novo.",
@@ -771,8 +769,7 @@ function btcRows(){
   if (current !== "USD" || !BTCREF || typeof BTCREF.borrow !== "number" || !BTCREF.markets?.length) return "";
   const c = t.extCols;
   const cell = (v, i) => `<td class="r num" data-l="${c[i]}">${typeof v === "number" ? fmt(v)+"%" : "n/a"}</td>`;
-  return `<tr><td colspan="5"><span class="asset">${t.btcGroup}</span></td></tr>
-    <tr class="ownrow"><td><span class="venue">${t.btcRef}</span><span class="asset">${t.btcRefSub}</span></td>${cell(BTCREF.borrow,1)}${cell(BTCREF.supply,2)}${cell(BTCREF.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(BTCREF.depthUsd)}</td></tr>`
+  return `<tr class="ownrow"><td><span class="venue">${t.btcRef}</span><span class="asset">${t.btcRefSub}</span></td>${cell(BTCREF.borrow,1)}${cell(BTCREF.supply,2)}${cell(BTCREF.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(BTCREF.depthUsd)}</td></tr>`
     + BTCREF.markets.map(m => `<tr><td><span class="venue">Morpho, ${m.chain}</span><span class="asset">${m.collateral}/USDC</span></td>${cell(m.borrow,1)}${cell(m.supply,2)}${cell(m.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(m.depthUsd)}</td></tr>`).join("");
 }
 
