@@ -1,12 +1,12 @@
 {
-  "fixing": "2026-09-27T08:30:45Z",
+  "fixing": "2026-09-28T08:30:49Z",
   "utilization": {
-    "Zest V2|USDCx": 69.66,
+    "Zest V2|USDCx": 69.74,
     "Granite|USDCx": 23.32,
-    "Zest V2|USDh": 29.37,
-    "Zest V2|sBTC": 11.08,
-    "Zest V2|stSTX": 8.04,
-    "Zest V2|STX": 41.79
+    "Zest V2|USDh": 29.35,
+    "Zest V2|sBTC": 11.07,
+    "Zest V2|stSTX": 7.99,
+    "Zest V2|STX": 41.55
   },
   "announced": {
     "ratemove:undefined:borrow": "2026-09-21",
