@@ -1,5 +1,5 @@
 SBOR WEEKLY RATE REPORT
-Week ending 23 September 2026
+Week ending 28 September 2026
 
 Benchmark lending rates for Stacks, read from contract state.
 Full data and methodology: https://sbor.xyz
@@ -7,28 +7,28 @@ Full data and methodology: https://sbor.xyz
 --------------------------------------------------------------
 INDEX        BORROW   SUPPLY   SPREAD  WoW BORROW
 --------------------------------------------------------------
-SBOR-USD      2.65%    0.81% 1.84 pts  +0.29 pts
-SBOR-BTC      1.31%    0.12% 1.19 pts
-SBOR-STX      1.64%    0.46% 1.18 pts  -0.66 pts
+SBOR-USD      2.68%    0.84% 1.84 pts  +0.21 pts
+SBOR-BTC      1.31%    0.12% 1.19 pts   0.00 pts
+SBOR-STX      1.43%    0.27% 1.16 pts  -0.84 pts
 --------------------------------------------------------------
 
-Compared with the fixing of 16 September 2026.
+Compared with the fixing of 21 September 2026.
 
 COVERAGE
-  SBOR-USD   2 venues  largest  65% of depth  total $15.7M
-  SBOR-BTC   1 venue   largest 100% of depth  total $57.5M
-  SBOR-STX   1 venue   largest  55% of depth  total $5.2M
+  SBOR-USD   2 venues  largest  66% of depth  total $15.5M
+  SBOR-BTC   1 venue   largest 100% of depth  total $49.8M
+  SBOR-STX   1 venue   largest  67% of depth  total $4.0M
 
 CONSTITUENTS
   SBOR-USD
-    Zest V2 USDCx          borrow   3.28%  supply   1.12%  weight  65.2%
-    Granite USDCx          borrow   1.44%  supply   0.25%  weight  32.0%
-    Zest V2 USDh           borrow   1.70%  supply   0.00%  weight   2.8%
+    Zest V2 USDCx          borrow   3.32%  supply   1.15%  weight  65.7%
+    Granite USDCx          borrow   1.44%  supply   0.25%  weight  32.3%
+    Zest V2 USDh           borrow   1.73%  supply   0.00%  weight   2.0%
   SBOR-BTC
     Zest V2 sBTC           borrow   1.31%  supply   0.12%  weight 100.0%
   SBOR-STX
-    Zest V2 stSTX          borrow   1.28%  supply   0.09%  weight  55.0%
-    Zest V2 STX            borrow   2.08%  supply   0.92%  weight  45.0%
+    Zest V2 stSTX          borrow   1.29%  supply   0.09%  weight  66.8%
+    Zest V2 STX            borrow   1.72%  supply   0.63%  weight  33.2%
 
 EXCLUDED FROM THE FIXING
   sBTC: Bitcoin protocol yield via dual stacking, paid on enrolment.
