@@ -113,6 +113,17 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--rule);color:v
 </div>
 
 <script>
+/* The fixing time in UTC, as published, and in the reader's own time zone,
+   so 08:30 UTC reads as 05:30 in Londrina. */
+function fixingTimes(iso){
+  const t = new Date(iso);
+  if (isNaN(t)) return iso;
+  const utc = t.toISOString().slice(0, 16).replace("T", " ") + " UTC";
+  let local = "";
+  try { local = t.toLocaleString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }) + " your time"; } catch {}
+  return local ? `${utc} (${local})` : utc;
+}
+
 const F = n => n == null || !Number.isFinite(Number(n)) ? "n/a" : Number(n).toFixed(2);
 const BPS = (now, then) =>
   now == null || then == null || !Number.isFinite(now) || !Number.isFinite(then)
@@ -170,7 +181,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
   const win   = H.slice(-8);
 
   document.getElementById("stamp").textContent =
-    `${L.fixing} · methodology ${L.methodologyVersion} · ${H.length} fixings · comparing with ${d1.date || "n/a"} and ${d7.date || "n/a"}`;
+    `${fixingTimes(L.fixing)} · methodology ${L.methodologyVersion} · ${H.length} fixings · comparing with ${d1.date || "n/a"} and ${d7.date || "n/a"}`;
 
   let out = "";
 
