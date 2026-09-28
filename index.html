@@ -139,6 +139,10 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .sofrcmp{color:var(--ink) !important;font-weight:450}
 .sofrwhy{font-size:13.5px !important}
 tr.ownrow td{background:rgba(29,78,107,.05);font-weight:500}
+tr.grp td{padding-top:18px;padding-bottom:6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);border-bottom:1px solid var(--rule)}
+tr.member td:first-child{padding-left:14px}
+tr.total td{font-weight:500;border-top:1px solid var(--ink-soft)}
+p.tnote{font-size:13px;color:var(--ink-soft);margin:10px 0 0}
 tr.ownrow .venue{color:var(--accent)}
 .spreadbox{border:1px solid var(--rule);border-left:2px solid var(--rule);padding:14px 18px;margin-bottom:8px;font-size:15px;color:var(--ink-soft)}
 .spreadbox strong,.invbox strong{color:var(--ink);font-weight:500}
@@ -343,6 +347,7 @@ a{color:var(--accent)}
           <tbody id="extBody"></tbody>
         </table>
       </div>
+      <p class="tnote" id="extNote" hidden></p>
     </section>
 
     <section id="pox-sec" data-tabpage="staking" hidden>
@@ -535,7 +540,10 @@ en:{
     ? `Borrowing a dollar on Stacks costs ${sbor}. Against US Treasuries it costs ${sofr}. That is ${-bps} basis points cheaper here, because few people borrow yet, not because it is safer.`
     : bps > 0 ? `Borrowing a dollar on Stacks costs ${sbor}. Against US Treasuries it costs ${sofr}. That is ${bps} basis points dearer here.`
     : `Borrowing a dollar on Stacks costs ${sbor}, the same as against US Treasuries.`,
-  btcRef:"USDC against bitcoin", btcRefSub:"the three markets below, weighted by depth",
+  grpAny:"Dollars on other chains, against any collateral",
+  grpBtc:"Dollars against bitcoin only: Morpho markets whose one collateral is cbBTC or WBTC",
+  btcTotal:"All three", btcTotalSub:"total supplied, rates weighted by it",
+  extNote:"Aave, HyperLend and Kamino lend against any collateral in one pool, so their rate is not specific to bitcoin, and those rows do not add up to a market. Their depth is shown only as total supplied, and n/a where the source does not report it. Only the bitcoin-only group has a total, because its markets are read the same way from the contracts.",
   btcTop:(r,dp)=>`Borrowing USDC against bitcoin on Base and Ethereum costs ${r}, across ${dp} of Morpho markets read from the contracts. A reference, not an SBOR index.`,
   absentNote:(label,reason)=>`<strong>${label} is not published in this fixing.</strong> ${reason}`,
   absentGeneric:"A market could not be read, so the index is left out rather than estimated. It returns on its own when the market can be read again.",
@@ -639,7 +647,10 @@ pt:{
     : bps > 0 ? `Tomar um dólar emprestado na Stacks custa ${sbor}. Com garantia de títulos do Tesouro americano, custa ${sofr}. São ${bps} pontos-base mais caro aqui.`
     : `Tomar um dólar emprestado na Stacks custa ${sbor}, o mesmo que com garantia de títulos do Tesouro americano.`,
   sofrH:"Garantido por títulos do Tesouro",
-  btcRef:"USDC com garantia de bitcoin", btcRefSub:"os três mercados abaixo, ponderados pela profundidade",
+  grpAny:"Dólares em outras redes, contra qualquer garantia",
+  grpBtc:"Dólares só contra bitcoin: mercados da Morpho cuja única garantia é cbBTC ou WBTC",
+  btcTotal:"Os três", btcTotalSub:"total fornecido, taxas ponderadas por ele",
+  extNote:"Aave, HyperLend e Kamino emprestam contra qualquer garantia em um único pool, então a taxa delas não é específica de bitcoin, e essas linhas não somam um mercado. A profundidade delas aparece só como total fornecido, e n/a quando a fonte não informa. Só o grupo contra bitcoin tem total, porque seus mercados são lidos do mesmo jeito, direto dos contratos.",
   btcTop:(r,dp)=>`Tomar USDC emprestado com bitcoin como garantia na Base e na Ethereum custa ${r}, em ${dp} de mercados da Morpho lidos direto dos contratos. Uma referência, não um índice SBOR.`,
   absentNote:(label,reason)=>`<strong>${label} não foi publicado neste fixing.</strong> ${reason}`,
   absentGeneric:"Um mercado não pôde ser lido, então o índice fica de fora em vez de ser estimado. Ele volta sozinho quando o mercado puder ser lido de novo.",
@@ -766,11 +777,17 @@ const set = (id, html) => { const el = document.getElementById(id); if (el) el.i
    comparison, since a number without its markets is not transparent. */
 function btcRows(){
   const t = T();
-  if (current !== "USD" || !BTCREF || typeof BTCREF.borrow !== "number" || !BTCREF.markets?.length) return "";
+  const note = document.getElementById("extNote");
+  if (current !== "USD" || !BTCREF || typeof BTCREF.borrow !== "number" || !BTCREF.markets?.length){
+    if (note) note.hidden = true;
+    return "";
+  }
   const c = t.extCols;
   const cell = (v, i) => `<td class="r num" data-l="${c[i]}">${typeof v === "number" ? fmt(v)+"%" : "n/a"}</td>`;
-  return `<tr class="ownrow"><td><span class="venue">${t.btcRef}</span><span class="asset">${t.btcRefSub}</span></td>${cell(BTCREF.borrow,1)}${cell(BTCREF.supply,2)}${cell(BTCREF.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(BTCREF.depthUsd)}</td></tr>`
-    + BTCREF.markets.map(m => `<tr><td><span class="venue">Morpho, ${m.chain}</span><span class="asset">${m.collateral}/USDC</span></td>${cell(m.borrow,1)}${cell(m.supply,2)}${cell(m.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(m.depthUsd)}</td></tr>`).join("");
+  if (note){ note.hidden = false; note.textContent = t.extNote; }
+  return `<tr class="grp"><td colspan="5">${t.grpBtc}</td></tr>`
+    + BTCREF.markets.map(m => `<tr class="member"><td><span class="venue">Morpho, ${m.chain}</span><span class="asset">${m.collateral}/USDC</span></td>${cell(m.borrow,1)}${cell(m.supply,2)}${cell(m.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(m.depthUsd)}</td></tr>`).join("")
+    + `<tr class="total"><td><span class="venue">${t.btcTotal}</span><span class="asset">${t.btcTotalSub}</span></td>${cell(BTCREF.borrow,1)}${cell(BTCREF.supply,2)}${cell(BTCREF.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(BTCREF.depthUsd)}</td></tr>`;
 }
 
 function computed(key){
@@ -1090,7 +1107,8 @@ function render(){
         <td class="r num" data-l="${t.extCols[4]}">${depth(ix.markets.reduce((a,m)=>a+m.depth*1e6,0))}</td>
       </tr>`;
 
-    set("extBody", own + forThis.map(m => `
+    const grpAny = current === "USD" ? `<tr class="grp"><td colspan="5">${t.grpAny}</td></tr>` : "";
+    set("extBody", own + grpAny + forThis.map(m => `
       <tr>
         <td>${m.url
             ? `<a class="venue" href="${m.url}" target="_blank" rel="noopener">${m.venue}</a>`
@@ -1098,7 +1116,8 @@ function render(){
         <td class="r num" data-l="${t.extCols[1]}">${m.borrow == null ? "n/a" : m.borrow.toFixed(2)+"%"}</td>
         <td class="r num" data-l="${t.extCols[2]}">${m.supply.toFixed(2)}%</td>
         <td class="r num" data-l="${t.extCols[3]}">${m.utilization == null ? "n/a" : m.utilization.toFixed(2)+"%"}</td>
-        <td class="r num" data-l="${t.extCols[4]}">${m.dataUrl
+        <td class="r num" data-l="${t.extCols[4]}">${m.depthBasis !== "supplied" ? "n/a"
+            : m.dataUrl
             ? `<a href="${m.dataUrl}" target="_blank" rel="noopener">${depth(m.depthUsd)}</a>`
             : depth(m.depthUsd)}</td>
       </tr>`).join("") + btcRows());
