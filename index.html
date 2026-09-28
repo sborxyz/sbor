@@ -542,8 +542,8 @@ en:{
     : `Borrowing a dollar on Stacks costs ${sbor}, the same as against US Treasuries.`,
   grpAny:"Dollars on other chains, against any collateral",
   grpBtc:"Dollars against bitcoin only: Morpho markets whose one collateral is cbBTC or WBTC",
-  btcTotal:"All three", btcTotalSub:"total supplied, rates weighted by it",
-  extNote:"Aave, HyperLend and Kamino lend against any collateral in one pool, so their rate is not specific to bitcoin, and those rows do not add up to a market. Their depth is shown only as total supplied, and n/a where the source does not report it. Only the bitcoin-only group has a total, because its markets are read the same way from the contracts.",
+  allOf:n => "All " + ({2:"two",3:"three",4:"four",5:"five",6:"six"}[n] || n), btcTotalSub:"total supplied, rates weighted by it",
+  extNote:"Aave, HyperLend and Kamino lend against any collateral in one pool, so their rate is not specific to bitcoin. The last line of each group is the total of the markets shown above it, one per chain, not every venue: what is supplied to them, and their rates weighted by it. Groups are never added together. Depth is always total supplied, and n/a where the source does not report it.",
   btcTop:(r,dp)=>`Borrowing USDC against bitcoin on Base and Ethereum costs ${r}, across ${dp} of Morpho markets read from the contracts. A reference, not an SBOR index.`,
   absentNote:(label,reason)=>`<strong>${label} is not published in this fixing.</strong> ${reason}`,
   absentGeneric:"A market could not be read, so the index is left out rather than estimated. It returns on its own when the market can be read again.",
@@ -649,8 +649,8 @@ pt:{
   sofrH:"Garantido por títulos do Tesouro",
   grpAny:"Dólares em outras redes, contra qualquer garantia",
   grpBtc:"Dólares só contra bitcoin: mercados da Morpho cuja única garantia é cbBTC ou WBTC",
-  btcTotal:"Os três", btcTotalSub:"total fornecido, taxas ponderadas por ele",
-  extNote:"Aave, HyperLend e Kamino emprestam contra qualquer garantia em um único pool, então a taxa delas não é específica de bitcoin, e essas linhas não somam um mercado. A profundidade delas aparece só como total fornecido, e n/a quando a fonte não informa. Só o grupo contra bitcoin tem total, porque seus mercados são lidos do mesmo jeito, direto dos contratos.",
+  allOf:n => ({2:"Os dois",3:"Os três",4:"Os quatro",5:"Os cinco",6:"Os seis"}[n] || "Os "+n), btcTotalSub:"total fornecido, taxas ponderadas por ele",
+  extNote:"Aave, HyperLend e Kamino emprestam contra qualquer garantia em um único pool, então a taxa delas não é específica de bitcoin. A última linha de cada grupo é o total dos mercados mostrados acima, um por rede, não todas as plataformas: o que está fornecido a eles, e as taxas ponderadas por isso. Os grupos nunca são somados. A profundidade é sempre o total fornecido, e n/a quando a fonte não informa.",
   btcTop:(r,dp)=>`Tomar USDC emprestado com bitcoin como garantia na Base e na Ethereum custa ${r}, em ${dp} de mercados da Morpho lidos direto dos contratos. Uma referência, não um índice SBOR.`,
   absentNote:(label,reason)=>`<strong>${label} não foi publicado neste fixing.</strong> ${reason}`,
   absentGeneric:"Um mercado não pôde ser lido, então o índice fica de fora em vez de ser estimado. Ele volta sozinho quando o mercado puder ser lido de novo.",
@@ -775,6 +775,21 @@ const set = (id, html) => { const el = document.getElementById(id); if (el) el.i
 
 /* Every market behind the bitcoin-collateral reference, shown with the dollar
    comparison, since a number without its markets is not transparent. */
+/* The total of a group of markets: what is supplied to all of them, and their
+   rates weighted by it. Shown only when every market's depth is total
+   supplied, so the total is never a sum of figures that mean different
+   things, and never across groups. */
+function groupTotal(ms){
+  const t = T();
+  if (!ms.length || !ms.every(m => m.depthBasis === "supplied" && m.depthUsd > 0
+      && typeof m.borrow === "number" && typeof m.supply === "number" && typeof m.utilization === "number")) return "";
+  const tot = ms.reduce((a, m) => a + m.depthUsd, 0);
+  const w = k => ms.reduce((a, m) => a + m[k] * m.depthUsd, 0) / tot;
+  const c = t.extCols;
+  const cell = (v, i) => `<td class="r num" data-l="${c[i]}">${fmt(v)}%</td>`;
+  return `<tr class="total"><td><span class="venue">${t.allOf(ms.length)}</span><span class="asset">${t.btcTotalSub}</span></td>${cell(w("borrow"),1)}${cell(w("supply"),2)}${cell(w("utilization"),3)}<td class="r num" data-l="${c[4]}">${depth(tot)}</td></tr>`;
+}
+
 function btcRows(){
   const t = T();
   const note = document.getElementById("extNote");
@@ -787,7 +802,7 @@ function btcRows(){
   if (note){ note.hidden = false; note.textContent = t.extNote; }
   return `<tr class="grp"><td colspan="5">${t.grpBtc}</td></tr>`
     + BTCREF.markets.map(m => `<tr class="member"><td><span class="venue">Morpho, ${m.chain}</span><span class="asset">${m.collateral}/USDC</span></td>${cell(m.borrow,1)}${cell(m.supply,2)}${cell(m.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(m.depthUsd)}</td></tr>`).join("")
-    + `<tr class="total"><td><span class="venue">${t.btcTotal}</span><span class="asset">${t.btcTotalSub}</span></td>${cell(BTCREF.borrow,1)}${cell(BTCREF.supply,2)}${cell(BTCREF.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(BTCREF.depthUsd)}</td></tr>`;
+    + `<tr class="total"><td><span class="venue">${t.allOf(BTCREF.markets.length)}</span><span class="asset">${t.btcTotalSub}</span></td>${cell(BTCREF.borrow,1)}${cell(BTCREF.supply,2)}${cell(BTCREF.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(BTCREF.depthUsd)}</td></tr>`;
 }
 
 function computed(key){
@@ -1120,7 +1135,7 @@ function render(){
             : m.dataUrl
             ? `<a href="${m.dataUrl}" target="_blank" rel="noopener">${depth(m.depthUsd)}</a>`
             : depth(m.depthUsd)}</td>
-      </tr>`).join("") + btcRows());
+      </tr>`).join("") + groupTotal(forThis) + btcRows());
   } else { esec.hidden = true; }
 
   /* SOFR is the cost of a dollar. It belongs beside the dollar index and
