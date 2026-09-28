@@ -93,12 +93,21 @@ jobs:
         continue-on-error: true
         run: node scripts/post.mjs
 
+      # Today's rates as plain text inside index.html, for readers that do not
+      # run the page's script, such as many AI crawlers. Like the drafter, it
+      # can never stop the fixing publishing: on a problem it leaves the page
+      # as it was.
+      - name: Write today's rates into the page
+        if: steps.guard.outputs.skip != 'true'
+        continue-on-error: true
+        run: node scripts/snapshot.mjs
+
       - name: Commit if changed
         if: steps.guard.outputs.skip != 'true'
         run: |
           git config user.name  "sbor-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A api latest.txt post.txt post.json post-state.json
+          git add -A api latest.txt post.txt post.json post-state.json index.html
           if git diff --staged --quiet; then
             echo "No change, nothing to commit."
           else
