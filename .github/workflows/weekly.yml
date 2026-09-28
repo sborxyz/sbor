@@ -2,7 +2,7 @@ name: SBOR weekly report
 
 on:
   schedule:
-    - cron: "30 11 * * 1"     # Mondays, just after the daily fixing
+    - cron: "0 10 * * 1"      # Mondays 07:00 BRT; the fixing is done by 05:30 BRT. cron-job.org backup at 07:15 BRT
   workflow_dispatch:
 
 permissions:
