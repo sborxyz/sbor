@@ -1,10 +1,20 @@
 # SBOR corrections
 
-*Created 24 September 2026. Last updated 28 September 2026.*
+*Created 24 September 2026. Last updated 30 September 2026.*
 
 SBOR never rewrites a published fixing. When a published figure turns out to be wrong, the record keeps what was published, and this page says what was wrong, when it was found, and what changed. It lists corrections to published figures only; fixes to the site and documentation are visible in the repository's public history.
 
 Newest first.
+
+---
+
+### 30 September 2026: Zest market sizes on a different basis from 26 September
+
+**What was wrong.** From the fixing of 26 September, DefiLlama began reporting Zest's markets as the amount still available to lend rather than the amount supplied. SBOR took most Zest market sizes from DefiLlama, so from that day those markets were weighted by what was left to lend: a market with high utilization counted for less than its real size. Found on 30 September, when a test compared each Zest contract's total with DefiLlama's figure and every gap matched that market's utilization; Zest STX, 40% lent, showed $1.43 million against $2.37 million supplied.
+
+**The effect, 26 to 30 September.** SBOR-STX was published 3 to 5 basis points too low to borrow and 4 to 7 basis points too low to supply. SBOR-USD was about 1 basis point too high. SBOR-BTC's rate was unaffected, since it has one market, but its published size was about 11% too low. The same change is why the brief of 26 September reported falls in depth that were not moves in the market. Published fixings are not rewritten.
+
+**What changed.** Methodology 1.11.0, from the fixing of 1 October: Zest market sizes are read from the Zest vault contracts, valued exactly (dollar stablecoins at par, sBTC at the bitcoin price, STX at the STX price, stSTX at the STX price times StackingDAO's own stSTX rate), with DefiLlama as the fallback and as a published cross-check on each market. Depth and weights step up on 1 October as a result; the brief treats a methodology change as a data event, not a market move.
 
 ---
 
