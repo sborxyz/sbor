@@ -53,7 +53,7 @@ if (missing.length){
   for (const m of missing){
     L.push(`  ${m}: no readable lending market. When a venue's contract state`);
     L.push(`  cannot be read, the index is omitted rather than published with a`);
-    L.push(`  figure that is not real.`);
+    L.push(`  figure SBOR cannot stand behind.`);
   }
   L.push(``);
 }
@@ -117,9 +117,8 @@ L.push(`Use it as a yardstick. Borrowing above SBOR means paying more than`);
 L.push(`the market. Supplying below it means earning less.`);
 L.push(``);
 L.push(`It is published as a public good. Free to reference, no key, no`);
-L.push(`registration, no fee. It is an independent benchmark and is not`);
-L.push(`affiliated with Stacks, the Stacks Foundation, or any venue it`);
-L.push(`measures.`);
+L.push(`registration, no fee. It is independent: no token, and no stake in`);
+L.push(`or payment from any venue it measures.`);
 L.push(``);
 L.push(`  Data and methodology   https://sbor.xyz`);
 L.push(`  API                    https://sbor.xyz/api/v1/latest.json`);
@@ -129,7 +128,7 @@ L.push(`  Contact                contact@sbor.xyz`);
 L.push(``);
 L.push(`--------------------------------------------------------------`);
 L.push(`Rates are read from lending contract state on Stacks mainnet and`);
-L.push(`published once daily, targeting 11:00 UTC. SBOR is a statistic, not`);
+L.push(`published once daily at 08:30 UTC. SBOR is a statistic, not`);
 L.push(`investment advice, and is provided as is without warranty.`);
 L.push(``);
 L.push(`You are receiving this because you asked for it at sbor.xyz.`);
@@ -184,7 +183,7 @@ const html = `<div style="background:${P};color:${INK};font-family:'IBM Plex San
 
   ${missing.length ? `<p style="margin:0 0 6px"><strong>Not published this week</strong></p>
   <ul style="margin:0 0 18px;padding-left:20px;color:${SOFT};font-size:14px">
-    ${missing.map(m => `<li><strong>${m}</strong> no readable lending market. When contract state cannot be read, the index is omitted rather than published with a figure that is not real.</li>`).join("")}
+    ${missing.map(m => `<li><strong>${m}</strong> no readable lending market. When contract state cannot be read, the index is omitted rather than published with a figure SBOR cannot stand behind.</li>`).join("")}
   </ul>` : ""}
 
   ${poxLine}
@@ -213,8 +212,7 @@ const html = `<div style="background:${P};color:${INK};font-family:'IBM Plex San
   </p>
   <p style="color:${SOFT};font-size:14px;margin:0 0 14px">
     It is published as a public good. Free to reference, no key, no registration, no fee.
-    SBOR is an independent benchmark and is not affiliated with Stacks, the Stacks
-    Foundation, or any venue it measures.
+    SBOR is independent: no token, and no stake in or payment from any venue it measures.
   </p>
 
   <table style="border-collapse:collapse;font-size:13px;margin-bottom:18px">
@@ -233,7 +231,7 @@ const html = `<div style="background:${P};color:${INK};font-family:'IBM Plex San
   <hr style="border:none;border-top:1px solid ${RL};margin:18px 0">
   <p style="color:${SOFT};font-size:12.5px;margin:0">
     Rates are read from lending contract state on Stacks mainnet and published once daily
-    targeting 11:00 UTC. SBOR is a statistic, not investment advice, and is provided as is without
+    at 08:30 UTC. SBOR is a statistic, not investment advice, and is provided as is without
     warranty.
   </p>
   <p style="color:${SOFT};font-size:12.5px;margin:10px 0 0">
