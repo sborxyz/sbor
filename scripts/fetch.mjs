@@ -109,7 +109,7 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.10.0";
+const METHODOLOGY_VERSION = "1.11.0";
 
 /* Below this, on both sides at once, a funded market is not showing a market rate. */
 const RATE_FLOOR = 0.05;
@@ -306,14 +306,31 @@ async function graniteMarket(){
    own prices. Dollar markets are taken at par. stSTX is taken at the STX price,
    which understates it slightly, since stSTX accrues yield above STX. A
    fallback for when DefiLlama has no size, never the first source. */
-function contractDepthUsd(asset, totalAssetsRaw, context){
+function contractDepthUsd(asset, totalAssetsRaw, context, stxPerStstx = null){
   const raw = Number(totalAssetsRaw);
   if (!Number.isFinite(raw) || raw <= 0 || asset.decimals == null) return 0;
   const units = raw / 10 ** asset.decimals;
+  const stx = context?.prices?.stxUsd;
   const price = asset.currency === "USD" ? 1
     : asset.currency === "BTC" ? context?.prices?.btcUsd
-    : asset.currency === "STX" ? context?.prices?.stxUsd : null;
+    : asset.symbol === "stSTX" && stxPerStstx ? (Number.isFinite(stx) ? stx * stxPerStstx : null)
+    : asset.currency === "STX" ? stx : null;
   return Number.isFinite(price) && price > 0 ? Math.round(units * price) : 0;
+}
+
+/* StackingDAO's own stSTX to STX rate, from its data contract: micro-STX
+   backing one stSTX. It is the rate StackingDAO's app uses for deposits.
+   Null when unreadable or implausible, so stSTX falls back to DefiLlama. */
+const STACKINGDAO_DATA = { deployer: "SP4SZE494VC2YC5JYG7AYFQ44F5Q4PYV7DVMDPBG", contract: "data-stx-v2" };
+async function readStxPerStstx(){
+  try {
+    let r = await readOnly(STACKINGDAO_DATA.deployer, STACKINGDAO_DATA.contract, "get-stx-per-ststx");
+    for (let i = 0; i < 3 && r && typeof r === "object"; i++) r = r.value;
+    const rate = Number(r) / 1e6;
+    if (!(rate >= 1 && rate < 2)) { log(`  stSTX rate implausible (${rate}), not used`); return null; }
+    log(`  stSTX rate from ${STACKINGDAO_DATA.contract}: ${rate} STX per stSTX`);
+    return rate;
+  } catch(e){ log(`  stSTX rate unreadable, stSTX size stays on DefiLlama. ${e.message}`); return null; }
 }
 
 /* Earlier compact rows, newest first, for the continuity guard. */
@@ -358,6 +375,7 @@ const main = async () => {
 
   const markets = [];
   const dynamicNotes = [];   /* what happened on this fixing only */
+  const stxPerStstx = await readStxPerStstx();
   for (const a of ZEST.assets){
     try {
       const { supply, borrow, utilization, supplyNominal, borrowNominal } = await apysFor(a);
@@ -371,27 +389,38 @@ const main = async () => {
         totalAssetsRaw = r;
       }
       catch(e){ log(`    total assets unreadable from ${a.vault}: ${e.message}`); }
-      let d = depth[a.symbol] ?? 0, depthSource = "DefiLlama";
+      let d = 0, depthSource = null, depthCheck = null;
       log(`  ${a.symbol}: supply=${round(supply)}% borrow=${round(borrow)}% (nominal ${round(supplyNominal)}/${round(borrowNominal)}) util=${utilization == null ? "n/a" : round(utilization)+"%"} depth=${d}`);
       if (!a.currency){ log(`    (collateral only, excluded from fixings)`); continue; }
-      /* DefiLlama is the usual source of Zest market sizes, but it can return
-         nothing for a market that is alive, as it did for USDCx on 26
-         September 2026, when the largest dollar market dropped out of the
-         index unnoticed. The contract knows how much is supplied; use that,
-         at the fixing's own prices, rather than drop the market in silence. */
-      const est = contractDepthUsd(a, totalAssetsRaw, context);
-      if (d > 0 && est > 0) log(`    size check: DefiLlama $${d}, contract $${est}`);
-      if (d <= 0){
-        if (est > 0){
-          d = est; depthSource = "contract";
-          log(`    depth from DefiLlama missing; read from the contract instead: $${d}`);
-          dynamicNotes.push(`${ZEST.venue} ${a.symbol}: market size read from the Zest contract on this fixing, because DefiLlama returned none.`);
-        } else {
-          log(`    (no depth from DefiLlama or the contract, skipped)`);
-          dynamicNotes.push(`${ZEST.venue} ${a.symbol}: not in this fixing, its size could not be read from DefiLlama or the contract.`);
-          continue;
-        }
+      /* Market size, which sets each market's weight. From methodology 1.11.0
+         the Zest vault contract is the primary source wherever its total
+         converts to dollars exactly: dollar stablecoins at par, sBTC at the
+         bitcoin price, STX at the STX price, and stSTX at the STX price times
+         StackingDAO's own stSTX rate, read from its data contract. DefiLlama
+         is the fallback and a daily cross-check. If the stSTX rate cannot be
+         read, stSTX falls back to DefiLlama.
+         Before 1.10.0 a market with no DefiLlama size was dropped in silence,
+         as Zest's USDCx was on 26 September 2026. */
+      const est = contractDepthUsd(a, totalAssetsRaw, context, stxPerStstx);
+      const llama = depth[a.symbol] ?? 0;
+      const exact = a.currency === "USD" || a.symbol === "sBTC" || a.symbol === "STX"
+        || (a.symbol === "stSTX" && stxPerStstx != null);
+      if (exact && est > 0){
+        d = est; depthSource = "contract";
+        if (llama > 0) depthCheck = { source: "DefiLlama", depthUsd: Math.round(llama) };
+      } else if (llama > 0){
+        d = llama; depthSource = "DefiLlama";
+        if (est > 0) depthCheck = { source: "contract", depthUsd: est };
+        if (exact) dynamicNotes.push(`${ZEST.venue} ${a.symbol}: market size from DefiLlama on this fixing, because the Zest contract could not be read.`);
+      } else if (est > 0){
+        d = est; depthSource = "contract";
+        dynamicNotes.push(`${ZEST.venue} ${a.symbol}: market size read from the Zest contract on this fixing, because DefiLlama returned none${exact ? "" : "; valued at the STX price without StackingDAO's rate, which understates it slightly"}.`);
+      } else {
+        log(`    (no size from the contract or DefiLlama, skipped)`);
+        dynamicNotes.push(`${ZEST.venue} ${a.symbol}: not in this fixing, its size could not be read from the contract or DefiLlama.`);
+        continue;
       }
+      log(`    size: $${d} from ${depthSource}${depthCheck ? `, check $${depthCheck.depthUsd} from ${depthCheck.source}` : ""}`);
       /* Plausibility floor. Lenders and borrowers do not price money at
          effectively nothing on both sides of a funded market. When it reads
          that way, either the venue is not reporting or the protocol is holding
@@ -411,7 +440,9 @@ const main = async () => {
         nominalSupply: round(supplyNominal),
         ...(protoYield[a.symbol] != null && { protocolYield: protoYield[a.symbol] }),
         ...(YIELD_SOURCE[a.symbol] && { protocolYieldSource: YIELD_SOURCE[a.symbol] }),
-        depthUsd: d, depthSource, phaseIn: 1
+        depthUsd: d, depthSource, ...(depthCheck && { depthCheck }),
+        ...(a.symbol === "stSTX" && stxPerStstx != null && depthSource === "contract" && { stxPerStstx }),
+        phaseIn: 1
       });
     } catch(e){
       log(`  ${a.symbol}: read failed, excluded. ${e.message}`);
@@ -556,7 +587,7 @@ const main = async () => {
     ...(Object.keys(withheld).length && { withheld }),
     notes:[
       ...dynamicNotes,
-      "Each market carries depthSource. Zest sizes come from DefiLlama, and when DefiLlama returns none for a live market the size is read from the Zest contract at the fixing's prices. A market that was in the index on its last published day and cannot be read today is noted on this fixing; when the missing markets carried a quarter or more of the index's depth, the index is withheld rather than published short.",
+      "Each market carries depthSource. Zest market sizes are read from the Zest vault contracts where the amount converts to dollars exactly (dollar stablecoins at par, sBTC at the bitcoin price, STX at the STX price), with DefiLlama as the fallback and as a cross-check in depthCheck; stSTX is valued at the STX price times StackingDAO's stSTX rate (get-stx-per-ststx on data-stx-v2), and falls back to DefiLlama if that rate cannot be read. A market that was in the index on its last published day and cannot be read today is noted on this fixing; when the missing markets carried a quarter or more of the index's depth, the index is withheld rather than published short.",
       "One fixing a day, final at the first successful attempt. The scheduler can drop runs, so backup attempts follow until 17:00 UTC, but only if no fixing has landed that day. The fixing timestamp is authoritative, not the time of any attempt.",
       "Rates are read from contract state, not from any venue's published figure.",
       "Protocol yield belongs to the asset, not the loan, and is excluded from every fixing.",
