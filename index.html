@@ -139,6 +139,7 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .sofrcmp{color:var(--ink) !important;font-weight:450}
 .sofrwhy{font-size:13.5px !important}
 tr.ownrow td{background:rgba(29,78,107,.05);font-weight:500}
+tr.tfirst td{border-top:1px solid var(--rule)}
 tr.grp td{padding-top:18px;padding-bottom:6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);border-bottom:1px solid var(--rule)}
 tr.member td:first-child{padding-left:14px}
 tr.total td{font-weight:500;border-top:1px solid var(--ink-soft)}
@@ -558,11 +559,12 @@ en:{
   extCols:["Market","Borrow","Supply","Utilization","Depth"],
   extThis:"this index",
   termsH:"Term averages",
-  termsP:"Compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window of fixings exists.",
+  termsP:"The average of each index over the last 30, 90 and 180 days, compounded daily, the same construction SOFR uses. SBOR shows two rates per index because a lending pool has two prices: what borrowers pay, and what suppliers earn, which is lower because only part of the pool is lent out and the protocol keeps a share. SOFR is a single rate because in a repo the borrower pays exactly what the lender earns. To judge a loan offer, compare it with the borrow average; to judge a deposit, compare it with the supply average. An average appears only once every day in its window has a fixing.",
+  termBorrow:"borrow, what borrowers pay", termSupply:"supply, what suppliers earn",
   termCol:d=>`${d}-day`,
   termFrom:d=>`from ${d}`,
   termPending:"not yet",
-  termSofr:"for comparison, US repo market",
+  termSofr:"one rate: in a repo, borrower and lender get the same",
   deltaBorrow:"", deltaSupply:"",
   poxH:"Bitcoin staking yield, from PoX (Proof of Transfer)",
   poxP:"What PoX pays STX stakers, in bitcoin, from what miners commit. The bitcoin paid over one two week reward cycle, divided by the STX locked, annualized. A staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
@@ -664,11 +666,12 @@ pt:{
   extCols:["Mercado","Empréstimo","Depósito","Utilização","Profundidade"],
   extThis:"este índice",
   termsH:"Médias de prazo",
-  termsP:"Médias compostas dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa de fixings.",
+  termsP:"A média de cada índice nos últimos 30, 90 e 180 dias, composta diariamente, a mesma construção usada pelo SOFR. O SBOR mostra duas taxas por índice porque um pool de empréstimo tem dois preços: o que quem toma paga, e o que quem fornece recebe, que é menor porque só parte do pool está emprestada e o protocolo fica com uma parcela. O SOFR é uma taxa só porque, num repo, quem toma paga exatamente o que quem empresta recebe. Para avaliar uma oferta de empréstimo, compare com a média de tomada; para avaliar um depósito, compare com a média de fornecimento. Uma média só aparece quando todos os dias da janela têm fixing.",
+  termBorrow:"tomar, o que quem toma paga", termSupply:"fornecer, o que quem fornece recebe",
   termCol:d=>`${d} dias`,
   termFrom:d=>`a partir de ${d}`,
   termPending:"ainda não",
-  termSofr:"para comparação, mercado de repo dos EUA",
+  termSofr:"uma taxa só: no repo, quem toma e quem empresta têm a mesma",
   deltaBorrow:"", deltaSupply:"",
   poxH:"Rendimento do staking de bitcoin, via PoX (Proof of Transfer)",
   poxP:"O que o PoX paga a quem faz staking de STX, em bitcoin, a partir do que os mineradores comprometem. O bitcoin pago em um ciclo de recompensa de duas semanas, dividido pelo STX travado, anualizado. É um rendimento de staking sobre uma posição travada, não uma taxa de crédito, por isso fica ao lado dos índices e nunca dentro deles.",
@@ -833,6 +836,24 @@ const movingAvg = (arr,w) => arr.map((_,i)=>{
 });
 
 /* Rows for the selected index and range, oldest first. */
+/* The first date a term average can exist. The fixing publishes one only when
+   every day in its window has a valid fixing, so a withdrawn or missing day
+   pushes the date back until the window has moved past it. SBOR-BTC's
+   withdrawn 5 September fixing moves its 30-day average to 5 October. */
+function termFromDate(label, began, n){
+  if (!began) return null;
+  const day = s => new Date(Date.parse(s) + 864e5).toISOString().slice(0,10);
+  const rows = HISTORY.filter(r => r.date >= began).sort((a,b) => a.date.localeCompare(b.date));
+  let start = began, prev = null;
+  for (const r of rows){
+    if (prev && day(prev) < r.date) start = r.date;          /* a missing day */
+    const ok = r[label] && !r[label].withdrawn && typeof r[label].borrow === "number";
+    if (!ok) start = day(r.date);                             /* a withdrawn day */
+    prev = r.date;
+  }
+  return new Date(Date.parse(start) + (n-1)*864e5).toISOString().slice(0,10);
+}
+
 function seriesFor(label, days){
   const cutoff = new Date(Date.now() - days*864e5).toISOString().slice(0,10);
   return HISTORY.filter(r => r.date >= cutoff && r[label] && !r[label].withdrawn
@@ -1040,17 +1061,17 @@ function renderTerms(){
   set("termsBody", labels.map(label => {
     const d = TERM_DATA[label] || {};
     const av = d.termAverages || {};
-    const cells = [30,90,180].map(n => {
-      const v = av[`d${n}`];
-      if (v && typeof v.borrow === "number")
-        return `<td class="r num">${v.borrow.toFixed(2)}% <span class="pend">/ ${
-          typeof v.supply === "number" ? v.supply.toFixed(2)+"%" : ""}</span></td>`;
-      const from = d.seriesBegan
-        ? new Date(Date.parse(d.seriesBegan) + (n-1)*864e5).toISOString().slice(0,10)
-        : null;
-      return `<td class="r pend">${from ? t.termFrom(from) : t.termPending}</td>`;
-    }).join("");
-    return `<tr><td><span class="venue">${label}</span></td>${cells}</tr>`;
+    /* One number per cell, as SOFR shows it: a line for what borrowers pay
+       and a line for what suppliers earn. */
+    const line = (side, first) => `<tr${first ? ' class="tfirst"' : ""}><td><span class="venue">${first ? label : ""}</span><span class="asset">${side === "borrow" ? t.termBorrow : t.termSupply}</span></td>` +
+      [30,90,180].map(n => {
+        const v = av[`d${n}`];
+        if (v && typeof v[side] === "number")
+          return `<td class="r num" data-l="${t.termCol(n)}">${v[side].toFixed(2)}%</td>`;
+        const from = termFromDate(label, d.seriesBegan, n);
+        return `<td class="r pend" data-l="${t.termCol(n)}">${from ? t.termFrom(from) : t.termPending}</td>`;
+      }).join("") + `</tr>`;
+    return line("borrow", true) + line("supply", false);
   }).join("") + sofrRow);
 }
 
