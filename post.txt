@@ -1,10 +1,26 @@
-SBOR post drafts, fixing 2026-09-29T08:30:45Z
-Compared with 2026-09-28
+SBOR post drafts, fixing 2026-09-30T08:30:32Z
+Compared with 2026-09-29
 
-Nothing moved enough to be worth posting.
+2 things worth saying. Pick one. Do not post more than one a day.
 
-Thresholds: a rate moving 25 bps, the staking yield moving 50 bps or
-changing cycle, an index appearing or dropping out, utilization
-crossing 80% or 20% in either direction, an inversion, or a term
-average publishing. A level that has not moved since yesterday is
-not news and is deliberately not flagged.
+--- 1. SBOR-USD 30-day average first published (179 chars)
+
+SBOR-USD now has a 30 day average.
+
+Borrow 2.47%, supply 0.68%.
+
+Compounded from 30 daily fixings. Term averages publish only once the full window exists.
+
+sbor.xyz
+
+--- 2. SBOR-STX 30-day average first published (179 chars)
+
+SBOR-STX now has a 30 day average.
+
+Borrow 1.99%, supply 0.87%.
+
+Compounded from 30 daily fixings. Term averages publish only once the full window exists.
+
+sbor.xyz
+
+Check the numbers against the site before posting. Never state a cause.
