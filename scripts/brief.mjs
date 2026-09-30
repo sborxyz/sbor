@@ -211,7 +211,7 @@ if ((px(today).measurement ?? 1) !== (px(d1).measurement ?? 1))
 if (facts.staking.crossSpotChange1dPercent != null && Math.abs(facts.staking.crossSpotChange1dPercent) >= 5)
   flags.push(`The BTC to STX cross moved ${facts.staking.crossSpotChange1dPercent}% on spot. The seven day mean absorbs most of it.`);
 if (today.methodologyVersion !== d1.methodologyVersion)
-  flags.push(`Methodology changed from ${d1.methodologyVersion} to ${today.methodologyVersion}. Figures either side are on a different basis.`);
+  flags.push(`DATA EVENT: methodology changed today, from ${d1.methodologyVersion} to ${today.methodologyVersion}. Market sizes, and so depth and index weights, may be on a different basis from yesterday. Report this in one sentence as a data event. Do not report any change in depth today, and say that an index move of a few basis points today may come from the method rather than the market.`);
 
 /* Same exposure legs. Borrowing a yield bearing token means owing its yield, so
    the raw rates suggest carry that is not there. Computed rather than described,
