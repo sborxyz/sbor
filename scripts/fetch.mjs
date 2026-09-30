@@ -303,9 +303,10 @@ async function graniteMarket(){
 }
 
 /* A market's size in dollars from the contract's total assets, at the fixing's
-   own prices. Dollar markets are taken at par. stSTX is taken at the STX price,
-   which understates it slightly, since stSTX accrues yield above STX. A
-   fallback for when DefiLlama has no size, never the first source. */
+   own prices: dollar stablecoins at par, sBTC at the bitcoin price, STX at the
+   STX price, and stSTX at the STX price times StackingDAO's stSTX rate when it
+   can be read. From methodology 1.11.0 this is the primary source for Zest
+   market sizes, with DefiLlama as the fallback and the cross-check. */
 function contractDepthUsd(asset, totalAssetsRaw, context, stxPerStstx = null){
   const raw = Number(totalAssetsRaw);
   if (!Number.isFinite(raw) || raw <= 0 || asset.decimals == null) return 0;
