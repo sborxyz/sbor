@@ -53,7 +53,7 @@ jobs:
           console.log("\nINDICES, each market and where its size came from");
           for (const [label, ix] of Object.entries(d.indices || {})){
             console.log("  " + label + ": borrow " + ix.borrow + "%  supply " + ix.supply + "%  " + ix.markets.length + " market(s)");
-            for (const m of ix.markets) console.log("     " + (m.venue + " " + m.asset).padEnd(18) + "borrow " + String(m.borrow).padStart(5) + "%  depth $" + (m.depthUsd/1e6).toFixed(2) + "M  size from " + (m.depthSource || "?") + "  weight " + m.weight);
+            for (const m of ix.markets) console.log("     " + (m.venue + " " + m.asset).padEnd(18) + "borrow " + String(m.borrow).padStart(5) + "%  depth $" + (m.depthUsd/1e6).toFixed(2) + "M  size from " + (m.depthSource || "?") + (m.depthCheck ? "  check $" + (m.depthCheck.depthUsd/1e6).toFixed(2) + "M " + m.depthCheck.source : "") + (m.stxPerStstx ? "  stSTX rate " + m.stxPerStstx : "") + "  weight " + m.weight);
           }
           for (const [label, w] of Object.entries(d.withheld || {})) console.log("  " + label + ": WITHHELD. " + w.reason);
           const dyn = (d.notes || []).filter(n => /this fixing/.test(n) && !/^Each market carries/.test(n));
