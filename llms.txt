@@ -5,7 +5,7 @@
 > offered is fair. SBOR (Stacks Bitcoin Offered Rate) is a benchmark for exactly
 > that. On Stacks,
 > where it started, it publishes one borrow and one supply rate per currency:
-> the SBOR indices. On Base and Ethereum, it publishes what it costs to borrow
+> the SBOR indices. On Base, Ethereum and Arc, it publishes what it costs to borrow
 > USDC against bitcoin, read from the Morpho contracts. All of it is read from
 > contract state and published daily, beside the largest lending markets on
 > Ethereum, Base, Solana and Hyperliquid for comparison. Free, no key, no rate
@@ -123,14 +123,18 @@ bitcoin is the bitcoinCollateralUsdc reference below.
 
 From the fixing of 25 September 2026, each fixing also carries
 bitcoinCollateralUsdc: what it costs to borrow USDC against bitcoin. It reads
-the Morpho Blue markets on Base and Ethereum whose only collateral is cbBTC or
-WBTC, bitcoin wrapped by a custodian. Morpho markets are isolated, one
+the Morpho Blue markets on Base, Ethereum and Arc whose only collateral is
+cbBTC, WBTC or cirBTC, bitcoin wrapped by a custodian. Arc's cirBTC market, the
+one Circle's Digital Asset-Backed Borrowing uses, was added from 2 October 2026
+(methodology 1.12.0) and phases in at zero weight, reaching full weight over
+30 days, as any newly eligible market does; each market carries phaseIn. Morpho markets are isolated, one
 collateral each, so their rate is the cost of a dollar borrowed against bitcoin
 and nothing else; Aave cannot give that number, because it pools all
 collateral. Each market is read from the Morpho contracts: its tokens, checked
 so a wrong market is refused, its totals, and its borrow rate from its own
 interest rate model, as effective APY. The reference weights each market by the
-USDC supplied to it and is published only when every market was read. It is a
+USDC supplied to it times its phaseIn, and is published only when every market
+carrying weight was read; a market still at zero weight cannot withhold it. It is a
 reference, not an SBOR index, and never enters a fixing.
 
 ## What SBOR is not
