@@ -23,7 +23,10 @@
 
 const RPC = {
   Ethereum: ["https://ethereum-rpc.publicnode.com", "https://eth.llamarpc.com", "https://1rpc.io/eth"],
-  Base:     ["https://base-rpc.publicnode.com", "https://mainnet.base.org", "https://1rpc.io/base"]
+  Base:     ["https://base-rpc.publicnode.com", "https://mainnet.base.org", "https://1rpc.io/base"],
+  /* Arc, Circle's Layer-1, chain 5042. Circle's endpoint first, then the
+     providers Arc's docs list; all four answered public reads on 1 Oct 2026. */
+  Arc:      ["https://rpc.mainnet.arc.io", "https://rpc.drpc.mainnet.arc.io", "https://rpc.quicknode.mainnet.arc.io", "https://rpc.blockdaemon.mainnet.arc.io"]
 };
 
 /* The Aave V3 Pool on each chain. Everything else is discovered from it. */
