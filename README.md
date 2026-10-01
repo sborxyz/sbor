@@ -6,7 +6,7 @@ market rate, read from contract state on Stacks, Base and Ethereum.**
 A single venue's number cannot tell anyone, human or agent, whether the rate
 they are offered is fair. SBOR, the Stacks Bitcoin Offered Rate, is a benchmark
 for exactly that. On Stacks, where it started, it publishes one borrow
-and one supply rate per currency: the SBOR indices. On Base and Ethereum, it
+and one supply rate per currency: the SBOR indices. On Base, Ethereum and Arc, it
 publishes what it costs to borrow USDC against bitcoin, read from the Morpho
 contracts. All of it is read from contract state and published daily, beside
 the largest lending markets on Ethereum, Base, Solana and Hyperliquid for
@@ -52,8 +52,8 @@ Ethereum, Base, Hyperliquid and Solana, for comparison.
 
 From the fixing of 25 September 2026, each fixing also carries
 `bitcoinCollateralUsdc`: what it costs to borrow USDC against bitcoin, read from
-the Morpho Blue markets on Base and Ethereum whose only collateral is cbBTC or
-WBTC. Each market is published with its rate, utilization and depth, and a
+the Morpho Blue markets on Base, Ethereum and Arc whose only collateral is
+cbBTC, WBTC or cirBTC. Each market is published with its rate, utilization and depth, and a
 reference weighted by depth when every market was read. It is a reference, not
 an SBOR index, and never enters a fixing.
 
