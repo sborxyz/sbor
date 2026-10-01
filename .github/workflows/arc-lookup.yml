@@ -1,0 +1,26 @@
+name: Look up Arc markets (read-only)
+
+# One-off, run by hand. Finds the cirBTC/USDC Morpho markets on Arc and
+# Ethereum and checks Arc's public endpoints. Publishes and commits nothing;
+# the result appears on the run's summary page.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lookup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Look up the markets
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/arc-lookup.mjs | tee arc.txt
+          { echo "## Arc lookup"; echo '```text'; cat arc.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
