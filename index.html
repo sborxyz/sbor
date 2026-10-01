@@ -544,10 +544,11 @@ en:{
     : bps > 0 ? `Borrowing a dollar on Stacks costs ${sbor}. Against US Treasuries it costs ${sofr}. That is ${bps} basis points dearer here.`
     : `Borrowing a dollar on Stacks costs ${sbor}, the same as against US Treasuries.`,
   grpAny:"Dollars on other chains, against any collateral",
-  grpBtc:"Dollars against bitcoin only: Morpho markets whose one collateral is cbBTC or WBTC",
+  grpBtc:"Dollars against bitcoin only: Morpho markets whose one collateral is cbBTC, WBTC or cirBTC",
   allOf:n => "All " + ({2:"two",3:"three",4:"four",5:"five",6:"six"}[n] || n), btcTotalSub:"total supplied, rates weighted by it",
+  phasing:w=>`phasing in, ${w} of the weight`,
   extNote:"Aave, HyperLend and Kamino lend against any collateral in one pool, so their rate is not specific to bitcoin. The last line of each group is the total of the markets shown above it, one per chain, not every venue: what is supplied to them, and their rates weighted by it. Groups are never added together. Depth is always total supplied, and n/a where the source does not report it.",
-  btcTop:(r,dp)=>`Borrowing USDC against bitcoin on Base and Ethereum costs ${r}, across ${dp} of Morpho markets read from the contracts. A reference, not an SBOR index.`,
+  btcTop:(r,dp)=>`Borrowing USDC against bitcoin on Base, Ethereum and Arc costs ${r}, across ${dp} of Morpho markets read from the contracts. A reference, not an SBOR index.`,
   absentNote:(label,reason)=>`<strong>${label} is not published in this fixing.</strong> ${reason}`,
   absentGeneric:"A market could not be read, so the index is left out rather than estimated. It returns on its own when the market can be read again.",
   sofrH:"Secured by Treasuries",
@@ -617,7 +618,7 @@ en:{
     "<strong>Protocol yield excluded.</strong> Some assets carry yield from the asset itself rather than from lending. sBTC carries Bitcoin protocol yield through dual stacking, and stSTX carries PoX staking yield managed by StackingDAO. That yield belongs to the asset, not the loan, so it never enters the fixing.",
     "<strong>Phase-in.</strong> A newly eligible market enters at zero weight and ramps to full weight linearly over 30 days, so adding a venue cannot step the rate.",
     "<strong>Utilization explains the rate.</strong> Utilization is the share of supplied capital currently borrowed. It is the reason a rate sits where it does: a market with little borrowing pays its suppliers little, however large that market is. It is published beside every rate so no figure has to be taken on trust.",
-    "<strong>Outside Stacks is context, not a constituent.</strong> Two references are published beside the indices. The largest lending markets on Ethereum, Base, Hyperliquid and Solana show what the same asset class costs off this chain: Aave on Ethereum and Base is read from its contracts, the others from DefiLlama. And the cost of borrowing USDC against bitcoin comes from the Morpho markets on Base and Ethereum whose only collateral is cbBTC or WBTC, read from the contracts and published only when every market was read. Neither is ever weighted into a fixing or moves an SBOR number.",
+    "<strong>Outside Stacks is context, not a constituent.</strong> Two references are published beside the indices. The largest lending markets on Ethereum, Base, Hyperliquid and Solana show what the same asset class costs off this chain: Aave on Ethereum and Base is read from its contracts, the others from DefiLlama. And the cost of borrowing USDC against bitcoin comes from the Morpho markets on Base, Ethereum and Arc whose only collateral is cbBTC, WBTC or cirBTC, read from the contracts and published only when every market carrying weight was read. A newly added market phases in over 30 days. Neither is ever weighted into a fixing or moves an SBOR number.",
     "<strong>Term averages.</strong> The 30, 90 and 180 day figures are compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window exists. A 180 day average appears on day 180, not before.",
     "<strong>Stale or implausible data.</strong> If a market's state cannot be read, its weight is zero for that fixing and the omission is recorded. A funded market whose borrow and supply rates both read below 0.05% is treated the same way, because lenders and borrowers do not set such a rate: it is either a reporting failure or a rate the protocol holds down by design.",
     "<strong>Revisions.</strong> Published fixings are never rewritten. Corrections appear as a new fixing with a note."
@@ -652,10 +653,11 @@ pt:{
     : `Tomar um dólar emprestado na Stacks custa ${sbor}, o mesmo que com garantia de títulos do Tesouro americano.`,
   sofrH:"Garantido por títulos do Tesouro",
   grpAny:"Dólares em outras redes, contra qualquer garantia",
-  grpBtc:"Dólares só contra bitcoin: mercados da Morpho cuja única garantia é cbBTC ou WBTC",
+  grpBtc:"Dólares só contra bitcoin: mercados da Morpho cuja única garantia é cbBTC, WBTC ou cirBTC",
   allOf:n => ({2:"Os dois",3:"Os três",4:"Os quatro",5:"Os cinco",6:"Os seis"}[n] || "Os "+n), btcTotalSub:"total fornecido, taxas ponderadas por ele",
+  phasing:w=>`entrando aos poucos, ${w} do peso`,
   extNote:"Aave, HyperLend e Kamino emprestam contra qualquer garantia em um único pool, então a taxa delas não é específica de bitcoin. A última linha de cada grupo é o total dos mercados mostrados acima, um por rede, não todas as plataformas: o que está fornecido a eles, e as taxas ponderadas por isso. Os grupos nunca são somados. A profundidade é sempre o total fornecido, e n/a quando a fonte não informa.",
-  btcTop:(r,dp)=>`Tomar USDC emprestado com bitcoin como garantia na Base e na Ethereum custa ${r}, em ${dp} de mercados da Morpho lidos direto dos contratos. Uma referência, não um índice SBOR.`,
+  btcTop:(r,dp)=>`Tomar USDC emprestado com bitcoin como garantia na Base, na Ethereum e na Arc custa ${r}, em ${dp} de mercados da Morpho lidos direto dos contratos. Uma referência, não um índice SBOR.`,
   absentNote:(label,reason)=>`<strong>${label} não foi publicado neste fixing.</strong> ${reason}`,
   absentGeneric:"Um mercado não pôde ser lido, então o índice fica de fora em vez de ser estimado. Ele volta sozinho quando o mercado puder ser lido de novo.",
   sofrLine:(r,d)=>`SOFR ${r}, o custo overnight de um dólar no mercado de repo dos Estados Unidos, garantido por dívida do governo americano. Publicado pelo Federal Reserve Bank of New York para ${d}.`,
@@ -724,7 +726,7 @@ pt:{
     "<strong>Rendimento do protocolo fica de fora.</strong> Alguns ativos rendem por si mesmos, e não pelo empréstimo. O sBTC carrega rendimento do protocolo Bitcoin via dual stacking, e o stSTX carrega rendimento de staking PoX administrado pela StackingDAO. Esse rendimento pertence ao ativo, não ao empréstimo, então nunca entra no fixing.",
     "<strong>Entrada gradual.</strong> Um mercado recém-elegível entra com peso zero e sobe linearmente até o peso cheio ao longo de 30 dias, de modo que incluir uma plataforma nunca provoca um salto na taxa.",
     "<strong>A utilização explica a taxa.</strong> Utilização é a parcela do capital depositado que está emprestada. É a razão de uma taxa estar onde está: um mercado com pouco crédito tomado paga pouco a quem deposita, por maior que ele seja. Ela é publicada ao lado de cada taxa para que nenhum número precise ser aceito sem explicação.",
-    "<strong>Fora da Stacks é contexto, não componente.</strong> Duas referências são publicadas ao lado dos índices. Os maiores mercados de crédito na Ethereum, na Base, na Hyperliquid e na Solana mostram quanto custa a mesma classe de ativo fora daqui: a Aave na Ethereum e na Base é lida dos contratos, os demais vêm da DefiLlama. E o custo de tomar USDC emprestado com bitcoin como garantia vem dos mercados da Morpho na Base e na Ethereum cuja única garantia é cbBTC ou WBTC, lido dos contratos e publicado só quando todos os mercados foram lidos. Nenhuma das duas entra no cálculo de um fixing nem move um número do SBOR.",
+    "<strong>Fora da Stacks é contexto, não componente.</strong> Duas referências são publicadas ao lado dos índices. Os maiores mercados de crédito na Ethereum, na Base, na Hyperliquid e na Solana mostram quanto custa a mesma classe de ativo fora daqui: a Aave na Ethereum e na Base é lida dos contratos, os demais vêm da DefiLlama. E o custo de tomar USDC emprestado com bitcoin como garantia vem dos mercados da Morpho na Base, na Ethereum e na Arc cuja única garantia é cbBTC, WBTC ou cirBTC, lido dos contratos e publicado só quando todos os mercados com peso foram lidos. Um mercado novo entra gradualmente, ao longo de 30 dias. Nenhuma das duas entra no cálculo de um fixing nem move um número do SBOR.",
     "<strong>Médias de prazo.</strong> As médias de 30, 90 e 180 dias são compostas a partir dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa. Uma média de 180 dias aparece no dia 180, não antes.",
     "<strong>Dados indisponíveis ou implausíveis.</strong> Se o estado de um mercado não puder ser lido, seu peso é zero naquele fixing e a omissão fica registrada. Um mercado com liquidez cujas taxas de empréstimo e de depósito ficam ambas abaixo de 0,05% recebe o mesmo tratamento, porque quem empresta e quem toma emprestado não define uma taxa assim: ou é uma falha de leitura, ou é uma taxa que o próprio protocolo mantém baixa de propósito.",
     "<strong>Revisões.</strong> Fixings publicados nunca são reescritos. Correções aparecem como um novo fixing, com nota."
@@ -806,7 +808,7 @@ function btcRows(){
   const cell = (v, i) => `<td class="r num" data-l="${c[i]}">${typeof v === "number" ? fmt(v)+"%" : "n/a"}</td>`;
   if (note){ note.hidden = false; note.textContent = t.extNote; }
   return `<tr class="grp"><td colspan="5">${t.grpBtc}</td></tr>`
-    + BTCREF.markets.map(m => `<tr class="member"><td><span class="venue">Morpho, ${m.chain}</span><span class="asset">${m.collateral}/USDC</span></td>${cell(m.borrow,1)}${cell(m.supply,2)}${cell(m.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(m.depthUsd)}</td></tr>`).join("")
+    + BTCREF.markets.map(m => `<tr class="member"><td><span class="venue">Morpho, ${m.chain}</span><span class="asset">${m.collateral}/USDC${typeof m.phaseIn === "number" && m.phaseIn < 1 ? ", " + t.phasing(((m.weight || 0) * 100).toFixed(1) + "%") : ""}</span></td>${cell(m.borrow,1)}${cell(m.supply,2)}${cell(m.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(m.depthUsd)}</td></tr>`).join("")
     + `<tr class="total"><td><span class="venue">${t.allOf(BTCREF.markets.length)}</span><span class="asset">${t.btcTotalSub}</span></td>${cell(BTCREF.borrow,1)}${cell(BTCREF.supply,2)}${cell(BTCREF.utilization,3)}<td class="r num" data-l="${c[4]}">${depth(BTCREF.depthUsd)}</td></tr>`;
 }
 
@@ -1180,7 +1182,7 @@ function render(){
     sbox.hidden = true;
     document.getElementById("sofrTop").hidden = true;
   }
-  /* What a dollar costs against bitcoin on Base and Ethereum. A reference, not
+  /* What a dollar costs against bitcoin on Base, Ethereum and Arc. A reference, not
      an index, so it sits beside the dollar index, only when every market was
      read, and never enters it. */
   const bt = document.getElementById("btcTop");  /* the summary line; the markets are in the comparison table below */
