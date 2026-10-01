@@ -40,10 +40,13 @@ const latest = JSON.parse(readFileSync("api/v1/latest.json", "utf8"));
    until it changes, which is how a notification channel gets ignored. */
 let priorUtil = {};
 let announced = {};
+let firsts = {};   /* one-time announcements, never pruned */
 try {
   const st = JSON.parse(readFileSync("post-state.json", "utf8"));
   priorUtil = st.utilization || {};
   announced = st.announced || {};
+  firsts = st.firsts || {};
+  for (const [k, d] of Object.entries(announced)) if (k.startsWith("termavg:") && !firsts[k]) firsts[k] = d;
 } catch {}
 
 /* The drafter compares today against the previous history row, so on a day with
@@ -278,15 +281,28 @@ ${LINK}`
 }
 
 /* ---------- 6. a term average published for the first time ---------- */
+/* "First" is judged against the previous fixing in full, from the daily
+   archive: history rows do not store term averages, so checking the history
+   row made every day look like the first, and the 30-day averages were
+   drafted again on 1 October 2026 after first appearing on 30 September. A
+   permanent record of what was announced backs it up. */
+let priorTerms = {};
+try {
+  const pa = JSON.parse(readFileSync(`api/v1/archive/${prior?.date}.json`, "utf8"));
+  for (const [l, x] of Object.entries(pa.indices || {})) priorTerms[l] = x.termAverages || {};
+} catch {}
 for (const [label, ix] of Object.entries(latest.indices)){
   for (const [k, v] of Object.entries(ix.termAverages || {})){
     if (!v || typeof v.borrow !== "number") continue;
     const days = k.replace("d", "");
-    const wasIx = prior && prior[label];
-    if (wasIx && wasIx[`avg${days}`]) continue;   // only announce once
+    const key = `termavg:${label}:${k}`;
+    const was = priorTerms[label]?.[k];
+    if (was && typeof was.borrow === "number") continue;   // existed in the previous fixing
+    if (firsts[key]) continue;                               // announced before
+    firsts[key] = today;
     drafts.push({
       rank: 40,
-      key: `termavg:${label}:${k}`,
+      key,
       why: `${label} ${days}-day average first published`,
       text:
 `${label} now has a ${days} day average.
@@ -355,7 +371,7 @@ const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
 for (const k of Object.keys(announced)) if (announced[k] < weekAgo) delete announced[k];
 
 writeFileSync("post-state.json",
-  JSON.stringify({ fixing: latest.fixing, utilization, announced }, null, 2) + "\n");
+  JSON.stringify({ fixing: latest.fixing, utilization, announced, firsts }, null, 2) + "\n");
 
 const text = out.join("\n") + "\n";
 writeFileSync("post.txt", text);
