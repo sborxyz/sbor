@@ -36,7 +36,7 @@ export function snapshotText(d){
     parts.push(b && s ? `${label}: borrow ${b}, supply ${s}.` : `${label}: not published in this fixing.`);
   }
   const ref = d.bitcoinCollateralUsdc;
-  if (ref && pct(ref.borrow)) parts.push(`USDC against bitcoin on Base and Ethereum, a reference, not an SBOR index: borrow ${pct(ref.borrow)}, across ${usd(ref.depthUsd)}.`);
+  if (ref && pct(ref.borrow)) parts.push(`USDC against bitcoin on Base, Ethereum and Arc, a reference, not an SBOR index: borrow ${pct(ref.borrow)}, across ${usd(ref.depthUsd)}.`);
   parts.push("Effective annual rates, read from lending contract state.");
   return esc(parts.join(" ")) + ' Plain text: <a href="/latest.txt">latest.txt</a>. Data: <a href="/api/v1/latest.json">latest.json</a>.';
 }
