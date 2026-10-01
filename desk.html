@@ -234,7 +234,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
   /* ---- bitcoin-collateral USDC: every market behind the reference ---- */
   if (today.btcUsdc?.markets?.length){
     const bc = r => r.btcUsdc || {};
-    out += `<h2>Bitcoin-collateral USDC</h2><div class="hint">A reference, not an SBOR index: the Morpho markets on Base and Ethereum whose only collateral is cbBTC or WBTC, read from the contracts, weighted by the USDC supplied to each. Withheld unless every market was read.</div><div class="scroll"><table>
+    out += `<h2>Bitcoin-collateral USDC</h2><div class="hint">A reference, not an SBOR index: the Morpho markets on Base, Ethereum and Arc whose only collateral is cbBTC, WBTC or cirBTC, read from the contracts, weighted by the USDC supplied to each. Withheld unless every market was read.</div><div class="scroll"><table>
       <tr><th>Market</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>Util</th><th>1d</th><th>Depth</th></tr>`;
     const row = (name, now, a, b) => `<tr><td class="nm">${name}</td>
       <td class="num" data-l="Borrow">${now.b == null ? "n/a" : F(now.b)+"%"}</td>${chg(BPS(now.b, a?.b),"bps",15,"Borrow 1d")}${chg(BPS(now.b, b?.b),"bps",15,"Borrow 7d")}
