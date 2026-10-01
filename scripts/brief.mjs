@@ -181,7 +181,7 @@ const flags = [];
   if (bc && !bc.published)
     flags.push(`The bitcoin-collateral USDC reference is withheld today: not every Morpho market could be read.`);
   if (bc?.published && bc.borrowChange1dBps != null && Math.abs(bc.borrowChange1dBps) >= 25)
-    flags.push(`Borrowing USDC against bitcoin on Morpho, Base and Ethereum, moved ${bc.borrowChange1dBps > 0 ? "+" : ""}${bc.borrowChange1dBps} bps to ${bc.borrowPct}%.`);
+    flags.push(`Borrowing USDC against bitcoin on Morpho, Base, Ethereum and Arc, moved ${bc.borrowChange1dBps > 0 ? "+" : ""}${bc.borrowChange1dBps} bps to ${bc.borrowPct}%.`);
 }
 for (const ix of facts.indices){
   if (!ix.published && ix.publishedYesterday) flags.push(`${ix.label} is not published today. It was yesterday.`);
@@ -312,7 +312,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 7. Some inputs are unreliable and you should say so rather than reporting them flatly. The stSTX protocol yield from StackingDAO has moved 6.81, 3.14, 4.21, 4.33 within a week, which is not how a staking yield behaves. Any figure that depends on it, including the same exposure legs and the all in supply rate, inherits that. If you cite one, say the input moves.
 
-8. bitcoinCollateralUsdc is a reference, not an SBOR index: what it costs to borrow USDC against wrapped bitcoin on Morpho, on Base and Ethereum. Report it on its own when it is flagged. Never average it with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
+8. bitcoinCollateralUsdc is a reference, not an SBOR index: what it costs to borrow USDC against wrapped bitcoin on Morpho, on Base, Ethereum and Arc. A newly added market phases in over 30 days; its own rate is not a move in the reference. Report it on its own when it is flagged. Never average it with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
 
 9. A flag marked DATA EVENT comes first and is never a market move. Say the index is not published, or is missing a market, and why, in one sentence, and do not interpret any change in that index or its remaining markets. A DATA NOTE is one sentence, no interpretation.
 
