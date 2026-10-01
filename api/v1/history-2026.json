@@ -4188,5 +4188,251 @@
         }
       ]
     }
+  },
+  {
+    "date": "2026-10-01",
+    "fixedAt": "2026-10-01T08:30:42Z",
+    "methodologyVersion": "1.11.0",
+    "btcUsdc": {
+      "b": 4.94,
+      "s": 4.44,
+      "u": 90.08,
+      "d": 2135076686,
+      "markets": [
+        {
+          "c": "Base",
+          "a": "cbBTC",
+          "b": 4.91,
+          "s": 4.41,
+          "u": 90.06,
+          "d": 1668880185
+        },
+        {
+          "c": "Ethereum",
+          "a": "cbBTC",
+          "b": 4.95,
+          "s": 4.45,
+          "u": 90.13,
+          "d": 338640844
+        },
+        {
+          "c": "Ethereum",
+          "a": "WBTC",
+          "b": 5.28,
+          "s": 4.75,
+          "u": 90.29,
+          "d": 127555657
+        }
+      ]
+    },
+    "SBOR-PoX": {
+      "apy": 7.27,
+      "cycle": 143,
+      "measurement": 2,
+      "cycleStart": "2026-09-10",
+      "cycleEnd": "2026-09-24",
+      "btcPaid": 4.94688,
+      "stxLocked": 441526004,
+      "stxPerBtc": 215246.81,
+      "stxPerBtcSmoothed": 250558.88
+    },
+    "ctx": {
+      "sofr": 3.88,
+      "sofrDate": "2026-09-29",
+      "btcUsd": 83402,
+      "stxUsd": 0.389766,
+      "sbtcSupply": 2483.91904428,
+      "burnBlock": 969421,
+      "nativeStacking": 6.48,
+      "stBtc": 2.47,
+      "liquidityCostBps": 324,
+      "npmLastDay": 14,
+      "npmLastWeek": 619
+    },
+    "external": [
+      {
+        "v": "Aave V3, Ethereum",
+        "a": "USDC",
+        "b": 4.48,
+        "s": 3.77,
+        "u": 93.69,
+        "d": 2426803167,
+        "db": "supplied",
+        "vs": "SBOR-USD"
+      },
+      {
+        "v": "Aave V3, Ethereum",
+        "a": "WBTC",
+        "b": 0.32,
+        "s": 0,
+        "u": 2.11,
+        "d": 2873418500,
+        "db": "supplied",
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Aave V3, Ethereum",
+        "a": "cbBTC",
+        "b": 0.29,
+        "s": 0,
+        "u": 0.74,
+        "d": 1467592121,
+        "db": "supplied",
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Aave V3, Base",
+        "a": "cbBTC",
+        "b": 0.65,
+        "s": 0.01,
+        "u": 3.05,
+        "d": 243050972,
+        "db": "supplied",
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Aave V3, Base",
+        "a": "USDC",
+        "b": 5.42,
+        "s": 4.4,
+        "u": 90.58,
+        "d": 180538139,
+        "db": "supplied",
+        "vs": "SBOR-USD"
+      },
+      {
+        "v": "HyperLend, Hyperliquid L1",
+        "a": "UBTC",
+        "b": 0.99,
+        "s": 0.14,
+        "u": 17.38,
+        "d": 14049534,
+        "db": "supplied",
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "HyperLend, Hyperliquid L1",
+        "a": "USDC",
+        "b": 4.78,
+        "s": 3.76,
+        "u": 87.26,
+        "d": 57344082,
+        "db": "supplied",
+        "vs": "SBOR-USD"
+      },
+      {
+        "v": "Kamino, Solana",
+        "a": "cbBTC",
+        "b": 0.14,
+        "s": 0,
+        "u": 1.52,
+        "d": 61030978,
+        "db": "supplied",
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Kamino, Solana",
+        "a": "USDC",
+        "b": 5.89,
+        "s": 4.32,
+        "u": 90.05,
+        "d": 121765997,
+        "db": "supplied",
+        "vs": "SBOR-USD"
+      }
+    ],
+    "SBOR-USD": {
+      "borrow": 2.71,
+      "supply": 0.84,
+      "allInSupply": 0.84,
+      "venues": 2,
+      "largestConstituentWeight": 0.6509,
+      "depthUsd": 15604250,
+      "utilization": 54.19,
+      "markets": [
+        {
+          "v": "Zest V2",
+          "a": "USDCx",
+          "b": 3.37,
+          "s": 1.17,
+          "u": 70.43,
+          "py": null,
+          "d": 10156981,
+          "w": 0.6509
+        },
+        {
+          "v": "Granite",
+          "a": "USDCx",
+          "b": 1.45,
+          "s": 0.25,
+          "u": 23.41,
+          "py": null,
+          "d": 5007382,
+          "w": 0.3209
+        },
+        {
+          "v": "Zest V2",
+          "a": "USDh",
+          "b": 1.76,
+          "s": 0,
+          "u": 29.58,
+          "py": null,
+          "d": 439887,
+          "w": 0.0282
+        }
+      ]
+    },
+    "SBOR-BTC": {
+      "borrow": 1.31,
+      "supply": 0.12,
+      "allInSupply": 0.12,
+      "venues": 1,
+      "largestConstituentWeight": 1,
+      "depthUsd": 55119472,
+      "utilization": 11.11,
+      "markets": [
+        {
+          "v": "Zest V2",
+          "a": "sBTC",
+          "b": 1.31,
+          "s": 0.12,
+          "u": 11.11,
+          "py": null,
+          "d": 55119472,
+          "w": 1
+        }
+      ]
+    },
+    "SBOR-STX": {
+      "borrow": 1.48,
+      "supply": 0.34,
+      "allInSupply": 2.21,
+      "venues": 1,
+      "largestConstituentWeight": 0.578,
+      "depthUsd": 6153573,
+      "utilization": 22.82,
+      "markets": [
+        {
+          "v": "Zest V2",
+          "a": "stSTX",
+          "b": 1.24,
+          "s": 0.08,
+          "u": 7.69,
+          "py": 3.24,
+          "d": 3556459,
+          "w": 0.578
+        },
+        {
+          "v": "Zest V2",
+          "a": "STX",
+          "b": 1.81,
+          "s": 0.69,
+          "u": 43.54,
+          "py": null,
+          "d": 2597114,
+          "w": 0.422
+        }
+      ]
+    }
   }
 ]

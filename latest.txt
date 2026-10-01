@@ -1,6 +1,6 @@
-SBOR fixing 2026-09-30T08:30:32Z
+SBOR fixing 2026-10-01T08:30:42Z
 currency  borrow%  supply%
-SBOR-USD  2.72     0.85
+SBOR-USD  2.71     0.84
 SBOR-BTC  1.31     0.12
-SBOR-STX  1.42     0.26
+SBOR-STX  1.48     0.34
 basis=APY source=https://sbor.xyz/api/latest.json
