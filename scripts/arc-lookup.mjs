@@ -39,10 +39,11 @@ async function morphoMarkets(){
       collateralAssetAddress_in: ["${CIRBTC[1]}", "${CIRBTC[5042]}"]
     }) {
       items {
-        uniqueKey lltv oracleAddress irmAddress
+        marketId lltv irmAddress
+        oracle { address }
+        chain { id }
         loanAsset { address symbol }
         collateralAsset { address symbol }
-        morphoBlue { address chain { id } }
         state { supplyAssetsUsd borrowAssetsUsd utilization borrowApy supplyApy }
       }
     }
@@ -66,21 +67,21 @@ async function main(){
   let markets = [];
   try { markets = await morphoMarkets(); }
   catch(e){ say("  API lookup failed:", e.message); }
-  const usdc = markets.filter(m => lc(m.loanAsset?.address) === lc(USDC[m.morphoBlue?.chain?.id]));
+  const usdc = markets.filter(m => lc(m.loanAsset?.address) === lc(USDC[m.chain?.id]));
   if (!markets.length) say("  none returned");
   for (const m of markets){
-    const chain = m.morphoBlue?.chain?.id, s = m.state || {};
+    const chain = m.chain?.id, s = m.state || {};
     const isUsdc = usdc.includes(m);
     say(`  chain ${chain} | ${m.collateralAsset?.symbol}/${m.loanAsset?.symbol}${isUsdc ? "" : " (not USDC, ignore)"}`);
-    say(`    id         ${m.uniqueKey}`);
+    say(`    id         ${m.marketId}`);
     say(`    size       supplied $${((s.supplyAssetsUsd||0)/1e6).toFixed(2)}M, borrowed $${((s.borrowAssetsUsd||0)/1e6).toFixed(2)}M, utilization ${((s.utilization||0)*100).toFixed(2)}%`);
     say(`    rates      borrow ${((s.borrowApy||0)*100).toFixed(2)}%, supply ${((s.supplyApy||0)*100).toFixed(2)}% (Morpho's API, for reference only)`);
-    say(`    lltv       ${(Number(m.lltv)/1e16).toFixed(1)}% | oracle ${m.oracleAddress} | irm ${m.irmAddress} | morpho ${m.morphoBlue?.address}`);
+    say(`    lltv       ${(Number(m.lltv)/1e16).toFixed(1)}% | oracle ${m.oracle?.address} | irm ${m.irmAddress}`);
   }
 
   say("");
   say("ARC PUBLIC ENDPOINTS");
-  const arcIds = usdc.filter(m => m.morphoBlue?.chain?.id === 5042).map(m => m.uniqueKey);
+  const arcIds = usdc.filter(m => m.chain?.id === 5042).map(m => m.marketId);
   for (const url of ARC_RPCS){
     try {
       const id = parseInt(await rpc(url, "eth_chainId", []), 16);
