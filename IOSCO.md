@@ -1,6 +1,6 @@
 # SBOR and the IOSCO Principles for Financial Benchmarks
 
-*A self-assessment. Created 24 September 2026. Last updated 24 September 2026.*
+*A self-assessment. Created 24 September 2026. Last updated 2 October 2026.*
 
 The International Organization of Securities Commissions published its Principles for Financial Benchmarks in July 2013, after the manipulation of major interest rate benchmarks. There are 19 of them, in four groups: governance, the quality of the benchmark, the quality of the methodology, and accountability. They were endorsed by the G20 and are the standard against which benchmark administrators describe themselves.
 
@@ -51,8 +51,8 @@ SBOR defines its indices, writes and publishes the methodology, computes and pub
 SBOR reads rates directly from lending contracts and depends on public infrastructure to do so. The sources:
 
 - **Stacks contract state** for Zest and Granite, through the Hiro API.
-- **Ethereum and Base contract state** for Aave and Morpho, through public RPC endpoints, three per chain with automatic failover.
-- **DefiLlama** for Zest's depth and for comparison venues not read from their contracts. Each comparison market states its source.
+- **Ethereum, Base and Arc contract state** for Aave and Morpho, through public RPC endpoints, several per chain with automatic failover.
+- **DefiLlama** for comparison venues not read from their contracts, and as a cross-check on Zest's market sizes, which are read from the Zest contracts since 1 October 2026. Each market states its source.
 - **CoinGecko** for prices, **Bitflow** for the bitcoin to STX rate, the **New York Fed** for SOFR, and **StackingDAO's** published method for the stBTC yield.
 
 Every read is checked, and a source that fails or returns something implausible is left out rather than replaced with an estimate.
