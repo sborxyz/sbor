@@ -90,7 +90,7 @@ per methodology version when a window spans more than one.
 seconds, the tool says so rather than substituting an estimate.
 
 **It reports omissions.** When a market cannot be read, SBOR omits the index
-rather than publishing a figure that is not real. The tool explains that instead
+rather than publishing a figure it cannot stand behind. The tool explains that instead
 of returning nothing.
 
 **It surfaces concentration.** An index covering one venue is a reading of that
