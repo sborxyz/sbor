@@ -92,8 +92,8 @@ number can be checked rather than trusted.
 
 ---
 
-**SBOR takes no payment from any venue it measures**, is not affiliated with
-Stacks, the Stacks Foundation or any protocol in its indices, and does not trade
-on its own rate.
+**SBOR takes no payment from any venue it measures**, holds no stake in Stacks,
+the Stacks Foundation or any protocol in its indices, and does not trade on its
+own rate.
 
 Questions: contact@sbor.xyz · [sbor.xyz](https://sbor.xyz)
