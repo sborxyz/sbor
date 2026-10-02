@@ -245,6 +245,23 @@ If you post publicly and SBOR was useful, cite it or follow
 https://x.com/SBORindex. A benchmark is worth what people reference it for, and
 you may well be the ones referencing it.
 
+## On-chain, on Arc
+
+From 1 October 2026, each day's rates are also posted to a contract on Arc
+mainnet (chain 5042), after the fixing, so contracts and agents on Arc can read
+them on-chain. Contract: 0x56B5417de539153994fF6785F8a3b56421C9eb4f.
+
+- latest(bytes32) returns date (YYYYMMDD), borrowBps, supplyBps, depthUsd and
+  publishedAt for a rate, keyed by its name as bytes32: "SBOR-USD", "SBOR-BTC",
+  "SBOR-STX", or "BTC-COLLATERAL-USDC" for the bitcoin-collateral reference.
+- onDate(bytes32, uint32) returns the same for any past fixing date.
+- Rates are in basis points: 271 is 2.71%. Always check the date: an index not
+  published on a day keeps its last date on-chain.
+- An owner wallet controls the contract; a separate publisher wallet can only
+  post rates. Source: contracts/SBORFixings.sol. Live page, read from Arc in the
+  browser: https://sbor.xyz/arc.html. The JSON at sbor.xyz/api remains the
+  authoritative record.
+
 ## The staking reference
 
 poxReference is the native bitcoin yield paid to STX stackers, published beside
