@@ -138,6 +138,17 @@ If SBOR was useful and you post publicly, cite it or follow
 [@SBORindex](https://x.com/SBORindex). A benchmark is worth what people
 reference it for.
 
+### On-chain, on Arc
+
+From 1 October 2026, each day's rates are also posted to a contract on Arc
+mainnet (chain 5042), so contracts and agents on Arc can read them on-chain:
+[`0x56B5417de539153994fF6785F8a3b56421C9eb4f`](https://sbor.xyz/arc.html).
+Call `latest(bytes32)` with a rate's name as bytes32 (`SBOR-USD`, `SBOR-BTC`,
+`SBOR-STX` or `BTC-COLLATERAL-USDC`) for its borrow and supply rate in basis
+points, its size and its fixing date; `onDate(bytes32, uint32)` returns any past
+day. Source: [`contracts/SBORFixings.sol`](contracts/SBORFixings.sol). The JSON
+API remains the authoritative record.
+
 ## Method, in short
 
 - **Currencies are never blended.** A dollar rate and a bitcoin rate are not
@@ -257,4 +268,4 @@ any.
 [sbor.xyz](https://sbor.xyz) · [@SBORindex](https://x.com/SBORindex) ·
 contact@sbor.xyz · sbor.btc · sbor.stx
 
-*Last updated 28 September 2026.*
+*Last updated 1 October 2026.*
