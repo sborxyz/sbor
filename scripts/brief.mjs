@@ -213,6 +213,15 @@ if (facts.staking.crossSpotChange1dPercent != null && Math.abs(facts.staking.cro
 if (today.methodologyVersion !== d1.methodologyVersion)
   flags.push(`DATA EVENT: methodology changed today, from ${d1.methodologyVersion} to ${today.methodologyVersion}. Market sizes, and so depth and index weights, may be on a different basis from yesterday. Report this in one sentence as a data event. Do not report any change in depth today, and say that an index move of a few basis points today may come from the method rather than the market.`);
 
+/* stSTX on the market against StackingDAO's rate, and the stBTC loop's carry.
+   Context only; flagged when they cross a line worth a reader's attention. */
+const sm = latest.context?.ststxMarket;
+if (sm && typeof sm.discountPercent === "number" && Math.abs(sm.discountPercent) >= 2)
+  flags.push(`stSTX trades ${Math.abs(sm.discountPercent)}% ${sm.discountPercent < 0 ? "below" : "above"} StackingDAO's redemption rate on Bitflow: ${sm.marketStxPerStstx} against ${sm.redemptionStxPerStstx} STX per stSTX. Report it as a fact; never say why.`);
+const sc = latest.context?.stbtcCarry;
+if (sc && typeof sc.carryBps === "number" && sc.carryBps <= 0)
+  flags.push(`The stBTC loop's carry is ${sc.carryBps} bps: borrowing sBTC (SBOR-BTC, ${sc.sbtcBorrow}%) costs as much as or more than stBTC's estimated yield (${sc.stBtcApy}%). Say that StackingDAO's stBTC figure is an estimate. Name no product.`);
+
 /* Same exposure legs. Borrowing a yield bearing token means owing its yield, so
    the raw rates suggest carry that is not there. Computed rather than described,
    because an agent reading the raw rates would get this wrong. */
