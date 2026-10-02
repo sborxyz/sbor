@@ -1,22 +1,7 @@
 {
-  "fixing": "2026-10-01T08:30:42Z",
-  "comparedWith": "2026-09-30",
-  "top": {
-    "why": "SBOR-USD 30-day average first published",
-    "chars": 179,
-    "text": "SBOR-USD now has a 30 day average.\n\nBorrow 2.47%, supply 0.69%.\n\nCompounded from 30 daily fixings. Term averages publish only once the full window exists.\n\nsbor.xyz"
-  },
-  "otherCount": 1,
-  "drafts": [
-    {
-      "why": "SBOR-USD 30-day average first published",
-      "chars": 179,
-      "text": "SBOR-USD now has a 30 day average.\n\nBorrow 2.47%, supply 0.69%.\n\nCompounded from 30 daily fixings. Term averages publish only once the full window exists.\n\nsbor.xyz"
-    },
-    {
-      "why": "SBOR-STX 30-day average first published",
-      "chars": 179,
-      "text": "SBOR-STX now has a 30 day average.\n\nBorrow 1.98%, supply 0.86%.\n\nCompounded from 30 daily fixings. Term averages publish only once the full window exists.\n\nsbor.xyz"
-    }
-  ]
+  "fixing": "2026-10-02T08:30:50Z",
+  "comparedWith": "2026-10-01",
+  "top": null,
+  "otherCount": 0,
+  "drafts": []
 }
