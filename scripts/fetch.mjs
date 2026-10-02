@@ -746,6 +746,8 @@ const main = async () => {
         nativeStacking: context.staking?.nativeStackingApy ?? null,
         stBtc: context.staking?.stBtcApy ?? null,
         liquidityCostBps: context.staking?.liquidityCostBps ?? null,
+        ststxDiscount: context.ststxMarket?.discountPercent ?? null,
+        stbtcCarryBps: context.stbtcCarry?.carryBps ?? null,
         npmLastDay: context.npmDownloads?.lastDay ?? null,
         npmLastWeek: context.npmDownloads?.lastWeek ?? null
       } }),
