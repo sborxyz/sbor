@@ -26,9 +26,11 @@ jobs:
       - name: Check for an inversion
         id: check
         env:
-          # "validating" while the detection is being proven, then "live".
-          # The status is published either way, so the period is visible.
-          SBOR_INVERSION_STATUS: validating
+          # "validating" from 11 September 2026; "live" from 2 October 2026,
+          # after three weeks with no false alarm and a constructed inversion
+          # (30 bps) caught while a 5 bps near miss was ignored. The status is
+          # published either way.
+          SBOR_INVERSION_STATUS: live
         run: node scripts/inversion.mjs
 
       - name: Commit if changed
@@ -60,7 +62,7 @@ jobs:
               headers: { "content-type": "application/json" },
               body: JSON.stringify({
                 chat_id: process.env.TG_CHAT,
-                text: body + "\n\n——— not part of any post ———\nsbor.xyz/api/v1/inversions.json",
+                text: body + "\n\n--- not part of any post ---\nsbor.xyz/api/v1/inversions.json",
                 disable_web_page_preview: true,
                 link_preview_options: { is_disabled: true }
               })
