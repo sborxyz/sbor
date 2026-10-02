@@ -638,7 +638,7 @@ const main = async () => {
 
   const latest = {
     name:"SBOR",
-    description:"Stacks Bitcoin Offered Rate. Benchmark lending rate for Stacks. Public good, free to reference.",
+    description:"Stacks Bitcoin Offered Rate. Benchmark lending rates for Bitcoin DeFi, read from contract state on Stacks, Base, Ethereum and Arc. Public good, free to reference.",
     url:"https://sbor.xyz",
     bns:["sbor.btc","sbor.stx"],
     fixing: stamp,
