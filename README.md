@@ -22,13 +22,13 @@ USDC, are lent and borrowed.
 
 ## What it is
 
-Every lending market on Stacks prices money differently, so there was no way to
-say what capital actually costs on the chain without opening each application
-and comparing by hand.
+Every lending market on Stacks prices money differently, so comparing them
+means opening each application by hand.
 
 SBOR publishes one borrow rate and one supply rate per currency, weighted by
 market depth and read directly from lending contract state rather than from any
-venue's published figure.
+venue's published figure. Each day's rates are also posted on-chain, on Stacks
+and on Arc.
 
 The model is SOFR, not a yield aggregator. SBOR does not route capital, hold
 deposits, or recommend anything. It publishes a statistic.
@@ -187,7 +187,8 @@ methodology at [sbor.xyz](https://sbor.xyz) and in
 Lending rates from Zest and Granite contract state. Protocol yield and staking
 context from StackingDAO. The BTC to STX rate used for the staking reference
 from Bitflow, quoted in both directions. Proof of Transfer rewards from Hiro.
-Depth read on-chain where available and from DefiLlama otherwise.
+Market sizes read from the contracts, with DefiLlama as a cross-check and as the
+source for the comparison venues not read on-chain.
 
 In the comparison, Aave on Ethereum and Base is read from Aave's contracts, on
 the same basis as SBOR. The other chains, Hyperliquid and Solana, and Morpho on
@@ -223,7 +224,7 @@ api/v1/                 published data
 ## Independence
 
 **Independent:** no token, and no stake in or payment from any venue SBOR
-measures. It is not affiliated with Stacks, the Stacks Foundation, or any
+measures, and holds no stake in Stacks, the Stacks Foundation, or any
 protocol in the index, and publishes whatever the market does, including numbers
 unfavorable to the ecosystem. It does not trade on its own rate. Grant funding,
 when received, is disclosed.
@@ -268,4 +269,4 @@ any.
 [sbor.xyz](https://sbor.xyz) · [@SBORindex](https://x.com/SBORindex) ·
 contact@sbor.xyz · sbor.btc · sbor.stx
 
-*Last updated 1 October 2026.*
+*Last updated 2 October 2026.*
