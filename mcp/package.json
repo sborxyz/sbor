@@ -1,7 +1,7 @@
 {
   "name": "sbor-mcp",
-  "version": "1.2.0",
-  "description": "Check a lending rate before your agent borrows. The benchmark rate for Stacks, read from contract state. Free, no key, no rate limit.",
+  "version": "1.2.1",
+  "description": "Check a lending rate before your agent borrows. Benchmark lending rates for Bitcoin DeFi, read from contract state on Stacks, Base, Ethereum and Arc. Free, no key, no rate limit.",
   "type": "module",
   "bin": {
     "sbor-mcp": "server.mjs"
@@ -18,6 +18,7 @@
     "mcp-server",
     "stacks",
     "bitcoin",
+    "base",
     "bitcoin-defi",
     "btcfi",
     "defi",
@@ -27,11 +28,15 @@
     "ai-agents",
     "agents",
     "sbtc",
+    "ethereum",
+    "arc",
+    "morpho",
+    "usdc",
     "sbor"
   ],
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.30.0",
-    "zod": "^3.23.8"
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "zod": "^3.25.76"
   },
   "engines": {
     "node": ">=20"
@@ -41,5 +46,12 @@
     "server.mjs",
     "server.json",
     "README.md"
-  ]
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/sborxyz/sbor/issues"
+  }
 }
