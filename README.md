@@ -1,7 +1,7 @@
 # SBOR
 
 **Every lending venue in Bitcoin DeFi quotes its own rate. SBOR publishes the
-market rate, read from contract state on Stacks, Base and Ethereum.**
+market rate, read from contract state on Stacks, Base, Ethereum and Arc.**
 
 A single venue's number cannot tell anyone, human or agent, whether the rate
 they are offered is fair. SBOR, the Stacks Bitcoin Offered Rate, is a benchmark
