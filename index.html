@@ -521,6 +521,9 @@ a{color:var(--accent)}
         <a href="https://github.com/sborxyz/sbor" id="ghLink" target="_blank" rel="noopener"></a>
         <a href="https://github.com/sborxyz/sbor/blob/main/LICENSE-DATA.md" id="licLink" target="_blank" rel="noopener"></a>
         <a href="mailto:contact@sbor.xyz" id="mailLink"></a>
+        <a href="/arc.html" id="arcLink"></a>
+        <a href="/privacy.html" id="privLink"></a>
+        <a href="/terms.html" id="termsLink"></a>
         <a href="https://x.com/SBORindex" target="_blank" rel="noopener">@SBORindex</a>
         <span>sbor.xyz · sbor.btc · sbor.stx</span>
       </div>
@@ -617,7 +620,7 @@ en:{
   footMethod:v=>`Methodology ${v}`,
   footSource:"Source on GitHub",
   footLicense:"Data license",
-  footContact:"contact@sbor.xyz",
+  footContact:"contact@sbor.xyz", footArc:"SBOR on Arc", footPrivacy:"Privacy", footTerms:"Terms",
   histH:"History",
   histFor:l=>` · ${l}`,
   histP:"Daily closes since the index began. A moving average is shown only once the full window exists.",
@@ -726,7 +729,7 @@ pt:{
   footMethod:v=>`Metodologia ${v}`,
   footSource:"Código no GitHub",
   footLicense:"Licença dos dados",
-  footContact:"contact@sbor.xyz",
+  footContact:"contact@sbor.xyz", footArc:"SBOR na Arc", footPrivacy:"Privacidade", footTerms:"Termos",
   histH:"Histórico",
   histFor:l=>` · ${l}`,
   histP:"Fechamentos diários desde o início do índice. A média móvel só aparece quando existe janela completa de dados.",
@@ -1017,6 +1020,9 @@ function renderChrome(){
   document.getElementById("ghLink").href = GITHUB;
   document.getElementById("licLink").textContent = t.footLicense;
   document.getElementById("mailLink").textContent = t.footContact;
+  document.getElementById("arcLink").textContent = t.footArc;
+  document.getElementById("privLink").textContent = t.footPrivacy;
+  document.getElementById("termsLink").textContent = t.footTerms;
   document.getElementById("csvBtn").textContent = t.csv;
   /* The example reads the dollar index, which can be absent from a fixing. */
   const ex = INDICES.USD ? computed("USD") : null;
