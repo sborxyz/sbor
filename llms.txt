@@ -262,6 +262,22 @@ them on-chain. Contract: 0x56B5417de539153994fF6785F8a3b56421C9eb4f.
   browser: https://sbor.xyz/arc.html. The JSON at sbor.xyz/api remains the
   authoritative record.
 
+## Context: stSTX on the market, and the stBTC loop's carry
+
+Two figures are recorded with each fixing as context, never in an index:
+
+- context.ststxMarket: stSTX's market price on Bitflow against StackingDAO's
+  own redemption rate (get-stx-per-ststx on data-stx-v2). Bitflow is quoted
+  both ways at the same notional, 1,000 stSTX, and the midpoint taken, since a
+  one-sided quote carries its own price impact. A negative discountPercent
+  means stSTX trades below what it redeems for: worth knowing before holding
+  it as collateral or looping it against STX.
+- context.stbtcCarry: stBTC's estimated yield, from StackingDAO, minus the cost
+  of borrowing sBTC, which is SBOR-BTC's borrow rate. It is what one turn of an
+  stBTC-against-sBTC loop earns before leverage; a negative carry means such a
+  loop loses money. StackingDAO's stBTC figure is an estimate. These are
+  inputs, never a rating of any product.
+
 ## The staking reference
 
 poxReference is the native bitcoin yield paid to STX stackers, published beside
