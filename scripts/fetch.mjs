@@ -335,6 +335,54 @@ async function readStxPerStstx(){
 }
 
 /* Earlier compact rows, newest first, for the continuity guard. */
+/* stSTX on the market against StackingDAO's own rate. A liquid staking token
+   trading below what it redeems for is an early warning for anyone holding it
+   as collateral or looping it against STX. Bitflow is quoted both ways at the
+   same notional and the midpoint taken, as for SBOR-PoX's BTC/STX rate: a
+   one-sided quote carries its own price impact and would always look like a
+   discount. Context only, never part of an index. */
+const BITFLOW_QUOTES = "https://bff.bitflowapis.finance/api/quotes/v1";
+const STSTX_QUOTE_SIZE = 1000;   // stSTX each way: meaningful, without moving the pool much
+async function ststxMarket(redemption){
+  const r0 = await fetch(`${BITFLOW_QUOTES}/tokens`, { headers:{ accept:"application/json" } });
+  if (!r0.ok) throw new Error(`Bitflow tokens responded ${r0.status}`);
+  const { tokens = [] } = await r0.json();
+  const find = sym => tokens.find(t => String(t.symbol).toUpperCase() === sym);
+  const ststx = find("STSTX"), stx = find("STX");
+  if (!ststx || !stx) throw new Error("stSTX or STX not listed on Bitflow");
+  async function quote(inTok, outTok, amountHuman){
+    const r = await fetch(`${BITFLOW_QUOTES}/quote`, {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({ input_token: inTok.contract_address, output_token: outTok.contract_address,
+        amount_in: String(Math.round(amountHuman * 10 ** inTok.decimals)), amm_strategy: "best" })
+    });
+    if (!r.ok) throw new Error(`Bitflow quote responded ${r.status}`);
+    const q = await r.json();
+    if (!q.success) throw new Error(q.error || "quote unsuccessful");
+    return Number(q.amount_out) / 10 ** (q.output_token_decimals ?? outTok.decimals);
+  }
+  const sellOut = await quote(ststx, stx, STSTX_QUOTE_SIZE);          // stSTX -> STX
+  const low = sellOut / STSTX_QUOTE_SIZE;                             // STX per stSTX, selling
+  const stxBack = Math.round(low * STSTX_QUOTE_SIZE);
+  const buyOut = await quote(stx, ststx, stxBack);                    // STX -> stSTX
+  const high = stxBack / buyOut;                                      // STX per stSTX, buying
+  const mid = (low + high) / 2;
+  if (!(low > 0 && high > 0) || mid < redemption * 0.5 || mid > redemption * 1.5)
+    throw new Error(`implausible stSTX quotes: low ${low}, high ${high}, redemption ${redemption}`);
+  log(`  stSTX market ${mid.toFixed(6)} STX (low ${low.toFixed(6)}, high ${high.toFixed(6)}) against redemption ${redemption}`);
+  return {
+    redemptionStxPerStstx: round(redemption, 6),
+    marketStxPerStstx: round(mid, 6),
+    marketLowSide: round(low, 6),
+    marketHighSide: round(high, 6),
+    discountPercent: round((mid / redemption - 1) * 100, 2),
+    quoteSizeStstx: STSTX_QUOTE_SIZE,
+    source: "Market: Bitflow, quoted both ways at the same notional, midpoint. Redemption: StackingDAO's get-stx-per-ststx on data-stx-v2.",
+    note: "Negative discountPercent means stSTX trades below what it redeems for. Context only, never part of an index."
+  };
+}
+
 function previousRows(){
   try {
     const h = JSON.parse(readFileSync("api/v1/history.json", "utf8"));
@@ -557,9 +605,33 @@ const main = async () => {
   try { external = await externalReference(); }
   catch(e){ log(`  external reference unavailable, omitted. ${e.message}`); }
 
+  /* stSTX on the market against StackingDAO's rate. Context only. */
+  let ststx = null;
+  if (stxPerStstx != null){
+    try { ststx = await ststxMarket(stxPerStstx); }
+    catch(e){ log(`  stSTX market reading unavailable, omitted. ${e.message}`); }
+  }
+
+  /* What one turn of an stBTC-against-sBTC loop earns before leverage:
+     stBTC's estimated yield minus the cost of borrowing sBTC, which is
+     SBOR-BTC's borrow rate. Inputs, never a rating of any product. */
+  let stbtcCarry = null;
+  if (typeof stakingContext?.stBtcApy === "number" && typeof indices["SBOR-BTC"]?.borrow === "number"){
+    const y = stakingContext.stBtcApy, b = indices["SBOR-BTC"].borrow;
+    stbtcCarry = {
+      stBtcApy: y, sbtcBorrow: b, carryBps: Math.round((y - b) * 100),
+      note: "stBTC's estimated yield minus the cost of borrowing sBTC (SBOR-BTC's borrow rate): what one turn of an stBTC-against-sBTC loop earns before leverage. A negative carry means the loop loses money. StackingDAO's stBTC figure is an estimate. Context only, never part of an index."
+    };
+  }
+
   /* Context for the record. Never enters an index, never breaks a fixing. */
-  if (stakingContext && Object.keys(stakingContext).length > 1)
-    context = { ...(context || { note: "Context recorded alongside the fixing. None of this enters an index or affects a rate." }), staking: stakingContext };
+  const extraContext = {
+    ...(stakingContext && Object.keys(stakingContext).length > 1 && { staking: stakingContext }),
+    ...(ststx && { ststxMarket: ststx }),
+    ...(stbtcCarry && { stbtcCarry })
+  };
+  if (Object.keys(extraContext).length)
+    context = { ...(context || { note: "Context recorded alongside the fixing. None of this enters an index or affects a rate." }), ...extraContext };
 
   const stamp = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
   const day = stamp.slice(0,10);
