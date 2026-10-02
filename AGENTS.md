@@ -1,8 +1,8 @@
 # SBOR AGENTS.md
 
-*Created 24 September 2026. Last updated 25 September 2026.*
+*Created 24 September 2026. Last updated 2 October 2026.*
 
-> SBOR publishes benchmark lending rates for Bitcoin DeFi, read from lending contract state and published once a day: what it costs to borrow, and what supplying earns, in each currency on Stacks, and what it costs to borrow USDC against bitcoin on Base and Ethereum. Free to use, including commercially.
+> SBOR publishes benchmark lending rates for Bitcoin DeFi, read from lending contract state and published once a day: what it costs to borrow, and what supplying earns, in each currency on Stacks, and what it costs to borrow USDC against bitcoin on Base, Ethereum and Arc. Each day's fixing is also posted on-chain, on Stacks and on Arc. Free to use, including commercially.
 
 This is the entry point for agents. It holds routes and rules only, never numbers: every figure lives at the endpoints below, which always carry the current fixing. The full methodology is in [llms.txt](https://sbor.xyz/llms.txt).
 
