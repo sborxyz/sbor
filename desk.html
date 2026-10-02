@@ -271,12 +271,18 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
     ["stBTC", `${SD} field "stbtc". Not read into any index`,
       today.ctx?.stBtc, d1.ctx?.stBtc, d7.ctx?.stBtc, "bps", 25, win.map(r => r.ctx?.stBtc)],
     ["Liquidity cost", "native stacking minus stSTX, the two rows above. What it costs to stay tradeable",
-      today.ctx?.liquidityCostBps, d1.ctx?.liquidityCostBps, d7.ctx?.liquidityCostBps, "raw", 30, win.map(r => r.ctx?.liquidityCostBps)]
+      today.ctx?.liquidityCostBps, d1.ctx?.liquidityCostBps, d7.ctx?.liquidityCostBps, "raw", 30, win.map(r => r.ctx?.liquidityCostBps)],
+    ["stSTX against its rate", "Bitflow midpoint against StackingDAO's redemption rate. Negative is a discount; the brief flags beyond 2%",
+      today.ctx?.ststxDiscount, d1.ctx?.ststxDiscount, d7.ctx?.ststxDiscount, "discount", 50, win.map(r => r.ctx?.ststxDiscount)],
+    ["stBTC loop carry", "stBTC's estimated yield minus SBOR-BTC's borrow rate, before leverage. Negative means the loop loses money",
+      today.ctx?.stbtcCarryBps, d1.ctx?.stbtcCarryBps, d7.ctx?.stbtcCarryBps, "raw", 30, win.map(r => r.ctx?.stbtcCarryBps)]
   ];
   for (const [name, src, n, a, b, unit, th, series] of rows){
     const fmtv = unit === "pct" ? (n == null ? "n/a" : Math.round(n).toLocaleString())
                : unit === "raw" ? (n == null ? "n/a" : n + " bps")
+               : unit === "discount" ? (n == null ? "n/a" : (n > 0 ? "+" : "") + n.toFixed(2) + "%")
                : F(n) + "%";
+    /* A discount is already a percent: its change is shown in basis points. */
     const c1 = unit === "pct" ? chg(PCT(n,a),"pct",th,"1d") : unit === "raw" ? chg(n!=null&&a!=null?n-a:null,"bps",th,"1d") : chg(BPS(n,a),"bps",th,"1d");
     const c7 = unit === "pct" ? chg(PCT(n,b),"pct",th,"7d") : unit === "raw" ? chg(n!=null&&b!=null?n-b:null,"bps",th,"7d") : chg(BPS(n,b),"bps",th,"7d");
     out += `<tr><td class="nm">${name}<span class="src">${src}</span></td><td class="num" data-l="Now">${fmtv}</td>${c1}${c7}<td class="spark" data-l="7 fixings">${spark(series)}</td></tr>`;
