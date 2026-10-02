@@ -106,12 +106,12 @@ if (withProtocolYield.length){
 L.push(`--------------------------------------------------------------`);
 L.push(`ABOUT SBOR`);
 L.push(``);
-L.push(`SBOR is the benchmark lending rate for Stacks. Every lending market`);
-L.push(`prices money differently, so there was no way to say what capital`);
-L.push(`actually costs on the chain without checking each venue by hand.`);
-L.push(`SBOR publishes one borrow rate and one supply rate per currency,`);
+L.push(`SBOR publishes benchmark lending rates for Bitcoin DeFi. Every`);
+L.push(`lending venue quotes its own rate; SBOR publishes the market rate.`);
+L.push(`On Stacks, one borrow rate and one supply rate per currency,`);
 L.push(`weighted by market depth and read directly from contract state`);
-L.push(`rather than from any venue's published figure.`);
+L.push(`rather than from any venue's published figure. On Base, Ethereum`);
+L.push(`and Arc, what it costs to borrow USDC against bitcoin.`);
 L.push(``);
 L.push(`Use it as a yardstick. Borrowing above SBOR means paying more than`);
 L.push(`the market. Supplying below it means earning less.`);
@@ -127,7 +127,7 @@ L.push(`  X                      https://x.com/SBORindex`);
 L.push(`  Contact                contact@sbor.xyz`);
 L.push(``);
 L.push(`--------------------------------------------------------------`);
-L.push(`Rates are read from lending contract state on Stacks mainnet and`);
+L.push(`Rates are read from lending contract state and`);
 L.push(`published once daily at 08:30 UTC. SBOR is a statistic, not`);
 L.push(`investment advice, and is provided as is without warranty.`);
 L.push(``);
@@ -200,11 +200,11 @@ const html = `<div style="background:${P};color:${INK};font-family:'IBM Plex San
 
   <p style="margin:0 0 8px"><strong>About SBOR</strong></p>
   <p style="color:${SOFT};font-size:14px;margin:0 0 12px">
-    SBOR is the benchmark lending rate for Stacks. Every lending market prices money
-    differently, so there was no way to say what capital actually costs on the chain
-    without checking each venue by hand. SBOR publishes one borrow rate and one supply
-    rate per currency, weighted by market depth and read directly from contract state
-    rather than from any venue's published figure.
+    SBOR publishes benchmark lending rates for Bitcoin DeFi. Every lending venue quotes
+    its own rate; SBOR publishes the market rate. On Stacks, one borrow rate and one
+    supply rate per currency, weighted by market depth and read directly from contract
+    state rather than from any venue's published figure. On Base, Ethereum and Arc, what
+    it costs to borrow USDC against bitcoin.
   </p>
   <p style="color:${SOFT};font-size:14px;margin:0 0 12px">
     Use it as a yardstick. Borrowing above SBOR means paying more than the market.
@@ -230,7 +230,7 @@ const html = `<div style="background:${P};color:${INK};font-family:'IBM Plex San
 
   <hr style="border:none;border-top:1px solid ${RL};margin:18px 0">
   <p style="color:${SOFT};font-size:12.5px;margin:0">
-    Rates are read from lending contract state on Stacks mainnet and published once daily
+    Rates are read from lending contract state and published once daily
     at 08:30 UTC. SBOR is a statistic, not investment advice, and is provided as is without
     warranty.
   </p>
