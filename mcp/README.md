@@ -7,8 +7,9 @@ Check a lending rate before your agent borrows.
 [SBOR](https://sbor.xyz) publishes benchmark lending rates for Bitcoin DeFi,
 read from lending contract state and published daily: one borrow and one
 supply rate per currency on Stacks, and what it costs to borrow USDC against
-bitcoin on Base and Ethereum. This server exposes it as tools for Claude, Cowork,
-Cursor or any MCP client.
+bitcoin on Base, Ethereum and Arc. This server exposes it as tools for Claude,
+Cowork, Cursor or any MCP client. Each day's fixing is also posted on-chain, on
+[Stacks](https://sbor.xyz/stacks.html) and on [Arc](https://sbor.xyz/arc.html).
 
 ## Quick check
 
@@ -60,8 +61,8 @@ All six tools are read-only.
 
 `SBOR-USD`, `SBOR-BTC` and `SBOR-STX` are the Stacks indices. `BTC-COLLATERAL-USDC`
 is a reference, not an SBOR index: what it costs to borrow USDC against bitcoin
-wrapped by a custodian (cbBTC, WBTC), from the Morpho markets on Base and
-Ethereum whose only collateral is that bitcoin. Use it to check a USDC loan
+wrapped by a custodian (cbBTC, WBTC, cirBTC), from the Morpho markets on Base,
+Ethereum and Arc whose only collateral is that bitcoin. Use it to check a USDC loan
 against bitcoin on those chains.
 
 ## Recommended use
