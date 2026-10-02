@@ -23,7 +23,7 @@ import {
   getAddressFromPrivateKey, Cl, cvToJSON, PostConditionMode
 } from "@stacks/transactions";
 
-export const CONTRACT = process.env.STACKS_CONTRACT || "";   // "SP….sbor-fixings", set after deployment
+export const CONTRACT = process.env.STACKS_CONTRACT || "SP2SRS600PZ70VHY09CK06FSYKW546NY2ARG6N8CD.sbor-fixings";   // deployed 2 October 2026 by the sbor.btc wallet
 const NETWORK = "mainnet";
 const FEE = BigInt(process.env.STACKS_FEE || 10000);          // micro-STX, 0.01 STX, a generous ceiling
 
