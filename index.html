@@ -22,13 +22,37 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap" rel="stylesheet">
+<meta name="color-scheme" content="light dark">
+<script>try{var t=localStorage.getItem("sbor-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <style>
 :root{
   --paper:#F1F2ED; --paper-2:#E7E9E1;
   --ink:#131A1F; --ink-soft:#5C646B;
   --rule:#CBCFC4; --rule-soft:#DEE1D8;
   --accent:#1D4E6B; --up:#2E6A4E; --down:#A2452F;
+  --tint:rgba(29,78,107,.05);
   --maxw:1120px;
+  color-scheme:light;
+}
+/* Dark theme: the visitor's device preference by default, or their choice
+   from the theme button, kept in localStorage as "sbor-theme". */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12171B; --paper-2:#1A2126;
+    --ink:#E7E9E4; --ink-soft:#9AA2A8;
+    --rule:#2F393F; --rule-soft:#232B30;
+    --accent:#7FB3D1; --up:#6FBF96; --down:#E2876F;
+    --tint:rgba(127,179,209,.08);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12171B; --paper-2:#1A2126;
+  --ink:#E7E9E4; --ink-soft:#9AA2A8;
+  --rule:#2F393F; --rule-soft:#232B30;
+  --accent:#7FB3D1; --up:#6FBF96; --down:#E2876F;
+  --tint:rgba(127,179,209,.08);
+  color-scheme:dark;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%;overflow-x:hidden}
@@ -49,6 +73,9 @@ header{border-bottom:1px solid var(--rule)}
 .lang button{font:inherit;font-size:12.5px;font-weight:500;letter-spacing:.04em;background:none;border:none;color:var(--ink-soft);padding:5px 9px;cursor:pointer}
 .lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .lang button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.theme{font:inherit;font-size:15px;line-height:1;background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:5px 9px;margin-right:10px;cursor:pointer}
+.theme:hover{color:var(--ink)}
+.theme:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .xlink{color:var(--ink-soft);display:inline-flex;padding:5px;border:1px solid var(--rule);border-radius:2px;transition:color .15s,border-color .15s}
 .xlink:hover{color:var(--ink);border-color:var(--ink)}
 .xlink:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -138,7 +165,7 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 }
 .sofrcmp{color:var(--ink) !important;font-weight:450}
 .sofrwhy{font-size:13.5px !important}
-tr.ownrow td{background:rgba(29,78,107,.05);font-weight:500}
+tr.ownrow td{background:var(--tint);font-weight:500}
 tr.tfirst td{border-top:1px solid var(--rule)}
 tr.grp td{padding-top:18px;padding-bottom:6px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);border-bottom:1px solid var(--rule)}
 tr.member td:first-child{padding-left:14px}
@@ -253,6 +280,7 @@ a{color:var(--accent)}
       <div class="fullname" id="t-fullname"></div>
     </div>
     <div class="head-right">
+      <button class="theme" id="themeBtn" type="button" aria-label="Switch to dark theme" title="Switch to dark theme">&#9680;</button>
       <div class="lang" id="lang" role="group" aria-label="Language / Idioma">
         <button data-lang="en" aria-pressed="true">EN</button>
         <button data-lang="pt" aria-pressed="false">PT</button>
@@ -561,6 +589,7 @@ en:{
   extThis:"this index",
   termsH:"Term averages",
   termsP:"The average of each index over the last 30, 90 and 180 days, compounded daily, the same construction SOFR uses. SBOR shows two rates per index because a lending pool has two prices: what borrowers pay, and what suppliers earn, which is lower because only part of the pool is lent out and the protocol keeps a share. SOFR is a single rate because in a repo the borrower pays exactly what the lender earns. To judge a loan offer, compare it with the borrow average; to judge a deposit, compare it with the supply average. An average appears only once every day in its window has a fixing.",
+  themeToDark:"Switch to dark theme", themeToLight:"Switch to light theme",
   termBorrow:"borrow, what borrowers pay", termSupply:"supply, what suppliers earn",
   termCol:d=>`${d}-day`,
   termFrom:d=>`from ${d}`,
@@ -669,6 +698,7 @@ pt:{
   extThis:"este índice",
   termsH:"Médias de prazo",
   termsP:"A média de cada índice nos últimos 30, 90 e 180 dias, composta diariamente, a mesma construção usada pelo SOFR. O SBOR mostra duas taxas por índice porque um pool de empréstimo tem dois preços: o que quem toma paga, e o que quem fornece recebe, que é menor porque só parte do pool está emprestada e o protocolo fica com uma parcela. O SOFR é uma taxa só porque, num repo, quem toma paga exatamente o que quem empresta recebe. Para avaliar uma oferta de empréstimo, compare com a média de tomada; para avaliar um depósito, compare com a média de fornecimento. Uma média só aparece quando todos os dias da janela têm fixing.",
+  themeToDark:"Mudar para o tema escuro", themeToLight:"Mudar para o tema claro",
   termBorrow:"tomar, o que quem toma paga", termSupply:"fornecer, o que quem fornece recebe",
   termCol:d=>`${d} dias`,
   termFrom:d=>`a partir de ${d}`,
@@ -873,7 +903,7 @@ function draw(){
   if (rows.length < 2){
     chart.innerHTML =
       `<text x="${W/2}" y="${H/2}" text-anchor="middle" font-family="IBM Plex Sans" `+
-      `font-size="14" fill="#5C646B">${t.notEnough}</text>`;
+      `font-size="14" style="fill:var(--ink-soft)">${t.notEnough}</text>`;
     set("chartNote", "");
     return;
   }
@@ -896,19 +926,19 @@ function draw(){
   const lastBf = rows.reduce((acc,r,i) => r.backfilled ? i : acc, -1);
   if (lastBf >= 0){
     g += `<rect x="${PL}" y="${PT}" width="${(x(lastBf)-PL).toFixed(1)}" `+
-         `height="${H-PT-PB}" fill="#E7E9E1"/>`;
+         `height="${H-PT-PB}" style="fill:var(--paper-2)"/>`;
   }
   for (let k=0;k<=4;k++){
     const v = lo+(hi-lo)*k/4, yy = y(v);
-    g += `<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="#DEE1D8"/>`;
-    g += `<text x="${PL-10}" y="${yy+4}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" fill="#5C646B">${v.toFixed(1)}%</text>`;
+    g += `<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" style="stroke:var(--rule-soft)"/>`;
+    g += `<text x="${PL-10}" y="${yy+4}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${v.toFixed(1)}%</text>`;
   }
-  g += `<text x="${PL}" y="${H-8}" font-family="IBM Plex Mono" font-size="11" fill="#5C646B">${rows[0].date}</text>`;
-  g += `<text x="${W-PR}" y="${H-8}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" fill="#5C646B">${rows[rows.length-1].date}</text>`;
+  g += `<text x="${PL}" y="${H-8}" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${rows[0].date}</text>`;
+  g += `<text x="${W-PR}" y="${H-8}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${rows[rows.length-1].date}</text>`;
   if (ma.some(v => v != null))
-    g += `<path d="${path(ma)}" fill="none" stroke="#A2452F" stroke-width="1.5" stroke-dasharray="5 4"/>`;
-  g += `<path d="${path(sp)}" fill="none" stroke="#5C646B" stroke-width="1.5"/>`;
-  g += `<path d="${path(b)}" fill="none" stroke="#1D4E6B" stroke-width="2"/>`;
+    g += `<path d="${path(ma)}" fill="none" style="stroke:var(--down)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  g += `<path d="${path(sp)}" fill="none" style="stroke:var(--ink-soft)" stroke-width="1.5"/>`;
+  g += `<path d="${path(b)}" fill="none" style="stroke:var(--accent)" stroke-width="2"/>`;
   chart.innerHTML = g;
 
   const bf = rows.filter(r => r.backfilled).length;
@@ -926,7 +956,27 @@ function settle(el, target){
   })(t0);
 }
 
+/* Light or dark: the device's preference unless the visitor chose. The
+   colors are CSS variables, so the charts follow without redrawing. */
+function themeNow(){
+  const set = document.documentElement.getAttribute("data-theme");
+  if (set === "dark" || set === "light") return set;
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+function themeLabel(){
+  const b = document.getElementById("themeBtn"); if (!b) return;
+  const label = themeNow() === "dark" ? T().themeToLight : T().themeToDark;
+  b.setAttribute("aria-label", label); b.title = label;
+}
+document.getElementById("themeBtn")?.addEventListener("click", () => {
+  const next = themeNow() === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("sbor-theme", next); } catch {}
+  themeLabel();
+});
+
 function renderChrome(){
+  themeLabel();
   const t = T();
   document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
   set("t-fullname", t.fullname);
@@ -981,9 +1031,9 @@ function renderChrome(){
   document.getElementById("t-signup-btn").textContent = t.signupBtn;
   document.getElementById("email").placeholder = t.signupPlaceholder;
   set("legend", [
-    `<span><i class="swatch" style="background:#1D4E6B"></i>${t.legend[0]}</span>`,
-    `<span><i class="swatch" style="background:#5C646B"></i>${t.legend[1]}</span>`,
-    `<span><i class="swatch" style="background:#A2452F"></i>${t.legend[2]}</span>`].join(""));
+    `<span><i class="swatch" style="background:var(--accent)"></i>${t.legend[0]}</span>`,
+    `<span><i class="swatch" style="background:var(--ink-soft)"></i>${t.legend[1]}</span>`,
+    `<span><i class="swatch" style="background:var(--down)"></i>${t.legend[2]}</span>`].join(""));
   set("thead", t.thead.map((h,i)=>
     i===0 ? `<th>${h}</th>`
     : i===7 ? `<th class="r" style="width:170px"></th>`
@@ -1015,7 +1065,7 @@ function drawPox(){
     .map(r => ({ date:r.date, e: r["SBOR-PoX"] || r["SBOR-POX"] }))
     .filter(r => r.e && typeof r.e.apy === "number");
   if (rows.length < 2){
-    el.innerHTML = `<text x="560" y="100" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" fill="#5C646B">${t.poxChartThin}</text>`;
+    el.innerHTML = `<text x="560" y="100" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" style="fill:var(--ink-soft)">${t.poxChartThin}</text>`;
     set("poxChartNote",""); return;
   }
   const v = rows.map(r => r.e.apy);
@@ -1027,19 +1077,19 @@ function drawPox(){
   let g = "";
   for (let k=0;k<=3;k++){
     const n = lo+(hi-lo)*k/3, yy = y(n);
-    g += `<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="#DEE1D8"/>`;
-    g += `<text x="${PL-10}" y="${yy+4}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" fill="#5C646B">${n.toFixed(1)}%</text>`;
+    g += `<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" style="stroke:var(--rule-soft)"/>`;
+    g += `<text x="${PL-10}" y="${yy+4}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${n.toFixed(1)}%</text>`;
   }
   /* mark where the reward cycle changed, since that is what steps the rate */
   rows.forEach((r,i) => {
     if (i && r.e.cycle && rows[i-1].e.cycle && r.e.cycle !== rows[i-1].e.cycle){
-      g += `<line x1="${x(i).toFixed(1)}" y1="${PT}" x2="${x(i).toFixed(1)}" y2="${H-PB}" stroke="#A2452F" stroke-width="1" stroke-dasharray="4 4"/>`;
-      g += `<text x="${(x(i)+6).toFixed(1)}" y="${PT+13}" font-family="IBM Plex Mono" font-size="11" fill="#A2452F">${t.poxCycleMark(r.e.cycle)}</text>`;
+      g += `<line x1="${x(i).toFixed(1)}" y1="${PT}" x2="${x(i).toFixed(1)}" y2="${H-PB}" style="stroke:var(--down)" stroke-width="1" stroke-dasharray="4 4"/>`;
+      g += `<text x="${(x(i)+6).toFixed(1)}" y="${PT+13}" font-family="IBM Plex Mono" font-size="11" style="fill:var(--down)">${t.poxCycleMark(r.e.cycle)}</text>`;
     }
   });
-  g += `<text x="${PL}" y="${H-7}" font-family="IBM Plex Mono" font-size="11" fill="#5C646B">${rows[0].date}</text>`;
-  g += `<text x="${W-PR}" y="${H-7}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" fill="#5C646B">${rows[rows.length-1].date}</text>`;
-  g += `<path d="${v.map((n,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(n).toFixed(1)).join(" ")}" fill="none" stroke="#1D4E6B" stroke-width="2"/>`;
+  g += `<text x="${PL}" y="${H-7}" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${rows[0].date}</text>`;
+  g += `<text x="${W-PR}" y="${H-7}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${rows[rows.length-1].date}</text>`;
+  g += `<path d="${v.map((n,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(n).toFixed(1)).join(" ")}" fill="none" style="stroke:var(--accent)" stroke-width="2"/>`;
   el.innerHTML = g;
   set("poxChartNote", t.poxChartNote(rows.length, rows[0].date, rows[rows.length-1].date));
 }
