@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SBOR on Arc</title>
+<meta name="description" content="SBOR's daily benchmark lending rates, published on Arc mainnet and read live from the chain.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F1F2ED;--ink:#131A1F;--soft:#5C646B;--accent:#1D4E6B;--rule:#CBCFC4}
+@media (prefers-color-scheme: dark){:root{--paper:#12171B;--ink:#E7E9E4;--soft:#9AA2A8;--accent:#7FB3D1;--rule:#2A3339}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 "IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:760px;margin:0 auto;padding:48px 24px 64px}
+.bar{height:6px;background:var(--accent)}
+.mark{font:500 13px/1 "IBM Plex Mono",ui-monospace,Menlo,monospace;letter-spacing:.08em;color:var(--soft);text-decoration:none}
+h1{font-weight:600;font-size:32px;line-height:1.2;margin:18px 0 8px}
+p{margin:0 0 14px}
+.soft{color:var(--soft);font-size:14px}
+.tscroll{overflow-x:auto;margin:24px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:10px 8px;border-bottom:1px solid var(--rule);text-align:left;white-space:nowrap}
+th{font-weight:600;color:var(--soft);font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+td.r,th.r{text-align:right}
+.num{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+code{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-size:13px;word-break:break-all}
+a{color:var(--accent)}
+.status{padding:10px 12px;border-left:3px solid var(--accent);background:rgba(29,78,107,.06);font-size:14px}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:var(--soft);font-size:14px}
+</style>
+</head>
+<body>
+<div class="bar"></div>
+<main>
+<a class="mark" href="/">SBOR · STACKS BITCOIN OFFERED RATE</a>
+<h1>SBOR on Arc</h1>
+<p>Every morning, after the fixing, SBOR posts its benchmark lending rates to a contract on Arc mainnet, so any Arc application, vault or agent can read them on-chain. The table below is read live from Arc by your browser, not from SBOR's servers.</p>
+<p class="status" id="status">Reading from Arc mainnet…</p>
+<div class="tscroll">
+<table>
+<thead><tr><th>Rate</th><th class="r">Borrow</th><th class="r">Supply</th><th class="r">Size</th><th class="r">Fixing</th></tr></thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
+<p class="soft">Rates are effective annual rates, posted in basis points. SBOR-USD, SBOR-BTC and SBOR-STX are SBOR's indices for lending on Stacks; the bitcoin-collateral USDC rate is a reference covering Morpho markets on Base, Ethereum and Arc. Sizes are total supplied, in US dollars. An index not published on a given day keeps its last date on-chain.</p>
+<p class="soft">Contract on Arc mainnet (chain 5042): <code id="addr"></code><br>
+Source: <a href="https://github.com/sborxyz/sbor/blob/main/contracts/SBORFixings.sol">contracts/SBORFixings.sol</a> · Methodology: <a href="/#methodology">sbor.xyz</a> · For agents: <code>latest(bytes32)</code> with the rate's name, such as "SBOR-USD", as bytes32.</p>
+<footer><a href="/">sbor.xyz</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></footer>
+</main>
+<script>
+const CONTRACT = "0x56B5417de539153994fF6785F8a3b56421C9eb4f";   // deployed 1 October 2026
+const RPCS = ["https://rpc.mainnet.arc.io", "https://rpc.drpc.mainnet.arc.io", "https://rpc.quicknode.mainnet.arc.io", "https://rpc.blockdaemon.mainnet.arc.io"];
+const KEYS = [
+  ["SBOR-USD", "0x53424f522d555344000000000000000000000000000000000000000000000000"],
+  ["SBOR-BTC", "0x53424f522d425443000000000000000000000000000000000000000000000000"],
+  ["SBOR-STX", "0x53424f522d535458000000000000000000000000000000000000000000000000"],
+  ["Bitcoin-collateral USDC", "0x4254432d434f4c4c41544552414c2d5553444300000000000000000000000000"]
+];
+const SELECTOR = "0x79feb107";   // latest(bytes32)
+document.getElementById("addr").textContent = CONTRACT;
+
+async function call(data){
+  let last;
+  for (const url of RPCS){
+    try {
+      const r = await fetch(url, { method:"POST", headers:{ "content-type":"application/json" },
+        body: JSON.stringify({ jsonrpc:"2.0", id:1, method:"eth_call", params:[{ to: CONTRACT, data }, "latest"] }) });
+      const j = await r.json();
+      if (j.error) throw new Error(j.error.message);
+      return { result: j.result, url };
+    } catch (e) { last = e; }
+  }
+  throw last || new Error("no endpoint answered");
+}
+const word = (hex, i) => BigInt("0x" + hex.slice(2 + i * 64, 2 + (i + 1) * 64));
+const pct = b => (Number(b) / 100).toFixed(2) + "%";
+const usd = n => { n = Number(n); return n >= 1e9 ? "$" + (n / 1e9).toFixed(2) + "B" : n >= 1e6 ? "$" + (n / 1e6).toFixed(1) + "M" : "$" + Math.round(n / 1e3) + "K"; };
+const day = d => { const s = String(d); return s.length === 8 ? `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6)}` : "n/a"; };
+
+(async () => {
+  const st = document.getElementById("status"), body = document.getElementById("rows");
+  if (/^0x0+$/.test(CONTRACT)){ st.textContent = "The contract address is not set yet."; return; }
+  try {
+    let via = "";
+    const rows = [];
+    for (const [name, key] of KEYS){
+      const { result, url } = await call(SELECTOR + key.slice(2));
+      via = url;
+      const date = word(result, 0);
+      rows.push(date === 0n
+        ? `<tr><td>${name}</td><td class="r" colspan="4">not yet posted</td></tr>`
+        : `<tr><td>${name}</td><td class="r num">${pct(word(result,1))}</td><td class="r num">${pct(word(result,2))}</td><td class="r num">${usd(word(result,3))}</td><td class="r num">${day(date)}</td></tr>`);
+    }
+    body.innerHTML = rows.join("");
+    st.textContent = `Read live from Arc mainnet at ${new Date().toLocaleString()}, through ${new URL(via).host}.`;
+  } catch (e) {
+    st.textContent = "Arc could not be reached from your browser just now. Try again in a moment.";
+  }
+})();
+</script>
+</body>
+</html>
