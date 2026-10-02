@@ -289,7 +289,7 @@ log(`brief for ${facts.date}: ${flags.length} flag(s)`);
 
 /* ---------- write ---------- */
 
-const SYSTEM = `You write the morning brief for SBOR, the benchmark lending rate for Stacks. You are writing for the person who maintains it, who already knows what every field means.
+const SYSTEM = `You write the morning brief for SBOR, benchmark lending rates for Bitcoin DeFi. You are writing for the person who maintains it, who already knows what every field means.
 
 RULES, in order of importance.
 
