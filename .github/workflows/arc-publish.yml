@@ -1,0 +1,51 @@
+name: Publish to Arc
+
+# Posts each day's SBOR rates to the SBORFixings contract on Arc mainnet,
+# after the daily fixing has published. Separate from the fixing, so a problem
+# on Arc can never stop or delay SBOR's own publication. Can also be run by
+# hand, for the first publication or after a correction.
+on:
+  workflow_run:
+    workflows: ["SBOR daily fixing"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the one library it needs
+        run: npm install --no-save --no-audit --no-fund viem@2.57.2
+      - name: Publish the day's rates
+        id: publish
+        shell: bash
+        env:
+          ARC_PUBLISHER_KEY: ${{ secrets.ARC_PUBLISHER_KEY }}
+          ARC_CONTRACT: ${{ vars.ARC_CONTRACT }}
+        run: |
+          set -o pipefail
+          node scripts/arc-publish.mjs | tee arc.txt
+          { echo "## Publish to Arc"; echo '```text'; cat arc.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Say so if it failed
+        if: failure()
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ]; then exit 0; fi
+          MSG=$(printf 'SBOR on Arc: publication FAILED on %s.\n\nThe fixing itself was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
+          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TG_CHAT" \
+            --data-urlencode "disable_web_page_preview=true" \
+            --data-urlencode "text=$MSG" > /dev/null
