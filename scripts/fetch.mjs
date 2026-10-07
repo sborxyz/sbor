@@ -334,6 +334,42 @@ async function readStxPerStstx(){
   } catch(e){ log(`  stSTX rate unreadable, stSTX size stays on DefiLlama. ${e.message}`); return null; }
 }
 
+/* stBTC's realized bitcoin yield. stBTC pays through ratio growth: Bitcoin
+   Staking rewards accrue in sBTC and raise what one stBTC is worth in sBTC,
+   with no separate payment. So the bitcoin a holder actually earned is the
+   growth of get-sbtc-per-stbtc on data-stbtc-v1 since the reward stream began
+   at Bitcoin block 967,405, when the ratio stood at 1.00117674, annualized.
+   Rewards earned but not yet released are not counted: this is what a holder
+   could redeem today, so it lags StackingDAO's forward-looking figure while
+   rewards are being released. Context only, never part of an index. */
+const STBTC_DATA = { deployer: "SP4SZE494VC2YC5JYG7AYFQ44F5Q4PYV7DVMDPBG", contract: "data-stbtc-v1" };
+const STBTC_STREAM_START = { burnBlock: 967405, ratio: 1.00117674 };
+async function stbtcRealized(advertisedApy){
+  let r = await readOnly(STBTC_DATA.deployer, STBTC_DATA.contract, "get-sbtc-per-stbtc");
+  for (let i = 0; i < 3 && r && typeof r === "object"; i++) r = r.value;
+  const ratio = Number(r) / 1e8;
+  if (!(ratio >= STBTC_STREAM_START.ratio && ratio < 1.5)) throw new Error(`implausible sBTC per stBTC: ${ratio}`);
+  const res = await fetch(`https://api.hiro.so/extended/v2/burn-blocks/${STBTC_STREAM_START.burnBlock}`, { headers: { accept: "application/json" } });
+  if (!res.ok) throw new Error(`burn block ${STBTC_STREAM_START.burnBlock} responded ${res.status}`);
+  const bb = await res.json();
+  const t0 = Number(bb.burn_block_time);
+  if (!(t0 > 1.7e9)) throw new Error("burn block time unreadable");
+  const days = (Date.now() / 1000 - t0) / 86400;
+  if (days < 7) throw new Error(`only ${days.toFixed(1)} days since the stream began`);
+  const apy = (Math.pow(ratio / STBTC_STREAM_START.ratio, 365.25 / days) - 1) * 100;
+  if (!(apy > -1 && apy < 20)) throw new Error(`implausible realized yield ${apy}`);
+  log(`  stBTC realized yield: ${apy.toFixed(2)}% over ${days.toFixed(1)} days (ratio ${ratio})`);
+  return {
+    sbtcPerStbtc: round(ratio, 8),
+    since: { bitcoinBlock: STBTC_STREAM_START.burnBlock, date: new Date(t0 * 1000).toISOString().slice(0, 10), sbtcPerStbtc: STBTC_STREAM_START.ratio },
+    days: round(days, 1),
+    realizedApy: round(apy, 2),
+    ...(typeof advertisedApy === "number" && { advertisedApy }),
+    source: "get-sbtc-per-stbtc on StackingDAO's data-stbtc-v1, against its value at Bitcoin block 967,405, when stBTC's reward stream began.",
+    note: "The bitcoin yield stBTC holders actually earned: growth of the sBTC value of one stBTC, annualized. Rewards earned but not yet released are not counted, so it can lag StackingDAO's own forward-looking figure (advertisedApy). Context only, never part of an index."
+  };
+}
+
 /* Earlier compact rows, newest first, for the continuity guard. */
 /* stSTX on the market against StackingDAO's own rate. A liquid staking token
    trading below what it redeems for is an early warning for anyone holding it
@@ -424,6 +460,7 @@ const main = async () => {
 
   const markets = [];
   const dynamicNotes = [];   /* what happened on this fixing only */
+  const zeroRated = [];      /* markets left out because both rates read at or near zero */
   const stxPerStstx = await readStxPerStstx();
   for (const a of ZEST.assets){
     try {
@@ -478,7 +515,8 @@ const main = async () => {
          is left out rather than published as a rate of zero. */
       if (borrow < RATE_FLOOR && supply < RATE_FLOOR){
         log(`    (both rates below the ${RATE_FLOOR}% plausibility floor, treated as unreadable and excluded)`);
-        dynamicNotes.push(`${ZEST.venue} ${a.symbol}: not in this fixing, both rates read below the plausibility floor.`);
+        dynamicNotes.push(`${ZEST.venue} ${a.symbol}: not in this fixing. Both rates read at or near zero on-chain, which SBOR does not publish as a market rate.`);
+        zeroRated.push({ currency: a.currency, venue: ZEST.venue, asset: a.symbol });
         continue;
       }
       markets.push({
@@ -586,6 +624,22 @@ const main = async () => {
     }
   }
 
+  /* An index whose only market was left out at or near zero never forms, so
+     the check above cannot see it. Record it as withheld, with the real
+     reason, so the brief, the site and the MCP server do not fall back to
+     "could not be read". On 7 October 2026 Zest set its sBTC rate to zero, a
+     temporary setting between Bitcoin Staking bonds, and SBOR-BTC dropped
+     out with no reason given. */
+  for (const z of zeroRated){
+    const label = META[z.currency]?.label;
+    if (!label || indices[label] || withheld[label]) continue;
+    withheld[label] = {
+      reason: `Withheld: ${z.venue} ${z.asset}, this index's only market, has its borrow and supply rates at or near zero on-chain, a level SBOR does not publish as a market rate. ${label} resumes when a non-zero rate returns.`,
+      zeroRated: [{ venue: z.venue, asset: z.asset }]
+    };
+    log(`  ${label}: withheld, its only market reads at or near zero`);
+  }
+
   /* PoX staking yield. Published beside the lending indices, never inside them.
      A failure here must not stop the fixing. */
   let pox = null;
@@ -612,6 +666,11 @@ const main = async () => {
     catch(e){ log(`  stSTX market reading unavailable, omitted. ${e.message}`); }
   }
 
+  /* stBTC's realized bitcoin yield. Context only. */
+  let stbtcReal = null;
+  try { stbtcReal = await stbtcRealized(stakingContext?.stBtcApy); }
+  catch(e){ log(`  stBTC realized yield unavailable, omitted. ${e.message}`); }
+
   /* What one turn of an stBTC-against-sBTC loop earns before leverage:
      stBTC's estimated yield minus the cost of borrowing sBTC, which is
      SBOR-BTC's borrow rate. Inputs, never a rating of any product. */
@@ -628,7 +687,8 @@ const main = async () => {
   const extraContext = {
     ...(stakingContext && Object.keys(stakingContext).length > 1 && { staking: stakingContext }),
     ...(ststx && { ststxMarket: ststx }),
-    ...(stbtcCarry && { stbtcCarry })
+    ...(stbtcCarry && { stbtcCarry }),
+    ...(stbtcReal && { stbtcRealized: stbtcReal })
   };
   if (Object.keys(extraContext).length)
     context = { ...(context || { note: "Context recorded alongside the fixing. None of this enters an index or affects a rate." }), ...extraContext };
@@ -748,6 +808,8 @@ const main = async () => {
         liquidityCostBps: context.staking?.liquidityCostBps ?? null,
         ststxDiscount: context.ststxMarket?.discountPercent ?? null,
         stbtcCarryBps: context.stbtcCarry?.carryBps ?? null,
+        stbtcRatio: context.stbtcRealized?.sbtcPerStbtc ?? null,
+        stbtcRealizedApy: context.stbtcRealized?.realizedApy ?? null,
         npmLastDay: context.npmDownloads?.lastDay ?? null,
         npmLastWeek: context.npmDownloads?.lastWeek ?? null
       } }),
