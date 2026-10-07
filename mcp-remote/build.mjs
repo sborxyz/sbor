@@ -115,24 +115,27 @@ function toolList(){
 
 /* Usage, counted without anything personal: which app connected, which tool
    it called, and for which benchmark. No addresses, no identities, and never
-   the rate or the question itself. Visible in the worker's logs. */
+   the rate or the question itself. Visible in the worker's logs. Each event
+   also carries the calling software's user-agent, cut short, because tool
+   calls do not repeat the app's name and this is how a tool call is matched
+   to the app that made it. */
 function usage(event, fields){
   try { console.log(JSON.stringify({ event, ...fields })); } catch {}
 }
 
-async function handle(msg){
+async function handle(msg, ua){
   if (!msg || msg.jsonrpc !== "2.0" || typeof msg.method !== "string")
     return err(msg?.id, -32600, "Invalid request");
   const note = msg.id === undefined;
   switch (msg.method){
     case "initialize": {
       const asked = msg.params?.protocolVersion;
-      usage("connect", { client: String(msg.params?.clientInfo?.name ?? "unknown").slice(0, 40) });
+      usage("connect", { client: String(msg.params?.clientInfo?.name ?? "unknown").slice(0, 40), ua });
       return ok(msg.id, {
         protocolVersion: PROTOCOLS.includes(asked) ? asked : PROTOCOLS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "sbor", title: "SBOR", version: VERSION },
-        instructions: "SBOR publishes benchmark lending rates for Bitcoin DeFi, read from contract state and published daily: an index per currency on Stacks, and BTC-COLLATERAL-USDC for borrowing USDC against bitcoin on Base and Ethereum. Before borrowing, call compare_rate: if an offer is well above the benchmark, stop. Every tool refuses rather than guesses; an error means there is no trustworthy answer."
+        instructions: "SBOR publishes benchmark lending rates for Bitcoin DeFi, read from contract state and published daily: an index per currency on Stacks, and BTC-COLLATERAL-USDC for borrowing USDC against bitcoin on Base, Ethereum and Arc. Each day's rates are also posted on-chain on Stacks, Arc, Base and Solana. Before borrowing, call compare_rate: if an offer is well above the benchmark, stop. Every tool refuses rather than guesses; an error means there is no trustworthy answer."
       });
     }
     case "ping": return ok(msg.id, {});
@@ -141,7 +144,7 @@ async function handle(msg){
       const name = msg.params?.name, args = msg.params?.arguments ?? {};
       const t = server.tools.get(name);
       if (!t) return err(msg.id, -32602, \`Unknown tool: \${name}\`);
-      usage("tool", { tool: name, benchmark: typeof args.index === "string" ? args.index.slice(0, 30) : null });
+      usage("tool", { tool: name, benchmark: typeof args.index === "string" ? args.index.slice(0, 30) : null, ua });
       for (const [k, s] of Object.entries(t.cfg.inputSchema || {})){
         const problem = s.check(k, args[k]);
         if (problem) return ok(msg.id, { isError: true, content: [{ type: "text", text: \`Invalid arguments for \${name}: \${problem}\` }] });
@@ -176,15 +179,16 @@ export default {
       return new Response("This server answers POST requests only. It holds no sessions and sends no streams.", { status: 405, headers: { allow: "POST", ...CORS } });
     if (request.method !== "POST") return new Response("Method not allowed", { status: 405, headers: { allow: "POST", ...CORS } });
 
+    const ua = String(request.headers.get("user-agent") || "none").slice(0, 60);
     let body;
     try { body = await request.json(); }
     catch { return json(err(null, -32700, "Parse error"), 400); }
 
     if (Array.isArray(body)){
-      const out = (await Promise.all(body.map(handle))).filter(Boolean);
+      const out = (await Promise.all(body.map(m => handle(m, ua)))).filter(Boolean);
       return out.length ? json(out) : new Response(null, { status: 202, headers: CORS });
     }
-    const res = await handle(body);
+    const res = await handle(body, ua);
     return res ? json(res) : new Response(null, { status: 202, headers: CORS });
   }
 };
