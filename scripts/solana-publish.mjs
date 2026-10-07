@@ -26,6 +26,10 @@ const RPCS = process.env.SOLANA_RPC ? [process.env.SOLANA_RPC] : [
   "https://solana-rpc.publicnode.com"
 ];
 const MEMO_PROGRAM = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+/* SBOR's own Solana program, which stores the latest rates in one account so
+   other programs can read them. Empty until deployed; then each fixing is
+   posted to it in the same transaction as the memo. */
+const SBOR_PROGRAM = process.env.SOLANA_PROGRAM || "85uzArk6VwzWG6mxZC7D2jLEPGhFL2SXzJs7P9zQUSz9";   // deployed 7 October 2026
 const LABEL = "sbor-solana-publisher-v1";
 
 const log = (...a) => console.log(...a);
@@ -37,6 +41,41 @@ export function publisherKeypair(secret){
   if (!/^[0-9a-fA-F]{64}$/.test(hex)) throw new Error("publisher key is not 32 bytes of hex");
   const seed = createHash("sha256").update(LABEL).update(Buffer.from(hex, "hex")).digest();
   return Keypair.fromSeed(seed);
+}
+
+/** The program's publish instruction: tag 1, date u32, count u8, then per
+    row a 32-byte key, borrow u16, supply u16 and depth u64, little-endian. */
+export function programData(memo){
+  const rows = Object.entries(memo.rates);
+  const b = Buffer.alloc(1 + 4 + 1 + rows.length * 44);
+  b.writeUInt8(1, 0); b.writeUInt32LE(memo.date, 1); b.writeUInt8(rows.length, 5);
+  rows.forEach(([label, [borrow, supply, depth]], i) => {
+    const o = 6 + i * 44;
+    Buffer.from(label.padEnd(32, "\0"), "utf8").copy(b, o, 0, 32);
+    b.writeUInt16LE(borrow, o + 32); b.writeUInt16LE(supply, o + 34);
+    b.writeBigUInt64LE(BigInt(depth), o + 36);
+  });
+  return b;
+}
+
+/** The program's account, decoded: "SBORFIX1", owner, publisher, bump,
+    count, then rows of key [32], date u32, borrow u16, supply u16, depth
+    u64, published_at i64. */
+export function decodeState(buf){
+  if (!buf || buf.length < 74 || buf.subarray(0, 8).toString("utf8") !== "SBORFIX1") return null;
+  const rows = {};
+  for (let j = 0; j < buf[73]; j++){
+    const o = 74 + j * 56;
+    const key = buf.subarray(o, o + 32).toString("utf8").replace(/\0+$/, "");
+    rows[key] = [buf.readUInt32LE(o + 32), buf.readUInt16LE(o + 36), buf.readUInt16LE(o + 38), Number(buf.readBigUInt64LE(o + 40))];
+  }
+  return rows;
+}
+
+/** True when the program already holds exactly today's rows. */
+export function programHas(rows, memo){
+  if (!rows) return false;
+  return Object.entries(memo.rates).every(([k, v]) => rows[k] && rows[k][0] === memo.date && rows[k][1] === v[0] && rows[k][2] === v[1] && rows[k][3] === v[2]);
 }
 
 /** What today's fixing puts on-chain: the same rows as on the other chains. */
@@ -75,18 +114,32 @@ async function main(){
   const text = JSON.stringify(memo);
 
   const conn = await connect();
-  /* Skip only if this exact record is already the publisher's latest memo; a
-     corrected fixing on the same day is published again. */
+  /* Post only what is missing: the memo unless this exact record is already
+     the publisher's latest, and the program unless its account already holds
+     today's rows. A corrected fixing on the same day is posted again. */
   const recent = await conn.getSignaturesForAddress(kp.publicKey, { limit: 10 });
   const last = recent.find(s => s.memo && s.memo.includes('{"sbor":1'));
-  if (last && last.memo.endsWith(text)){ log(`solana: fixing ${memo.date} already on Solana, nothing to do`); return; }
+  const memoDone = !!(last && last.memo.endsWith(text));
+  let programDone = true, programId, state;
+  if (SBOR_PROGRAM){
+    programId = new PublicKey(SBOR_PROGRAM);
+    [state] = PublicKey.findProgramAddressSync([Buffer.from("sbor-fixings")], programId);
+    const acct = await conn.getAccountInfo(state);
+    programDone = programHas(decodeState(acct?.data), memo);
+  }
+  if (memoDone && programDone){ log(`solana: fixing ${memo.date} already on Solana, nothing to do`); return; }
 
-  const tx = new Transaction().add(new TransactionInstruction({
+  const tx = new Transaction();
+  if (!memoDone) tx.add(new TransactionInstruction({
     keys: [{ pubkey: kp.publicKey, isSigner: true, isWritable: false }],
     programId: MEMO_PROGRAM, data: Buffer.from(text, "utf8")
   }));
+  if (!programDone) tx.add(new TransactionInstruction({
+    keys: [{ pubkey: kp.publicKey, isSigner: true, isWritable: false }, { pubkey: state, isSigner: false, isWritable: true }],
+    programId, data: programData(memo)
+  }));
   const sig = await sendAndConfirmTransaction(conn, tx, [kp], { commitment: "confirmed" });
-  log(`solana: fixing ${memo.date} published, ${Object.entries(memo.rates).map(([k, v]) => `${k} ${v[0]}/${v[1]} bps`).join(", ")}`);
+  log(`solana: fixing ${memo.date} published${memoDone ? "" : " as a memo"}${!memoDone && !programDone ? " and" : ""}${programDone ? "" : " to SBOR's program"}, ${Object.entries(memo.rates).map(([k, v]) => `${k} ${v[0]}/${v[1]} bps`).join(", ")}`);
   log(`solana: transaction ${sig}`);
 }
 
