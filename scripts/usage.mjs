@@ -109,7 +109,7 @@ export function summarize(conns, tools, mapping = conns, capped = false){
   parts.push(aiConns.length ? `AI apps connected ${aiConns.reduce((s, c) => s + c.n, 0)} times (${fmt(byApp)})` : "no AI app connected");
   parts.push(tools.length ? `${tools.length} tool calls (${fmt(byTool)}; by app: ${fmt(toolsByApp)})` : "no tool calls");
   parts.push(`${capped ? "at least " : ""}${nMon.toLocaleString("en-US")} ${nMon === 1 ? "check" : "checks"} from ${nMonNames} ${nMonNames === 1 ? "directory or monitor" : "directories and monitors"}`);
-  return `SBOR's MCP server, last ${HOURS} hours: ${parts.join("; ")}.`;
+  return `SBOR's MCP server, last ${HOURS} hours, from Cloudflare's sampled logs: ${parts.join("; ")}.`;
 }
 
 async function main(){
