@@ -69,33 +69,33 @@ async function toolCalls(){
   })).filter(t => t.tool);
 }
 
-/* Grouped counts of connect events. Grouping drops records that lack a
-   grouped key, and records from before 7 October 2026 carry no ua, so the
-   count by app uses the app name alone; the app-and-ua grouping is only used
-   to match tool calls to apps. */
-async function grouped(keys){
-  const res = await query(base("calculations", { limit: 200, parameters: {
-    datasets: ["cloudflare-workers"],
-    filters: [service, { key: "event", operation: "eq", type: "string", value: "connect" }],
-    calculations: [{ operator: "count", alias: "n" }],
-    groupBys: keys.map(k => ({ type: "string", value: k }))
-  }}));
-  const calc = (res.calculations || [])[0] || {};
-  if (process.env.USAGE_DEBUG) console.error("raw aggregate:", JSON.stringify((calc.aggregates || [])[0] || calc).slice(0, 400));
-  return (calc.aggregates || []).map(a => {
-    const g = Object.fromEntries((a.groups || []).map(x => [x.key, x.value]));
-    return { client: g.client ?? "unknown", ua: g.ua ?? null, n: Number(a.count ?? a.value ?? 0) };
-  });
-}
+/* Connections, fetched as individual records and counted here. Cloudflare's
+   grouped counts stop early on high-volume data and returned partial numbers
+   (mcpbeat at 1 a day instead of about 80), so nothing is grouped by the API.
+   Records from before 7 October 2026 carry no ua. */
+const CONNECT_LIMIT = 2000;
 async function connections(){
-  const [byClient, byClientUa] = await Promise.all([grouped(["client"]), grouped(["client", "ua"])]);
-  return { conns: byClient, mapping: byClientUa };
+  const res = await query(base("events", { limit: CONNECT_LIMIT, parameters: {
+    datasets: ["cloudflare-workers"],
+    filters: [service, { key: "event", operation: "eq", type: "string", value: "connect" }]
+  }}));
+  const list = res.events?.events || res.events || [];
+  const rows = (Array.isArray(list) ? list : []).map(e => ({
+    client: String(e.client ?? e.source?.client ?? "unknown"),
+    ua: e.ua ?? e.source?.ua ?? null
+  }));
+  const counts = {};
+  for (const r of rows){ const k = r.client + "\u0000" + (r.ua ?? ""); counts[k] = (counts[k] || 0) + 1; }
+  const mapping = Object.entries(counts).map(([k, n]) => { const [client, ua] = k.split("\u0000"); return { client, ua: ua || null, n }; });
+  const byClient = {};
+  for (const m of mapping) byClient[m.client] = (byClient[m.client] || 0) + m.n;
+  return { conns: Object.entries(byClient).map(([client, n]) => ({ client, n })), mapping, capped: rows.length >= CONNECT_LIMIT };
 }
 
 const tally = (items, keyOf) => items.reduce((m, x) => { const k = keyOf(x); m[k] = (m[k] || 0) + (x.n ?? 1); return m; }, {});
 const fmt = obj => Object.entries(obj).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(", ");
 
-export function summarize(conns, tools, mapping = conns){
+export function summarize(conns, tools, mapping = conns, capped = false){
   const uaToApp = {};
   for (const c of mapping){ const app = appOf(c.client); if (app && c.ua) uaToApp[c.ua] = app; }
   const aiConns = conns.filter(c => appOf(c.client));
@@ -108,15 +108,15 @@ export function summarize(conns, tools, mapping = conns){
   const parts = [];
   parts.push(aiConns.length ? `AI apps connected ${aiConns.reduce((s, c) => s + c.n, 0)} times (${fmt(byApp)})` : "no AI app connected");
   parts.push(tools.length ? `${tools.length} tool calls (${fmt(byTool)}; by app: ${fmt(toolsByApp)})` : "no tool calls");
-  parts.push(`${nMon.toLocaleString("en-US")} ${nMon === 1 ? "check" : "checks"} from ${nMonNames} ${nMonNames === 1 ? "directory or monitor" : "directories and monitors"}`);
+  parts.push(`${capped ? "at least " : ""}${nMon.toLocaleString("en-US")} ${nMon === 1 ? "check" : "checks"} from ${nMonNames} ${nMonNames === 1 ? "directory or monitor" : "directories and monitors"}`);
   return `SBOR's MCP server, last ${HOURS} hours: ${parts.join("; ")}.`;
 }
 
 async function main(){
   if (!process.env.CLOUDFLARE_API_TOKEN){ console.log("usage: no CLOUDFLARE_API_TOKEN, nothing read"); return; }
-  const [{ conns, mapping }, tools] = await Promise.all([connections(), toolCalls()]);
-  if (process.env.USAGE_DEBUG) console.error(JSON.stringify({ conns: conns.slice(0, 12), mapping: mapping.slice(0, 6), tools: tools.slice(0, 10) }));
-  console.log(summarize(conns, tools, mapping));
+  const [{ conns, mapping, capped }, tools] = await Promise.all([connections(), toolCalls()]);
+  if (process.env.USAGE_DEBUG) console.error(JSON.stringify({ records: conns.reduce((t, c) => t + c.n, 0), capped, conns: conns.slice(0, 12), tools: tools.slice(0, 10) }));
+  console.log(summarize(conns, tools, mapping, capped));
 }
 
 if (import.meta.url === `file://${process.argv[1]}`)
