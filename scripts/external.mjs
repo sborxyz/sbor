@@ -9,6 +9,7 @@
  * Source: DefiLlama pools and lend/borrow datasets. No key required.
  */
 import { readAaveReserve } from "./aave.mjs";
+import { readKaminoReserve, KAMINO_RESERVES } from "./kamino.mjs";
 
 const POOLS = "https://yields.llama.fi/pools";
 
@@ -235,13 +236,28 @@ export async function externalReference({ contracts = true } = {}){
         log(`  external ${entry.asset} @ ${label}: contract read failed, using DefiLlama. ${e.message}`);
       }
     }
+    /* Kamino on Solana, read from its Reserve accounts, from 7 October 2026.
+       Same rule as Aave: if the read fails, DefiLlama's figure stands. */
+    if (contracts && p.project === "kamino-lend" && KAMINO_RESERVES[entry.asset]){
+      try {
+        const k = await readKaminoReserve(entry.asset);
+        entry.borrow = k.borrow;
+        entry.supply = k.supply;
+        entry.nominalBorrow = round(k.borrowApr);
+        entry.nominalSupply = round(k.supplyApr);
+        entry.utilization = k.utilization;
+        entry.source = "contract";
+      } catch (e) {
+        log(`  external ${entry.asset} @ ${label}: contract read failed, using DefiLlama. ${e.message}`);
+      }
+    }
     log(`  external ${entry.asset} @ ${label}: supply=${entry.supply}% borrow=${entry.borrow ?? "n/a"}% util=${entry.utilization ?? "n/a"}% depth=${entry.depthUsd} (${entry.source})`);
     out.push(entry);
   }
   if (!out.length) throw new Error("no external reference pools resolved");
   return {
     note: "Reference rates from the largest lending markets off this chain, published for comparison only. One market is selected per chain: a venue that publishes a borrow rate and utilization is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. These are not constituents of any SBOR index and never enter a fixing. Aave on Ethereum and on Base is read from Aave's contracts and converted to effective APY, the same basis as the SBOR indices, with the simple annual rate kept as nominalBorrow and nominalSupply. The other venues come from DefiLlama and are shown as it publishes them, so they are not on quite the same basis. Each market's source field says which. depthUsd is the total supplied to each market, as DefiLlama reports it, and depthBasis says so; where DefiLlama gives no total supplied, depthBasis is \"available\" and the figure should not be read as the size of the market. It also decides which venue is shown for a chain. The rows are not additive: each venue pools every kind of collateral.",
-    source: "Aave contracts on Ethereum and Base; DefiLlama for the other venues",
+    source: "Aave contracts on Ethereum and Base, Kamino's reserve accounts on Solana; DefiLlama for the other venues",
     markets: out
   };
 }
