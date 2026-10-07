@@ -42,7 +42,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:v
 <button class="theme" id="themeBtn" type="button" aria-label="Switch theme" title="Switch theme">&#9680;</button>
 <a class="mark" href="/">SBOR · STACKS BITCOIN OFFERED RATE</a>
 <h1>SBOR on Solana</h1>
-<p>Every morning, after the fixing, SBOR posts its benchmark lending rates on Solana mainnet, as a signed record from SBOR's publisher, so any Solana application, vault or agent can read them from the chain. The table below is read live from Solana by your browser, not from SBOR's servers. The same rates are also posted on <a href="/stacks.html">Stacks</a>, <a href="/arc.html">Arc</a> and <a href="/base.html">Base</a>.</p>
+<p>Every morning, after the fixing, SBOR posts its benchmark lending rates on Solana mainnet, to SBOR's own program and as a signed record from SBOR's publisher, so any Solana program, application, vault or agent can read them from the chain. The table below is read live from Solana by your browser, not from SBOR's servers. The same rates are also posted on <a href="/stacks.html">Stacks</a>, <a href="/arc.html">Arc</a> and <a href="/base.html">Base</a>.</p>
 <p class="status" id="status">Reading from Solana mainnet…</p>
 <div class="tscroll">
 <table>
@@ -51,17 +51,38 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:v
 </table>
 </div>
 <p class="soft">Rates are effective annual rates, posted in basis points. SBOR-USD, SBOR-BTC and SBOR-STX are SBOR's indices for lending on Stacks; the bitcoin-collateral USDC rate is a reference covering Morpho markets on Base, Ethereum and Arc. Sizes are total supplied, in US dollars. An index not published on a given day keeps its last date on-chain.</p>
-<p class="soft">Publisher on Solana mainnet: <code id="addr"></code><br>
-Each fixing is a memo beginning <code>{"sbor":1</code>, with each rate as <code>[borrowBps, supplyBps, depthUsd]</code>. To read it: the publisher's recent transactions, newest first, through any Solana RPC. Source: <a href="https://github.com/sborxyz/sbor/blob/main/scripts/solana-publish.mjs">scripts/solana-publish.mjs</a> · Methodology: <a href="/#methodology">sbor.xyz</a></p>
+<p class="soft">Program on Solana mainnet: <code>85uzArk6VwzWG6mxZC7D2jLEPGhFL2SXzJs7P9zQUSz9</code>, rates account <code>85F1segB7Mrsj8ZFsGBGCpNHfuu1qEwLxmQEykphtFtF</code> (seed <code>sbor-fixings</code>). Layout: <code>SBORFIX1</code>, owner, publisher, bump, count, then per benchmark 56 bytes: key, date, borrow bps, supply bps, size in dollars, posted at.<br>
+Publisher: <code id="addr"></code>. Each fixing is also a memo beginning <code>{"sbor":1</code>, with each rate as <code>[borrowBps, supplyBps, depthUsd]</code>. Source: <a href="https://github.com/sborxyz/sbor/blob/main/scripts/solana-publish.mjs">scripts/solana-publish.mjs</a> · Methodology: <a href="/#methodology">sbor.xyz</a></p>
 <footer><a href="/">sbor.xyz</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></footer>
 </main>
 <script>
 const PUBLISHER = "AY5EE9QiCpxy7DhpyZ81VReoBg94vt7dgaqzbqmwJtD1";   // SBOR's Solana publisher, first record 7 October 2026
+const STATE = "85F1segB7Mrsj8ZFsGBGCpNHfuu1qEwLxmQEykphtFtF";        // SBOR program's rates account, from 7 October 2026
 const RPCS = ["https://solana-rpc.publicnode.com", "https://api.mainnet-beta.solana.com"];
 const NAMES = [["SBOR-USD", "SBOR-USD"], ["SBOR-BTC", "SBOR-BTC"], ["SBOR-STX", "SBOR-STX"], ["BTC-COLLATERAL-USDC", "Bitcoin-collateral USDC"]];
 document.getElementById("addr").textContent = PUBLISHER;
 
+/* The program's account first: rows of key, date, borrow, supply, size. */
+async function programRows(url){
+  const r = await fetch(url, { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getAccountInfo", params: [STATE, { encoding: "base64" }] }) });
+  const v = (await r.json()).result?.value;
+  if (!v) return null;
+  const b = Uint8Array.from(atob(v.data[0]), c => c.charCodeAt(0)), dv = new DataView(b.buffer);
+  if (String.fromCharCode(...b.slice(0, 8)) !== "SBORFIX1" || !b[73]) return null;
+  const rates = {};
+  for (let j = 0; j < b[73]; j++){
+    const o = 74 + j * 56;
+    const key = new TextDecoder().decode(b.slice(o, o + 32)).replace(/\0+$/, "");
+    rates[key] = [dv.getUint16(o + 36, true), dv.getUint16(o + 38, true), Number(dv.getBigUint64(o + 40, true)), dv.getUint32(o + 32, true)];
+  }
+  return rates;
+}
+
 async function latestRecord(){
+  for (const url of RPCS){
+    try { const rates = await programRows(url); if (rates) return { record: { rates, fromProgram: true }, url }; } catch (e) {}
+  }
   let last;
   for (const url of RPCS){
     try {
@@ -89,9 +110,9 @@ const day = d => { const s = String(d); return s.length === 8 ? `${s.slice(0,4)}
       const v = record?.rates?.[key];
       return !v
         ? `<tr><td>${name}</td><td class="r" colspan="4">not in the latest record</td></tr>`
-        : `<tr><td>${name}</td><td class="r num">${pct(v[0])}</td><td class="r num">${pct(v[1])}</td><td class="r num">${usd(v[2])}</td><td class="r num">${day(record.date)}</td></tr>`;
+        : `<tr><td>${name}</td><td class="r num">${pct(v[0])}</td><td class="r num">${pct(v[1])}</td><td class="r num">${usd(v[2])}</td><td class="r num">${day(v[3] ?? record.date)}</td></tr>`;
     }).join("");
-    st.textContent = `Read live from Solana mainnet at ${new Date().toLocaleString()}, through ${new URL(url).host}.`;
+    st.textContent = `Read live from Solana mainnet${record?.fromProgram ? ", from SBOR's program account," : ""} at ${new Date().toLocaleString()}, through ${new URL(url).host}.`;
   } catch (e) {
     st.textContent = "Solana could not be reached from your browser just now. Try again in a moment.";
   }
