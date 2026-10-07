@@ -278,6 +278,26 @@ Two figures are recorded with each fixing as context, never in an index:
   loop loses money. StackingDAO's stBTC figure is an estimate. These are
   inputs, never a rating of any product.
 
+## Context: stBTC's realized bitcoin yield
+
+context.stbtcRealized is the bitcoin yield stBTC holders actually earned.
+stBTC pays through ratio growth: Bitcoin Staking rewards accrue in sBTC and
+raise the sBTC value of one stBTC. SBOR reads get-sbtc-per-stbtc on
+StackingDAO's data-stbtc-v1 each day and annualizes its growth since the reward
+stream began at Bitcoin block 967,405, when the ratio stood at 1.00117674.
+Rewards earned but not yet released are not counted, so the realized figure can
+lag StackingDAO's own forward-looking one, published beside it as
+advertisedApy. Context only, never part of an index.
+
+## When a market reads at or near zero
+
+When both a market's borrow and supply rates read below 0.05%, SBOR does not
+publish it as a market rate: either the venue is not reporting, or the protocol
+is holding the rate at zero by design, as Zest did with sBTC from 7 October
+2026, a temporary setting between Bitcoin Staking bonds. If that market is its
+index's only one, the index is withheld that day, with the reason in withheld,
+and resumes when a non-zero rate returns.
+
 ## The staking reference
 
 poxReference is the native bitcoin yield paid to STX stackers, published beside
