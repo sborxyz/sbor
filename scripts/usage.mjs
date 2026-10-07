@@ -69,27 +69,35 @@ async function toolCalls(){
   })).filter(t => t.tool);
 }
 
-/* Connections, counted by app name and user-agent. */
-async function connections(){
+/* Grouped counts of connect events. Grouping drops records that lack a
+   grouped key, and records from before 7 October 2026 carry no ua, so the
+   count by app uses the app name alone; the app-and-ua grouping is only used
+   to match tool calls to apps. */
+async function grouped(keys){
   const res = await query(base("calculations", { limit: 200, parameters: {
     datasets: ["cloudflare-workers"],
     filters: [service, { key: "event", operation: "eq", type: "string", value: "connect" }],
     calculations: [{ operator: "count", alias: "n" }],
-    groupBys: [{ type: "string", value: "client" }, { type: "string", value: "ua" }]
+    groupBys: keys.map(k => ({ type: "string", value: k }))
   }}));
   const calc = (res.calculations || [])[0] || {};
+  if (process.env.USAGE_DEBUG) console.error("raw aggregate:", JSON.stringify((calc.aggregates || [])[0] || calc).slice(0, 400));
   return (calc.aggregates || []).map(a => {
     const g = Object.fromEntries((a.groups || []).map(x => [x.key, x.value]));
     return { client: g.client ?? "unknown", ua: g.ua ?? null, n: Number(a.count ?? a.value ?? 0) };
   });
 }
+async function connections(){
+  const [byClient, byClientUa] = await Promise.all([grouped(["client"]), grouped(["client", "ua"])]);
+  return { conns: byClient, mapping: byClientUa };
+}
 
 const tally = (items, keyOf) => items.reduce((m, x) => { const k = keyOf(x); m[k] = (m[k] || 0) + (x.n ?? 1); return m; }, {});
 const fmt = obj => Object.entries(obj).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(", ");
 
-export function summarize(conns, tools){
+export function summarize(conns, tools, mapping = conns){
   const uaToApp = {};
-  for (const c of conns){ const app = appOf(c.client); if (app && c.ua) uaToApp[c.ua] = app; }
+  for (const c of mapping){ const app = appOf(c.client); if (app && c.ua) uaToApp[c.ua] = app; }
   const aiConns = conns.filter(c => appOf(c.client));
   const monitors = conns.filter(c => !appOf(c.client));
   const byApp = tally(aiConns, c => appOf(c.client));
@@ -106,9 +114,9 @@ export function summarize(conns, tools){
 
 async function main(){
   if (!process.env.CLOUDFLARE_API_TOKEN){ console.log("usage: no CLOUDFLARE_API_TOKEN, nothing read"); return; }
-  const [conns, tools] = await Promise.all([connections(), toolCalls()]);
-  if (process.env.USAGE_DEBUG) console.error(JSON.stringify({ conns: conns.slice(0, 10), tools: tools.slice(0, 10) }));
-  console.log(summarize(conns, tools));
+  const [{ conns, mapping }, tools] = await Promise.all([connections(), toolCalls()]);
+  if (process.env.USAGE_DEBUG) console.error(JSON.stringify({ conns: conns.slice(0, 12), mapping: mapping.slice(0, 6), tools: tools.slice(0, 10) }));
+  console.log(summarize(conns, tools, mapping));
 }
 
 if (import.meta.url === `file://${process.argv[1]}`)
