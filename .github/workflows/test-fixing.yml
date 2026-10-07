@@ -66,6 +66,8 @@ jobs:
           console.log("\nCONTEXT, never part of an index");
           console.log("  stSTX market: " + (cx.ststxMarket ? cx.ststxMarket.marketStxPerStstx + " STX against redemption " + cx.ststxMarket.redemptionStxPerStstx + ", " + cx.ststxMarket.discountPercent + "%  (low " + cx.ststxMarket.marketLowSide + ", high " + cx.ststxMarket.marketHighSide + ")" : "not read"));
           console.log("  stBTC carry:  " + (cx.stbtcCarry ? cx.stbtcCarry.carryBps + " bps  (stBTC " + cx.stbtcCarry.stBtcApy + "% minus sBTC borrow " + cx.stbtcCarry.sbtcBorrow + "%)" : "not computed"));
+          console.log("  stBTC realized: " + (cx.stbtcRealized ? cx.stbtcRealized.realizedApy + "% over " + cx.stbtcRealized.days + " days, ratio " + cx.stbtcRealized.sbtcPerStbtc + " (advertised " + cx.stbtcRealized.advertisedApy + "%)" : "not read"));
+          for (const [k, w] of Object.entries(d.withheld || {})) if (w && w.zeroRated) console.log("  " + k + ": withheld at or near zero, " + w.zeroRated.map(z => z.venue + " " + z.asset).join(", "));
           const c = require("./api/v1/changes.json");
           console.log("\nCHANGE FEED: baseline holds " + Object.keys(c.baseline?.markets || {}).length + " markets, " + c.changes.length + " changes recorded\n");
           ' | tee produced.txt
