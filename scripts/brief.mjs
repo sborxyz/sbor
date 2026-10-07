@@ -144,8 +144,15 @@ const facts = {
     supplyPct: F(today.btcUsdc.s), utilizationPct: F(today.btcUsdc.u), depthUsd: today.btcUsdc.d,
     markets: (today.btcUsdc.markets || []).map(m => {
       const a = (d1.btcUsdc?.markets || []).find(x => x.c === m.c && x.a === m.a);
+      /* Phase-in lives in the fixing, not in history: take it from there, so
+         the writer never has to guess which market is new. On 7 October 2026
+         the brief called Ethereum's WBTC market "still phasing in"; only
+         Arc's was. */
+      const lm = (latest.bitcoinCollateralUsdc?.markets || []).find(x => x.chain === m.c && x.collateral === m.a);
+      const phasingIn = typeof lm?.phaseIn === "number" && lm.phaseIn < 1;
       return { chain: m.c, collateral: m.a, borrowPct: F(m.b), borrowChange1dBps: bps(m.b, a?.b),
-               utilizationPct: F(m.u), depthUsd: m.d };
+               utilizationPct: F(m.u), depthUsd: m.d,
+               phasingIn, ...(phasingIn && { phaseInPctOfFullWeight: Math.round(lm.phaseIn * 100) }) };
     })
   } : null
 };
@@ -321,7 +328,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 7. Some inputs are unreliable and you should say so rather than reporting them flatly. The stSTX protocol yield from StackingDAO has moved 6.81, 3.14, 4.21, 4.33 within a week, which is not how a staking yield behaves. Any figure that depends on it, including the same exposure legs and the all in supply rate, inherits that. If you cite one, say the input moves.
 
-8. bitcoinCollateralUsdc is a reference, not an SBOR index: what it costs to borrow USDC against wrapped bitcoin on Morpho, on Base, Ethereum and Arc. A newly added market phases in over 30 days; its own rate is not a move in the reference. Report it on its own when it is flagged. Never average it with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
+8. bitcoinCollateralUsdc is a reference, not an SBOR index: what it costs to borrow USDC against wrapped bitcoin on Morpho, on Base, Ethereum and Arc. A newly added market phases in over 30 days; its own rate is not a move in the reference. Only a market with phasingIn true is phasing in; every other market carries its full weight, and must never be called new or phasing in. Report it on its own when it is flagged. Never average it with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
 
 9. A flag marked DATA EVENT comes first and is never a market move. Say the index is not published, or is missing a market, and why, in one sentence, and do not interpret any change in that index or its remaining markets. A DATA NOTE is one sentence, no interpretation.
 
