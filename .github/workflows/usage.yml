@@ -1,0 +1,45 @@
+name: SBOR usage
+
+# Who used SBOR's MCP server in the last 24 hours, read from the worker's logs
+# with a read-only Cloudflare key, sent to Telegram as one line each morning
+# after the brief. Separate from the brief, so a problem here never touches it.
+# Can be run by hand at any time.
+on:
+  schedule:
+    - cron: "50 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  usage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Read the last 24 hours
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          USAGE_DEBUG: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
+        run: |
+          set -o pipefail
+          node scripts/usage.mjs | tee usage.txt
+          { echo "## SBOR usage"; echo '```text'; cat usage.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Send it to Telegram
+        if: always()
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TG_TOKEN" ] || [ ! -s usage.txt ]; then exit 0; fi
+          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TG_CHAT" \
+            --data-urlencode "disable_web_page_preview=true" \
+            --data-urlencode "text=$(cat usage.txt)" > /dev/null
