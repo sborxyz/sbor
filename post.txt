@@ -1,15 +1,15 @@
-SBOR post drafts, fixing 2026-10-06T08:30:41Z
-Compared with 2026-10-05
+SBOR post drafts, fixing 2026-10-07T08:31:19Z
+Compared with 2026-10-06
 
 1 thing worth saying. Pick one. Do not post more than one a day.
 
---- 1. SBOR-STX supply moved +46 bps (151 chars)
+--- 1. SBOR-BTC dropped out (204 chars)
 
-SBOR-STX supply rate: 0.35% to 0.81%.
+SBOR-BTC is not published today.
 
-+46 bps in a day.
+The market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.
 
-Best paying to supply now: Zest V2 STX at 2.08%, utilization 74.64%.
+It returns when the read does.
 
 sbor.xyz
 

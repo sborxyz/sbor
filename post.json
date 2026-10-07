@@ -1,17 +1,17 @@
 {
-  "fixing": "2026-10-06T08:30:41Z",
-  "comparedWith": "2026-10-05",
+  "fixing": "2026-10-07T08:31:19Z",
+  "comparedWith": "2026-10-06",
   "top": {
-    "why": "SBOR-STX supply moved +46 bps",
-    "chars": 151,
-    "text": "SBOR-STX supply rate: 0.35% to 0.81%.\n\n+46 bps in a day.\n\nBest paying to supply now: Zest V2 STX at 2.08%, utilization 74.64%.\n\nsbor.xyz"
+    "why": "SBOR-BTC dropped out",
+    "chars": 204,
+    "text": "SBOR-BTC is not published today.\n\nThe market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.\n\nIt returns when the read does.\n\nsbor.xyz"
   },
   "otherCount": 0,
   "drafts": [
     {
-      "why": "SBOR-STX supply moved +46 bps",
-      "chars": 151,
-      "text": "SBOR-STX supply rate: 0.35% to 0.81%.\n\n+46 bps in a day.\n\nBest paying to supply now: Zest V2 STX at 2.08%, utilization 74.64%.\n\nsbor.xyz"
+      "why": "SBOR-BTC dropped out",
+      "chars": 204,
+      "text": "SBOR-BTC is not published today.\n\nThe market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.\n\nIt returns when the read does.\n\nsbor.xyz"
     }
   ]
 }
