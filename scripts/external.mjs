@@ -223,7 +223,11 @@ export async function externalReference({ contracts = true } = {}){
     /* Read Aave from the contract where we can. If the read fails for any
        reason, the DefiLlama figure stands and the entry says so: the
        comparison is never lost to a failed read. */
-    if (contracts && p.project === "aave-v3" && AAVE_CONTRACT_CHAINS.has(p.chain) && underlying){
+    /* HyperLend's core pool is an Aave V3 fork, read the same way from
+       7 October 2026. */
+    const aaveLike = (p.project === "aave-v3" && AAVE_CONTRACT_CHAINS.has(p.chain))
+      || (p.project === "hyperlend-pooled" && p.chain === "Hyperliquid L1");
+    if (contracts && aaveLike && underlying){
       try {
         const c = await readAaveReserve(p.chain, underlying);
         entry.borrow = c.borrow;
@@ -257,7 +261,7 @@ export async function externalReference({ contracts = true } = {}){
   if (!out.length) throw new Error("no external reference pools resolved");
   return {
     note: "Reference rates from the largest lending markets off this chain, published for comparison only. One market is selected per chain: a venue that publishes a borrow rate and utilization is preferred over one that does not, and depth decides between those that publish both, so the venue named can change. These are not constituents of any SBOR index and never enter a fixing. Aave on Ethereum and on Base is read from Aave's contracts and converted to effective APY, the same basis as the SBOR indices, with the simple annual rate kept as nominalBorrow and nominalSupply. The other venues come from DefiLlama and are shown as it publishes them, so they are not on quite the same basis. Each market's source field says which. depthUsd is the total supplied to each market, as DefiLlama reports it, and depthBasis says so; where DefiLlama gives no total supplied, depthBasis is \"available\" and the figure should not be read as the size of the market. It also decides which venue is shown for a chain. The rows are not additive: each venue pools every kind of collateral.",
-    source: "Aave contracts on Ethereum and Base, Kamino's reserve accounts on Solana; DefiLlama for the other venues",
+    source: "Aave contracts on Ethereum and Base, HyperLend's on Hyperliquid, Kamino's reserve accounts on Solana; DefiLlama for the other venues",
     markets: out
   };
 }
