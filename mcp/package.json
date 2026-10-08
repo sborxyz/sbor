@@ -1,7 +1,7 @@
 {
   "name": "sbor-mcp",
-  "version": "1.2.1",
-  "description": "Check a lending rate before your agent borrows. Benchmark lending rates for Bitcoin DeFi, read from contract state on Stacks, Base, Ethereum and Arc. Free, no key, no rate limit.",
+  "version": "1.2.2",
+  "description": "Check a lending rate before your agent borrows. Benchmark lending rates for Bitcoin DeFi, read from contract state on Stacks, Base, Ethereum and Arc, and posted on-chain on five chains. Free, no key, no rate limit.",
   "type": "module",
   "bin": {
     "sbor-mcp": "server.mjs"

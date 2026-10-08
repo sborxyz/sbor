@@ -9,7 +9,9 @@ read from lending contract state and published daily: one borrow and one
 supply rate per currency on Stacks, and what it costs to borrow USDC against
 bitcoin on Base, Ethereum and Arc. This server exposes it as tools for Claude,
 Cowork, Cursor or any MCP client. Each day's fixing is also posted on-chain, on
-[Stacks](https://sbor.xyz/stacks.html) and on [Arc](https://sbor.xyz/arc.html).
+[Arc](https://sbor.xyz/arc.html), [Base](https://sbor.xyz/base.html),
+[Hyperliquid](https://sbor.xyz/hyperliquid.html),
+[Solana](https://sbor.xyz/solana.html) and [Stacks](https://sbor.xyz/stacks.html).
 
 ## Quick check
 
@@ -104,4 +106,4 @@ writes, no telemetry. Set `SBOR_BASE` to point at a different host.
 MIT. The published fixing is free to read. See
 [llms.txt](https://sbor.xyz/llms.txt) for the full integration policy.
 
-*Last updated 28 September 2026.*
+*Last updated 8 October 2026.*
