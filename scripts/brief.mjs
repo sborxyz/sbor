@@ -173,6 +173,13 @@ const flags = [];
       flags.push(`DATA EVENT: ${label} is not published today. ${reason} Report this in one sentence as a data event, not a market move.`);
       continue;
     }
+    /* Still withheld: say why on every day, not only the first. On 8 October
+       2026 SBOR-BTC was withheld for a second day and the brief gave no
+       reason, although the fixing stated it. */
+    if (!now?.markets?.length && latest.withheld?.[label]?.reason){
+      flags.push(`DATA EVENT: ${label} is still not published today. ${latest.withheld[label].reason} Report this in one sentence as a data event, not a market move.`);
+      continue;
+    }
     if (was?.markets?.length && !was.withdrawn && now?.markets?.length){
       const missing = was.markets.filter(m => !now.markets.some(n => n.v === m.v && n.a === m.a));
       if (missing.length)
@@ -328,7 +335,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 7. Some inputs are unreliable and you should say so rather than reporting them flatly. The stSTX protocol yield from StackingDAO has moved 6.81, 3.14, 4.21, 4.33 within a week, which is not how a staking yield behaves. Any figure that depends on it, including the same exposure legs and the all in supply rate, inherits that. If you cite one, say the input moves.
 
-8. bitcoinCollateralUsdc is a reference, not an SBOR index: what it costs to borrow USDC against wrapped bitcoin on Morpho, on Base, Ethereum and Arc. A newly added market phases in over 30 days; its own rate is not a move in the reference. Only a market with phasingIn true is phasing in; every other market carries its full weight, and must never be called new or phasing in. Report it on its own when it is flagged. Never average it with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
+8. bitcoinCollateralUsdc is a reference, not an SBOR index: what it costs to borrow USDC against wrapped bitcoin on Morpho, on Base, Ethereum and Arc. A newly added market phases in over 30 days; its own rate is not a move in the reference. Only a market with phasingIn true is phasing in; every other market carries its full weight, and must never be called new or phasing in. Describe a phasing-in market as that share of the way to its full weight (phaseInPctOfFullWeight), never as its weight in the reference. Report it on its own when it is flagged. Never average it with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
 
 9. A flag marked DATA EVENT comes first and is never a market move. Say the index is not published, or is missing a market, and why, in one sentence, and do not interpret any change in that index or its remaining markets. A DATA NOTE is one sentence, no interpretation.
 
