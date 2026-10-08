@@ -22,7 +22,7 @@ const START = "<!-- snapshot:start -->", END = "<!-- snapshot:end -->";
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 const pct = n => (typeof n === "number" && Number.isFinite(n)) ? n.toFixed(2) + "%" : null;
-const usd = n => n >= 1e9 ? "$" + (n / 1e9).toFixed(2) + "B" : "$" + (n / 1e6).toFixed(1) + "M";
+const usd = n => n >= 1e9 ? "$" + (n / 1e9).toFixed(1) + "B" : "$" + (n / 1e6).toFixed(1) + "M";
 const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 export function snapshotText(d){
