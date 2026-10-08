@@ -48,7 +48,7 @@ class McpServer {
 }
 
 /* ---------------- tool code, verbatim from mcp/server.mjs ---------------- */
-const VERSION = "1.2.1";
+const VERSION = "1.2.2";
 const BASE = process.env.SBOR_BASE || "https://sbor.xyz";
 const UA = `sbor-mcp/${VERSION}`;
 const TIMEOUT_MS = 10_000;
@@ -66,7 +66,7 @@ const BTC_REF_WHAT = "a reference, not an SBOR index: what it costs to borrow US
 
 /* Each day's fixing is also posted on-chain, for contracts and agents that
    read chains rather than APIs. The JSON API remains the authoritative record. */
-const ONCHAIN = "Also on-chain each day: on Stacks, contract SP2SRS600PZ70VHY09CK06FSYKW546NY2ARG6N8CD.sbor-fixings (get-latest); on Arc, contract 0x56B5417de539153994fF6785F8a3b56421C9eb4f (latest(bytes32)). Rates there are in basis points.";
+const ONCHAIN = "Also on-chain each day: on Arc and on Hyperliquid's HyperEVM, contract 0x56B5417de539153994fF6785F8a3b56421C9eb4f, and on Base, contract 0xfc968C7A39bA80b1F6E3c0c058311EbD5d724323 (latest(bytes32)); on Stacks, contract SP2SRS600PZ70VHY09CK06FSYKW546NY2ARG6N8CD.sbor-fixings (get-latest); on Solana, program 85uzArk6VwzWG6mxZC7D2jLEPGhFL2SXzJs7P9zQUSz9, rates account 85F1segB7Mrsj8ZFsGBGCpNHfuu1qEwLxmQEykphtFtF. Rates there are in basis points.";
 const NOT_ADVICE = "Market data, not financial advice.";
 
 /* All SBOR tools only read published data. */
@@ -97,7 +97,7 @@ const fail = e => refuse(
 
 const pct = n => (typeof n === "number" && Number.isFinite(n) ? n.toFixed(2) + "%" : "not published");
 const usd = n => !Number.isFinite(n) ? "n/a"
-  : n >= 1e9 ? "$" + (n / 1e9).toFixed(2) + "B" : "$" + (n / 1e6).toFixed(1) + "M";
+  : n >= 1e9 ? "$" + (n / 1e9).toFixed(1) + "B" : "$" + (n / 1e6).toFixed(1) + "M";
 
 /* Age of a fixing in hours, or null when the timestamp cannot be parsed. An
    unparseable timestamp must read as unusable, never as fresh. */
@@ -372,9 +372,10 @@ server.registerTool("compare_chains", {
     "The same asset classes on the largest lending markets on Ethereum, Base, " +
     "Hyperliquid and Solana, plus SOFR, the US repo rate, and what it costs to " +
     "borrow USDC against bitcoin on Base, Ethereum and Arc. Context only: none of " +
-    "these is ever a constituent of an SBOR index. Aave on Ethereum and Base and " +
-    "the bitcoin-collateral markets are read from contract state; the other venues " +
-    "come from DefiLlama, so small differences are expected for those.",
+    "these is ever a constituent of an SBOR index. Every rate is read from the " +
+    "venues' contracts (Aave on Ethereum and Base, HyperLend on Hyperliquid, Kamino " +
+    "on Solana, Morpho for the bitcoin-collateral markets); DefiLlama picks the " +
+    "largest market per chain, gives its size, and stands in only if a read fails.",
   inputSchema: {
     index: z.enum(INDICES).optional().describe("Only markets comparable to this index. Omit for all.")
   }
@@ -487,7 +488,7 @@ async function handle(msg, ua){
         protocolVersion: PROTOCOLS.includes(asked) ? asked : PROTOCOLS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "sbor", title: "SBOR", version: VERSION },
-        instructions: "SBOR publishes benchmark lending rates for Bitcoin DeFi, read from contract state and published daily: an index per currency on Stacks, and BTC-COLLATERAL-USDC for borrowing USDC against bitcoin on Base, Ethereum and Arc. Each day's rates are also posted on-chain on Stacks, Arc, Base and Solana. Before borrowing, call compare_rate: if an offer is well above the benchmark, stop. Every tool refuses rather than guesses; an error means there is no trustworthy answer."
+        instructions: "SBOR publishes benchmark lending rates for Bitcoin DeFi, read from contract state and published daily: an index per currency on Stacks, and BTC-COLLATERAL-USDC for borrowing USDC against bitcoin on Base, Ethereum and Arc. Each day's rates are also posted on-chain on Arc, Base, Hyperliquid, Solana and Stacks. Before borrowing, call compare_rate: if an offer is well above the benchmark, stop. Every tool refuses rather than guesses; an error means there is no trustworthy answer."
       });
     }
     case "ping": return ok(msg.id, {});
