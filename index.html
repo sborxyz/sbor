@@ -525,6 +525,7 @@ a{color:var(--accent)}
         <a href="/arc.html" id="arcLink"></a>
         <a href="/base.html" id="baseLink"></a>
         <a href="/solana.html" id="solanaLink"></a>
+        <a href="/hyperliquid.html" id="hyperliquidLink"></a>
         <a href="/privacy.html" id="privLink"></a>
         <a href="/terms.html" id="termsLink"></a>
         <a href="https://x.com/SBORindex" target="_blank" rel="noopener">@SBORindex</a>
@@ -623,7 +624,7 @@ en:{
   footMethod:v=>`Methodology ${v}`,
   footSource:"Source on GitHub",
   footLicense:"Data license",
-  footContact:"contact@sbor.xyz", footStacks:"SBOR on Stacks", footArc:"SBOR on Arc", footBase:"SBOR on Base", footSolana:"SBOR on Solana", footPrivacy:"Privacy", footTerms:"Terms",
+  footContact:"contact@sbor.xyz", footStacks:"SBOR on Stacks", footArc:"SBOR on Arc", footBase:"SBOR on Base", footSolana:"SBOR on Solana", footHyperliquid:"SBOR on Hyperliquid", footPrivacy:"Privacy", footTerms:"Terms",
   histH:"History",
   histFor:l=>` · ${l}`,
   histP:"Daily closes since the index began. A moving average is shown only once the full window exists.",
@@ -634,7 +635,7 @@ en:{
   consH:"Constituents",
   thead:["Market","Borrow APY","Supply APY","Utilization","Protocol yield","Depth","Weight",""],
   coverage:(n,pct)=>`${n} ${n===1?"venue":"venues"} in this index · largest constituent ${pct}% of depth`,
-  sources:"Lending rates are read from Zest and Granite contract state on Stacks mainnet, and from Aave and Morpho contract state on Ethereum, Base and Arc. Market sizes are read from the contracts too; the other chains in the comparison come from DefiLlama, which also serves as a cross-check. Protocol yield comes from StackingDAO. The BTC to STX rate used for the staking yield is quoted from Bitflow. SOFR comes from the Federal Reserve Bank of New York.",
+  sources:"Lending rates are read from Zest and Granite contract state on Stacks mainnet, and from Aave and Morpho contract state on Ethereum, Base and Arc. In the comparison, HyperLend on Hyperliquid and Kamino on Solana are read from their contracts too. Market sizes are read from the contracts; DefiLlama selects the comparison markets, gives their size and serves as a cross-check. Protocol yield comes from StackingDAO. The BTC to STX rate used for the staking yield is quoted from Bitflow. SOFR comes from the Federal Reserve Bank of New York.",
   consFoot:"Hatched weights are phasing in. A market becomes eligible once its lending depth stays above the inclusion floor for 30 consecutive days. Protocol yield is yield carried by the asset itself rather than by the loan. It is displayed but excluded from the fixing.",
   methodH:"Methodology",
   methodA:[
@@ -653,7 +654,7 @@ en:{
     "<strong>Protocol yield excluded.</strong> Some assets carry yield from the asset itself rather than from lending. sBTC carries Bitcoin protocol yield through dual stacking, and stSTX carries PoX staking yield managed by StackingDAO. That yield belongs to the asset, not the loan, so it never enters the fixing.",
     "<strong>Phase-in.</strong> A newly eligible market enters at zero weight and ramps to full weight linearly over 30 days, so adding a venue cannot step the rate.",
     "<strong>Utilization explains the rate.</strong> Utilization is the share of supplied capital currently borrowed. It is the reason a rate sits where it does: a market with little borrowing pays its suppliers little, however large that market is. It is published beside every rate so no figure has to be taken on trust.",
-    "<strong>Outside Stacks is context, not a constituent.</strong> Two references are published beside the indices. The largest lending markets on Ethereum, Base, Hyperliquid and Solana show what the same asset class costs off this chain: Aave on Ethereum and Base is read from its contracts, the others from DefiLlama. And the cost of borrowing USDC against bitcoin comes from the Morpho markets on Base, Ethereum and Arc whose only collateral is cbBTC, WBTC or cirBTC, read from the contracts and published only when every market carrying weight was read. A newly added market phases in over 30 days. Neither is ever weighted into a fixing or moves an SBOR number.",
+    "<strong>Outside Stacks is context, not a constituent.</strong> Two references are published beside the indices. The largest lending markets on Ethereum, Base, Hyperliquid and Solana show what the same asset class costs off this chain: every rate is read from the venue's contracts (Aave on Ethereum and Base, HyperLend on Hyperliquid, Kamino on Solana), with DefiLlama only as a fallback. And the cost of borrowing USDC against bitcoin comes from the Morpho markets on Base, Ethereum and Arc whose only collateral is cbBTC, WBTC or cirBTC, read from the contracts and published only when every market carrying weight was read. A newly added market phases in over 30 days. Neither is ever weighted into a fixing or moves an SBOR number.",
     "<strong>Term averages.</strong> The 30, 90 and 180 day figures are compounded averages of the daily fixings, actual/365, the same construction SOFR uses. An average is published only once its full window exists. A 180 day average appears on day 180, not before.",
     "<strong>Stale or implausible data.</strong> If a market's state cannot be read, its weight is zero for that fixing and the omission is recorded. A funded market whose borrow and supply rates both read below 0.05% is treated the same way, because lenders and borrowers do not set such a rate: it is either a reporting failure or a rate the protocol holds down by design.",
     "<strong>Revisions.</strong> Published fixings are never rewritten. Corrections appear as a new fixing with a note."
@@ -732,7 +733,7 @@ pt:{
   footMethod:v=>`Metodologia ${v}`,
   footSource:"Código no GitHub",
   footLicense:"Licença dos dados",
-  footContact:"contact@sbor.xyz", footStacks:"SBOR na Stacks", footArc:"SBOR na Arc", footBase:"SBOR na Base", footSolana:"SBOR na Solana", footPrivacy:"Privacidade", footTerms:"Termos",
+  footContact:"contact@sbor.xyz", footStacks:"SBOR na Stacks", footArc:"SBOR na Arc", footBase:"SBOR na Base", footSolana:"SBOR na Solana", footHyperliquid:"SBOR na Hyperliquid", footPrivacy:"Privacidade", footTerms:"Termos",
   histH:"Histórico",
   histFor:l=>` · ${l}`,
   histP:"Fechamentos diários desde o início do índice. A média móvel só aparece quando existe janela completa de dados.",
@@ -743,7 +744,7 @@ pt:{
   consH:"Componentes",
   thead:["Mercado","APY de empréstimo","APY de depósito","Utilização","Rendimento do protocolo","Profundidade","Peso",""],
   coverage:(n,pct)=>`${n} ${n===1?"plataforma":"plataformas"} neste índice · maior componente com ${pct}% da profundidade`,
-  sources:"As taxas de crédito são lidas do estado dos contratos da Zest e da Granite na mainnet da Stacks, e dos contratos da Aave e da Morpho na Ethereum, na Base e na Arc. O tamanho dos mercados também é lido dos contratos; as outras redes da comparação vêm da DefiLlama, que também serve de conferência. O rendimento do protocolo vem da StackingDAO. A relação BTC para STX usada no rendimento do staking é cotada na Bitflow. O SOFR vem do Federal Reserve Bank of New York.",
+  sources:"As taxas de crédito são lidas do estado dos contratos da Zest e da Granite na mainnet da Stacks, e dos contratos da Aave e da Morpho na Ethereum, na Base e na Arc. Na comparação, a HyperLend na Hyperliquid e a Kamino na Solana também são lidas dos contratos. O tamanho dos mercados é lido dos contratos; a DefiLlama seleciona os mercados da comparação, dá o tamanho deles e serve de conferência. O rendimento do protocolo vem da StackingDAO. A relação BTC para STX usada no rendimento do staking é cotada na Bitflow. O SOFR vem do Federal Reserve Bank of New York.",
   consFoot:"Pesos hachurados estão em entrada gradual. Um mercado se torna elegível quando sua profundidade de crédito permanece acima do piso de inclusão por 30 dias consecutivos. Rendimento do protocolo é o rendimento gerado pelo próprio ativo, e não pelo empréstimo. Ele é exibido, mas fica fora do fixing.",
   methodH:"Metodologia",
   methodA:[
@@ -762,7 +763,7 @@ pt:{
     "<strong>Rendimento do protocolo fica de fora.</strong> Alguns ativos rendem por si mesmos, e não pelo empréstimo. O sBTC carrega rendimento do protocolo Bitcoin via dual stacking, e o stSTX carrega rendimento de staking PoX administrado pela StackingDAO. Esse rendimento pertence ao ativo, não ao empréstimo, então nunca entra no fixing.",
     "<strong>Entrada gradual.</strong> Um mercado recém-elegível entra com peso zero e sobe linearmente até o peso cheio ao longo de 30 dias, de modo que incluir uma plataforma nunca provoca um salto na taxa.",
     "<strong>A utilização explica a taxa.</strong> Utilização é a parcela do capital depositado que está emprestada. É a razão de uma taxa estar onde está: um mercado com pouco crédito tomado paga pouco a quem deposita, por maior que ele seja. Ela é publicada ao lado de cada taxa para que nenhum número precise ser aceito sem explicação.",
-    "<strong>Fora da Stacks é contexto, não componente.</strong> Duas referências são publicadas ao lado dos índices. Os maiores mercados de crédito na Ethereum, na Base, na Hyperliquid e na Solana mostram quanto custa a mesma classe de ativo fora daqui: a Aave na Ethereum e na Base é lida dos contratos, os demais vêm da DefiLlama. E o custo de tomar USDC emprestado com bitcoin como garantia vem dos mercados da Morpho na Base, na Ethereum e na Arc cuja única garantia é cbBTC, WBTC ou cirBTC, lido dos contratos e publicado só quando todos os mercados com peso foram lidos. Um mercado novo entra gradualmente, ao longo de 30 dias. Nenhuma das duas entra no cálculo de um fixing nem move um número do SBOR.",
+    "<strong>Fora da Stacks é contexto, não componente.</strong> Duas referências são publicadas ao lado dos índices. Os maiores mercados de crédito na Ethereum, na Base, na Hyperliquid e na Solana mostram quanto custa a mesma classe de ativo fora daqui: todas as taxas são lidas dos contratos de cada plataforma (Aave na Ethereum e na Base, HyperLend na Hyperliquid, Kamino na Solana), com a DefiLlama só como reserva. E o custo de tomar USDC emprestado com bitcoin como garantia vem dos mercados da Morpho na Base, na Ethereum e na Arc cuja única garantia é cbBTC, WBTC ou cirBTC, lido dos contratos e publicado só quando todos os mercados com peso foram lidos. Um mercado novo entra gradualmente, ao longo de 30 dias. Nenhuma das duas entra no cálculo de um fixing nem move um número do SBOR.",
     "<strong>Médias de prazo.</strong> As médias de 30, 90 e 180 dias são compostas a partir dos fixings diários, actual/365, a mesma construção usada pelo SOFR. Uma média só é publicada quando existe a janela completa. Uma média de 180 dias aparece no dia 180, não antes.",
     "<strong>Dados indisponíveis ou implausíveis.</strong> Se o estado de um mercado não puder ser lido, seu peso é zero naquele fixing e a omissão fica registrada. Um mercado com liquidez cujas taxas de empréstimo e de depósito ficam ambas abaixo de 0,05% recebe o mesmo tratamento, porque quem empresta e quem toma emprestado não define uma taxa assim: ou é uma falha de leitura, ou é uma taxa que o próprio protocolo mantém baixa de propósito.",
     "<strong>Revisões.</strong> Fixings publicados nunca são reescritos. Correções aparecem como um novo fixing, com nota."
@@ -811,7 +812,7 @@ const T = () => I18N[lang];
 const fmt = n => Number(n).toFixed(2);
 /* Depth runs from hundreds of thousands to billions once other chains are in
    the comparison, so it needs a scale rather than a fixed unit. */
-const depth = n => n >= 1e9 ? "$" + (n/1e9).toFixed(2) + "B"
+const depth = n => n >= 1e9 ? "$" + (n/1e9).toFixed(1) + "B"
                  : n >= 1e6 ? "$" + (n/1e6).toFixed(1) + "M"
                  : "$" + Math.round(n/1e3) + "K";
 const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
@@ -1027,6 +1028,7 @@ function renderChrome(){
   document.getElementById("arcLink").textContent = t.footArc;
   document.getElementById("baseLink").textContent = t.footBase;
   document.getElementById("solanaLink").textContent = t.footSolana;
+  document.getElementById("hyperliquidLink").textContent = t.footHyperliquid;
   document.getElementById("privLink").textContent = t.footPrivacy;
   document.getElementById("termsLink").textContent = t.footTerms;
   document.getElementById("csvBtn").textContent = t.csv;

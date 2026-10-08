@@ -42,7 +42,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:v
 <button class="theme" id="themeBtn" type="button" aria-label="Switch theme" title="Switch theme">&#9680;</button>
 <a class="mark" href="/">SBOR · STACKS BITCOIN OFFERED RATE</a>
 <h1>SBOR on Solana</h1>
-<p>Every morning, after the fixing, SBOR posts its benchmark lending rates on Solana mainnet, to SBOR's own program and as a signed record from SBOR's publisher, so any Solana program, application, vault or agent can read them from the chain. The table below is read live from Solana by your browser, not from SBOR's servers. The same rates are also posted on <a href="/stacks.html">Stacks</a>, <a href="/arc.html">Arc</a> and <a href="/base.html">Base</a>.</p>
+<p>Every morning, after the fixing, SBOR posts its benchmark lending rates on Solana mainnet, to SBOR's own program and as a signed record from SBOR's publisher, so any Solana program, application, vault or agent can read them from the chain. The table below is read live from Solana by your browser, not from SBOR's servers. The same rates are also posted on <a href="/arc.html">Arc</a>, <a href="/base.html">Base</a>, <a href="/hyperliquid.html">Hyperliquid</a> and <a href="/stacks.html">Stacks</a>.</p>
 <p class="status" id="status">Reading from Solana mainnet…</p>
 <div class="tscroll">
 <table>
@@ -99,7 +99,7 @@ async function latestRecord(){
   throw last || new Error("no endpoint answered");
 }
 const pct = b => (Number(b) / 100).toFixed(2) + "%";
-const usd = n => { n = Number(n); return n >= 1e9 ? "$" + (n / 1e9).toFixed(2) + "B" : n >= 1e6 ? "$" + (n / 1e6).toFixed(1) + "M" : "$" + Math.round(n / 1e3) + "K"; };
+const usd = n => { n = Number(n); return n >= 1e9 ? "$" + (n / 1e9).toFixed(1) + "B" : n >= 1e6 ? "$" + (n / 1e6).toFixed(1) + "M" : "$" + Math.round(n / 1e3) + "K"; };
 const day = d => { const s = String(d); return s.length === 8 ? `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6)}` : "n/a"; };
 
 (async () => {

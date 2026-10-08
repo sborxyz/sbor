@@ -27,8 +27,8 @@ means opening each application by hand.
 
 SBOR publishes one borrow rate and one supply rate per currency, weighted by
 market depth and read directly from lending contract state rather than from any
-venue's published figure. Each day's rates are also posted on-chain, on Stacks
-and on Arc.
+venue's published figure. Each day's rates are also posted on-chain, on Arc,
+Base, Hyperliquid, Solana and Stacks.
 
 The model is SOFR, not a yield aggregator. SBOR does not route capital, hold
 deposits, or recommend anything. It publishes a statistic.
@@ -138,16 +138,30 @@ If SBOR was useful and you post publicly, cite it or follow
 [@SBORindex](https://x.com/SBORindex). A benchmark is worth what people
 reference it for.
 
-### On-chain, on Arc
+### On-chain, on five chains
 
-From 1 October 2026, each day's rates are also posted to a contract on Arc
-mainnet (chain 5042), so contracts and agents on Arc can read them on-chain:
-[`0x56B5417de539153994fF6785F8a3b56421C9eb4f`](https://sbor.xyz/arc.html).
-Call `latest(bytes32)` with a rate's name as bytes32 (`SBOR-USD`, `SBOR-BTC`,
-`SBOR-STX` or `BTC-COLLATERAL-USDC`) for its borrow and supply rate in basis
-points, its size and its fixing date; `onDate(bytes32, uint32)` returns any past
-day. Source: [`contracts/SBORFixings.sol`](contracts/SBORFixings.sol). The JSON
-API remains the authoritative record.
+After each fixing, the day's rates are posted on-chain, so contracts and agents
+can read them on their own chain:
+
+| Chain | Contract | Since | Live page |
+|---|---|---|---|
+| Arc (chain 5042) | `0x56B5417de539153994fF6785F8a3b56421C9eb4f` | 1 Oct 2026 | [arc.html](https://sbor.xyz/arc.html) |
+| Stacks | `SP2SRS600PZ70VHY09CK06FSYKW546NY2ARG6N8CD.sbor-fixings` | 2 Oct 2026 | [stacks.html](https://sbor.xyz/stacks.html) |
+| Base (chain 8453) | `0xfc968C7A39bA80b1F6E3c0c058311EbD5d724323` | 7 Oct 2026 | [base.html](https://sbor.xyz/base.html) |
+| Solana | program `85uzArk6VwzWG6mxZC7D2jLEPGhFL2SXzJs7P9zQUSz9`, plus a daily signed memo | 7 Oct 2026 | [solana.html](https://sbor.xyz/solana.html) |
+| Hyperliquid, HyperEVM (chain 999) | `0x56B5417de539153994fF6785F8a3b56421C9eb4f` | 8 Oct 2026 | [hyperliquid.html](https://sbor.xyz/hyperliquid.html) |
+
+On the EVM chains (Arc, Base, Hyperliquid), call `latest(bytes32)` with a rate's
+name as bytes32 (`SBOR-USD`, `SBOR-BTC`, `SBOR-STX` or `BTC-COLLATERAL-USDC`) for
+its borrow and supply rate in basis points, its size and its fixing date;
+`onDate(bytes32, uint32)` returns any past day. Source:
+[`contracts/SBORFixings.sol`](contracts/SBORFixings.sol). On Stacks, the same
+reads are `get-latest` and `get-on-date`, keyed by the rate's name as a string,
+in [`contracts/sbor-fixings.clar`](contracts/sbor-fixings.clar). On Solana, the
+program keeps the latest rates in one account any program can read,
+`85F1segB7Mrsj8ZFsGBGCpNHfuu1qEwLxmQEykphtFtF`; source in
+[`contracts/solana/`](contracts/solana/). The JSON API remains the
+authoritative record.
 
 ## Method, in short
 
@@ -187,12 +201,13 @@ methodology at [sbor.xyz](https://sbor.xyz) and in
 Lending rates from Zest and Granite contract state. Protocol yield and staking
 context from StackingDAO. The BTC to STX rate used for the staking reference
 from Bitflow, quoted in both directions. Proof of Transfer rewards from Hiro.
-Market sizes read from the contracts, with DefiLlama as a cross-check and as the
-source for the comparison venues not read on-chain.
+Market sizes read from the contracts, with DefiLlama as a cross-check.
 
-In the comparison, Aave on Ethereum and Base is read from Aave's contracts, on
-the same basis as SBOR. The other chains, Hyperliquid and Solana, and Morpho on
-Base, come from DefiLlama, so small differences are expected for those. SOFR
+In the comparison, rates are read from the venues' own contracts, on the same
+basis as SBOR: Aave on Ethereum and Base, HyperLend on Hyperliquid, and Kamino's
+reserve accounts on Solana. DefiLlama selects the largest market on each chain,
+supplies its size, and stands in for a rate only if a contract read fails; each
+market's source field says which. SOFR
 and its averages come from the Federal Reserve Bank of New York. Spot prices,
 recorded as context only, come from CoinGecko. Every source is named on the site
 and in the machine-readable documentation.
@@ -209,13 +224,19 @@ revised silently.
 ```
 scripts/fetch.mjs       the fixing
 scripts/pox.mjs         Proof of Transfer staking reference
+scripts/morpho.mjs      the bitcoin-collateral USDC reference
 scripts/external.mjs    the comparison chains
+scripts/aave.mjs        Aave and HyperLend contract reads
+scripts/kamino.mjs      Kamino reserve reads on Solana
+scripts/*-publish.mjs   on-chain posting: Arc, Base, Hyperliquid, Solana, Stacks
+contracts/              the on-chain contracts and the Solana program
 scripts/context.mjs     SOFR, prices, sBTC supply, block height
 scripts/inversion.mjs   cross venue monitor, every three hours
 scripts/post.mjs        drafts a post when something moves
 scripts/brief.mjs       the morning brief, written from the record
 scripts/weekly.mjs      weekly report
 mcp/                    the MCP server, published as sbor-mcp
+mcp-remote/             the same server, hosted at mcp.sbor.xyz
 index.html              the site, bilingual EN/PT
 llms.txt                method and integration policy
 api/v1/                 published data
@@ -269,4 +290,4 @@ any.
 [sbor.xyz](https://sbor.xyz) · [@SBORindex](https://x.com/SBORindex) ·
 contact@sbor.xyz · sbor.btc · sbor.stx
 
-*Last updated 2 October 2026.*
+*Last updated 8 October 2026.*

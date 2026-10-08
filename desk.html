@@ -114,7 +114,7 @@ footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--rule);color:v
 
 <script>
 /* The fixing time in UTC, as published, and in the reader's own time zone,
-   so 08:30 UTC reads as 05:30 in Londrina. */
+   so 08:30 UTC reads as 05:30 in São Paulo. */
 function fixingTimes(iso){
   const t = new Date(iso);
   if (isNaN(t)) return iso;
@@ -227,7 +227,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
       <td class="num" data-l="Borrow">${F(m.b)}%</td>${chg(BPS(m.b, a?.b),"bps",15,"Borrow 1d")}${chg(BPS(m.b, b?.b),"bps",15,"Borrow 7d")}
       <td class="num" data-l="Supply">${F(m.s)}%</td>
       <td class="num" data-l="Utilization">${F(m.u)}%</td>${chg(BPS(m.u, a?.u),"bps",200,"Util 1d")}
-      <td class="num dim" data-l="Depth">${m.db !== "supplied" ? "n/a" : "$"+((m.d||0)/1e9 >= 1 ? ((m.d/1e9).toFixed(2)+"B") : ((m.d||0)/1e6).toFixed(1)+"M")}</td></tr>`;
+      <td class="num dim" data-l="Depth">${m.db !== "supplied" ? "n/a" : "$"+((m.d||0)/1e9 >= 1 ? ((m.d/1e9).toFixed(1)+"B") : ((m.d||0)/1e6).toFixed(1)+"M")}</td></tr>`;
   }
   out += `</table></div>`;
 
@@ -240,7 +240,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
       <td class="num" data-l="Borrow">${now.b == null ? "n/a" : F(now.b)+"%"}</td>${chg(BPS(now.b, a?.b),"bps",15,"Borrow 1d")}${chg(BPS(now.b, b?.b),"bps",15,"Borrow 7d")}
       <td class="num" data-l="Supply">${now.s == null ? "n/a" : F(now.s)+"%"}</td>
       <td class="num" data-l="Utilization">${now.u == null ? "n/a" : F(now.u)+"%"}</td>${chg(BPS(now.u, a?.u),"bps",200,"Util 1d")}
-      <td class="num dim" data-l="Depth">$${((now.d||0)/1e9 >= 1 ? ((now.d/1e9).toFixed(2)+"B") : ((now.d||0)/1e6).toFixed(1)+"M")}</td></tr>`;
+      <td class="num dim" data-l="Depth">$${((now.d||0)/1e9 >= 1 ? ((now.d/1e9).toFixed(1)+"B") : ((now.d||0)/1e6).toFixed(1)+"M")}</td></tr>`;
     out += row(`Reference <span class="dim">weighted</span>`, bc(today), bc(d1), bc(d7));
     for (const m of today.btcUsdc.markets){
       const find = r => (bc(r).markets || []).find(x => x.c === m.c && x.a === m.a);

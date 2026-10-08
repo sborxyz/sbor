@@ -1,6 +1,6 @@
 # SBOR and the IOSCO Principles for Financial Benchmarks
 
-*A self-assessment. Created 24 September 2026. Last updated 2 October 2026.*
+*A self-assessment. Created 24 September 2026. Last updated 8 October 2026.*
 
 The International Organization of Securities Commissions published its Principles for Financial Benchmarks in July 2013, after the manipulation of major interest rate benchmarks. There are 19 of them, in four groups: governance, the quality of the benchmark, the quality of the methodology, and accountability. They were endorsed by the G20 and are the standard against which benchmark administrators describe themselves.
 
@@ -51,8 +51,8 @@ SBOR defines its indices, writes and publishes the methodology, computes and pub
 SBOR reads rates directly from lending contracts and depends on public infrastructure to do so. The sources:
 
 - **Stacks contract state** for Zest and Granite, through the Hiro API.
-- **Ethereum, Base and Arc contract state** for Aave and Morpho, through public RPC endpoints, several per chain with automatic failover.
-- **DefiLlama** for comparison venues not read from their contracts, and as a cross-check on Zest's market sizes, which are read from the Zest contracts since 1 October 2026. Each market states its source.
+- **Ethereum, Base and Arc contract state** for Aave and Morpho, and **Hyperliquid and Solana contract state** for HyperLend and Kamino in the comparison, through public RPC endpoints, several per chain with automatic failover.
+- **DefiLlama** to select the comparison markets and give their size, as a fallback if a contract read fails, and as a cross-check on Zest's market sizes, which are read from the Zest contracts since 1 October 2026. Each market states its source.
 - **CoinGecko** for prices, **Bitflow** for the bitcoin to STX rate, the **New York Fed** for SOFR, and **StackingDAO's** published method for the stBTC yield.
 
 Every read is checked, and a source that fails or returns something implausible is left out rather than replaced with an estimate.
@@ -152,7 +152,7 @@ SBOR has not been audited by an independent party. In the meantime, the code is 
 
 ### 18. Audit trail: met
 
-Every fixing is a public commit in the repository, kept alongside a daily archive of the full published record and a compact history of every fixing. Changes to protocol parameters are recorded in [api/v1/changes.json](https://sbor.xyz/api/v1/changes.json). Nothing published is overwritten.
+Every fixing is a public commit in the repository, kept alongside a daily archive of the full published record and a compact history of every fixing. Changes to protocol parameters are recorded in [api/v1/changes.json](https://sbor.xyz/api/v1/changes.json). Nothing published is overwritten. From 1 October 2026, each day's rates are also posted on-chain, now on Arc, Base, Hyperliquid, Solana and Stacks, where every past posting stays readable on each chain.
 
 ### 19. Cooperation with regulatory authorities: not applicable
 

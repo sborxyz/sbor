@@ -105,10 +105,14 @@ which is what this comparison exists for. It is published so
 a reader can see what comparable capital costs elsewhere. It is never a
 constituent of any index and never affects a fixing.
 
-Aave on Ethereum and on Base is read from Aave's own contracts and converted to
-effective APY, the same basis as the SBOR indices, with the simple annual rate
-kept as nominalBorrow and nominalSupply. The other venues come from DefiLlama
-and are shown as it publishes them. Each market's source field says which.
+Rates are read from the venues' own contracts and converted to effective APY,
+the same basis as the SBOR indices, with the simple annual rate kept as
+nominalBorrow and nominalSupply: Aave on Ethereum and on Base from 23 September
+2026, and from 7 October 2026 HyperLend on Hyperliquid (an Aave V3 fork, read
+the same way) and Kamino on Solana (from its reserve accounts). DefiLlama
+selects the largest market on each chain and supplies its size; if a contract
+read fails, DefiLlama's rate stands in, as it publishes it. Each market's source
+field says which.
 Note that DefiLlama reports Aave as a simple annual rate, so before 23 September
 2026 the Aave figures here were about 10 basis points lower than on SBOR's
 basis. depthUsd is the total supplied, as DefiLlama reports it, for every
@@ -245,11 +249,28 @@ If you post publicly and SBOR was useful, cite it or follow
 https://x.com/SBORindex. A benchmark is worth what people reference it for, and
 you may well be the ones referencing it.
 
-## On-chain, on Arc
+## On-chain, on five chains
 
-From 1 October 2026, each day's rates are also posted to a contract on Arc
-mainnet (chain 5042), after the fixing, so contracts and agents on Arc can read
-them on-chain. Contract: 0x56B5417de539153994fF6785F8a3b56421C9eb4f.
+After each fixing, the day's rates are posted on-chain, so contracts and agents
+can read them on their own chain:
+
+- Arc mainnet (chain 5042), from 1 October 2026:
+  0x56B5417de539153994fF6785F8a3b56421C9eb4f. Live page: https://sbor.xyz/arc.html
+- Stacks mainnet, from 2 October 2026:
+  SP2SRS600PZ70VHY09CK06FSYKW546NY2ARG6N8CD.sbor-fixings, read-only functions
+  get-latest and get-on-date, keyed by the rate's name as a string. Live page:
+  https://sbor.xyz/stacks.html
+- Base mainnet (chain 8453), from 7 October 2026:
+  0xfc968C7A39bA80b1F6E3c0c058311EbD5d724323. Live page: https://sbor.xyz/base.html
+- Solana mainnet, from 7 October 2026: SBOR's program
+  85uzArk6VwzWG6mxZC7D2jLEPGhFL2SXzJs7P9zQUSz9 keeps the latest rates in the
+  account 85F1segB7Mrsj8ZFsGBGCpNHfuu1qEwLxmQEykphtFtF (seed "sbor-fixings"),
+  plus a daily signed memo. Live page: https://sbor.xyz/solana.html
+- Hyperliquid's HyperEVM (chain 999), from 8 October 2026:
+  0x56B5417de539153994fF6785F8a3b56421C9eb4f. Live page:
+  https://sbor.xyz/hyperliquid.html
+
+On the EVM chains (Arc, Base, Hyperliquid), the contract is the same:
 
 - latest(bytes32) returns date (YYYYMMDD), borrowBps, supplyBps, depthUsd and
   publishedAt for a rate, keyed by its name as bytes32: "SBOR-USD", "SBOR-BTC",
@@ -258,9 +279,9 @@ them on-chain. Contract: 0x56B5417de539153994fF6785F8a3b56421C9eb4f.
 - Rates are in basis points: 271 is 2.71%. Always check the date: an index not
   published on a day keeps its last date on-chain.
 - An owner wallet controls the contract; a separate publisher wallet can only
-  post rates. Source: contracts/SBORFixings.sol. Live page, read from Arc in the
-  browser: https://sbor.xyz/arc.html. The JSON at sbor.xyz/api remains the
-  authoritative record.
+  post rates. Source: contracts/SBORFixings.sol, and contracts/sbor-fixings.clar
+  for Stacks. Each live page reads its chain directly in the browser. The JSON
+  at sbor.xyz/api remains the authoritative record.
 
 ## Context: stSTX on the market, and the stBTC loop's carry
 
