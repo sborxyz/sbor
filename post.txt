@@ -1,16 +1,10 @@
-SBOR post drafts, fixing 2026-10-07T08:31:19Z
-Compared with 2026-10-06
+SBOR post drafts, fixing 2026-10-08T08:30:46Z
+Compared with 2026-10-07
 
-1 thing worth saying. Pick one. Do not post more than one a day.
+Nothing moved enough to be worth posting.
 
---- 1. SBOR-BTC dropped out (204 chars)
-
-SBOR-BTC is not published today.
-
-The market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.
-
-It returns when the read does.
-
-sbor.xyz
-
-Check the numbers against the site before posting. Never state a cause.
+Thresholds: a rate moving 25 bps, the staking yield moving 50 bps or
+changing cycle, an index appearing or dropping out, utilization
+crossing 80% or 20% in either direction, an inversion, or a term
+average publishing. A level that has not moved since yesterday is
+not news and is deliberately not flagged.

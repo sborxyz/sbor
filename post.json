@@ -1,17 +1,7 @@
 {
-  "fixing": "2026-10-07T08:31:19Z",
-  "comparedWith": "2026-10-06",
-  "top": {
-    "why": "SBOR-BTC dropped out",
-    "chars": 204,
-    "text": "SBOR-BTC is not published today.\n\nThe market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.\n\nIt returns when the read does.\n\nsbor.xyz"
-  },
+  "fixing": "2026-10-08T08:30:46Z",
+  "comparedWith": "2026-10-07",
+  "top": null,
   "otherCount": 0,
-  "drafts": [
-    {
-      "why": "SBOR-BTC dropped out",
-      "chars": 204,
-      "text": "SBOR-BTC is not published today.\n\nThe market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.\n\nIt returns when the read does.\n\nsbor.xyz"
-    }
-  ]
+  "drafts": []
 }
