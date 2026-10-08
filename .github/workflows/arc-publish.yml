@@ -35,8 +35,16 @@ jobs:
           ARC_CONTRACT: ${{ vars.ARC_CONTRACT }}
         run: |
           set -o pipefail
-          node scripts/arc-publish.mjs | tee arc.txt
+          # Up to three attempts a minute apart: public endpoints have brief outages,
+          # and one should not raise an alarm. On 7 October 2026 a two-minute Hiro
+          # outage did exactly that.
+          : > arc.txt; ok=0
+          for attempt in 1 2 3; do
+            if node scripts/arc-publish.mjs | tee -a arc.txt; then ok=1; break; fi
+            if [ "$attempt" -lt 3 ]; then echo "attempt $attempt failed, retrying in 60 seconds" | tee -a arc.txt; sleep 60; fi
+          done
           { echo "## Publish to Arc"; echo '```text'; cat arc.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          [ "$ok" = 1 ]
       - name: Say so if it failed
         if: failure()
         env:
