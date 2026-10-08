@@ -26,13 +26,20 @@ const RPC = {
   Base:     ["https://base-rpc.publicnode.com", "https://mainnet.base.org", "https://1rpc.io/base"],
   /* Arc, Circle's Layer-1, chain 5042. Circle's endpoint first, then the
      providers Arc's docs list; all four answered public reads on 1 Oct 2026. */
-  Arc:      ["https://rpc.mainnet.arc.io", "https://rpc.drpc.mainnet.arc.io", "https://rpc.quicknode.mainnet.arc.io", "https://rpc.blockdaemon.mainnet.arc.io"]
+  Arc:      ["https://rpc.mainnet.arc.io", "https://rpc.drpc.mainnet.arc.io", "https://rpc.quicknode.mainnet.arc.io", "https://rpc.blockdaemon.mainnet.arc.io"],
+  /* Hyperliquid's EVM, chain 999. The foundation's endpoint first; all four
+     answered on 7 Oct 2026. */
+  "Hyperliquid L1": ["https://rpc.hyperliquid.xyz/evm", "https://hyperliquid.drpc.org", "https://rpc.hypurrscan.io", "https://hyperliquid-json-rpc.stakely.io"]
 };
 
 /* The Aave V3 Pool on each chain. Everything else is discovered from it. */
 const POOL = {
   Ethereum: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
-  Base:     "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5"
+  Base:     "0xA238Dd80C259a72e81d7e4664a9801593F98d1c5",
+  /* HyperLend's core pool, a fork of Aave V3 with the same reserve layout.
+     Checked on-chain on 7 Oct 2026: its getReservesList includes the USDC
+     and UBTC tokens DefiLlama lists for HyperLend. */
+  "Hyperliquid L1": "0x00A89d7a5A02160f20150EbEA7a2b5E4879A1A8b"
 };
 
 /* Four-byte function selectors. */
@@ -131,7 +138,9 @@ const MARKETS = [
   { chain: "Ethereum", asset: "USDC",  token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
   { chain: "Ethereum", asset: "WBTC",  token: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" },
   { chain: "Ethereum", asset: "cbBTC", token: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" },
-  { chain: "Base",     asset: "USDC",  token: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" }
+  { chain: "Base",     asset: "USDC",  token: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" },
+  { chain: "Hyperliquid L1", asset: "USDC", token: "0xb88339CB7199b77E23DB6E890353E22632Ba630f" },
+  { chain: "Hyperliquid L1", asset: "UBTC", token: "0x9FDBdA0A5e284c32744D2f17Ee5c74B284993463" }
 ];
 
 async function compare(){
