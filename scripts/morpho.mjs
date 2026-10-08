@@ -43,7 +43,7 @@ const COLLATERAL = {
 const collateralOn = (name, chain) => typeof COLLATERAL[name] === "string" ? COLLATERAL[name] : COLLATERAL[name]?.[chain];
 
 /* The largest bitcoin-collateral USDC markets, each at 86% liquidation LTV.
-   The Base market is the one Coinbase's bitcoin-backed loans use; the Arc
+   The Base market is the one a large US exchange's bitcoin-backed loans use; the Arc
    market is the one Circle's Digital Asset-Backed Borrowing uses. A market
    with eligibleFrom enters the reference at zero weight on that date and ramps
    to full weight linearly over 30 days, as SBOR's methodology requires of any
