@@ -659,7 +659,7 @@ const main = async () => {
      enters no fixing and changes no published rate until its effective date
      is announced. A failure here must not stop the fixing. */
   let preview = null;
-  try { preview = await methodologyPreview(); }
+  try { preview = await methodologyPreview(indices["SBOR-USD"]?.markets?.find(m => m.venue === "Granite") || null); }
   catch(e){ log(`  methodology preview unavailable, omitted. ${e.message}`); }
 
   /* Reference rates from outside Stacks. Context only, never a constituent.
