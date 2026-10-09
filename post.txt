@@ -1,10 +1,16 @@
-SBOR post drafts, fixing 2026-10-08T08:30:46Z
-Compared with 2026-10-07
+SBOR post drafts, fixing 2026-10-09T08:30:37Z
+Compared with 2026-10-08
 
-Nothing moved enough to be worth posting.
+1 thing worth saying. Pick one. Do not post more than one a day.
 
-Thresholds: a rate moving 25 bps, the staking yield moving 50 bps or
-changing cycle, an index appearing or dropping out, utilization
-crossing 80% or 20% in either direction, an inversion, or a term
-average publishing. A level that has not moved since yesterday is
-not news and is deliberately not flagged.
+--- 1. PoX cycle 143 to 144 (142 chars)
+
+Reward cycle 144 settled.
+
+7.86 BTC paid to STX stackers, against 448,279,555 STX locked.
+
+SBOR-PoX: 6.49% to 10.19%.
+
+sbor.xyz
+
+Check the numbers against the site before posting. Never state a cause.

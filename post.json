@@ -1,7 +1,17 @@
 {
-  "fixing": "2026-10-08T08:30:46Z",
-  "comparedWith": "2026-10-07",
-  "top": null,
+  "fixing": "2026-10-09T08:30:37Z",
+  "comparedWith": "2026-10-08",
+  "top": {
+    "why": "PoX cycle 143 to 144",
+    "chars": 142,
+    "text": "Reward cycle 144 settled.\n\n7.86 BTC paid to STX stackers, against 448,279,555 STX locked.\n\nSBOR-PoX: 6.49% to 10.19%.\n\nsbor.xyz"
+  },
   "otherCount": 0,
-  "drafts": []
+  "drafts": [
+    {
+      "why": "PoX cycle 143 to 144",
+      "chars": 142,
+      "text": "Reward cycle 144 settled.\n\n7.86 BTC paid to STX stackers, against 448,279,555 STX locked.\n\nSBOR-PoX: 6.49% to 10.19%.\n\nsbor.xyz"
+    }
+  ]
 }
