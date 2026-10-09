@@ -102,7 +102,7 @@ export const MARKETS = [
   { chain: "Base",     collateral: "cbBTC",  loan: "USDC",  id: "0x9103c3b4e834476c9a62ea009ba2c884ee42e94e6e314a26f04d312434191836", live: true },
   { chain: "Ethereum", collateral: "cbBTC",  loan: "USDC",  id: "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64", live: true },
   { chain: "Ethereum", collateral: "WBTC",   loan: "USDC",  id: "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49", live: true },
-  { chain: "Arc",      collateral: "cirBTC", loan: "USDC",  id: "0xc2db905f174e5defcce01d321b09f15f78856a36a21b90cc7e1abbc29225815d", live: true },
+  { chain: "Arc",      collateral: "cirBTC", loan: "USDC",  id: "0xc2db905f174e5defcce01d321b09f15f78856a36a21b90cc7e1abbc29225815d", live: true, eligibleFrom: "2026-10-02" },
   { chain: "Ethereum", collateral: "kBTC",   loan: "RLUSD", id: "0x15bb2a6af0c909eed19fb1f2ceeead34ecbdcba626de752c6b09389ee14eec32" },
   { chain: "Ethereum", collateral: "kBTC",   loan: "PYUSD", id: "0xe51f9aaad25d0e755429cf77076b3c2d37cb1228ed81f8a5482f2102c220eef5" },
   { chain: "Ethereum", collateral: "WBTC",   loan: "USDT",  id: "0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99" },
@@ -144,6 +144,7 @@ async function readMarket(m){
   const p = await call(m.chain, morpho, SEL.idToMarketParams + id);
   if (words(p) < 5) throw new Error(`idToMarketParams returned ${words(p)} words`);
   const loan = addr(word(p, 0)), coll = addr(word(p, 1)), irm = addr(word(p, 3));
+  const lltv = Number(big(word(p, 4))) / WAD;
   const wantLoan = USD[m.chain]?.[m.loan], wantColl = BTC[m.chain]?.[m.collateral];
   if (!wantLoan || loan !== wantLoan) throw new Error(`lends ${loan}, not ${m.loan}`);
   if (!wantColl || coll !== wantColl) throw new Error(`takes ${coll} as collateral, not ${m.collateral}`);
@@ -170,8 +171,10 @@ async function readMarket(m){
     utilization: round(utilization * 100),
     supplied: Number(supplied) / scale,
     borrowed: Number(borrowed) / scale,
+    lltv: round(lltv * 100, 1), fee: round(fee * 100, 2),
     marketId: m.id, loanToken: loan, collateralToken: coll,
     inBtcCollateralUsdcToday: !!m.live,
+    eligibleFrom: m.live ? (m.eligibleFrom || null) : EFFECTIVE,
     source: "contract"
   };
 }
@@ -248,11 +251,11 @@ async function graniteCollateralCheck(){
   return present;
 }
 
-export async function methodologyPreview(granite = null){
-  const read = [], notRead = [];
+async function collect(granite){
+  const read = [], notRead = [], notReadIds = [];
   for (const m of MARKETS){
     try { read.push(await readMarket(m)); }
-    catch (e) { notRead.push(`${m.chain} ${m.collateral}/${m.loan} ${m.id.slice(0, 10)}: ${e.message}`); log(`  preview ${m.chain} ${m.collateral}/${m.loan}: not read. ${e.message}`); }
+    catch (e) { notReadIds.push(m.id); notRead.push(`${m.chain} ${m.collateral}/${m.loan} ${m.id.slice(0, 10)}: ${e.message}`); log(`  preview ${m.chain} ${m.collateral}/${m.loan}: not read. ${e.message}`); }
   }
   if (granite && typeof granite.borrow === "number" && granite.depthUsd > 0){
     const g = {
@@ -260,14 +263,14 @@ export async function methodologyPreview(granite = null){
       borrow: granite.borrow, supply: granite.supply, nominalBorrow: granite.nominalBorrow ?? granite.borrow,
       utilization: granite.utilization, supplied: granite.depthUsd,
       borrowed: granite.depthUsd * (granite.utilization || 0) / 100,
-      marketId: GRANITE_STATE.replace("/", "."), inBtcCollateralUsdcToday: false, source: "contract"
+      marketId: GRANITE_STATE.replace("/", "."), inBtcCollateralUsdcToday: false, eligibleFrom: EFFECTIVE, source: "contract"
     };
     try {
       const present = await graniteCollateralCheck();
       g.collateralCheck = present;
       if (present.length === 1 && present[0] === SBTC) read.push(g);
-      else notRead.push(`Stacks Granite USDCx: collateral list is ${present.join(", ") || "empty"}, not sBTC alone`);
-    } catch (e) { notRead.push(`Stacks Granite USDCx: collateral list not readable, no weight. ${e.message}`); }
+      else notReadIds.push(g.marketId), notRead.push(`Stacks Granite USDCx: collateral list is ${present.join(", ") || "empty"}, not sBTC alone`);
+    } catch (e) { notReadIds.push(g.marketId); notRead.push(`Stacks Granite USDCx: collateral list not readable, no weight. ${e.message}`); }
   }
   if (!read.length) throw new Error(`no market could be read. ${notRead.join("; ")}`);
 
@@ -285,7 +288,13 @@ export async function methodologyPreview(granite = null){
     if (m.sizeUsd < FLOOR_USD){ context.push({ ...m, reason: `$${(m.sizeUsd / 1e6).toFixed(2)}M supplied, under the $1M floor` }); continue; }
     counted.push(m);
   }
+  return { counted, context, notRead, notReadIds, guard };
+}
 
+const clean = m => { const { sizeUsd, supplied, borrowed, wsize, ...rest } = m; return { ...rest, depthUsd: Math.round(supplied), borrowedUsd: Math.round(borrowed) }; };
+
+export async function methodologyPreview(granite = null){
+  const { counted, context, notRead, guard } = await collect(granite);
   const headline = weigh(counted);
   const subRates = {};
   for (const g of [...new Set(counted.map(m => m.group))]){
@@ -298,7 +307,6 @@ export async function methodologyPreview(granite = null){
   log(`  preview 1.13.0: ${counted.length} markets, borrow ${headline?.borrow}% supply ${headline?.supply}% across $${(headline?.depthUsd / 1e9).toFixed(2)}B; ${notRead.length} not read`);
   for (const [k, v] of Object.entries(subRates)) log(`    ${k}: borrow ${v.borrow}% across $${(v.depthUsd / 1e6).toFixed(1)}M, ${v.markets} markets`);
 
-  const clean = m => { const { sizeUsd, supplied, borrowed, ...rest } = m; return { ...rest, depthUsd: Math.round(supplied), borrowedUsd: Math.round(borrowed) }; };
   return {
     label: "SBOR, methodology 1.13.0 preview",
     status: "preview, not a fixing",
@@ -313,6 +321,133 @@ export async function methodologyPreview(granite = null){
     ...(context.length && { context: context.map(m => ({ ...clean(m), reason: m.reason })) }),
     ...(notRead.length && { notRead })
   };
+}
+
+/* ------------------------------------------------------------------------
+   From the effective date: the live rates under methodology 1.13.0.
+
+   Returns { usd, usdc }:
+   - usd, the SBOR headline BTC-COLLATERAL-USD, with a sub-rate per stablecoin
+     once $25M or more of it is weighted in (rule 9.2);
+   - usdc, BTC-COLLATERAL-USDC, in the shape it has always had, now over every
+     eligible USDC market (rule 9.3), so every reader of it keeps working.
+
+   Weights are size times phase-in. A market added under 1.13.0 enters at zero
+   weight on the effective date and reaches full weight 30 days later; the four
+   markets already in BTC-COLLATERAL-USDC keep the phase-in they had.
+
+   Continuity (rule 9.5): a rate is withheld when the markets that could not be
+   read carried a quarter or more of its weight in the previous fixing.
+   ------------------------------------------------------------------------ */
+const PHASE_IN_DAYS = 30;
+function phaseIn(eligibleFrom, today){
+  if (!eligibleFrom) return 1;
+  const days = (Date.parse(today) - Date.parse(eligibleFrom)) / 864e5;
+  return Math.max(0, Math.min(1, days / PHASE_IN_DAYS));
+}
+function weighPhased(ms){
+  const w = ms.reduce((a, m) => a + m.wsize, 0);
+  if (!w) return null;
+  return {
+    borrow: round(ms.reduce((a, m) => a + m.borrow * m.wsize, 0) / w),
+    supply: round(ms.reduce((a, m) => a + m.supply * m.wsize, 0) / w),
+    nominalBorrow: round(ms.reduce((a, m) => a + m.nominalBorrow * m.wsize, 0) / w),
+    utilization: round(ms.reduce((a, m) => a + m.borrowed, 0) / ms.reduce((a, m) => a + m.supplied, 0) * 100),
+    depthUsd: Math.round(ms.reduce((a, m) => a + m.sizeUsd, 0)),
+    weightedDepthUsd: Math.round(w),
+    markets: ms.filter(m => m.wsize > 0).length,
+    venues: new Set(ms.filter(m => m.wsize > 0).map(m => m.venue)).size,
+    chains: new Set(ms.filter(m => m.wsize > 0).map(m => m.chain)).size,
+    largestConstituentWeight: round(Math.max(...ms.map(m => m.wsize)) / w, 4)
+  };
+}
+/* Continuity (rule 9.5). Each fixing records every market's weight, in
+   weighted dollars, from the last fixing in which it was read, so a market that fails two days running
+   still counts against the rate. missingShare is the share of that recorded
+   weight, within a group or overall, carried by markets not read today. */
+function continuityFrom(prev){
+  if (prev?.bitcoinCollateralUsd?.continuity) return prev.bitcoinCollateralUsd.continuity;
+  /* The first fixing under 1.13.0: yesterday's BTC-COLLATERAL-USDC. */
+  return (prev?.bitcoinCollateralUsdc?.markets || []).map(m => ({ id: String(m.marketId || "").toLowerCase(), group: "USDC", weight: m.weight || 0 }));
+}
+function missingShare(cont, notReadIds, group = null){
+  const ids = new Set(notReadIds.map(x => x.toLowerCase()));
+  const rows = cont.filter(c => !group || c.group === group);
+  const total = rows.reduce((a, c) => a + c.weight, 0);
+  if (!total) return 0;
+  return rows.reduce((a, c) => a + (ids.has(c.id) ? c.weight : 0), 0) / total;
+}
+const withheldNote = share => `markets not read today carried ${(share * 100).toFixed(1)}% of the rate's weight when last read`;
+
+export async function bitcoinCollateral(granite = null, prev = null, today = new Date().toISOString().slice(0, 10)){
+  const { counted, context, notRead, notReadIds, guard } = await collect(granite);
+  for (const m of counted){
+    m.phaseIn = round(phaseIn(m.eligibleFrom, today), 4);
+    m.wsize = m.sizeUsd * m.phaseIn;
+  }
+  const head = weighPhased(counted);
+  const cont = continuityFrom(prev);
+  const headMissing = missingShare(cont, notReadIds);
+  const headOk = head && headMissing < 0.25;
+  const wsum = counted.reduce((a, m) => a + m.wsize, 0);
+  for (const m of counted) m.weight = wsum ? round(m.wsize / wsum, 4) : 0;
+
+  /* Today's weights for every market read, the last recorded weight for every
+     market not read. */
+  const readIds = new Set(counted.map(m => String(m.marketId).toLowerCase()));
+  const continuity = [
+    ...counted.map(m => ({ id: String(m.marketId).toLowerCase(), group: m.group, weight: Math.round(m.wsize) })),
+    /* Carried for up to 30 fixings, then dropped, as a market below the floor
+       is removed after 30 (rule 4.2). */
+    ...cont.filter(c => !readIds.has(c.id) && notReadIds.some(x => x.toLowerCase() === c.id) && (c.missed || 0) < 30)
+           .map(c => ({ ...c, missed: (c.missed || 0) + 1 }))
+  ];
+
+  const subRates = {};
+  for (const g of [...new Set(counted.map(m => m.group))]){
+    const w = weighPhased(counted.filter(m => m.group === g));
+    if (!w || w.weightedDepthUsd < SUBRATE_FLOOR_USD) continue;
+    const miss = missingShare(cont, notReadIds, g);
+    subRates[`BTC-COLLATERAL-${g}`] = miss < 0.25 ? w : { withheld: withheldNote(miss) };
+  }
+
+  /* BTC-COLLATERAL-USDC, as before, now over every eligible USDC market. */
+  const usdcMs = counted.filter(m => m.group === "USDC");
+  const usdcW = weighPhased(usdcMs);
+  const usdcMissing = missingShare(cont, notReadIds, "USDC");
+  const usdcOk = usdcW && usdcMissing < 0.25;
+  const usdcSum = usdcMs.reduce((a, m) => a + m.wsize, 0);
+  const usdc = {
+    label: "Bitcoin-collateral USDC",
+    kind: "the USDC rate under the SBOR headline (BTC-COLLATERAL-USD), methodology 1.13.0",
+    note: "What it costs to borrow USDC against plain bitcoin: every eligible market lending USDC (or USDCx on Stacks) against cbBTC, WBTC, cirBTC or sBTC, priced by its own interest rate model, read from contract state, weighted by what is supplied times its phase-in. Markets added under methodology 1.13.0 entered at zero weight on 14 October 2026 and reach full weight over 30 days. depthUsd counts every market in full. Withheld when markets that could not be read carried a quarter or more of its weight when last read. Recording began on 25 September 2026.",
+    ...(usdcOk && { borrow: usdcW.borrow, supply: usdcW.supply, utilization: usdcW.utilization, depthUsd: usdcW.depthUsd }),
+    markets: usdcMs.map(m => ({ ...clean(m), weight: usdcSum ? round(m.wsize / usdcSum, 4) : 0 })),
+    ...(!usdcOk && usdcW && { withheld: withheldNote(usdcMissing) }),
+    ...(notRead.length && { notRead })
+  };
+
+  const usd = {
+    label: "SBOR",
+    code: "BTC-COLLATERAL-USD",
+    kind: "the SBOR headline, methodology 1.13.0",
+    effectiveFrom: EFFECTIVE,
+    notice: "https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md",
+    note: "What it costs to borrow dollars against bitcoin: every eligible market lending a dollar stablecoin against plain 1:1 bitcoin, priced by its own interest rate model, read from contract state, weighted by what is supplied times its phase-in. Markets added under methodology 1.13.0 entered at zero weight on 14 October 2026 and reach full weight over 30 days, so the rate glides rather than steps. depthUsd counts every market in full; weightedDepthUsd is what carries weight today. A rate per stablecoin is published once $25M or more of it is weighted in. Withheld when markets that could not be read carried a quarter or more of its weight when last read. continuity records that weight per market.",
+    ...(headOk && { borrow: head.borrow, supply: head.supply, nominalBorrow: head.nominalBorrow, utilization: head.utilization,
+      depthUsd: head.depthUsd, weightedDepthUsd: head.weightedDepthUsd, constituents: head.markets, venues: head.venues,
+      chains: head.chains, largestConstituentWeight: head.largestConstituentWeight }),
+    ...(!headOk && head && { withheld: withheldNote(headMissing) }),
+    subRates,
+    depegGuard: guard,
+    markets: counted.map(clean),
+    ...(context.length && { context: context.map(m => ({ ...clean(m), reason: m.reason })) }),
+    ...(notRead.length && { notRead }),
+    continuity
+  };
+  log(`  SBOR 1.13.0: ${usd.borrow ?? "withheld"}% borrow across $${(head?.depthUsd / 1e9).toFixed(2)}B (weighted $${(head?.weightedDepthUsd / 1e9).toFixed(2)}B), ${counted.length} markets; USDC ${usdc.borrow ?? "withheld"}%`);
+  for (const [k, v] of Object.entries(subRates)) log(`    ${k}: ${v.borrow ?? "withheld"}% weighted $${(v.weightedDepthUsd / 1e6).toFixed(1)}M`);
+  return { usd, usdc };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

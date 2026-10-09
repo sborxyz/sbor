@@ -87,6 +87,12 @@ export function memoFrom(latest){
     const depth = (ix.markets || []).reduce((t, m) => t + (m.depthUsd || 0), 0);
     rates[label] = [bps(ix.borrow), bps(ix.supply), Math.round(depth)];
   }
+  /* From methodology 1.13.0 (14 October 2026), the SBOR headline. The
+     account holds six keys; the rates per stablecoin other than USDC are
+     published in the API, not here. */
+  const head = latest.bitcoinCollateralUsd;
+  if (head && typeof head.borrow === "number" && typeof head.supply === "number")
+    rates["BTC-COLLATERAL-USD"] = [bps(head.borrow), bps(head.supply), Math.round(head.depthUsd || 0)];
   const ref = latest.bitcoinCollateralUsdc;
   if (ref && typeof ref.borrow === "number" && typeof ref.supply === "number")
     rates["BTC-COLLATERAL-USDC"] = [bps(ref.borrow), bps(ref.supply), Math.round(ref.depthUsd || 0)];

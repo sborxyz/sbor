@@ -57,6 +57,11 @@ export function rowsFrom(latest){
     const depth = (ix.markets || []).reduce((t, m) => t + (m.depthUsd || 0), 0);
     rows.push({ label, borrow: bps(ix.borrow), supply: bps(ix.supply), depth: BigInt(Math.round(depth)) });
   }
+  /* From methodology 1.13.0 (14 October 2026), the SBOR headline. The
+     rates per stablecoin other than USDC are published in the API. */
+  const head = latest.bitcoinCollateralUsd;
+  if (head && typeof head.borrow === "number" && typeof head.supply === "number")
+    rows.push({ label: "BTC-COLLATERAL-USD", borrow: bps(head.borrow), supply: bps(head.supply), depth: BigInt(Math.round(head.depthUsd || 0)) });
   const ref = latest.bitcoinCollateralUsdc;
   if (ref && typeof ref.borrow === "number" && typeof ref.supply === "number")
     rows.push({ label: "BTC-COLLATERAL-USDC", borrow: bps(ref.borrow), supply: bps(ref.supply), depth: BigInt(Math.round(ref.depthUsd || 0)) });

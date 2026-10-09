@@ -138,19 +138,39 @@ const facts = {
   /* What it costs to borrow USDC against bitcoin, from Morpho on Base and
      Ethereum, recorded from 25 September 2026. A reference, not an SBOR index:
      reported on its own, never blended with the Stacks indices. */
+  /* From methodology 1.13.0 (14 October 2026), the SBOR headline: borrowing
+     any dollar stablecoin against plain bitcoin, with a rate per stablecoin.
+     Its first day has no previous reading to compare with. */
+  bitcoinCollateralUsd: today.btcCollateralUsd ? {
+    published: today.btcCollateralUsd.b != null,
+    borrowPct: F(today.btcCollateralUsd.b), borrowChange1dBps: bps(today.btcCollateralUsd.b, d1.btcCollateralUsd?.b),
+    supplyPct: F(today.btcCollateralUsd.s), utilizationPct: F(today.btcCollateralUsd.u),
+    depthUsd: today.btcCollateralUsd.d, weightedDepthUsd: today.btcCollateralUsd.wd,
+    venues: latest.bitcoinCollateralUsd?.venues ?? null, chains: latest.bitcoinCollateralUsd?.chains ?? null,
+    perStablecoin: Object.entries(today.btcCollateralUsd.sub || {}).map(([code, v]) => ({
+      code, published: v.b != null, borrowPct: F(v.b), borrowChange1dBps: bps(v.b, d1.btcCollateralUsd?.sub?.[code]?.b),
+      newToday: !d1.btcCollateralUsd?.sub?.[code], weightedDepthUsd: v.wd })),
+    marketsPhasingIn: (today.btcCollateralUsd.markets || []).filter(m => typeof m.p === "number" && m.p < 1).length,
+    marketsAtFullWeight: (today.btcCollateralUsd.markets || []).filter(m => m.p === 1).length
+  } : null,
+
   bitcoinCollateralUsdc: today.btcUsdc ? {
     published: today.btcUsdc.b != null,
     borrowPct: F(today.btcUsdc.b), borrowChange1dBps: bps(today.btcUsdc.b, d1.btcUsdc?.b),
     supplyPct: F(today.btcUsdc.s), utilizationPct: F(today.btcUsdc.u), depthUsd: today.btcUsdc.d,
     markets: (today.btcUsdc.markets || []).map(m => {
-      const a = (d1.btcUsdc?.markets || []).find(x => x.c === m.c && x.a === m.a);
+      /* Match by market id where both days have one. From 14 October 2026 a
+         chain can have two markets on the same collateral, so chain and
+         collateral alone match only where that pair is unique today. */
+      const unique = (today.btcUsdc.markets || []).filter(x => x.c === m.c && x.a === m.a).length === 1;
+      const a = (d1.btcUsdc?.markets || []).find(x => m.i && x.i ? x.i === m.i : unique && x.c === m.c && x.a === m.a);
       /* Phase-in lives in the fixing, not in history: take it from there, so
          the writer never has to guess which market is new. On 7 October 2026
          the brief called Ethereum's WBTC market "still phasing in"; only
          Arc's was. */
-      const lm = (latest.bitcoinCollateralUsdc?.markets || []).find(x => x.chain === m.c && x.collateral === m.a);
+      const lm = (latest.bitcoinCollateralUsdc?.markets || []).find(x => m.i ? String(x.marketId || "").startsWith(m.i) : x.chain === m.c && x.collateral === m.a);
       const phasingIn = typeof lm?.phaseIn === "number" && lm.phaseIn < 1;
-      return { chain: m.c, collateral: m.a, borrowPct: F(m.b), borrowChange1dBps: bps(m.b, a?.b),
+      return { chain: m.c, ...(m.v && { venue: m.v }), collateral: m.a, ...(m.l && { loan: m.l }), borrowPct: F(m.b), borrowChange1dBps: bps(m.b, a?.b),
                utilizationPct: F(m.u), depthUsd: m.d,
                phasingIn, ...(phasingIn && { phaseInPctOfFullWeight: Math.round(lm.phaseIn * 100) }) };
     })
@@ -191,11 +211,22 @@ const flags = [];
 }
 
 {
+  const sg = x => (x > 0 ? "+" : "") + x;
+  const hu = facts.bitcoinCollateralUsd;
+  if (hu && !hu.published)
+    flags.push(`DATA EVENT: SBOR (BTC-COLLATERAL-USD) is withheld today: markets that could not be read carried a quarter or more of its weight. ${latest.bitcoinCollateralUsd?.withheld || ""}`.trim());
+  if (hu?.published && hu.borrowChange1dBps != null && Math.abs(hu.borrowChange1dBps) >= 25)
+    flags.push(`SBOR (BTC-COLLATERAL-USD), borrowing dollars against bitcoin, moved ${sg(hu.borrowChange1dBps)} bps to ${hu.borrowPct}%.`);
+  for (const r of hu?.perStablecoin || []){
+    if (r.newToday && r.published) flags.push(`${r.code} is published for the first time today: its markets now carry $25M or more of weight.`);
+    else if (r.published && r.borrowChange1dBps != null && Math.abs(r.borrowChange1dBps) >= 25)
+      flags.push(`${r.code} moved ${sg(r.borrowChange1dBps)} bps to ${r.borrowPct}%.`);
+  }
   const bc = facts.bitcoinCollateralUsdc;
   if (bc && !bc.published)
-    flags.push(`The bitcoin-collateral USDC reference is withheld today: not every Morpho market could be read.`);
+    flags.push(`The bitcoin-collateral USDC rate is withheld today: markets that could not be read carried too much of its weight.`);
   if (bc?.published && bc.borrowChange1dBps != null && Math.abs(bc.borrowChange1dBps) >= 25)
-    flags.push(`Borrowing USDC against bitcoin on Morpho, Base, Ethereum and Arc, moved ${bc.borrowChange1dBps > 0 ? "+" : ""}${bc.borrowChange1dBps} bps to ${bc.borrowPct}%.`);
+    flags.push(`Borrowing USDC against bitcoin (BTC-COLLATERAL-USDC) moved ${sg(bc.borrowChange1dBps)} bps to ${bc.borrowPct}%.`);
 }
 for (const ix of facts.indices){
   if (!ix.published && ix.publishedYesterday) flags.push(`${ix.label} is not published today. It was yesterday.`);
@@ -335,7 +366,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 7. Some inputs are unreliable and you should say so rather than reporting them flatly. The stSTX protocol yield from StackingDAO has moved 6.81, 3.14, 4.21, 4.33 within a week, which is not how a staking yield behaves. Any figure that depends on it, including the same exposure legs and the all in supply rate, inherits that. If you cite one, say the input moves.
 
-8. bitcoinCollateralUsdc is a reference, not an SBOR index: what it costs to borrow USDC against wrapped bitcoin on Morpho, on Base, Ethereum and Arc. A newly added market phases in over 30 days; its own rate is not a move in the reference. Only a market with phasingIn true is phasing in; every other market carries its full weight, and must never be called new or phasing in. Describe a phasing-in market as that share of the way to its full weight (phaseInPctOfFullWeight), never as its weight in the reference. Report it on its own when it is flagged. Never average it with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
+8. From 14 October 2026 (methodology 1.13.0), bitcoinCollateralUsd is the SBOR headline, BTC-COLLATERAL-USD: what it costs to borrow any dollar stablecoin against plain bitcoin, across every eligible market on every chain SBOR reads. perStablecoin holds the rate for each stablecoin with $25M or more of weight, and bitcoinCollateralUsdc is its USDC rate, BTC-COLLATERAL-USDC. Before that date bitcoinCollateralUsdc covered Morpho markets on Base, Ethereum and Arc only. Markets added under 1.13.0 phase in over 30 days from 14 October, so in those weeks the headline glides as their weight grows: a change from phase-in is not a market move, and a stablecoin rate appearing for the first time is its weight crossing $25M, not new lending. Only a market with phasingIn true is phasing in; every other market carries its full weight and must never be called new or phasing in. Describe a phasing-in market as that share of the way to its full weight (phaseInPctOfFullWeight), never as its weight in the rate. Report these rates on their own when flagged. Never average them with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
 
 9. A flag marked DATA EVENT comes first and is never a market move. Say the index is not published, or is missing a market, and why, in one sentence, and do not interpret any change in that index or its remaining markets. A DATA NOTE is one sentence, no interpretation.
 

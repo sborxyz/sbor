@@ -10,7 +10,7 @@ import { fetchCallReadOnlyFunction, contractPrincipalCV, cvToValue } from "@stac
 import { poxReference } from "./pox.mjs";
 import { externalReference } from "./external.mjs";
 import { bitcoinCollateralUsdc } from "./morpho.mjs";
-import { methodologyPreview } from "./preview.mjs";
+import { methodologyPreview, bitcoinCollateral, EFFECTIVE as V113 } from "./preview.mjs";
 import { contextBlock } from "./context.mjs";
 
 const POOLS_URL = "https://yields.llama.fi/pools";
@@ -110,7 +110,15 @@ const SECONDS_IN_YEAR = 31_536_000;
 
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
-const METHODOLOGY_VERSION = "1.12.0";
+/* 1.13.0 takes effect with the fixing of 14 October 2026 (METHODOLOGY-1.13.0.md),
+   announced on 9 October. Before that date every fixing is produced under 1.12.0. */
+const TODAY = new Date().toISOString().slice(0, 10);
+/* SBOR_METHOD_DATE is set only by the manual test workflow, to run a fixing
+   under the method of a later date (for example 1.13.0 before 14 October).
+   The morning job never sets it. */
+const METHOD_DATE = process.env.SBOR_METHOD_DATE || TODAY;
+const IS_113 = METHOD_DATE >= V113;
+const METHODOLOGY_VERSION = IS_113 ? "1.13.0" : "1.12.0";
 
 /* Below this, on both sides at once, a funded market is not showing a market rate. */
 const RATE_FLOOR = 0.05;
@@ -650,17 +658,30 @@ const main = async () => {
   /* What it costs to borrow USDC against bitcoin, from Morpho on Base and
      Ethereum. A reference, not an index. A failure here must not stop the
      fixing. */
-  let btcUsdc = null;
-  try { btcUsdc = await bitcoinCollateralUsdc(); }
-  catch(e){ log(`  bitcoin-collateral USDC unavailable, omitted. ${e.message}`); }
+  let btcUsdc = null, btcUsd = null;
+  const graniteMarket = indices["SBOR-USD"]?.markets?.find(m => m.venue === "Granite") || null;
+  if (IS_113){
+    /* Methodology 1.13.0: the SBOR headline across every dollar stablecoin
+       lent against plain bitcoin, and BTC-COLLATERAL-USDC over every eligible
+       USDC market. The previous fixing is read for the continuity rule. */
+    let prev = null;
+    try { prev = JSON.parse(readFileSync("api/v1/latest.json", "utf8")); } catch {}
+    try { const r = await bitcoinCollateral(graniteMarket, prev, METHOD_DATE); btcUsd = r.usd; btcUsdc = r.usdc; }
+    catch(e){ log(`  bitcoin-collateral rates unavailable, omitted. ${e.message}`); }
+  } else {
+    try { btcUsdc = await bitcoinCollateralUsdc(); }
+    catch(e){ log(`  bitcoin-collateral USDC unavailable, omitted. ${e.message}`); }
+  }
 
   /* Methodology 1.13.0 as a preview: the headline across every dollar
      stablecoin lent against plain bitcoin, and a rate per stablecoin. It
      enters no fixing and changes no published rate until its effective date
      is announced. A failure here must not stop the fixing. */
   let preview = null;
-  try { preview = await methodologyPreview(indices["SBOR-USD"]?.markets?.find(m => m.venue === "Granite") || null); }
-  catch(e){ log(`  methodology preview unavailable, omitted. ${e.message}`); }
+  if (!IS_113){
+    try { preview = await methodologyPreview(graniteMarket); }
+    catch(e){ log(`  methodology preview unavailable, omitted. ${e.message}`); }
+  }
 
   /* Reference rates from outside Stacks. Context only, never a constituent.
      A failure here must not stop the fixing. */
@@ -723,6 +744,7 @@ const main = async () => {
     source:"Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Market sizes read from the Zest vault and Granite contracts, with DefiLlama as fallback and cross-check; each market's depthSource says which. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
     indices,
     ...(pox && { poxReference: pox }),
+    ...(btcUsd && { bitcoinCollateralUsd: btcUsd }),
     ...(btcUsdc && { bitcoinCollateralUsdc: btcUsdc }),
     ...(preview && { methodologyPreview: preview }),
     ...(external && { externalReference: external }),
@@ -750,7 +772,9 @@ const main = async () => {
       "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
       "Protocol yield for stSTX and stSTXbtc is sourced from StackingDAO, which derives it from PoX reward claims net of pool commission over stSTX supply. Where a source cannot be reached, the index is marked allInSupplyIncomplete and the yield is left out rather than estimated.",
       "StackingDAO's stBTC figure is recorded in context as their estimated net yield on the Bitcoin Staking bond, per the method they published on 15 September 2026: 3.0% on bonded sBTC, diluted by an unbonded liquidity buffer, less commission and a payment to stSTX holders for STX locked in the bond. It is a staking yield, not a lending rate, and enters no index."
-    ]
+    ].concat(IS_113 ? [
+      "From methodology 1.13.0, which took effect with the fixing of 14 October 2026, bitcoinCollateralUsd is the SBOR headline, BTC-COLLATERAL-USD: what it costs to borrow any dollar stablecoin against plain 1:1 bitcoin, across every eligible market SBOR reads, weighted by supply times phase-in. subRates holds a rate per stablecoin with $25M or more of weight. bitcoinCollateralUsdc is the USDC rate, BTC-COLLATERAL-USDC, under its original name and on-chain key. The Stacks indices are unchanged. Notice: https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md"
+    ] : [])
   };
 
   const payload = { schema: "sbor.v1", ...latest };
@@ -761,6 +785,10 @@ const main = async () => {
   const lines = [
     `SBOR fixing ${stamp}`,
     `currency  borrow%  supply%`,
+    /* From 14 October 2026, the SBOR headline and each stablecoin's rate first. */
+    ...(btcUsd && typeof btcUsd.borrow === "number" ? [[btcUsd.code, btcUsd], ...Object.entries(btcUsd.subRates || {})]
+        .filter(([, v]) => typeof v.borrow === "number")
+        .map(([k, v]) => `${k} ${v.borrow} ${v.supply}`) : []),
     ...Object.entries(indices).map(([k,v]) =>
       `${k.padEnd(9)} ${String(v.borrow).padEnd(8)} ${v.supply}`),
     `basis=APY source=https://sbor.xyz/api/latest.json`
@@ -795,7 +823,14 @@ const main = async () => {
          the track record is the point. Compact, as the rest of the row. */
       ...(btcUsdc && { btcUsdc: {
         b: btcUsdc.borrow ?? null, s: btcUsdc.supply ?? null, u: btcUsdc.utilization ?? null, d: btcUsdc.depthUsd ?? null,
-        markets: btcUsdc.markets.map(m => ({ c: m.chain, a: m.collateral, b: m.borrow, s: m.supply, u: m.utilization, d: m.depthUsd }))
+        markets: btcUsdc.markets.map(m => ({ c: m.chain, ...(m.marketId && { i: String(m.marketId).slice(0, 10) }), ...(m.venue && { v: m.venue }), a: m.collateral, ...(m.loan && { l: m.loan }), b: m.borrow, s: m.supply, u: m.utilization, d: m.depthUsd, ...(m.weight != null && { w: m.weight }) }))
+      } }),
+      /* The SBOR headline under 1.13.0, from 14 October 2026, with each
+         stablecoin's rate and every market's weight. */
+      ...(btcUsd && { btcCollateralUsd: {
+        b: btcUsd.borrow ?? null, s: btcUsd.supply ?? null, u: btcUsd.utilization ?? null, d: btcUsd.depthUsd ?? null, wd: btcUsd.weightedDepthUsd ?? null,
+        sub: Object.fromEntries(Object.entries(btcUsd.subRates || {}).map(([k, v]) => [k, { b: v.borrow ?? null, s: v.supply ?? null, d: v.depthUsd ?? null, wd: v.weightedDepthUsd ?? null }])),
+        markets: btcUsd.markets.map(m => ({ c: m.chain, i: String(m.marketId).slice(0, 10), v: m.venue, a: m.collateral, l: m.loan, b: m.borrow, s: m.supply, u: m.utilization, d: m.depthUsd, w: m.weight, p: m.phaseIn }))
       } }),
       ...(pox && { "SBOR-PoX": {
         apy: pox.apy, cycle: pox.cycle, measurement: pox.measurement ?? null,

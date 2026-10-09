@@ -30,13 +30,21 @@ export function snapshotText(d){
   if (isNaN(t)) throw new Error("unreadable fixing time");
   const when = `${t.getUTCDate()} ${MONTHS[t.getUTCMonth()]} ${t.getUTCFullYear()}, ${t.toISOString().slice(11, 16)} UTC`;
   const parts = [`SBOR fixing of ${when}.`];
+  const head = d.bitcoinCollateralUsd, ref = d.bitcoinCollateralUsdc;
+  /* Methodology 1.13.0, from 14 October 2026: the headline first. */
+  if (head){
+    parts.push(pct(head.borrow)
+      ? `SBOR, dollars borrowed against bitcoin (BTC-COLLATERAL-USD): borrow ${pct(head.borrow)}, supply ${pct(head.supply)}, across ${usd(head.depthUsd)} on ${head.chains} chains.`
+      : `SBOR (BTC-COLLATERAL-USD): not published in this fixing.`);
+    if (ref && pct(ref.borrow)) parts.push(`BTC-COLLATERAL-USDC: borrow ${pct(ref.borrow)}.`);
+    parts.push("SBOR Stacks:");
+  }
   for (const label of ["SBOR-USD", "SBOR-BTC", "SBOR-STX"]){
     const ix = d.indices?.[label];
     const b = pct(ix?.borrow), s = pct(ix?.supply);
     parts.push(b && s ? `${label}: borrow ${b}, supply ${s}.` : `${label}: not published in this fixing.`);
   }
-  const ref = d.bitcoinCollateralUsdc;
-  if (ref && pct(ref.borrow)) parts.push(`USDC against bitcoin on Base, Ethereum and Arc, a reference, not an SBOR index: borrow ${pct(ref.borrow)}, across ${usd(ref.depthUsd)}.`);
+  if (!head && ref && pct(ref.borrow)) parts.push(`USDC against bitcoin on Base, Ethereum and Arc, a reference, not an SBOR index: borrow ${pct(ref.borrow)}, across ${usd(ref.depthUsd)}.`);
   parts.push("Effective annual rates, read from lending contract state.");
   return esc(parts.join(" ")) + ' Plain text: <a href="/latest.txt">latest.txt</a>. Data: <a href="/api/v1/latest.json">latest.json</a>.';
 }
