@@ -54,6 +54,16 @@ jobs:
             for (const m of bu.markets) console.log("  " + (m.chain + " " + m.collateral + "/USDC").padEnd(22) + "borrow " + String(m.borrow).padStart(5) + "%  supply " + String(m.supply).padStart(5) + "%  util " + String(m.utilization).padStart(6) + "%  depth $" + (m.depthUsd/1e6).toFixed(1) + "M  lltv " + m.lltv + "%");
             console.log(bu.borrow != null ? "  reference: borrow " + bu.borrow + "%, supply " + bu.supply + "%, depth $" + (bu.depthUsd/1e6).toFixed(0) + "M" : "  reference withheld, not every market was read: " + JSON.stringify(bu.notRead));
           }
+          const pv = d.methodologyPreview;
+          console.log("\nMETHODOLOGY 1.13.0 PREVIEW, not a fixing");
+          if (!pv) console.log("  NOT PUBLISHED: see the Compute step log");
+          else {
+            for (const m of pv.markets) console.log("  " + (m.chain + " " + m.collateral + "/" + m.loan).padEnd(24) + "borrow " + String(m.borrow).padStart(5) + "%  util " + String(m.utilization).padStart(6) + "%  supplied $" + (m.depthUsd/1e6).toFixed(2) + "M  weight " + m.weight);
+            if (pv.headline) console.log("  SBOR headline: borrow " + pv.headline.borrow + "%, supply " + pv.headline.supply + "%, $" + (pv.headline.depthUsd/1e9).toFixed(2) + "B, " + pv.headline.markets + " markets");
+            for (const [k, v] of Object.entries(pv.subRates || {})) console.log("  " + k.padEnd(22) + "borrow " + v.borrow + "%  $" + (v.depthUsd/1e6).toFixed(1) + "M  " + v.markets + " markets");
+            for (const c of pv.context || []) console.log("  context: " + c.chain + " " + c.collateral + "/" + c.loan + ", " + c.reason);
+            console.log("  depeg guard: " + pv.depegGuard + (pv.notRead ? "\n  not read: " + JSON.stringify(pv.notRead) : ""));
+          }
           console.log("\nINDICES, each market and where its size came from");
           for (const [label, ix] of Object.entries(d.indices || {})){
             console.log("  " + label + ": borrow " + ix.borrow + "%  supply " + ix.supply + "%  " + ix.markets.length + " market(s)");
