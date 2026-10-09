@@ -307,6 +307,7 @@ a{color:var(--accent)}
     <p id="t-introP"></p>
     <p class="snapshot" id="snapshot"><!-- snapshot:start -->SBOR fixing of 9 October 2026, 08:30 UTC. SBOR-USD: borrow 2.73%, supply 0.86%. SBOR-BTC: not published in this fixing. SBOR-STX: borrow 1.81%, supply 0.81%. USDC against bitcoin on Base, Ethereum and Arc, a reference, not an SBOR index: borrow 5.01%, across $2.4B. Effective annual rates, read from lending contract state. Plain text: <a href="/latest.txt">latest.txt</a>. Data: <a href="/api/v1/latest.json">latest.json</a>.<!-- snapshot:end --></p>
     <p id="t-introUse"></p>
+    <p class="sofrtop" id="notice" style="grid-column:1 / -1;margin-top:10px"></p>
   </div>
 </div>
 
@@ -562,6 +563,7 @@ en:{
   fullname:"Stacks Bitcoin Offered Rate",
   introH:"What credit really costs in Bitcoin DeFi.",
   introP:"Every lending venue in Bitcoin DeFi quotes its own rate. SBOR publishes the market rate, starting with Stacks: one rate per currency, read straight from the contracts, every day.",
+  notice:'<strong>Methodology 1.13.0 takes effect on 14 October 2026.</strong> The bitcoin rate widens from USDC to every dollar stablecoin lent against plain bitcoin, across Ethereum, Base, Arc, Arbitrum, BNB Chain and Stacks, with a rate per stablecoin beside it. The Stacks indices do not change. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Read the notice</a>.',
   introUse:"Use it as a yardstick. Borrow above SBOR and you are paying more than the market. Supply below it and you are earning less. Every loan here is overcollateralized, and the collateral is whatever you supplied rather than one particular asset, so a dollar borrowed on Stacks is secured by crypto collateral rather than by bitcoin specifically.",
   stamp:d=>`Rate as of <span class="num">${d}</span> · read from Zest contract state · updated daily`,
   borrowK:"Borrow APY", supplyK:"Supply APY",
@@ -671,6 +673,7 @@ pt:{
   fullname:"Taxa de Referência de Bitcoin da Stacks",
   introH:"O custo real do crédito no Bitcoin DeFi.",
   introP:"Cada plataforma de crédito no Bitcoin DeFi mostra só a própria taxa. O SBOR publica a taxa de mercado, começando pela Stacks: uma taxa por moeda, lida direto dos contratos, todo dia.",
+  notice:'<strong>A metodologia 1.13.0 entra em vigor em 14 de outubro de 2026.</strong> A taxa com garantia de bitcoin passa de USDC para toda stablecoin em dólar emprestada contra bitcoin puro, na Ethereum, na Base, na Arc, na Arbitrum, na BNB Chain e na Stacks, com uma taxa por stablecoin ao lado. Os índices da Stacks não mudam. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Leia o aviso</a>.',
   introUse:"Use como régua. Tomar emprestado acima do SBOR significa pagar mais que o mercado. Depositar abaixo dele significa ganhar menos. Todo empréstimo aqui é sobrecolateralizado, e a garantia é o que você depositou, não um ativo específico, então um dólar tomado emprestado na Stacks é garantido por colateral cripto e não por bitcoin especificamente.",
   stamp:d=>`Taxa em <span class="num">${d}</span> · lida do estado dos contratos da Zest · atualizada diariamente`,
   borrowK:"APY de empréstimo", supplyK:"APY de depósito",
@@ -987,7 +990,7 @@ function renderChrome(){
   const t = T();
   document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
   set("t-fullname", t.fullname);
-  set("t-introH", t.introH); set("t-introP", t.introP); set("t-introUse", t.introUse);
+  set("t-introH", t.introH); set("t-introP", t.introP); set("t-introUse", t.introUse); set("notice", t.notice);
   set("t-borrow-k", t.borrowK); set("t-supply-k", t.supplyK);
   set("t-hist-p", t.histP);
   set("t-termsH", t.termsH); set("t-termsP", t.termsP);

@@ -1,6 +1,6 @@
 # SBOR and the IOSCO Principles for Financial Benchmarks
 
-*A self-assessment. Created 24 September 2026. Last updated 8 October 2026.*
+*A self-assessment. Created 24 September 2026. Last updated 9 October 2026.*
 
 The International Organization of Securities Commissions published its Principles for Financial Benchmarks in July 2013, after the manipulation of major interest rate benchmarks. There are 19 of them, in four groups: governance, the quality of the benchmark, the quality of the methodology, and accountability. They were endorsed by the G20 and are the standard against which benchmark administrators describe themselves.
 
@@ -120,7 +120,7 @@ The methodology states what is measured, where each input comes from, how market
 
 Every fixing records the methodology version that produced it, and published fixings are never rewritten, so every historical figure can be traced to the method in force at the time. Changes are documented when they are made.
 
-**Missing:** material changes are not yet announced in advance with a period for comment. Planned.
+**Partly met from 9 October 2026:** methodology 1.13.0 was announced five days before it took effect, with its full rules published in METHODOLOGY-1.13.0.md and the new rates computed every day on real contract data as a preview. A formal comment period for material changes is not yet set.
 
 ### 13. Transition: partly met
 
