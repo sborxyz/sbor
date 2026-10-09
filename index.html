@@ -104,6 +104,28 @@ header{border-bottom:1px solid var(--rule)}
 .sofrtop{margin:18px 0 0;padding-left:12px;border-left:2px solid var(--accent);font-size:14.5px;color:var(--ink-soft);max-width:62ch}
 
 .fixing{padding:46px 0 42px;border-bottom:1px solid var(--rule)}
+/* The SBOR headline, methodology 1.13.0, from 14 October 2026. */
+.subcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.subcard{border:1px solid var(--rule);padding:18px 18px 16px}
+.subcard .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.subcard .tok{font-weight:500}
+.subcard .scode{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-soft)}
+.subcard .v{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:40px;font-weight:500;letter-spacing:-.02em;margin-top:8px;line-height:1.1}
+.subcard .v .pct{font-size:.45em;font-weight:400;color:var(--ink-soft)}
+.subcard .sz{font-size:13px;color:var(--ink-soft);margin-top:4px}
+.hdmeta{margin:0 0 12px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-soft)}
+.mflag{color:var(--accent);font-size:12px;margin-left:8px}
+.stxcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+a.stxcard{display:block;border:1px solid var(--rule);padding:18px;text-decoration:none;color:var(--ink);background:var(--paper-2)}
+a.stxcard:hover{border-color:var(--accent)}
+.stxcard .sub{font-size:13px;color:var(--ink-soft)}
+.stxcard .v{font-family:"IBM Plex Mono",monospace;font-size:22px;margin-top:10px;color:var(--accent)}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chips a{border:1px solid var(--rule);padding:6px 12px;font-size:14px;color:var(--ink);text-decoration:none}
+.chips a:hover{border-color:var(--accent);color:var(--accent)}
+.morebtn{font:inherit;font-size:13.5px;background:none;border:none;color:var(--accent);padding:10px 0;cursor:pointer;text-decoration:underline}
+#sbor-head section{padding:40px 0}
+#sbor-head section:last-child{border-bottom:none}
 .fixing h1{font-size:clamp(19px,2.4vw,25px);font-weight:450;line-height:1.35;max-width:38ch}
 .stamp{margin-top:10px;color:var(--ink-soft);font-size:13.5px}
 .rates{display:grid;grid-template-columns:1fr 1fr;margin-top:34px;border:1px solid var(--rule);
@@ -295,10 +317,58 @@ a{color:var(--accent)}
 <div class="wrap">
   <nav class="tabs" id="tabs" aria-label="Sections">
     <a href="#rates" data-tab="rates" id="tab-rates">Rates</a>
+    <a href="#stacks" data-tab="stacks" id="tab-stacks" hidden>Stacks</a>
     <a href="#staking" data-tab="staking" id="tab-staking">Staking</a>
     <a href="#agents" data-tab="agents" id="tab-agents">For AI agents</a>
     <a href="#methodology" data-tab="methodology" id="tab-method">Methodology</a>
   </nav>
+</div>
+
+<!-- The SBOR headline, methodology 1.13.0. Shown once the fixing carries
+     bitcoinCollateralUsd (from 14 October 2026); until then the page is as before. -->
+<div class="wrap" id="sbor-head" data-tabpage="rates" hidden>
+  <div class="fixing">
+    <h1 id="hd-h"></h1>
+    <p class="stamp" id="hd-stamp"></p>
+    <div class="rates">
+      <div class="rate">
+        <div class="rate-k" id="hd-borrow-k"></div>
+        <div class="rate-v"><span class="num" id="hd-borrow"></span><span class="pct">%</span></div>
+      </div>
+      <div class="rate">
+        <div class="rate-k" id="hd-supply-k"></div>
+        <div class="rate-v" style="color:var(--ink-soft)"><span class="num" id="hd-supply"></span><span class="pct">%</span></div>
+      </div>
+    </div>
+    <p class="sofrtop" id="hd-sofr" hidden></p>
+  </div>
+  <section id="hd-subs-sec">
+    <div class="sec-h"><div><h2 id="hd-sub-h"></h2></div><p id="hd-sub-p"></p></div>
+    <div class="subcards" id="hd-subs"></div>
+  </section>
+  <section id="markets">
+    <div class="sec-h"><div><h2 id="hd-mkt-h"></h2></div><p id="hd-mkt-p"></p></div>
+    <p class="hdmeta" id="hd-meta"></p>
+    <div class="tscroll">
+      <table>
+        <thead><tr id="hd-thead"></tr></thead>
+        <tbody id="hd-rows"></tbody>
+      </table>
+    </div>
+    <button type="button" class="morebtn" id="hd-more" hidden></button>
+  </section>
+  <section>
+    <div class="sec-h"><div><h2 id="hd-stx-h"></h2></div><a href="#stacks" id="hd-stx-link" style="font-size:14px;color:var(--accent)"></a></div>
+    <div class="stxcards" id="hd-stx"></div>
+    <p class="tnote" id="hd-stx-p" style="margin-top:14px"></p>
+  </section>
+  <section>
+    <div class="sec-h"><div><h2 id="hd-chain-h"></h2></div></div>
+    <div class="chips">
+      <a href="/arc.html">Arc</a><a href="/base.html">Base</a><a href="/hyperliquid.html">Hyperliquid</a><a href="/solana.html">Solana</a><a href="/stacks.html">Stacks</a>
+    </div>
+    <p class="tnote" id="hd-chain-p" style="margin-top:14px"></p>
+  </section>
 </div>
 
 <div class="intro" data-tabpage="rates">
@@ -612,7 +682,24 @@ en:{
   poxCycleMark:c=>`cycle ${c} settled`,
   poxMeta:(c,btc,stx,x,w)=>`Read fresh each day from the bitcoin actually paid out in completed reward cycle ${c}${w} · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over 7 days`,
   csv:"Download CSV",
-  tabRates:"Rates", tabStaking:"Staking", tabAgents:"For AI agents", tabMethod:"Methodology",
+  tabRates:"Rates", tabStaking:"Staking", tabAgents:"For AI agents", tabMethod:"Methodology", tabStacks:"Stacks",
+  noticeLive:'<strong>Methodology 1.13.0 took effect on 14 October 2026.</strong> SBOR\'s headline now covers every dollar stablecoin lent against plain bitcoin, on the Rates tab. The Stacks indices below do not change. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Read the notice</a>.',
+  hdH:"What it costs to borrow dollars against bitcoin.",
+  hdStamp:(d,n,c,dp)=>`Fixing of <span class="num">${d}</span>, 08:30 UTC · ${n} markets · ${c} chains · <span class="num">${dp}</span> supplied · read from contract state`,
+  hdBorrowK:"SBOR borrow, every dollar stablecoin", hdSupplyK:"SBOR supply",
+  hdSofr:(s,b)=>`A dollar secured by US Treasuries costs ${s} today (SOFR). A dollar secured by bitcoin costs ${b}.`,
+  hdWithheld:r=>`SBOR is not published in this fixing. ${r}`,
+  hdSubH:"By stablecoin", hdSubP:"The same bitcoin, borrowed in each dollar. A stablecoin gets its own rate once $25M or more of it carries weight.",
+  hdSubSize:(dp,n)=>`${dp} supplied · ${n} ${n === 1 ? "market" : "markets"}`, hdNotPub:"not published today",
+  hdMktH:"Every market behind the rate", hdMktP:"Only markets whose sole collateral is plain bitcoin, weighted by what is supplied. Markets added on 14 October 2026 reach full weight over 30 days.",
+  hdMeta:(v,c,w)=>`${v} venues · ${c} chains · largest market ${w} of the weight`,
+  hdCols:["Market","Chain","Borrow","Supplied","Weight"],
+  hdPhasing:p=>`phasing in, ${p}`, hdFlags:{ lenderIncentive:"lender rewards", synthetic:"synthetic dollar" },
+  hdMore:n=>`Show all ${n} markets`, hdLess:"Show fewer",
+  hdStxH:"On Bitcoin's own layers", hdStxLink:"SBOR Stacks, all three indices",
+  hdStxSub:{ "SBOR-USD":"Dollars on Stacks, any crypto collateral", "SBOR-BTC":"sBTC on Stacks", "SBOR-STX":"STX on Stacks" },
+  hdStxP:"Borrow / supply. Granite's USDCx market on Stacks takes only sBTC as collateral, so it is also one of the markets behind the SBOR headline.",
+  hdChainH:"Posted on-chain after every fixing", hdChainP:"Any contract on these chains can read the day's rate, with its date. Agents connect at mcp.sbor.xyz.",
   devMcpH:"As an MCP tool",
   devRemote:`Or connect by address, with nothing to install: Claude on the web, ChatGPT, and any client that accepts a URL. No key and no sign-in. The short version for agents is <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>.`,
   govern:`Independent: no token, and no stake in or payment from any venue SBOR measures. Published fixings are never rewritten; corrections to published figures are listed in <a href="https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>. How SBOR measures up to the IOSCO Principles for Financial Benchmarks: <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" target="_blank" rel="noopener">self-assessment</a>.`,
@@ -722,7 +809,24 @@ pt:{
   poxCycleMark:c=>`ciclo ${c} fechou`,
   poxMeta:(c,btc,stx,x,w)=>`Lido todo dia a partir do bitcoin efetivamente pago no ciclo de recompensa ${c}, já concluído${w} · ${btc} BTC pagos a stakers · ${stx} STX travados · convertido a ${x} STX por BTC, média de 7 dias`,
   csv:"Baixar CSV",
-  tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes de IA", tabMethod:"Metodologia",
+  tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes de IA", tabMethod:"Metodologia", tabStacks:"Stacks",
+  noticeLive:'<strong>A metodologia 1.13.0 entrou em vigor em 14 de outubro de 2026.</strong> A taxa principal do SBOR agora cobre toda stablecoin em dólar emprestada contra bitcoin puro, na aba Taxas. Os índices da Stacks abaixo não mudam. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Leia o aviso</a>.',
+  hdH:"Quanto custa tomar dólares emprestados com bitcoin como garantia.",
+  hdStamp:(d,n,c,dp)=>`Fixing de <span class="num">${d}</span>, 08:30 UTC · ${n} mercados · ${c} redes · <span class="num">${dp}</span> fornecidos · lido do estado dos contratos`,
+  hdBorrowK:"SBOR tomador, toda stablecoin em dólar", hdSupplyK:"SBOR fornecedor",
+  hdSofr:(s,b)=>`Um dólar garantido por títulos do Tesouro americano custa ${s} hoje (SOFR). Um dólar garantido por bitcoin custa ${b}.`,
+  hdWithheld:r=>`O SBOR não foi publicado neste fixing. ${r}`,
+  hdSubH:"Por stablecoin", hdSubP:"O mesmo bitcoin, emprestado em cada dólar. Uma stablecoin ganha taxa própria quando US$ 25M ou mais dela passam a ter peso.",
+  hdSubSize:(dp,n)=>`${dp} fornecidos · ${n} ${n === 1 ? "mercado" : "mercados"}`, hdNotPub:"não publicada hoje",
+  hdMktH:"Todos os mercados por trás da taxa", hdMktP:"Só mercados cuja única garantia é bitcoin puro, ponderados pelo que está fornecido. Mercados incluídos em 14 de outubro de 2026 chegam ao peso cheio em 30 dias.",
+  hdMeta:(v,c,w)=>`${v} plataformas · ${c} redes · o maior mercado tem ${w} do peso`,
+  hdCols:["Mercado","Rede","Tomador","Fornecido","Peso"],
+  hdPhasing:p=>`entrando aos poucos, ${p}`, hdFlags:{ lenderIncentive:"recompensa ao fornecedor", synthetic:"dólar sintético" },
+  hdMore:n=>`Mostrar os ${n} mercados`, hdLess:"Mostrar menos",
+  hdStxH:"Nas camadas do próprio Bitcoin", hdStxLink:"SBOR Stacks, os três índices",
+  hdStxSub:{ "SBOR-USD":"Dólares na Stacks, qualquer garantia cripto", "SBOR-BTC":"sBTC na Stacks", "SBOR-STX":"STX na Stacks" },
+  hdStxP:"Tomador / fornecedor. O mercado de USDCx da Granite na Stacks aceita só sBTC como garantia, então também é um dos mercados por trás da taxa principal do SBOR.",
+  hdChainH:"Publicado on-chain a cada fixing", hdChainP:"Qualquer contrato nessas redes pode ler a taxa do dia, com a data. Agentes se conectam em mcp.sbor.xyz.",
   devMcpH:"Como ferramenta MCP",
   devRemote:`Ou conecte pelo endereço, sem instalar nada: Claude na web, ChatGPT e qualquer cliente que aceite um URL. Sem chave e sem login. A versão curta para agentes está em <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>.`,
   govern:`Independente: sem token, sem participação em nenhuma plataforma que o SBOR mede e sem receber pagamento delas. Fixings publicados nunca são reescritos; as correções de valores publicados estão em <a href="https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>. Como o SBOR se compara aos Princípios da IOSCO para benchmarks financeiros: <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" target="_blank" rel="noopener">autoavaliação</a>.`,
@@ -840,7 +944,7 @@ function groupTotal(ms){
 function btcRows(){
   const t = T();
   const note = document.getElementById("extNote");
-  if (current !== "USD" || !BTCREF || typeof BTCREF.borrow !== "number" || !BTCREF.markets?.length){
+  if (HEAD || current !== "USD" || !BTCREF || typeof BTCREF.borrow !== "number" || !BTCREF.markets?.length){
     if (note) note.hidden = true;
     return "";
   }
@@ -868,6 +972,74 @@ let POX = null;     /* filled by boot() from api/v1/latest.json */
 let METHOD_VERSION = "1.0.0";
 let EXTERNAL = null;   /* filled by boot() from api/v1/latest.json */
 let BTCREF = null;     /* the bitcoin-collateral USDC reference, from the same file */
+let HEAD = null;       /* the SBOR headline, BTC-COLLATERAL-USD, from 14 October 2026 */
+let HEAD_ALL = false;  /* the markets table: the largest eight, or all */
+let STXIDX = {};       /* the Stacks indices, for the cards under the headline */
+
+/* From 14 October 2026 the Rates tab leads with the SBOR headline and the
+   Stacks indices move, unchanged, to their own tab. Before the fixing carries
+   bitcoinCollateralUsd, none of this runs and the page is as it was. */
+function layout113(){
+  document.querySelectorAll('[data-tabpage="rates"]:not(#sbor-head)').forEach(el => { el.dataset.tabpage = "stacks"; });
+  document.getElementById("sbor-head").hidden = false;
+  document.getElementById("tab-stacks").hidden = false;
+  showTab();
+}
+
+function renderHead(){
+  if (!HEAD) return;
+  const t = T(), esc = x => String(x ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
+  const pc = v => typeof v === "number" ? fmt(v) : "n/a";
+  const day = new Date(fixingDate + "T00:00:00Z").toLocaleDateString(lang === "pt" ? "pt-BR" : "en-GB", { day:"numeric", month:"short", year:"numeric", timeZone:"UTC" });
+  const live = HEAD.markets.filter(m => (m.weight || 0) > 0);
+  set("hd-h", t.hdH);
+  set("hd-stamp", t.hdStamp(day, live.length, HEAD.chains ?? new Set(live.map(m => m.chain)).size, depth(HEAD.depthUsd || 0)));
+  set("hd-borrow-k", t.hdBorrowK); set("hd-supply-k", t.hdSupplyK);
+  set("hd-borrow", pc(HEAD.borrow)); set("hd-supply", pc(HEAD.supply));
+  const sofr = CONTEXT?.sofr?.rate, sl = document.getElementById("hd-sofr");
+  if (typeof HEAD.borrow !== "number"){ sl.hidden = false; set("hd-sofr", esc(t.hdWithheld(HEAD.withheld || ""))); }
+  else if (typeof sofr === "number"){ sl.hidden = false; set("hd-sofr", t.hdSofr(fmt(sofr)+"%", fmt(HEAD.borrow)+"%")); }
+  else sl.hidden = true;
+
+  set("hd-sub-h", t.hdSubH); set("hd-sub-p", t.hdSubP);
+  const subs = Object.entries(HEAD.subRates || {});
+  document.getElementById("hd-subs-sec").hidden = !subs.length;
+  set("hd-subs", subs.map(([code, v]) => `<div class="subcard">
+    <div class="top"><span class="tok">${esc(code.replace("BTC-COLLATERAL-", ""))}</span><span class="scode">${esc(code)}</span></div>
+    <div class="v">${typeof v.borrow === "number" ? fmt(v.borrow) + '<span class="pct">%</span>' : '<span class="pct">' + t.hdNotPub + '</span>'}</div>
+    <div class="sz">${typeof v.borrow === "number" ? t.hdSubSize(depth(v.depthUsd || 0), v.markets) : esc(v.withheld || "")}</div></div>`).join(""));
+
+  set("hd-mkt-h", t.hdMktH); set("hd-mkt-p", t.hdMktP);
+  if (typeof HEAD.largestConstituentWeight === "number")
+    set("hd-meta", t.hdMeta(HEAD.venues, HEAD.chains, (HEAD.largestConstituentWeight * 100).toFixed(1) + "%"));
+  const c = t.hdCols;
+  set("hd-thead", `<th>${c[0]}</th><th>${c[1]}</th><th class="r">${c[2]}</th><th class="r">${c[3]}</th><th class="r">${c[4]}</th>`);
+  const ms = [...HEAD.markets].sort((a, b) => (b.weight || 0) - (a.weight || 0) || (b.depthUsd || 0) - (a.depthUsd || 0));
+  const shown = HEAD_ALL ? ms : ms.slice(0, 8);
+  set("hd-rows", shown.map(m => {
+    const notes = [
+      ...(typeof m.phaseIn === "number" && m.phaseIn < 1 ? [t.hdPhasing(Math.round(m.phaseIn * 100) + "%")] : []),
+      ...(m.flags || []).map(f => t.hdFlags[f] || f)
+    ];
+    return `<tr><td><span class="venue">${esc(m.venue)}</span><span class="asset">${esc(m.collateral)} / ${esc(m.loan)}</span>${notes.length ? `<span class="mflag">${esc(notes.join(", "))}</span>` : ""}</td>
+      <td data-l="${c[1]}" style="color:var(--ink-soft);font-size:14px">${esc(m.chain)}</td>
+      <td class="r num" data-l="${c[2]}">${pc(m.borrow)}%</td>
+      <td class="r num" data-l="${c[3]}">${depth(m.depthUsd || 0)}</td>
+      <td class="r num" data-l="${c[4]}">${((m.weight || 0) * 100).toFixed(1)}%</td></tr>`;
+  }).join(""));
+  const more = document.getElementById("hd-more");
+  more.hidden = ms.length <= 8;
+  more.textContent = HEAD_ALL ? t.hdLess : t.hdMore(ms.length);
+
+  set("hd-stx-h", t.hdStxH); set("hd-stx-link", t.hdStxLink); set("hd-stx-p", t.hdStxP);
+  set("hd-stx", ["SBOR-USD", "SBOR-STX", "SBOR-BTC"].map(code => {
+    const ix = STXIDX[code];
+    const v = ix && typeof ix.borrow === "number" ? `${fmt(ix.borrow)}% / ${fmt(ix.supply)}%` : t.hdNotPub;
+    return `<a class="stxcard" href="#stacks"><div class="venue">${code}</div><div class="sub">${t.hdStxSub[code]}</div><div class="v">${v}</div></a>`;
+  }).join(""));
+  set("hd-chain-h", t.hdChainH); set("hd-chain-p", t.hdChainP);
+}
+document.getElementById("hd-more").addEventListener("click", () => { HEAD_ALL = !HEAD_ALL; renderHead(); });
 let INVERSIONS = null; /* filled by boot() from api/v1/inversions.json */
 let CONTEXT = null;    /* filled by boot() from api/v1/latest.json */
 
@@ -990,7 +1162,7 @@ function renderChrome(){
   const t = T();
   document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
   set("t-fullname", t.fullname);
-  set("t-introH", t.introH); set("t-introP", t.introP); set("t-introUse", t.introUse); set("notice", t.notice);
+  set("t-introH", t.introH); set("t-introP", t.introP); set("t-introUse", t.introUse); set("notice", HEAD ? t.noticeLive : t.notice);
   set("t-borrow-k", t.borrowK); set("t-supply-k", t.supplyK);
   set("t-hist-p", t.histP);
   set("t-termsH", t.termsH); set("t-termsP", t.termsP);
@@ -1012,7 +1184,7 @@ function renderChrome(){
   set("t-method-h", t.methodH);
   set("t-signup-h", t.signupH); set("t-signup-p", t.signupP);
   set("t-devH", t.devH); set("t-devP", t.devP);
-  set("tab-rates", t.tabRates); set("tab-staking", t.tabStaking); set("tab-agents", t.tabAgents); set("tab-method", t.tabMethod);
+  set("tab-rates", t.tabRates); set("tab-staking", t.tabStaking); set("tab-agents", t.tabAgents); set("tab-method", t.tabMethod); set("tab-stacks", t.tabStacks);
   set("t-devMcpH", t.devMcpH); set("t-devMcpP", t.devMcpP);
   set("t-devRemote", t.devRemote); set("t-govern", t.govern);
   set("t-devEndpoints", t.devEndpoints); set("t-devExample", t.devExample);
@@ -1253,7 +1425,7 @@ function render(){
      an index, so it sits beside the dollar index, only when every market was
      read, and never enters it. */
   const bt = document.getElementById("btcTop");  /* the summary line; the markets are in the comparison table below */
-  if (ix.label === "SBOR-USD" && BTCREF && typeof BTCREF.borrow === "number"){
+  if (!HEAD && ix.label === "SBOR-USD" && BTCREF && typeof BTCREF.borrow === "number"){
     bt.hidden = false;
     set("btcTop", t.btcTop(fmt(BTCREF.borrow)+"%", depth(BTCREF.depthUsd)));
   } else bt.hidden = true;
@@ -1314,7 +1486,7 @@ document.getElementById("lang").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
   lang = b.dataset.lang;
   try { localStorage.setItem("sbor-lang", lang); } catch {}
-  renderChrome(); render();
+  renderChrome(); render(); renderHead();
 });
 document.getElementById("switch").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
@@ -1354,6 +1526,7 @@ async function boot(){
     if (d.poxReference) POX = d.poxReference;
     if (d.externalReference) EXTERNAL = d.externalReference;
     if (d.bitcoinCollateralUsdc) BTCREF = d.bitcoinCollateralUsdc;
+    if (d.bitcoinCollateralUsd?.markets?.length){ HEAD = d.bitcoinCollateralUsd; STXIDX = d.indices || {}; }
     if (d.context) CONTEXT = d.context;
     if (d.methodologyVersion) METHOD_VERSION = d.methodologyVersion;
     for (const [label, ix] of Object.entries(d.indices || {}))
@@ -1367,7 +1540,8 @@ async function boot(){
     const h = await fetch("/api/v1/history.json", { cache:"no-store" });
     if (h.ok) HISTORY = await h.json();
   }catch(e){ console.warn("Live fixing unavailable, showing bundled snapshot.", e); }
-  renderChrome(); render();
+  if (HEAD) layout113();
+  renderChrome(); render(); renderHead();
   /* The plain-text rates are for readers that do not run this script, such
      as many crawlers. Once the live table is drawn, they are not needed. */
   if (INDICES && Object.keys(INDICES).length) document.getElementById("snapshot")?.setAttribute("hidden", "");
@@ -1378,10 +1552,11 @@ async function boot(){
    and the tabs only choose what is shown. The hiding rule applies only once
    tabs-ready is set, so if this ever failed the page would show everything
    rather than nothing, and readers that do not run scripts see it all. */
-const TABS = ["rates", "staking", "agents", "methodology"];
+const TABS = ["rates", "stacks", "staking", "agents", "methodology"];
 function currentTab(){
   const h = decodeURIComponent(location.hash.slice(1));
   if (h === "method") return "methodology";   // the first name, kept working
+  if (h === "stacks" && !HEAD) return "rates";
   if (TABS.includes(h)) return h;
   if (h){
     const el = document.getElementById(h);

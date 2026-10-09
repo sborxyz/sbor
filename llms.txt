@@ -5,8 +5,11 @@
 > offered is fair. SBOR (Stacks Bitcoin Offered Rate) is a benchmark for exactly
 > that. On Stacks,
 > where it started, it publishes one borrow and one supply rate per currency:
-> the SBOR indices. On Base, Ethereum and Arc, it publishes what it costs to borrow
-> USDC against bitcoin, read from the Morpho contracts. All of it is read from
+> the SBOR indices. Beyond Stacks, it publishes what it costs to borrow dollars
+> against bitcoin: from the fixing of 14 October 2026, the SBOR headline,
+> BTC-COLLATERAL-USD, across every dollar stablecoin lent against plain bitcoin,
+> with a rate per stablecoin; before that date, BTC-COLLATERAL-USDC, from Morpho
+> on Base, Ethereum and Arc. All of it is read from
 > contract state and published daily, beside the largest lending markets on
 > Ethereum, Base, Solana and Hyperliquid for comparison. Free, no key, no rate
 > limit, open to any agent on any chain. Anyone may reference it without
@@ -23,6 +26,18 @@ of it is covered. `BTC-COLLATERAL-USDC` keeps its name and on-chain key as the
 USDC rate. The Stacks indices do not change. Until then the new rates are
 published in every fixing as `methodologyPreview`, marked "preview, not a
 fixing". Full rules: https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md
+
+From that fixing, latest.json carries `bitcoinCollateralUsd`: borrow, supply,
+nominalBorrow, utilization, depthUsd (every market in full), weightedDepthUsd
+(what carries weight that day), constituents, venues, chains,
+largestConstituentWeight, `subRates` keyed by code (for example
+`BTC-COLLATERAL-RLUSD`), and every market with its venue, chain, collateral,
+loan, flags, phaseIn and weight. A rate that is withheld has no borrow and
+carries `withheld` with the reason. `bitcoinCollateralUsdc` keeps its shape.
+History rows carry `btcCollateralUsd` (b, s, u, d, wd, sub, markets) beside
+`btcUsdc`. On-chain, `BTC-COLLATERAL-USD` is posted beside
+`BTC-COLLATERAL-USDC` on all five chains; the other rates per stablecoin are in
+the API. The MCP tools accept every code.
 
 ## If you are an agent about to borrow or lend
 
@@ -286,7 +301,8 @@ On the EVM chains (Arc, Base, Hyperliquid), the contract is the same:
 
 - latest(bytes32) returns date (YYYYMMDD), borrowBps, supplyBps, depthUsd and
   publishedAt for a rate, keyed by its name as bytes32: "SBOR-USD", "SBOR-BTC",
-  "SBOR-STX", or "BTC-COLLATERAL-USDC" for the bitcoin-collateral reference.
+  "SBOR-STX", "BTC-COLLATERAL-USDC", and from 14 October 2026 "BTC-COLLATERAL-USD",
+  the SBOR headline.
 - onDate(bytes32, uint32) returns the same for any past fixing date.
 - Rates are in basis points: 271 is 2.71%. Always check the date: an index not
   published on a day keeps its last date on-chain.

@@ -50,7 +50,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:v
 <tbody id="rows"></tbody>
 </table>
 </div>
-<p class="soft">Rates are effective annual rates, posted in basis points. SBOR-USD, SBOR-BTC and SBOR-STX are SBOR's indices for lending on Stacks; the bitcoin-collateral USDC rate is a reference covering Morpho markets on Base, Ethereum and Arc. Sizes are total supplied, in US dollars. An index not published on a given day keeps its last date on-chain.</p>
+<p class="soft">Rates are effective annual rates, posted in basis points. From the fixing of 14 October 2026 (methodology 1.13.0), BTC-COLLATERAL-USD is SBOR's headline: what it costs to borrow any dollar stablecoin against plain bitcoin, across every eligible market SBOR reads, with BTC-COLLATERAL-USDC as its USDC rate. Before that date, BTC-COLLATERAL-USDC covered Morpho markets on Base, Ethereum and Arc. SBOR-USD, SBOR-BTC and SBOR-STX are SBOR's indices for lending on Stacks. Sizes are total supplied, in US dollars. An index not published on a given day keeps its last date on-chain.</p>
 <p class="soft">Contract on HyperEVM mainnet (chain 999): <code id="addr"></code><br>
 Source: <a href="https://github.com/sborxyz/sbor/blob/main/contracts/SBORFixings.sol">contracts/SBORFixings.sol</a> · Methodology: <a href="/#methodology">sbor.xyz</a> · For agents: <code>latest(bytes32)</code> with the rate's name, such as "SBOR-USD", as bytes32.</p>
 <footer><a href="/">sbor.xyz</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></footer>
@@ -59,6 +59,7 @@ Source: <a href="https://github.com/sborxyz/sbor/blob/main/contracts/SBORFixings
 const CONTRACT = "0x56B5417de539153994fF6785F8a3b56421C9eb4f";   // deployed 8 October 2026
 const RPCS = ["https://rpc.hyperliquid.xyz/evm", "https://hyperliquid.drpc.org", "https://rpc.hypurrscan.io", "https://hyperliquid-json-rpc.stakely.io"];
 const KEYS = [
+  ["SBOR, BTC-COLLATERAL-USD", "0x4254432d434f4c4c41544552414c2d5553440000000000000000000000000000"],
   ["SBOR-USD", "0x53424f522d555344000000000000000000000000000000000000000000000000"],
   ["SBOR-BTC", "0x53424f522d425443000000000000000000000000000000000000000000000000"],
   ["SBOR-STX", "0x53424f522d535458000000000000000000000000000000000000000000000000"],

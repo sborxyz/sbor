@@ -231,10 +231,37 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
   }
   out += `</table></div>`;
 
+  /* ---- SBOR headline, methodology 1.13.0, from 14 October 2026 ---- */
+  if (today.btcCollateralUsd?.markets?.length){
+    const hu = r => r.btcCollateralUsd || {};
+    const M = n => "$"+((n||0)/1e9 >= 1 ? ((n/1e9).toFixed(2)+"B") : ((n||0)/1e6).toFixed(1)+"M");
+    out += `<h2>SBOR, BTC-COLLATERAL-USD</h2><div class="hint">Every dollar stablecoin lent against plain bitcoin, weighted by supply times phase-in. A rate per stablecoin from $25M weighted. Phase-in moves are not market moves.</div><div class="scroll"><table>
+      <tr><th>Rate</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>Weighted</th><th>Depth</th></tr>`;
+    const hrow = (name, now, a, b) => `<tr><td class="nm">${name}</td>
+      <td class="num" data-l="Borrow">${now?.b == null ? "n/a" : F(now.b)+"%"}</td>${chg(BPS(now?.b, a?.b),"bps",15,"Borrow 1d")}${chg(BPS(now?.b, b?.b),"bps",15,"Borrow 7d")}
+      <td class="num" data-l="Supply">${now?.s == null ? "n/a" : F(now.s)+"%"}</td>
+      <td class="num dim" data-l="Weighted">${M(now?.wd)}</td><td class="num dim" data-l="Depth">${M(now?.d)}</td></tr>`;
+    out += hrow(`SBOR <span class="dim">headline</span>`, hu(today), hu(d1), hu(d7));
+    for (const [k, v] of Object.entries(hu(today).sub || {}))
+      out += hrow(`${k.replace("BTC-COLLATERAL-","")} <span class="dim">${k}</span>`, v, hu(d1).sub?.[k], hu(d7).sub?.[k]);
+    out += `</table></div><div class="scroll"><table>
+      <tr><th>Market</th><th>Borrow</th><th>1d</th><th>Util</th><th>Weight</th><th>Phase-in</th><th>Depth</th></tr>`;
+    for (const m of [...hu(today).markets].sort((x, y) => (y.d||0) - (x.d||0))){
+      const a = (hu(d1).markets || []).find(x => x.i === m.i);
+      out += `<tr><td class="nm">${m.v} ${m.c} <span class="dim">${m.a}/${m.l}</span></td>
+        <td class="num" data-l="Borrow">${F(m.b)}%</td>${chg(BPS(m.b, a?.b),"bps",15,"Borrow 1d")}
+        <td class="num" data-l="Utilization">${F(m.u)}%</td>
+        <td class="num" data-l="Weight">${F((m.w||0)*100)}%</td>
+        <td class="num dim" data-l="Phase-in">${Math.round((m.p ?? 1)*100)}%</td>
+        <td class="num dim" data-l="Depth">${M(m.d)}</td></tr>`;
+    }
+    out += `</table></div>`;
+  }
+
   /* ---- bitcoin-collateral USDC: every market behind the reference ---- */
   if (today.btcUsdc?.markets?.length){
     const bc = r => r.btcUsdc || {};
-    out += `<h2>Bitcoin-collateral USDC</h2><div class="hint">A reference, not an SBOR index: the Morpho markets on Base, Ethereum and Arc whose only collateral is cbBTC, WBTC or cirBTC, read from the contracts, weighted by the USDC supplied to each. Withheld unless every market was read.</div><div class="scroll"><table>
+    out += `<h2>Bitcoin-collateral USDC</h2><div class="hint">${today.btcCollateralUsd ? "BTC-COLLATERAL-USDC, the USDC rate under the SBOR headline: every eligible USDC market, weighted by supply times phase-in." : "A reference, not an SBOR index: the Morpho markets on Base, Ethereum and Arc whose only collateral is cbBTC, WBTC or cirBTC, read from the contracts, weighted by the USDC supplied to each. Withheld unless every market was read."}</div><div class="scroll"><table>
       <tr><th>Market</th><th>Borrow</th><th>1d</th><th>7d</th><th>Supply</th><th>Util</th><th>1d</th><th>Depth</th></tr>`;
     const row = (name, now, a, b) => `<tr><td class="nm">${name}</td>
       <td class="num" data-l="Borrow">${now.b == null ? "n/a" : F(now.b)+"%"}</td>${chg(BPS(now.b, a?.b),"bps",15,"Borrow 1d")}${chg(BPS(now.b, b?.b),"bps",15,"Borrow 7d")}
@@ -243,8 +270,9 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
       <td class="num dim" data-l="Depth">$${((now.d||0)/1e9 >= 1 ? ((now.d/1e9).toFixed(1)+"B") : ((now.d||0)/1e6).toFixed(1)+"M")}</td></tr>`;
     out += row(`Reference <span class="dim">weighted</span>`, bc(today), bc(d1), bc(d7));
     for (const m of today.btcUsdc.markets){
-      const find = r => (bc(r).markets || []).find(x => x.c === m.c && x.a === m.a);
-      out += row(`Morpho ${m.c} <span class="dim">${m.a}/USDC</span>`, m, find(d1), find(d7));
+      const unique = today.btcUsdc.markets.filter(x => x.c === m.c && x.a === m.a).length === 1;
+      const find = r => (bc(r).markets || []).find(x => m.i && x.i ? x.i === m.i : unique && x.c === m.c && x.a === m.a);
+      out += row(`${m.v || "Morpho"} ${m.c} <span class="dim">${m.a}/${m.l || "USDC"}</span>`, m, find(d1), find(d7));
     }
     out += `</table></div>`;
   }

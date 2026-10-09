@@ -1,8 +1,8 @@
 # SBOR AGENTS.md
 
-*Created 24 September 2026. Last updated 8 October 2026.*
+*Created 24 September 2026. Last updated 9 October 2026.*
 
-> SBOR publishes benchmark lending rates for Bitcoin DeFi, read from lending contract state and published once a day: what it costs to borrow, and what supplying earns, in each currency on Stacks, and what it costs to borrow USDC against bitcoin on Base, Ethereum and Arc. Each day's fixing is also posted on-chain, on Arc, Base, Hyperliquid, Solana and Stacks: contract addresses in [llms.txt](https://sbor.xyz/llms.txt). Free to use, including commercially.
+> SBOR publishes benchmark lending rates for Bitcoin DeFi, read from lending contract state and published once a day: what it costs to borrow, and what supplying earns, in each currency on Stacks, and what it costs to borrow dollars against bitcoin. From the fixing of 14 October 2026 (methodology 1.13.0) the SBOR headline is `BTC-COLLATERAL-USD`, every dollar stablecoin lent against plain bitcoin, with a rate per stablecoin; before that date, `BTC-COLLATERAL-USDC`, from Morpho on Base, Ethereum and Arc. Each day's fixing is also posted on-chain, on Arc, Base, Hyperliquid, Solana and Stacks: contract addresses in [llms.txt](https://sbor.xyz/llms.txt). Free to use, including commercially.
 
 This is the entry point for agents. It holds routes and rules only, never numbers: every figure lives at the endpoints below, which always carry the current fixing. The full methodology is in [llms.txt](https://sbor.xyz/llms.txt).
 
@@ -25,7 +25,8 @@ The remote and local servers are built from the same code and give the same answ
 | How has a rate moved? | [api/v1/history.json](https://sbor.xyz/api/v1/history.json), or `get_history` |
 | What does the same asset cost on other chains? | `externalReference` in `latest.json`, or `compare_chains` |
 | Where can a contract read the rates on-chain? | `On-chain, on five chains` in [llms.txt](https://sbor.xyz/llms.txt), or the live pages at sbor.xyz/arc.html, base.html, hyperliquid.html, solana.html and stacks.html |
-| What does it cost to borrow USDC against bitcoin? | `bitcoinCollateralUsdc` in `latest.json`, or the MCP tools with `BTC-COLLATERAL-USDC` |
+| What does it cost to borrow dollars against bitcoin? | from 14 October 2026, `bitcoinCollateralUsd` in `latest.json`, or the MCP tools with `BTC-COLLATERAL-USD` |
+| What does it cost in one stablecoin? | `subRates` in `bitcoinCollateralUsd`, or the MCP tools with `BTC-COLLATERAL-USDC`, `-USDT`, `-RLUSD`, `-PYUSD` or `-USD1` |
 | Did a lending protocol change its own parameters? | [api/v1/changes.json](https://sbor.xyz/api/v1/changes.json) |
 | Where does supplying an asset at one venue pay more than borrowing it at another? | [api/v1/inversions.json](https://sbor.xyz/api/v1/inversions.json) and [api/v1/inversion-log.json](https://sbor.xyz/api/v1/inversion-log.json) |
 | How is it all calculated? | [llms.txt](https://sbor.xyz/llms.txt), or `get_methodology` |
@@ -37,7 +38,7 @@ The remote and local servers are built from the same code and give the same answ
 3. **A missing index means unknown, never zero.** When a market cannot be read, or its rate is not set by the market, SBOR leaves it out rather than publishing a figure it cannot stand behind.
 4. **Rates are effective annual rates (APY).** Where a simple annual rate is also given, it is labeled `nominal`.
 5. **A staking yield is not a lending rate.** Never add Proof of Transfer or a protocol yield to a borrow or supply rate.
-6. **A dollar on Stacks is borrowed against crypto collateral, not only bitcoin.** Do not describe SBOR-USD as bitcoin-backed. The bitcoin-collateral USDC rate is a separate reference, from markets whose only collateral is wrapped bitcoin.
+6. **A dollar on Stacks is borrowed against crypto collateral, not only bitcoin.** Do not describe SBOR-USD as bitcoin-backed. The bitcoin-collateral rates (`BTC-COLLATERAL-USD` and the rate per stablecoin) are separate, from markets whose only collateral is plain bitcoin, and are never averaged with the Stacks indices.
 7. **Published fixings are never rewritten.** Corrections are listed in [CORRECTIONS.md](https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md).
 
 ## Governance

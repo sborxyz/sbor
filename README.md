@@ -1,14 +1,16 @@
 # SBOR
 
 **Every lending venue in Bitcoin DeFi quotes its own rate. SBOR publishes the
-market rate, read from contract state on Stacks, Base, Ethereum and Arc.**
+market rate, read from contract state on Ethereum, Base, Arc, Arbitrum, BNB Chain and Stacks.**
 
 A single venue's number cannot tell anyone, human or agent, whether the rate
 they are offered is fair. SBOR, the Stacks Bitcoin Offered Rate, is a benchmark
 for exactly that. On Stacks, where it started, it publishes one borrow
-and one supply rate per currency: the SBOR indices. On Base, Ethereum and Arc, it
-publishes what it costs to borrow USDC against bitcoin, read from the Morpho
-contracts. All of it is read from contract state and published daily, beside
+and one supply rate per currency: the SBOR indices. Beyond Stacks, it publishes
+what it costs to borrow dollars against bitcoin: from the fixing of 14 October
+2026 (methodology 1.13.0), the SBOR headline, `BTC-COLLATERAL-USD`, across every
+dollar stablecoin lent against plain bitcoin, with a rate per stablecoin; before
+that date, `BTC-COLLATERAL-USDC`, from Morpho on Base, Ethereum and Arc. All of it is read from contract state and published daily, beside
 the largest lending markets on Ethereum, Base, Solana and Hyperliquid for
 comparison. Free, no key, no rate limit, open to any agent on any chain.
 
@@ -48,7 +50,27 @@ Published beside them, never inside them: a Proof of Transfer staking
 reference, and the same asset classes on the largest lending markets on
 Ethereum, Base, Hyperliquid and Solana, for comparison.
 
-### Beyond Stacks: borrowing USDC against bitcoin
+### Beyond Stacks: borrowing dollars against bitcoin
+
+From the fixing of 14 October 2026, methodology 1.13.0
+([notice](METHODOLOGY-1.13.0.md)) makes `BTC-COLLATERAL-USD` the SBOR headline:
+every market lending a dollar stablecoin against plain 1:1 bitcoin, priced by
+its own interest rate model, on Morpho, Lista and Granite, across Ethereum,
+Base, Arc, Arbitrum, BNB Chain and Stacks. A rate per stablecoin is published
+once $25M or more of it carries weight. New markets phase in over 30 days.
+From that fixing, `latest.json` carries `bitcoinCollateralUsd`: borrow, supply,
+nominalBorrow, utilization, depthUsd (every market in full), weightedDepthUsd
+(what carries weight that day), constituents, venues, chains,
+largestConstituentWeight, `subRates` keyed by code (for example
+`BTC-COLLATERAL-RLUSD`), and every market with its venue, chain, collateral,
+loan, flags, phaseIn and weight. A rate that is withheld has no borrow and
+carries `withheld` with the reason. `bitcoinCollateralUsdc` keeps its shape.
+History rows carry `btcCollateralUsd` (b, s, u, d, wd, sub, markets) beside
+`btcUsdc`. On-chain, `BTC-COLLATERAL-USD` is posted beside
+`BTC-COLLATERAL-USDC` on all five chains; the other rates per stablecoin are in
+the API. The MCP tools accept every code.
+
+Before that date:
 
 From the fixing of 25 September 2026, each fixing also carries
 `bitcoinCollateralUsdc`: what it costs to borrow USDC against bitcoin, read from
@@ -152,7 +174,7 @@ can read them on their own chain:
 | Hyperliquid, HyperEVM (chain 999) | `0x56B5417de539153994fF6785F8a3b56421C9eb4f` | 8 Oct 2026 | [hyperliquid.html](https://sbor.xyz/hyperliquid.html) |
 
 On the EVM chains (Arc, Base, Hyperliquid), call `latest(bytes32)` with a rate's
-name as bytes32 (`SBOR-USD`, `SBOR-BTC`, `SBOR-STX` or `BTC-COLLATERAL-USDC`) for
+name as bytes32 (`SBOR-USD`, `SBOR-BTC`, `SBOR-STX`, `BTC-COLLATERAL-USDC`, or from 14 October 2026 `BTC-COLLATERAL-USD`) for
 its borrow and supply rate in basis points, its size and its fixing date;
 `onDate(bytes32, uint32)` returns any past day. Source:
 [`contracts/SBORFixings.sol`](contracts/SBORFixings.sol). On Stacks, the same
