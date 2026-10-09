@@ -135,7 +135,7 @@ async function handle(msg, ua){
         protocolVersion: PROTOCOLS.includes(asked) ? asked : PROTOCOLS[0],
         capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "sbor", title: "SBOR", version: VERSION },
-        instructions: "SBOR publishes benchmark lending rates for Bitcoin DeFi, read from contract state and published daily: an index per currency on Stacks, and BTC-COLLATERAL-USDC for borrowing USDC against bitcoin on Base, Ethereum and Arc. Each day's rates are also posted on-chain on Arc, Base, Hyperliquid, Solana and Stacks. Before borrowing, call compare_rate: if an offer is well above the benchmark, stop. Every tool refuses rather than guesses; an error means there is no trustworthy answer."
+        instructions: "SBOR publishes benchmark lending rates for borrowing against bitcoin, read from contract state and published daily. From 14 October 2026 its headline is BTC-COLLATERAL-USD, what it costs to borrow any dollar stablecoin against plain bitcoin, with a rate per stablecoin (BTC-COLLATERAL-USDC, -USDT, -RLUSD, -PYUSD, -USD1); before that date, BTC-COLLATERAL-USDC. It also publishes an index per currency on Stacks. Each day's rates are also posted on-chain on Arc, Base, Hyperliquid, Solana and Stacks. Before borrowing, call compare_rate: if an offer is well above the benchmark, stop. Every tool refuses rather than guesses; an error means there is no trustworthy answer."
       });
     }
     case "ping": return ok(msg.id, {});
