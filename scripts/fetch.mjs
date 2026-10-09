@@ -10,6 +10,7 @@ import { fetchCallReadOnlyFunction, contractPrincipalCV, cvToValue } from "@stac
 import { poxReference } from "./pox.mjs";
 import { externalReference } from "./external.mjs";
 import { bitcoinCollateralUsdc } from "./morpho.mjs";
+import { methodologyPreview } from "./preview.mjs";
 import { contextBlock } from "./context.mjs";
 
 const POOLS_URL = "https://yields.llama.fi/pools";
@@ -653,6 +654,14 @@ const main = async () => {
   try { btcUsdc = await bitcoinCollateralUsdc(); }
   catch(e){ log(`  bitcoin-collateral USDC unavailable, omitted. ${e.message}`); }
 
+  /* Methodology 1.13.0 as a preview: the headline across every dollar
+     stablecoin lent against plain bitcoin, and a rate per stablecoin. It
+     enters no fixing and changes no published rate until its effective date
+     is announced. A failure here must not stop the fixing. */
+  let preview = null;
+  try { preview = await methodologyPreview(); }
+  catch(e){ log(`  methodology preview unavailable, omitted. ${e.message}`); }
+
   /* Reference rates from outside Stacks. Context only, never a constituent.
      A failure here must not stop the fixing. */
   let external = null;
@@ -715,6 +724,7 @@ const main = async () => {
     indices,
     ...(pox && { poxReference: pox }),
     ...(btcUsdc && { bitcoinCollateralUsdc: btcUsdc }),
+    ...(preview && { methodologyPreview: preview }),
     ...(external && { externalReference: external }),
     ...(context && { context }),
     ...(Object.keys(withheld).length && { withheld }),
