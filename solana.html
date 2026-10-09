@@ -106,7 +106,8 @@ const day = d => { const s = String(d); return s.length === 8 ? `${s.slice(0,4)}
   const st = document.getElementById("status"), body = document.getElementById("rows");
   try {
     const { record, url } = await latestRecord();
-    body.innerHTML = NAMES.map(([key, name]) => {
+    /* The SBOR headline is posted from 14 October 2026; until then its row is left out. */
+    body.innerHTML = NAMES.filter(([key]) => key !== "BTC-COLLATERAL-USD" || record?.rates?.[key]).map(([key, name]) => {
       const v = record?.rates?.[key];
       return !v
         ? `<tr><td>${name}</td><td class="r" colspan="4">not in the latest record</td></tr>`

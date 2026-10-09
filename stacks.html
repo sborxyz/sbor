@@ -110,6 +110,8 @@ const day = d => { const s = String(d); return s.length === 8 ? `${s.slice(0,4)}
       const { result, url } = await call(arg);
       via = url;
       const v = decode(result);
+      /* The SBOR headline is posted from 14 October 2026; until then its row is left out. */
+      if (!v && name.startsWith("SBOR, BTC-COLLATERAL-USD")) continue;
       rows.push(!v
         ? `<tr><td>${name}</td><td class="r" colspan="4">not yet posted</td></tr>`
         : `<tr><td>${name}</td><td class="r num">${pct(v["borrow-bps"])}</td><td class="r num">${pct(v["supply-bps"])}</td><td class="r num">${usd(v["depth-usd"])}</td><td class="r num">${day(v.date)}</td></tr>`);
