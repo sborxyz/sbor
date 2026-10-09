@@ -711,7 +711,7 @@ const main = async () => {
       markets: PARAMS
     } }),
     method:"https://sbor.xyz/llms.txt",
-    source:"Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Zest depth from DefiLlama, Granite depth read on-chain. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
+    source:"Lending rates read from Zest v0-5-data and Granite contract state on Stacks mainnet. Market sizes read from the Zest vault and Granite contracts, with DefiLlama as fallback and cross-check; each market's depthSource says which. Protocol yield from StackingDAO. BTC to STX rate for the staking reference from Bitflow.",
     indices,
     ...(pox && { poxReference: pox }),
     ...(btcUsdc && { bitcoinCollateralUsdc: btcUsdc }),
