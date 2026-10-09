@@ -11,8 +11,8 @@
  * A PREVIEW. Nothing here enters a fixing, changes BTC-COLLATERAL-USDC, an
  * SBOR index or anything posted on-chain. It is published so the change can be
  * read on real contract data before it takes effect, as SBOR announces every
- * change to how a number is built before it applies. EFFECTIVE stays null
- * until the date is announced.
+ * change to how a number is built before it applies. 1.13.0 was announced
+ * on 9 October 2026 and takes effect with the fixing of 14 October 2026.
  *
  * Markets are read the same way as scripts/morpho.mjs: the market's own
  * parameters (a wrong id is refused), supplied and borrowed from contract
@@ -27,7 +27,7 @@
  */
 import { call as baseCall } from "./aave.mjs";
 
-export const EFFECTIVE = null;           // set when 1.13.0 is announced, e.g. "2026-10-21"
+export const EFFECTIVE = "2026-10-14";   // announced 9 Oct 2026 in METHODOLOGY-1.13.0.md
 const FLOOR_USD = 1_000_000;             // rule 4.2
 const SUBRATE_FLOOR_USD = 25_000_000;    // rule 9.2
 const DEPEG_STABLE = 0.98;               // rule 5.1
@@ -116,7 +116,7 @@ export const MARKETS = [
   { chain: "Arbitrum", collateral: "WBTC",   loan: "USDC",  id: "0xe6392ff19d10454b099d692b58c361ef93e31af34ed1ef78232e07c78fe99169" },
   { chain: "Arbitrum", collateral: "WBTC",   loan: "USDT0", id: "0xed06d9e82d7c35ca80d3983194e15462a96202bd875800af18183321f4611868" },
   /* Lista's floating-rate BTCB markets, verified 9 Oct 2026. */
-  { chain: "BNB Chain", collateral: "BTCB",  loan: "USD1",  id: "0xd9c00925089bfdfa28fd1e9ee734da1461d0b1b9bed9647f6e7ec5acb9d20fc6" },
+  { chain: "BNB Chain", collateral: "BTCB",  loan: "USD1",  id: "0xd9c00925089bfdfa28fd1e9ee734da1461d0b1b9bed9647f6e7ec5acb9d20fc6", flags: ["lenderIncentive"] },
   { chain: "BNB Chain", collateral: "BTCB",  loan: "U",     id: "0xae82d976f5470fa4fc7c32b4f01069351874516946de7352cb783381a0e94d14" },
   { chain: "BNB Chain", collateral: "BTCB",  loan: "USDT",  id: "0x975f4cf3db16812d995f60e19bec91a96108d47429237acc8d208bc0519c5b19" }
 ];
@@ -163,7 +163,7 @@ async function readMarket(m){
   const scale = 10 ** dec;
   return {
     chain: m.chain, venue: VENUE[m.chain] || "Morpho", collateral: m.collateral, loan: m.loan, group: GROUP[m.loan],
-    ...(FLAGS[m.loan] && { flags: FLAGS[m.loan] }),
+    ...((FLAGS[m.loan] || m.flags) && { flags: [...(FLAGS[m.loan] || []), ...(m.flags || [])] }),
     borrow: round(apy(borrowPerSecond) * 100),
     supply: round(apy(supplyPerSecond) * 100),
     nominalBorrow: round(borrowPerSecond * SECONDS_PER_YEAR * 100),
@@ -206,7 +206,8 @@ function weigh(ms){
     nominalBorrow: round(ms.reduce((a, m) => a + m.nominalBorrow * m.sizeUsd, 0) / tot),
     utilization: round(ms.reduce((a, m) => a + m.borrowed, 0) / ms.reduce((a, m) => a + m.supplied, 0) * 100),
     depthUsd: Math.round(tot),
-    markets: ms.length
+    markets: ms.length,
+    venues: new Set(ms.map(m => m.venue)).size
   };
 }
 
@@ -302,7 +303,8 @@ export async function methodologyPreview(granite = null){
     label: "SBOR, methodology 1.13.0 preview",
     status: "preview, not a fixing",
     effectiveFrom: EFFECTIVE,
-    note: "What it costs to borrow dollars against bitcoin under methodology 1.13.0: every market lending a dollar stablecoin against plain 1:1 bitcoin, priced by its own interest rate model, read from contract state and weighted by what is supplied. Shown at full weight, as it will stand once every market has phased in. A preview published before the change takes effect: it enters no fixing and changes no published rate. Markets still being verified (Curve LlamaLend, cbBTC/USDS, UBTC/USDT0) are not yet included.",
+    notice: "https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md",
+    note: "What it costs to borrow dollars against bitcoin under methodology 1.13.0, which takes effect with the fixing of 14 October 2026: every market lending a dollar stablecoin against plain 1:1 bitcoin, priced by its own interest rate model, read from contract state and weighted by what is supplied. Shown at full weight, as it will stand once every market has phased in. A preview published before the change takes effect: it enters no fixing and changes no published rate. Markets still being verified (Curve LlamaLend, cbBTC/USDS, UBTC/USDT0) are not yet included.",
     code: "BTC-COLLATERAL-USD",
     ...(headline && { headline: { ...headline, largestConstituentWeight: round(largest, 4) } }),
     subRates,
