@@ -4,10 +4,10 @@
 
 Check a lending rate before your agent borrows.
 
-[SBOR](https://sbor.xyz) publishes benchmark lending rates for Bitcoin DeFi,
-read from lending contract state and published daily: one borrow and one
-supply rate per currency on Stacks, and what it costs to borrow USDC against
-bitcoin on Base, Ethereum and Arc. This server exposes it as tools for Claude,
+[SBOR](https://sbor.xyz) publishes benchmark lending rates for borrowing
+against bitcoin, read from lending contract state and published daily: what it
+costs to borrow dollars against bitcoin, with a rate per stablecoin, and one
+borrow and one supply rate per currency on Stacks. This server exposes it as tools for Claude,
 Cowork, Cursor or any MCP client. Each day's fixing is also posted on-chain, on
 [Arc](https://sbor.xyz/arc.html), [Base](https://sbor.xyz/base.html),
 [Hyperliquid](https://sbor.xyz/hyperliquid.html),
@@ -61,11 +61,22 @@ All six tools are read-only.
 
 ## Benchmarks
 
-`SBOR-USD`, `SBOR-BTC` and `SBOR-STX` are the Stacks indices. `BTC-COLLATERAL-USDC`
-is a reference, not an SBOR index: what it costs to borrow USDC against bitcoin
-wrapped by a custodian (cbBTC, WBTC, cirBTC), from the Morpho markets on Base,
-Ethereum and Arc whose only collateral is that bitcoin. Use it to check a USDC loan
-against bitcoin on those chains.
+From the fixing of 14 October 2026 (methodology 1.13.0,
+[notice](https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md)):
+
+- `BTC-COLLATERAL-USD` is the SBOR headline: what it costs to borrow any dollar
+  stablecoin against plain 1:1 bitcoin, across every eligible market on
+  Ethereum, Base, Arc, Arbitrum, BNB Chain and Stacks.
+- `BTC-COLLATERAL-USDC`, `BTC-COLLATERAL-USDT`, `BTC-COLLATERAL-RLUSD`,
+  `BTC-COLLATERAL-PYUSD` and `BTC-COLLATERAL-USD1` are the rates per stablecoin,
+  each published once $25M or more of it carries weight. `BTC-COLLATERAL-USDC`
+  keeps its name and history from 25 September 2026.
+- `SBOR-USD`, `SBOR-BTC` and `SBOR-STX` are the Stacks indices, unchanged.
+
+To check a dollar loan against bitcoin, compare with the stablecoin's own rate
+where one is published, else with `BTC-COLLATERAL-USD`. Before 14 October, only
+`BTC-COLLATERAL-USDC` is published (Morpho on Base, Ethereum and Arc), and the
+other codes answer that they start on that date.
 
 ## Recommended use
 
