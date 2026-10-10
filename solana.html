@@ -50,7 +50,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);color:v
 <tbody id="rows"></tbody>
 </table>
 </div>
-<p class="soft">Rates are effective annual rates, posted in basis points. From the fixing of 14 October 2026 (methodology 1.13.0), BTC-COLLATERAL-USD is SBOR's headline: what it costs to borrow any dollar stablecoin against plain bitcoin, across every eligible market SBOR reads, with BTC-COLLATERAL-USDC as its USDC rate. Before that date, BTC-COLLATERAL-USDC covered Morpho markets on Base, Ethereum and Arc. SBOR-USD, SBOR-BTC and SBOR-STX are SBOR's indices for lending on Stacks. Sizes are total supplied, in US dollars. An index not published on a given day keeps its last date on-chain.</p>
+<p class="soft">Rates are effective annual rates, posted in basis points. From the fixing of 14 October 2026 (methodology 1.13.0), BTC-COLLATERAL-USD is SBOR's headline: what it costs to borrow any dollar stablecoin against plain bitcoin, across every eligible market SBOR reads, with BTC-COLLATERAL-USDC as its USDC rate. Before that date, BTC-COLLATERAL-USDC covered Morpho markets on Base, Ethereum and Arc. SBOR-USD, SBOR-BTC and SBOR-STX are SBOR's indices for lending on Stacks. Sizes are total supplied, in US dollars. A rate not in the latest fixing, such as an index withheld that day, is shown as such with the date it was last posted. On-chain, each rate keeps its last posted value and date, so a contract reading it should check the date.</p>
 <p class="soft">Program on Solana mainnet: <code>85uzArk6VwzWG6mxZC7D2jLEPGhFL2SXzJs7P9zQUSz9</code>, rates account <code>85F1segB7Mrsj8ZFsGBGCpNHfuu1qEwLxmQEykphtFtF</code> (seed <code>sbor-fixings</code>). Layout: <code>SBORFIX1</code>, owner, publisher, bump, count, then per benchmark 56 bytes: key, date, borrow bps, supply bps, size in dollars, posted at.<br>
 Publisher: <code id="addr"></code>. Each fixing is also a memo beginning <code>{"sbor":1</code>, with each rate as <code>[borrowBps, supplyBps, depthUsd]</code>. Source: <a href="https://github.com/sborxyz/sbor/blob/main/scripts/solana-publish.mjs">scripts/solana-publish.mjs</a> · Methodology: <a href="/#methodology">sbor.xyz</a></p>
 <footer><a href="/">sbor.xyz</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></footer>
@@ -102,17 +102,31 @@ const pct = b => (Number(b) / 100).toFixed(2) + "%";
 const usd = n => { n = Number(n); return n >= 1e9 ? "$" + (n / 1e9).toFixed(1) + "B" : n >= 1e6 ? "$" + (n / 1e6).toFixed(1) + "M" : "$" + Math.round(n / 1e3) + "K"; };
 const day = d => { const s = String(d); return s.length === 8 ? `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6)}` : "n/a"; };
 
+/* One rule on every chain page: a rate shows only if it is in the latest
+   fixing posted on this chain. A rate not in it, such as an index withheld
+   that day, says so and when it was last posted. The contract keeps its last
+   posted value for contracts that read it; this page shows only the latest. */
+function renderRows(items){
+  const dated = items.filter(i => i.v);
+  const latest = dated.length ? Math.max(...dated.map(i => Number(i.v.date))) : 0;
+  return items.filter(i => i.v || !i.optional).map(i => {
+    if (!i.v || Number(i.v.date) !== latest)
+      return `<tr><td>${i.name}</td><td class="r" colspan="4">not in the latest fixing${i.v ? `, last posted ${day(i.v.date)}` : ""}</td></tr>`;
+    return `<tr><td>${i.name}</td><td class="r num">${pct(i.v.borrow)}</td><td class="r num">${pct(i.v.supply)}</td><td class="r num">${usd(i.v.depth)}</td><td class="r num">${day(i.v.date)}</td></tr>`;
+  }).join("");
+}
+
 (async () => {
   const st = document.getElementById("status"), body = document.getElementById("rows");
   try {
     const { record, url } = await latestRecord();
-    /* The SBOR headline is posted from 14 October 2026; until then its row is left out. */
-    body.innerHTML = NAMES.filter(([key]) => key !== "BTC-COLLATERAL-USD" || record?.rates?.[key]).map(([key, name]) => {
+    /* The memo carries one date for the whole record; the program, one per rate. */
+    const items = NAMES.map(([key, name]) => {
       const v = record?.rates?.[key];
-      return !v
-        ? `<tr><td>${name}</td><td class="r" colspan="4">not in the latest record</td></tr>`
-        : `<tr><td>${name}</td><td class="r num">${pct(v[0])}</td><td class="r num">${pct(v[1])}</td><td class="r num">${usd(v[2])}</td><td class="r num">${day(v[3] ?? record.date)}</td></tr>`;
-    }).join("");
+      return { name, optional: key === "BTC-COLLATERAL-USD",   /* posted from 14 October 2026 */
+        v: v ? { date: v[3] ?? record.date, borrow: v[0], supply: v[1], depth: v[2] } : null };
+    });
+    body.innerHTML = renderRows(items);
     st.textContent = `Read live from Solana mainnet${record?.fromProgram ? ", from SBOR's program account," : ""} at ${new Date().toLocaleString()}, through ${new URL(url).host}.`;
   } catch (e) {
     st.textContent = "Solana could not be reached from your browser just now. Try again in a moment.";

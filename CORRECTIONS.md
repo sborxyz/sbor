@@ -1,10 +1,18 @@
 # SBOR corrections
 
-*Created 24 September 2026. Last updated 30 September 2026.*
+*Created 24 September 2026. Last updated 10 October 2026.*
 
 SBOR never rewrites a published fixing. When a published figure turns out to be wrong, the record keeps what was published, and this page says what was wrong, when it was found, and what changed. It lists corrections to published figures only; fixes to the site and documentation are visible in the repository's public history.
 
 Newest first.
+
+---
+
+### 10 October 2026: SBOR-USD withheld at 08:30 by a code error, republished at 11:38 UTC
+
+**What was wrong.** The fixing of 10 October, at 08:30 UTC, withheld SBOR-USD, saying Granite's USDCx market could not be read. Granite could be read: an update to SBOR's fixing code on 9 October gave a new variable the same name as the function that reads Granite, so the function could not run and the market was treated as unreadable. With Granite missing, 32% of the index's depth, the rule against publishing an index short withheld SBOR-USD, as designed. Found the same morning from the fixing log. No published rate was wrong; SBOR-USD was missing.
+
+**What changed.** The variable was renamed, a test fixing confirmed Granite read normally, and a corrected fixing was published at 11:38 UTC: SBOR-USD at 2.75% to borrow and 0.87% to supply, with all three markets. The corrected rates were read at 11:38 UTC, not at 08:30. The other rates were unchanged in substance, and the fixing of 08:30 remains in the repository's public history. The corrected rates were posted on-chain on all five chains after the corrected fixing.
 
 ---
 
