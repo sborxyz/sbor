@@ -659,14 +659,17 @@ const main = async () => {
      Ethereum. A reference, not an index. A failure here must not stop the
      fixing. */
   let btcUsdc = null, btcUsd = null;
-  const graniteMarket = indices["SBOR-USD"]?.markets?.find(m => m.venue === "Granite") || null;
+  /* Named so it cannot shadow the graniteMarket() reader above: a const of
+     the same name in this function put the reader in its temporal dead zone,
+     and Granite went unread from 9 to 10 October 2026. */
+  const graniteRow = indices["SBOR-USD"]?.markets?.find(m => m.venue === "Granite") || null;
   if (IS_113){
     /* Methodology 1.13.0: the SBOR headline across every dollar stablecoin
        lent against plain bitcoin, and BTC-COLLATERAL-USDC over every eligible
        USDC market. The previous fixing is read for the continuity rule. */
     let prev = null;
     try { prev = JSON.parse(readFileSync("api/v1/latest.json", "utf8")); } catch {}
-    try { const r = await bitcoinCollateral(graniteMarket, prev, METHOD_DATE); btcUsd = r.usd; btcUsdc = r.usdc; }
+    try { const r = await bitcoinCollateral(graniteRow, prev, METHOD_DATE); btcUsd = r.usd; btcUsdc = r.usdc; }
     catch(e){ log(`  bitcoin-collateral rates unavailable, omitted. ${e.message}`); }
   } else {
     try { btcUsdc = await bitcoinCollateralUsdc(); }
@@ -679,7 +682,7 @@ const main = async () => {
      is announced. A failure here must not stop the fixing. */
   let preview = null;
   if (!IS_113){
-    try { preview = await methodologyPreview(graniteMarket); }
+    try { preview = await methodologyPreview(graniteRow); }
     catch(e){ log(`  methodology preview unavailable, omitted. ${e.message}`); }
   }
 
