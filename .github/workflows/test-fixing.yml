@@ -28,6 +28,10 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      # Keep the last published fixing, to check below that no market went missing.
+      - name: Keep the last published fixing
+        run: cp api/v1/latest.json "$RUNNER_TEMP/published.json"
+
       - name: Compute a fixing, not published
         run: node scripts/fetch.mjs
         env:
@@ -101,3 +105,31 @@ jobs:
           console.log("\nCHANGE FEED: baseline holds " + Object.keys(c.baseline?.markets || {}).length + " markets, " + c.changes.length + " changes recorded\n");
           ' | tee produced.txt
           { echo "## What the test produced"; echo '```text'; cat produced.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      # Every market in the last published fixing must be in this one. A market
+      # missing turns the test red, so a change that drops one cannot be
+      # mistaken for a passing test. On 9 October 2026 a test showed Granite
+      # missing in a note, the change went live, and SBOR-USD was withheld the
+      # next morning. A venue that is genuinely down also turns it red: read
+      # the log before uploading anything.
+      - name: Check that no market went missing
+        shell: bash
+        run: |
+          node -e '
+          const prev = JSON.parse(require("fs").readFileSync(process.env.RUNNER_TEMP + "/published.json", "utf8"));
+          const now = require("./api/v1/latest.json");
+          const keys = d => {
+            const s = new Set();
+            for (const [l, ix] of Object.entries(d.indices || {})) for (const m of ix.markets || []) s.add(l + ": " + m.venue + " " + m.asset);
+            for (const m of d.bitcoinCollateralUsdc?.markets || []) s.add("BTC-COLLATERAL-USDC: " + (m.venue || "Morpho") + " " + m.chain + " " + m.collateral + "/" + (m.loan || "USDC"));
+            return s;
+          };
+          const before = keys(prev), after = keys(now);
+          const missing = [...before].filter(k => !after.has(k));
+          const lines = missing.length
+            ? ["MISSING, in the last published fixing (" + prev.fixing + ") but not in this test:", ...missing.map(k => "  " + k)]
+            : ["Every market in the last published fixing (" + prev.fixing + ") is in this test: " + before.size + " markets."];
+          console.log(lines.join("\n"));
+          require("fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, "\n## Markets against the last published fixing\n```text\n" + lines.join("\n") + "\n```\n");
+          if (missing.length) process.exit(1);
+          '
