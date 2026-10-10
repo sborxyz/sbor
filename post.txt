@@ -1,15 +1,15 @@
-SBOR post drafts, fixing 2026-10-09T08:30:37Z
-Compared with 2026-10-08
+SBOR post drafts, fixing 2026-10-10T08:31:15Z
+Compared with 2026-10-09
 
 1 thing worth saying. Pick one. Do not post more than one a day.
 
---- 1. PoX cycle 143 to 144 (142 chars)
+--- 1. SBOR-USD dropped out (204 chars)
 
-Reward cycle 144 settled.
+SBOR-USD is not published today.
 
-7.86 BTC paid to STX stackers, against 448,279,555 STX locked.
+The market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.
 
-SBOR-PoX: 6.49% to 10.19%.
+It returns when the read does.
 
 sbor.xyz
 

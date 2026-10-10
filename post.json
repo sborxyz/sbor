@@ -1,17 +1,17 @@
 {
-  "fixing": "2026-10-09T08:30:37Z",
-  "comparedWith": "2026-10-08",
+  "fixing": "2026-10-10T08:31:15Z",
+  "comparedWith": "2026-10-09",
   "top": {
-    "why": "PoX cycle 143 to 144",
-    "chars": 142,
-    "text": "Reward cycle 144 settled.\n\n7.86 BTC paid to STX stackers, against 448,279,555 STX locked.\n\nSBOR-PoX: 6.49% to 10.19%.\n\nsbor.xyz"
+    "why": "SBOR-USD dropped out",
+    "chars": 204,
+    "text": "SBOR-USD is not published today.\n\nThe market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.\n\nIt returns when the read does.\n\nsbor.xyz"
   },
   "otherCount": 0,
   "drafts": [
     {
-      "why": "PoX cycle 143 to 144",
-      "chars": 142,
-      "text": "Reward cycle 144 settled.\n\n7.86 BTC paid to STX stackers, against 448,279,555 STX locked.\n\nSBOR-PoX: 6.49% to 10.19%.\n\nsbor.xyz"
+      "why": "SBOR-USD dropped out",
+      "chars": 204,
+      "text": "SBOR-USD is not published today.\n\nThe market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.\n\nIt returns when the read does.\n\nsbor.xyz"
     }
   ]
 }
