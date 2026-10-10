@@ -108,6 +108,19 @@ const GRANITE = {
 };
 const SECONDS_IN_YEAR = 31_536_000;
 
+/* A programming error is not a market that could not be read. On 10 October
+   2026 a name used before it existed made Granite look unreadable, and
+   SBOR-USD was withheld at 08:30 for a fault in SBOR's own code. Such an
+   error now stops the fixing: nothing is published short, the failure alert
+   fires, and the backup runs pick it up once the code is fixed. A venue that
+   cannot be reached, or answers in an unexpected shape, is still handled as
+   before: noted, and withheld if it carried too much weight. */
+const CODE_ERROR = /is not a function|is not a constructor|Assignment to constant/;
+function stopOnCodeError(e, where){
+  if (e instanceof ReferenceError || e instanceof SyntaxError || (e instanceof TypeError && CODE_ERROR.test(e.message)))
+    throw new Error(`code error in ${where}, fixing stopped rather than published short: ${e.name}: ${e.message}`);
+}
+
 /* Bump whenever the calculation changes. Every fixing records the version it
    was produced under, so any historical figure can be traced to its method. */
 /* 1.13.0 takes effect with the fixing of 14 October 2026 (METHODOLOGY-1.13.0.md),
@@ -541,6 +554,7 @@ const main = async () => {
         phaseIn: 1
       });
     } catch(e){
+      stopOnCodeError(e, `${ZEST.venue} ${a.symbol}`);
       log(`  ${a.symbol}: read failed, excluded. ${e.message}`);
       dynamicNotes.push(`${ZEST.venue} ${a.symbol}: not in this fixing, its contract could not be read.`);
     }
@@ -567,6 +581,7 @@ const main = async () => {
       log(`  Granite: implausible values, excluded. depth=${depthUsd} borrow=${g.borrow} supply=${g.supply}`);
     }
   } catch(e){
+    stopOnCodeError(e, "Granite");
     log(`  Granite: read failed, excluded. ${e.message}`);
   }
 
@@ -670,10 +685,10 @@ const main = async () => {
     let prev = null;
     try { prev = JSON.parse(readFileSync("api/v1/latest.json", "utf8")); } catch {}
     try { const r = await bitcoinCollateral(graniteRow, prev, METHOD_DATE); btcUsd = r.usd; btcUsdc = r.usdc; }
-    catch(e){ log(`  bitcoin-collateral rates unavailable, omitted. ${e.message}`); }
+    catch(e){ stopOnCodeError(e, "the bitcoin-collateral rates"); log(`  bitcoin-collateral rates unavailable, omitted. ${e.message}`); }
   } else {
     try { btcUsdc = await bitcoinCollateralUsdc(); }
-    catch(e){ log(`  bitcoin-collateral USDC unavailable, omitted. ${e.message}`); }
+    catch(e){ stopOnCodeError(e, "BTC-COLLATERAL-USDC"); log(`  bitcoin-collateral USDC unavailable, omitted. ${e.message}`); }
   }
 
   /* Methodology 1.13.0 as a preview: the headline across every dollar
@@ -683,7 +698,7 @@ const main = async () => {
   let preview = null;
   if (!IS_113){
     try { preview = await methodologyPreview(graniteRow); }
-    catch(e){ log(`  methodology preview unavailable, omitted. ${e.message}`); }
+    catch(e){ stopOnCodeError(e, "the methodology preview"); log(`  methodology preview unavailable, omitted. ${e.message}`); }
   }
 
   /* Reference rates from outside Stacks. Context only, never a constituent.
