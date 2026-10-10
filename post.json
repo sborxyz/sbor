@@ -1,17 +1,7 @@
 {
-  "fixing": "2026-10-10T08:31:15Z",
+  "fixing": "2026-10-10T11:38:46Z",
   "comparedWith": "2026-10-09",
-  "top": {
-    "why": "SBOR-USD dropped out",
-    "chars": 204,
-    "text": "SBOR-USD is not published today.\n\nThe market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.\n\nIt returns when the read does.\n\nsbor.xyz"
-  },
+  "top": null,
   "otherCount": 0,
-  "drafts": [
-    {
-      "why": "SBOR-USD dropped out",
-      "chars": 204,
-      "text": "SBOR-USD is not published today.\n\nThe market could not be read, so the index is omitted rather than filled in with a number it cannot stand behind.\n\nIt returns when the read does.\n\nsbor.xyz"
-    }
-  ]
+  "drafts": []
 }
