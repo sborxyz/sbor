@@ -692,7 +692,7 @@ en:{
   hdSubH:"By stablecoin", hdSubP:"The same bitcoin, borrowed in each dollar. A stablecoin gets its own rate once $25M or more of it carries weight.",
   hdSubSize:(dp,n)=>`${dp} supplied · ${n} ${n === 1 ? "market" : "markets"}`, hdNotPub:"not published today",
   hdMktH:"Every market behind the rate", hdMktP:"Only markets whose sole collateral is plain bitcoin, weighted by what is supplied. Markets added on 14 October 2026 reach full weight over 30 days.",
-  hdMeta:(v,c,w)=>`${v} venues · ${c} chains · largest market ${w} of the weight`,
+  hdMeta:(v,c,w)=>`${v} ${v === 1 ? "venue" : "venues"} · ${c} ${c === 1 ? "chain" : "chains"} carrying weight · largest market ${w} of the weight`,
   hdCols:["Market","Chain","Borrow","Supplied","Weight"],
   hdPhasing:p=>`phasing in, ${p}`, hdFlags:{ lenderIncentive:"lender rewards", synthetic:"synthetic dollar" },
   hdMore:n=>`Show all ${n} markets`, hdLess:"Show fewer",
@@ -819,7 +819,7 @@ pt:{
   hdSubH:"Por stablecoin", hdSubP:"O mesmo bitcoin, emprestado em cada dólar. Uma stablecoin ganha taxa própria quando US$ 25M ou mais dela passam a ter peso.",
   hdSubSize:(dp,n)=>`${dp} fornecidos · ${n} ${n === 1 ? "mercado" : "mercados"}`, hdNotPub:"não publicada hoje",
   hdMktH:"Todos os mercados por trás da taxa", hdMktP:"Só mercados cuja única garantia é bitcoin puro, ponderados pelo que está fornecido. Mercados incluídos em 14 de outubro de 2026 chegam ao peso cheio em 30 dias.",
-  hdMeta:(v,c,w)=>`${v} plataformas · ${c} redes · o maior mercado tem ${w} do peso`,
+  hdMeta:(v,c,w)=>`${v} ${v === 1 ? "plataforma" : "plataformas"} · ${c} ${c === 1 ? "rede" : "redes"} com peso · o maior mercado tem ${w} do peso`,
   hdCols:["Mercado","Rede","Tomador","Fornecido","Peso"],
   hdPhasing:p=>`entrando aos poucos, ${p}`, hdFlags:{ lenderIncentive:"recompensa ao fornecedor", synthetic:"dólar sintético" },
   hdMore:n=>`Mostrar os ${n} mercados`, hdLess:"Mostrar menos",
@@ -991,9 +991,10 @@ function renderHead(){
   const t = T(), esc = x => String(x ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
   const pc = v => typeof v === "number" ? fmt(v) : "n/a";
   const day = new Date(fixingDate + "T00:00:00Z").toLocaleDateString(lang === "pt" ? "pt-BR" : "en-GB", { day:"numeric", month:"short", year:"numeric", timeZone:"UTC" });
-  const live = HEAD.markets.filter(m => (m.weight || 0) > 0);
+  /* The stamp counts every market read, the way depthUsd counts every market in full;
+     how many carry weight today is in the markets section below. */
   set("hd-h", t.hdH);
-  set("hd-stamp", t.hdStamp(day, live.length, HEAD.chains ?? new Set(live.map(m => m.chain)).size, depth(HEAD.depthUsd || 0)));
+  set("hd-stamp", t.hdStamp(day, HEAD.markets.length, new Set(HEAD.markets.map(m => m.chain)).size, depth(HEAD.depthUsd || 0)));
   set("hd-borrow-k", t.hdBorrowK); set("hd-supply-k", t.hdSupplyK);
   set("hd-borrow", pc(HEAD.borrow)); set("hd-supply", pc(HEAD.supply));
   const sofr = CONTEXT?.sofr?.rate, sl = document.getElementById("hd-sofr");
@@ -1007,7 +1008,7 @@ function renderHead(){
   set("hd-subs", subs.map(([code, v]) => `<div class="subcard">
     <div class="top"><span class="tok">${esc(code.replace("BTC-COLLATERAL-", ""))}</span><span class="scode">${esc(code)}</span></div>
     <div class="v">${typeof v.borrow === "number" ? fmt(v.borrow) + '<span class="pct">%</span>' : '<span class="pct">' + t.hdNotPub + '</span>'}</div>
-    <div class="sz">${typeof v.borrow === "number" ? t.hdSubSize(depth(v.depthUsd || 0), v.markets) : esc(v.withheld || "")}</div></div>`).join(""));
+    <div class="sz">${typeof v.borrow === "number" ? t.hdSubSize(depth(v.depthUsd || 0), HEAD.markets.filter(m => m.group === code.replace("BTC-COLLATERAL-", "")).length || v.markets) : esc(v.withheld || "")}</div></div>`).join(""));
 
   set("hd-mkt-h", t.hdMktH); set("hd-mkt-p", t.hdMktP);
   if (typeof HEAD.largestConstituentWeight === "number")
