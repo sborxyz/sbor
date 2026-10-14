@@ -375,7 +375,7 @@ a{color:var(--accent)}
   <div class="wrap intro-in">
     <h2 id="t-introH"></h2>
     <p id="t-introP"></p>
-    <p class="snapshot" id="snapshot"><!-- snapshot:start -->SBOR fixing of 13 October 2026, 08:31 UTC. SBOR-USD: borrow 2.77%, supply 0.89%. SBOR-BTC: not published in this fixing. SBOR-STX: borrow 1.71%, supply 0.78%. USDC against bitcoin on Base, Ethereum and Arc, a reference, not an SBOR index: borrow 5.13%, across $2.4B. Effective annual rates, read from lending contract state. Plain text: <a href="/latest.txt">latest.txt</a>. Data: <a href="/api/v1/latest.json">latest.json</a>.<!-- snapshot:end --></p>
+    <p class="snapshot" id="snapshot"><!-- snapshot:start -->SBOR fixing of 14 October 2026, 08:30 UTC. SBOR, dollars borrowed against bitcoin (BTC-COLLATERAL-USD): borrow 5.09%, supply 4.59%, across $3.1B on 3 chains. BTC-COLLATERAL-USDC: borrow 5.09%. SBOR Stacks: SBOR-USD: borrow 2.78%, supply 0.89%. SBOR-BTC: not published in this fixing. SBOR-STX: borrow 1.69%, supply 0.77%. Effective annual rates, read from lending contract state. Plain text: <a href="/latest.txt">latest.txt</a>. Data: <a href="/api/v1/latest.json">latest.json</a>.<!-- snapshot:end --></p>
     <p id="t-introUse"></p>
     <p class="sofrtop" id="notice" style="grid-column:1 / -1;margin-top:10px"></p>
   </div>
@@ -394,7 +394,7 @@ a{color:var(--accent)}
       <div class="rates">
         <div class="rate">
           <div class="rate-k" id="t-borrow-k"></div>
-          <div class="rate-v"><span class="num" id="borrowVal">2.77</span><span class="pct">%</span></div>
+          <div class="rate-v"><span class="num" id="borrowVal">2.78</span><span class="pct">%</span></div>
           <div class="delta" id="borrowDelta"></div>
         </div>
         <div class="rate">
@@ -461,7 +461,7 @@ a{color:var(--accent)}
       </div>
       <div class="poxbox">
         <div class="poxk">SBOR-PoX</div>
-        <div class="poxv"><span class="num" id="poxVal">9.66</span><span class="pct">%</span></div>
+        <div class="poxv"><span class="num" id="poxVal">9.51</span><span class="pct">%</span></div>
         <div class="coverage" id="poxMeta" style="margin:10px 0 0"></div>
       </div>
       <svg class="chart poxchart" id="poxChart" viewBox="0 0 1120 200" preserveAspectRatio="none" role="img" aria-label="PoX staking yield history"></svg>
@@ -549,7 +549,7 @@ a{color:var(--accent)}
   | jq '.indices["SBOR-USD"] | {borrow, supply}'
 
 {
-  "borrow": <span id="exB">2.77</span>,
+  "borrow": <span id="exB">2.78</span>,
   "supply": <span id="exS">0.89</span>
 }</pre>
         </div>
