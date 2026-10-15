@@ -328,6 +328,20 @@ for (const ix of facts.indices){
     addMove(`${m.venue} ${m.asset} market`, "utilization", m.utilizationPct, m.utilizationChange1dBps);
   }
 }
+/* The headline and each bitcoin-collateral market, with any phase-in share
+   written into the market's own name. On 15 October 2026 the brief gave Arc's
+   cirBTC market (43% of the way to full weight) the 3% of the market before
+   it, because it paired the share itself. */
+{
+  const hu = facts.bitcoinCollateralUsd;
+  if (hu?.published) addMove("BTC-COLLATERAL-USD headline", "borrow", hu.borrowPct, hu.borrowChange1dBps);
+  const bc = facts.bitcoinCollateralUsdc;
+  if (bc?.published) addMove("BTC-COLLATERAL-USDC rate", "borrow", bc.borrowPct, bc.borrowChange1dBps);
+  for (const m of bc?.markets || []){
+    const share = m.phasingIn ? ` (phasing in, ${m.phaseInPctOfFullWeight}% of the way to full weight)` : "";
+    addMove(`${m.chain} ${m.venue || "Morpho"} ${m.collateral}/${m.loan || "USDC"} market${share}`, "borrow", m.borrowPct, m.borrowChange1dBps);
+  }
+}
 facts.moves = moves;
 
 log(`brief for ${facts.date}: ${flags.length} flag(s)`);
@@ -366,7 +380,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 7. Some inputs are unreliable and you should say so rather than reporting them flatly. The stSTX protocol yield from StackingDAO has moved 6.81, 3.14, 4.21, 4.33 within a week, which is not how a staking yield behaves. Any figure that depends on it, including the same exposure legs and the all in supply rate, inherits that. If you cite one, say the input moves.
 
-8. From 14 October 2026 (methodology 1.13.0), bitcoinCollateralUsd is the SBOR headline, BTC-COLLATERAL-USD: what it costs to borrow any dollar stablecoin against plain bitcoin, across every eligible market on every chain SBOR reads. perStablecoin holds the rate for each stablecoin with $25M or more of weight, and bitcoinCollateralUsdc is its USDC rate, BTC-COLLATERAL-USDC. Before that date bitcoinCollateralUsdc covered Morpho markets on Base, Ethereum and Arc only. Markets added under 1.13.0 phase in over 30 days from 14 October, so in those weeks the headline glides as their weight grows: a change in the headline from phase-in is not a market move. Phase-in changes a market's weight in the headline, never the market's own rate. A move in a market's own borrow or supply rate is a market move in that market, whether or not it is phasing in: report it with its level and size, and no cause. A stablecoin rate appearing for the first time is its weight crossing $25M, not new lending. Only a market with phasingIn true is phasing in; every other market carries its full weight and must never be called new or phasing in. Describe a phasing-in market as that share of the way to its full weight (phaseInPctOfFullWeight), never as its weight in the rate. Report these rates on their own when flagged. Never average them with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
+8. From 14 October 2026 (methodology 1.13.0), bitcoinCollateralUsd is the SBOR headline, BTC-COLLATERAL-USD: what it costs to borrow any dollar stablecoin against plain bitcoin, across every eligible market on every chain SBOR reads. perStablecoin holds the rate for each stablecoin with $25M or more of weight, and bitcoinCollateralUsdc is its USDC rate, BTC-COLLATERAL-USDC. Before that date bitcoinCollateralUsdc covered Morpho markets on Base, Ethereum and Arc only. Markets added under 1.13.0 phase in over 30 days from 14 October, so in those weeks the headline glides as their weight grows: a change in the headline from phase-in is not a market move. Phase-in changes a market's weight in the headline, never the market's own rate. A move in a market's own borrow or supply rate is a market move in that market, whether or not it is phasing in: report it with its level and size, and no cause. A stablecoin rate appearing for the first time is its weight crossing $25M, not new lending. Only a market with phasingIn true is phasing in; every other market carries its full weight and must never be called new or phasing in. Describe a phasing-in market as that share of the way to its full weight (phaseInPctOfFullWeight), never as its weight in the rate. Take each market's share only from that market's own phrase in "moves", where it is written into the market's name, and never carry one market's share to another with "also". Report these rates on their own when flagged. Never average them with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
 
 9. A flag marked DATA EVENT comes first and is never a market move. Say the index is not published, or is missing a market, and why, in one sentence, and do not interpret any change in that index or its remaining markets. A DATA NOTE is one sentence, no interpretation.
 
