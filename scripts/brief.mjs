@@ -398,10 +398,10 @@ If an index was unchanged, one clause is enough: "SBOR-BTC unchanged at 1.31%." 
 
 The flags array is what crossed a threshold. Use it as your agenda, not as your text: write it properly rather than listing it back. Do not mention that flags exist.`;
 
-/* One call to the model. Thinking is capped explicitly rather than left to
-   expand: at 4000 total tokens it worked one day and consumed the whole budget
-   the next, because thinking grows to fill what it is given. A fixed thinking
-   budget below max_tokens guarantees room for the brief itself. */
+/* One call to the model. Thinking is adaptive at low effort, inside a 6000
+   token cap that leaves room for the brief itself. Until 15 October 2026 this
+   asked for a fixed thinking budget, which the model refuses (400), so every
+   brief since the model change was written by the thinking-off retry. */
 async function call(thinking){
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("no ANTHROPIC_API_KEY");
@@ -411,7 +411,7 @@ async function call(thinking){
     system: SYSTEM,
     messages: [{ role: "user", content: JSON.stringify(facts) }],
     ...(thinking
-      ? { thinking: { type: "enabled", budget_tokens: 2000 } }
+      ? { thinking: { type: "adaptive" }, output_config: { effort: "low" } }
       : { thinking: { type: "disabled" } })
   };
   const r = await fetch("https://api.anthropic.com/v1/messages", {
@@ -428,12 +428,12 @@ async function call(thinking){
   const d = await r.json();
   const text = (d.content || []).filter(c => c.type === "text").map(c => c.text).join("\n").trim();
   if (!text && d.stop_reason === "max_tokens")
-    throw new Error(`ran out of tokens before writing (${d.usage?.output_tokens ?? "?"} output tokens, thinking ${thinking ? "capped at 2000" : "off"})`);
+    throw new Error(`ran out of tokens before writing (${d.usage?.output_tokens ?? "?"} output tokens, thinking ${thinking ? "adaptive, low effort" : "off"})`);
   if (!text) throw new Error(`no text in response: ${JSON.stringify({ stop_reason: d.stop_reason ?? null, blocks: (d.content || []).map(c => c.type) })}`);
   return text;
 }
 
-/* Capped thinking first, because it writes better. If that fails for any
+/* Adaptive thinking first, because it writes better. If that fails for any
    reason, one more attempt with thinking off, which is terser but reliable.
    Only if both fail does the brief go out as raw findings. */
 async function write(){
