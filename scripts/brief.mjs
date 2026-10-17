@@ -109,7 +109,7 @@ const facts = {
   staking: {
     poxApyPct: F(px(today).apy),
     /* No change across a measurement correction: it would read as a market move. */
-    poxApyChange1dBps: (px(today).measurement ?? 1) === (px(d1).measurement ?? 1) ? bps(px(today).apy, px(d1).apy) : null,
+    poxApyChange1dBps: px(today).apy != null && px(d1).apy != null && (px(today).measurement ?? 1) === (px(d1).measurement ?? 1) ? bps(px(today).apy, px(d1).apy) : null,
     cycle: px(today).cycle ?? null,
     crossSmoothed: px(today).stxPerBtcSmoothed ?? null,
     crossSpot: px(today).stxPerBtc ?? null,
@@ -251,7 +251,13 @@ for (const ix of facts.indices){
 }
 if (facts.world.sofrChange1dBps != null && Math.abs(facts.world.sofrChange1dBps) >= 10)
   flags.push(`SOFR moved ${facts.world.sofrChange1dBps > 0 ? "+" : ""}${facts.world.sofrChange1dBps} bps to ${facts.world.sofrPct}%, which is large for an overnight rate.`);
-if ((px(today).measurement ?? 1) !== (px(d1).measurement ?? 1))
+/* A missing SBOR-PoX is a data event, never a measurement change. Compare
+   measurements only when both days carry a reading. */
+if (px(today).apy == null && px(d1).apy != null)
+  flags.push(`SBOR-PoX could not be read for today's fixing and is omitted. This is a data event, not a market move and not a methodology change. Say only that it is omitted today.`);
+else if (px(today).apy != null && px(d1).apy == null)
+  flags.push(`SBOR-PoX is published again today after being omitted yesterday, so no change is reported. Give today's level only.`);
+else if (px(today).apy != null && (px(today).measurement ?? 1) !== (px(d1).measurement ?? 1))
   flags.push(`SBOR-PoX is measured the corrected way from today: the chain's exact cycle window and that cycle's own STX locked. Today's figure is not comparable with yesterday's, so no change is reported.`);
 if (facts.staking.crossSpotChange1dPercent != null && Math.abs(facts.staking.crossSpotChange1dPercent) >= 5)
   flags.push(`The BTC to STX cross moved ${facts.staking.crossSpotChange1dPercent}% on spot. The seven day mean absorbs most of it.`);
