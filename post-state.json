@@ -1,15 +1,14 @@
 {
-  "fixing": "2026-10-16T08:30:57Z",
+  "fixing": "2026-10-17T08:30:56Z",
   "utilization": {
-    "Zest V2|USDCx": 72.64,
-    "Granite|USDCx": 23.67,
-    "Zest V2|USDh": 30.59,
-    "Zest V2|sBTC": 71,
-    "Zest V2|stSTX": 5.3,
-    "Zest V2|STX": 73.77
+    "Zest V2|USDCx": 72.28,
+    "Granite|USDCx": 23.55,
+    "Zest V2|USDh": 32.75,
+    "Zest V2|sBTC": 70.63,
+    "Zest V2|stSTX": 5.31,
+    "Zest V2|STX": 76.21
   },
   "announced": {
-    "poxsettled:144": "2026-10-09",
     "dropped:SBOR-USD": "2026-10-10",
     "returned:SBOR-BTC": "2026-10-16"
   },

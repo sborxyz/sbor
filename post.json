@@ -1,17 +1,7 @@
 {
-  "fixing": "2026-10-16T08:30:57Z",
-  "comparedWith": "2026-10-15",
-  "top": {
-    "why": "SBOR-BTC returned",
-    "chars": 213,
-    "text": "SBOR-BTC is publishing again.\n\nBorrow 1.31%, supply 0.82%.\n\nIt was omitted while the market could not be read. SBOR leaves an index out rather than publish a figure it cannot stand behind.\n\nsbor.xyz"
-  },
+  "fixing": "2026-10-17T08:30:56Z",
+  "comparedWith": "2026-10-16",
+  "top": null,
   "otherCount": 0,
-  "drafts": [
-    {
-      "why": "SBOR-BTC returned",
-      "chars": 213,
-      "text": "SBOR-BTC is publishing again.\n\nBorrow 1.31%, supply 0.82%.\n\nIt was omitted while the market could not be read. SBOR leaves an index out rather than publish a figure it cannot stand behind.\n\nsbor.xyz"
-    }
-  ]
+  "drafts": []
 }
