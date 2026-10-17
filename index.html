@@ -466,6 +466,16 @@ a{color:var(--accent)}
       </div>
       <svg class="chart poxchart" id="poxChart" viewBox="0 0 1120 200" preserveAspectRatio="none" role="img" aria-label="PoX staking yield history"></svg>
       <p class="coverage" id="poxChartNote" style="margin:10px 0 0"></p>
+      <h3 id="t-poxCycH" style="margin:28px 0 6px"></h3>
+      <p id="poxCycLine" style="margin:0 0 10px"></p>
+      <div class="tscroll">
+        <table>
+          <thead><tr id="poxCycHead"></tr></thead>
+          <tbody id="poxCycRows"></tbody>
+        </table>
+      </div>
+      <p class="coverage" id="poxCycNote" style="margin:10px 0 0"></p>
+      <div class="coverage" id="poxCycFormula" style="margin:14px 0 0"></div>
     </section>
 
     <section data-tabpage="rates">
@@ -680,6 +690,22 @@ en:{
   poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. Each reading annualizes the most recently completed two week cycle, so a marked line is the day a cycle settled and everything to its right is derived from that cycle. The drift between markers is the BTC to STX rate, which is averaged over seven days.`,
   poxChartThin:"Not enough history yet to draw this.",
   poxCycleMark:c=>`cycle ${c} settled`,
+  poxCycH:"Every reward cycle",
+  poxCycCols:["Cycle","Window (about)","BTC paid to stakers","STX locked","Yield the day it settled"],
+  poxCycVs:c=>`vs cycle ${c}`,
+  poxCycLine:(c,btc,dBtc,stx,dStx,p)=>`Cycle ${c} paid ${btc} BTC to stakers, ${dBtc} on cycle ${p}, with ${stx} STX locked, ${dStx}.`,
+  poxCycWord:v=>v.startsWith("-") ? `down ${v.slice(1)}` : `up ${v.replace("+","")}`,
+  poxCycNote:"From cycle 143, measured on the chain's exact cycle window with that cycle's own STX locked. BTC paid and STX locked are fixed for a cycle; the yield shown is the one published the day the cycle settled, since the daily figure after that moves with the BTC to STX rate. Earlier cycles were measured another way and are not shown.",
+  poxCycNone:"No completed cycle in the record yet.",
+  poxCycFormulaH:"How each number is calculated",
+  poxCycFormula:[
+    "BTC paid: the sum of every PoX reward payout in the cycle's Bitcoin blocks, from the cycle's first burn block to its last (2,100 blocks), read from the Stacks chain through Hiro's API.",
+    "STX locked: that same cycle's total stacked STX, as the chain records it.",
+    "STX per BTC: a two-way Bitflow quote, midpointed, averaged over 7 days (CoinGecko prices if Bitflow cannot be reached). The spot quote is published beside it.",
+    "Yield per cycle = BTC paid × STX per BTC ÷ STX locked.",
+    "Annual yield = (1 + yield per cycle) ^ (52,560 ÷ 2,100) − 1, compounding over about 25.03 cycles a year (52,560 Bitcoin blocks a year, 2,100 per cycle)."],
+  poxCycWorked:(c,btc,x,stx,cy,ann)=>`Cycle ${c}, the day it settled: ${btc} BTC × ${x} STX per BTC ÷ ${stx} STX = ${cy}% per cycle. (1 + ${cy}%) ^ 25.03 − 1 = ${ann}%. The code is public: scripts/pox.mjs.`,
+  poxMissing:"SBOR-PoX could not be read for today's fixing and is omitted today. The history and every cycle below are unchanged.",
   poxMeta:(c,btc,stx,x,w)=>`Read fresh each day from the bitcoin actually paid out in completed reward cycle ${c}${w} · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over 7 days`,
   csv:"Download CSV",
   tabRates:"Rates", tabStaking:"Staking", tabAgents:"For AI agents", tabMethod:"Methodology", tabStacks:"Stacks",
@@ -807,6 +833,22 @@ pt:{
   poxChartNote:(n,first,last)=>`${n} leituras diárias, de ${first} a ${last}. Cada leitura anualiza o último ciclo de duas semanas concluído, então uma linha marcada é o dia em que um ciclo fechou, e tudo à direita dela vem daquele ciclo. A variação entre marcadores é a relação BTC para STX, que é suavizada em sete dias.`,
   poxChartThin:"Ainda não há histórico suficiente para desenhar isso.",
   poxCycleMark:c=>`ciclo ${c} fechou`,
+  poxCycH:"Cada ciclo de recompensa",
+  poxCycCols:["Ciclo","Período (aprox.)","BTC pago a stakers","STX travado","Rendimento no dia em que fechou"],
+  poxCycVs:c=>`vs ciclo ${c}`,
+  poxCycLine:(c,btc,dBtc,stx,dStx,p)=>`O ciclo ${c} pagou ${btc} BTC a stakers, ${dBtc} sobre o ciclo ${p}, com ${stx} STX travados, ${dStx}.`,
+  poxCycWord:v=>v.startsWith("-") ? `queda de ${v.slice(1)}` : `alta de ${v.replace("+","")}`,
+  poxCycNote:"A partir do ciclo 143, medido na janela exata do ciclo na rede, com o STX travado daquele ciclo. BTC pago e STX travado são fixos em um ciclo; o rendimento mostrado é o publicado no dia em que o ciclo fechou, porque o número diário depois disso varia com a relação BTC para STX. Ciclos anteriores foram medidos de outra forma e não aparecem.",
+  poxCycNone:"Ainda não há ciclo concluído no registro.",
+  poxCycFormulaH:"Como cada número é calculado",
+  poxCycFormula:[
+    "BTC pago: a soma de cada pagamento de recompensa do PoX nos blocos de Bitcoin do ciclo, do primeiro ao último bloco (2.100 blocos), lida da rede Stacks pela API da Hiro.",
+    "STX travado: o total de STX em staking naquele mesmo ciclo, como a rede registra.",
+    "STX por BTC: cotação da Bitflow nos dois sentidos, no ponto médio, com média de 7 dias (preços da CoinGecko se a Bitflow não responder). A cotação spot é publicada ao lado.",
+    "Rendimento por ciclo = BTC pago × STX por BTC ÷ STX travado.",
+    "Rendimento anual = (1 + rendimento por ciclo) ^ (52.560 ÷ 2.100) − 1, composto em cerca de 25,03 ciclos por ano (52.560 blocos de Bitcoin por ano, 2.100 por ciclo)."],
+  poxCycWorked:(c,btc,x,stx,cy,ann)=>`Ciclo ${c}, no dia em que fechou: ${btc} BTC × ${x} STX por BTC ÷ ${stx} STX = ${cy}% por ciclo. (1 + ${cy}%) ^ 25,03 − 1 = ${ann}%. O código é público: scripts/pox.mjs.`,
+  poxMissing:"O SBOR-PoX não pôde ser lido no fixing de hoje e foi omitido hoje. O histórico e cada ciclo abaixo não mudam.",
   poxMeta:(c,btc,stx,x,w)=>`Lido todo dia a partir do bitcoin efetivamente pago no ciclo de recompensa ${c}, já concluído${w} · ${btc} BTC pagos a stakers · ${stx} STX travados · convertido a ${x} STX por BTC, média de 7 dias`,
   csv:"Baixar CSV",
   tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes de IA", tabMethod:"Metodologia", tabStacks:"Stacks",
@@ -1173,13 +1215,20 @@ function renderChrome(){
   if (POX){
     psec.hidden = false;
     document.getElementById("poxVal").textContent = POX.apy.toFixed(2);
+    { const pc = document.querySelector("#pox-sec .poxv .pct"); if (pc) pc.style.display = ""; }
     const loc = lang === "pt" ? "pt-BR" : "en-US";
     const win = (POX.cycleStartApprox && POX.cycleEndApprox)
       ? `, ${POX.cycleStartApprox} to ${POX.cycleEndApprox}` : ", a two week period";
     set("poxMeta", t.poxMeta(POX.cycle, POX.btcPaid.toFixed(3),
         POX.stxLocked.toLocaleString(loc),
         Math.round(POX.stxPerBtcSmoothed ?? POX.stxPerBtc).toLocaleString(loc), win));
-    drawPox();
+    drawPox(); drawPoxCycles();
+  } else if (HISTORY.some(r => (r["SBOR-PoX"] || {}).apy != null)){
+    psec.hidden = false;
+    document.getElementById("poxVal").textContent = "n/a";
+    { const pc = document.querySelector("#pox-sec .poxv .pct"); if (pc) pc.style.display = "none"; }
+    set("poxMeta", t.poxMissing);
+    drawPox(); drawPoxCycles();
   } else { psec.hidden = true; }
   set("t-cons-foot", t.consFoot);
   set("t-method-h", t.methodH);
@@ -1282,6 +1331,59 @@ function drawPox(){
   g += `<path d="${v.map((n,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(n).toFixed(1)).join(" ")}" fill="none" style="stroke:var(--accent)" stroke-width="2"/>`;
   el.innerHTML = g;
   set("poxChartNote", t.poxChartNote(rows.length, rows[0].date, rows[rows.length-1].date));
+}
+
+/* One row per completed reward cycle, from the daily record. BTC paid and STX
+   locked are fixed for a cycle; the yield is the one published the day the
+   cycle settled (its first reading). Only measurement 2 and later, since
+   earlier readings used a different window and are not comparable. */
+function drawPoxCycles(){
+  const t = T();
+  const loc = lang === "pt" ? "pt-BR" : "en-US";
+  const dec = (n, k) => n.toFixed(k).replace(".", lang === "pt" ? "," : ".");
+  const by = new Map();
+  for (const r of HISTORY){
+    const e = r["SBOR-PoX"] || {};
+    if (typeof e.apy !== "number" || e.cycle == null || (e.measurement ?? 1) < 2) continue;
+    if (!by.has(e.cycle)) by.set(e.cycle, { cycle:e.cycle, first:e, last:e });
+    else by.get(e.cycle).last = e;
+  }
+  const c = t.poxCycCols;
+  set("t-poxCycH", t.poxCycH);
+  set("poxCycHead", c.map((h,i) => `<th${i>1?' class="r"':""}>${h}</th>`).join(""));
+  const cyc = [...by.values()].sort((a,b) => b.cycle - a.cycle);
+  if (!cyc.length){ set("poxCycRows", `<tr><td colspan="5">${t.poxCycNone}</td></tr>`); set("poxCycNote",""); return; }
+  const d = s => s ? new Date(s + "T00:00:00Z").toLocaleDateString(loc, { day:"numeric", month:"short", timeZone:"UTC" }) : "";
+  /* Change on the previous cycle in the record, from the chain numbers only. */
+  const pct = (a, b) => (typeof a === "number" && typeof b === "number" && b > 0)
+    ? `${a >= b ? "+" : ""}${((a / b - 1) * 100).toFixed(1).replace(".", lang === "pt" ? "," : ".")}%` : null;
+  const prevOf = x => by.get(x.cycle - 1);
+  const chg = (a, b, prev) => { const v = pct(a, b); return v ? `<span class="asset" style="display:block">${v} ${t.poxCycVs(prev)}</span>` : ""; };
+  const top = cyc[0], tp = prevOf(top);
+  const dB = tp && pct(top.first.btcPaid, tp.first.btcPaid), dS = tp && pct(top.first.stxLocked, tp.first.stxLocked);
+  set("poxCycLine", dB && dS ? t.poxCycLine(top.cycle, dec(top.first.btcPaid, 3), t.poxCycWord(dB),
+      (top.first.stxLocked / 1e6).toFixed(1).replace(".", lang === "pt" ? "," : ".") + "M", t.poxCycWord(dS), tp.cycle) : "");
+  set("poxCycRows", cyc.map(x => `<tr><td data-l="${c[0]}"><span class="venue">${x.cycle}</span></td>`
+    + `<td data-l="${c[1]}">${d(x.first.cycleStart)}${lang === "pt" ? " a " : " to "}${d(x.first.cycleEnd)}</td>`
+    + `<td class="r num" data-l="${c[2]}">${typeof x.first.btcPaid === "number" ? dec(x.first.btcPaid, 3) : "n/a"}${prevOf(x) ? chg(x.first.btcPaid, prevOf(x).first.btcPaid, x.cycle - 1) : ""}</td>`
+    + `<td class="r num" data-l="${c[3]}">${typeof x.first.stxLocked === "number" ? x.first.stxLocked.toLocaleString(loc) : "n/a"}${prevOf(x) ? chg(x.first.stxLocked, prevOf(x).first.stxLocked, x.cycle - 1) : ""}</td>`
+    + `<td class="r num" data-l="${c[4]}">${dec(x.first.apy, 2)}%</td></tr>`).join(""));
+  set("poxCycNote", t.poxCycNote);
+  /* The formula, and a worked example for the newest cycle recomputed here
+     from the published numbers. The example is shown only if it reproduces
+     the published yield, so the page can never display a sum that disagrees. */
+  const f = cyc[0].first;
+  let worked = "";
+  if ([f.btcPaid, f.stxPerBtcSmoothed, f.stxLocked].every(n => typeof n === "number")){
+    const cy = f.btcPaid * f.stxPerBtcSmoothed / f.stxLocked;
+    const ann = (Math.pow(1 + cy, 52560/2100) - 1) * 100;
+    if (Math.abs(ann - f.apy) < 0.006)
+      worked = `<p style="margin:8px 0 0">${t.poxCycWorked(cyc[0].cycle, dec(f.btcPaid, 6),
+        Math.round(f.stxPerBtcSmoothed).toLocaleString(loc), f.stxLocked.toLocaleString(loc),
+        dec((cy*100), 4), dec(ann, 2))}</p>`;
+  }
+  set("poxCycFormula", `<strong>${t.poxCycFormulaH}</strong><ol style="margin:6px 0 0;padding-left:20px">`
+    + t.poxCycFormula.map(x => `<li>${x}</li>`).join("") + `</ol>` + worked);
 }
 
 function renderTerms(){
