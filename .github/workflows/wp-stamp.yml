@@ -1,0 +1,76 @@
+name: Stamp the white paper
+
+# Posts the SHA-256 of the white paper PDF on Arc, Base, Hyperliquid, Solana,
+# Stacks and Bitcoin, plus an OpenTimestamps proof, and commits the record
+# (whitepaper-stamps.json and the .ots file) that sbor.xyz/whitepaper reads.
+# Manual only. Run "address" first to see what to fund, "dry" to build and sign
+# everything without posting, then "live" once, on publication day. A failed
+# chain is stamped by running "live" again; stamped chains are skipped.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "address, dry, live, or ots-upgrade"
+        required: true
+        default: dry
+        type: choice
+        options: [address, dry, live, ots-upgrade]
+      file:
+        description: "The PDF at the repository root"
+        required: true
+        default: SBOR_White_Paper_v1.pdf
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wp-stamp
+  cancel-in-progress: false
+
+jobs:
+  stamp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the libraries it needs
+        if: inputs.mode != 'ots-upgrade'
+        run: npm install --no-save --no-audit --no-fund viem@2.57.2 @solana/web3.js@1.99.0 @stacks/transactions@7.6.0 @scure/btc-signer@2.0.1 @noble/curves@2.0.0
+      - name: Stamp
+        if: inputs.mode != 'ots-upgrade'
+        env:
+          ARC_PUBLISHER_KEY: ${{ secrets.ARC_PUBLISHER_KEY }}
+          WP_FILE: ${{ inputs.file }}
+        shell: bash
+        run: |
+          set -o pipefail
+          status=0
+          node scripts/wp-stamp.mjs "${{ inputs.mode }}" | tee stamp.txt || status=$?
+          { echo "## White paper stamp (${{ inputs.mode }})"; echo '```text'; cat stamp.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          echo "status=$status" >> "$GITHUB_ENV"
+      - name: OpenTimestamps
+        if: inputs.mode == 'live' || inputs.mode == 'ots-upgrade'
+        shell: bash
+        run: |
+          pip install --quiet opentimestamps-client
+          f="${{ inputs.file }}"
+          if [ "${{ inputs.mode }}" = live ] && [ ! -f "$f.ots" ]; then ots stamp "$f"; fi
+          if [ -f "$f.ots" ]; then ots upgrade "$f.ots" || true; ots info "$f.ots" | head -20 >> "$GITHUB_STEP_SUMMARY" || true; fi
+      - name: Commit the record
+        if: inputs.mode == 'live' || inputs.mode == 'ots-upgrade'
+        shell: bash
+        run: |
+          git config user.name "sbor-bot"
+          git config user.email "contact@sbor.xyz"
+          git add whitepaper-stamps.json "${{ inputs.file }}.ots" 2>/dev/null || true
+          if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+          git commit -m "white paper stamps ${{ inputs.mode }} [skip netlify]"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done
+      - name: Fail if a chain failed
+        if: inputs.mode != 'ots-upgrade'
+        run: '[ "${status:-0}" = 0 ]'
