@@ -53,11 +53,15 @@ jobs:
           node scripts/wp-stamp.mjs "${{ inputs.mode }}" | tee stamp.txt || status=$?
           { echo "## White paper stamp (${{ inputs.mode }})"; echo '```text'; cat stamp.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           echo "status=$status" >> "$GITHUB_ENV"
+      - uses: actions/setup-python@v5
+        if: inputs.mode == 'live' || inputs.mode == 'ots-upgrade'
+        with:
+          python-version: "3.12"
       - name: OpenTimestamps
         if: inputs.mode == 'live' || inputs.mode == 'ots-upgrade'
         shell: bash
         run: |
-          pip install --quiet opentimestamps-client
+          python -m pip install --quiet opentimestamps-client
           f="${{ inputs.file }}"
           if [ "${{ inputs.mode }}" = live ] && [ ! -f "$f.ots" ]; then ots stamp "$f"; fi
           if [ -f "$f.ots" ]; then ots upgrade "$f.ots" || true; ots info "$f.ots" | head -20 >> "$GITHUB_STEP_SUMMARY" || true; fi
