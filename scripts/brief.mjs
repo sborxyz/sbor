@@ -291,6 +291,12 @@ if (stx?.published){
         netBps: Math.round(((yld.supplyPct + py) - plain.borrowPct) * 100),
         ignoringYieldBps: Math.round((yld.supplyPct - plain.borrowPct) * 100) }
     ];
+    /* Each leg written out whole, like the moves. On 19 October 2026 a test brief
+       called the leg's earnings (supply 0.03% plus yield 7.91% = 7.94%) "the stSTX
+       protocol yield of 7.94%". */
+    const f2 = x => Number(x).toFixed(2) + "%";
+    facts.sameExposure[0].phrase = `supply STX earns ${f2(plain.supplyPct)}; borrowing stSTX costs ${f2(yld.borrowPct)} plus the ${f2(py)} stSTX protocol yield given up, ${f2(yld.borrowPct + py)}; net ${facts.sameExposure[0].netBps > 0 ? "+" : ""}${facts.sameExposure[0].netBps} basis points`;
+    facts.sameExposure[1].phrase = `supply stSTX earns ${f2(yld.supplyPct)} plus the ${f2(py)} stSTX protocol yield, ${f2(yld.supplyPct + py)}; borrowing STX costs ${f2(plain.borrowPct)}; net ${facts.sameExposure[1].netBps > 0 ? "+" : ""}${facts.sameExposure[1].netBps} basis points`;
     for (const l of facts.sameExposure)
       if (l.netBps > 0) flags.push(`Same exposure: ${l.leg} nets +${l.netBps} bps after the protocol yield. Worth checking whether it is real.`);
   }
@@ -407,7 +413,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 6. A single venue is not a market. When an index covers one venue, its rate is a reading of that venue. SBOR-BTC covers one venue today.
 
-7. Some inputs are unreliable and you should say so rather than reporting them flatly. The stSTX protocol yield from StackingDAO has moved 6.81, 3.14, 4.21, 4.33 within a week, which is not how a staking yield behaves. Any figure that depends on it, including the same exposure legs and the all in supply rate, inherits that. If you cite one, say the input moves.
+7. Some inputs are unreliable and you should say so rather than reporting them flatly. The stSTX protocol yield from StackingDAO has moved 6.81, 3.14, 4.21, 4.33 within a week, which is not how a staking yield behaves. Any figure that depends on it, including the same exposure legs and the all in supply rate, inherits that. If you cite one, say the input moves. Quote a same-exposure leg only from its own "phrase", which names each number; never relabel one of its numbers.
 
 8. From 14 October 2026 (methodology 1.13.0), bitcoinCollateralUsd is the SBOR headline, BTC-COLLATERAL-USD: what it costs to borrow any dollar stablecoin against plain bitcoin, across every eligible market on every chain SBOR reads. perStablecoin holds the rate for each stablecoin with $25M or more of weight, and bitcoinCollateralUsdc is its USDC rate, BTC-COLLATERAL-USDC. Before that date bitcoinCollateralUsdc covered Morpho markets on Base, Ethereum and Arc only. Markets added under 1.13.0 phase in over 30 days from 14 October, so in those weeks the headline glides as their weight grows: a change in the headline from phase-in is not a market move. Phase-in changes a market's weight in the headline, never the market's own rate. A move in a market's own borrow or supply rate is a market move in that market, whether or not it is phasing in: report it with its level and size, and no cause. Never comment on phase-in beside a market's move, either to blame it or to rule it out: give the market's name as written, its level and its change, and stop. A stablecoin rate appearing for the first time is its weight crossing $25M, not new lending. Only a market with phasingIn true is phasing in; every other market carries its full weight and must never be called new or phasing in. Describe a phasing-in market as that share of the way to its full weight (phaseInPctOfFullWeight), never as its weight in the rate. Take each market's share only from that market's own phrase in "moves", where it is written into the market's name, and never carry one market's share to another with "also". Report these rates on their own when flagged. Never average them with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
 
@@ -430,6 +436,8 @@ Never say "actually" as filler, as in "utilization actually eased". Either it ea
 **Length is a hard limit, not a target.** 220 words maximum on any day. 80 words on a quiet one. Count them. If you are over, cut the smallest movers, not the largest.
 
 **What to leave out.** An index or market that did not move does not need four figures. A rate that moved less than 10 basis points is not a move and does not need reporting unless nothing else happened. Do not describe every market in every index. Most days two or three things matter and the rest is noise you are being paid not to repeat.
+
+Never write that nothing else moved, or that no other move crossed a threshold: a minor move you leave out still happened. Never write a field name from the payload (sameExposure, depthUsd, flags); say what it means in words.
 
 If an index was unchanged, one clause is enough: "SBOR-BTC unchanged at 1.31%." Not its supply, utilization, depth and venue count as well.
 
