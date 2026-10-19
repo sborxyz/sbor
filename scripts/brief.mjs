@@ -172,6 +172,7 @@ const facts = {
       const phasingIn = typeof lm?.phaseIn === "number" && lm.phaseIn < 1;
       return { chain: m.c, ...(m.v && { venue: m.v }), collateral: m.a, ...(m.l && { loan: m.l }), borrowPct: F(m.b), borrowChange1dBps: bps(m.b, a?.b),
                utilizationPct: F(m.u), depthUsd: m.d,
+               ...(typeof lm?.weight === "number" && { weightInHeadline: lm.weight }),
                phasingIn, ...(phasingIn && { phaseInPctOfFullWeight: Math.round(lm.phaseIn * 100) }) };
     })
   } : null
@@ -315,11 +316,11 @@ facts.flags = flags;
    numbers side by side and still crossed them, so it is no longer asked to pair
    anything: it quotes a phrase that already carries its own start and end. */
 const moves = [];
-function addMove(subject, field, now, changeBps){
+function addMove(subject, field, now, changeBps, minor = false){
   if (now == null || changeBps == null || changeBps === 0) return;
   const was = Number((now - changeBps / 100).toFixed(2));
   moves.push({
-    subject, field, fromPct: was, toPct: now, changeBps,
+    subject, field, fromPct: was, toPct: now, changeBps, ...(minor && { minor: true }),
     phrase: `${subject} ${field} ${changeBps > 0 ? "up" : "down"} ${Math.abs(changeBps)} basis points, from ${was.toFixed(2)}% to ${Number(now).toFixed(2)}%`
   });
 }
@@ -328,10 +329,16 @@ for (const ix of facts.indices){
   addMove(`${ix.label} index`, "borrow", ix.borrowPct, ix.borrowChange1dBps);
   addMove(`${ix.label} index`, "supply", ix.supplyPct, ix.supplyChange1dBps);
   addMove(`${ix.label} index`, "utilization", ix.utilizationPct, ix.utilizationChange1dBps);
+  /* A market under 5% of its index's depth is marked minor and named with its
+     share, so it is never the lead. On 19 October 2026 the brief opened with
+     Zest's USDh market, $0.44M of SBOR-USD's $15.8M, ahead of the headline. */
   for (const m of ix.markets){
-    addMove(`${m.venue} ${m.asset} market`, "borrow", m.borrowPct, m.borrowChange1dBps);
-    addMove(`${m.venue} ${m.asset} market`, "supply", m.supplyPct, m.supplyChange1dBps);
-    addMove(`${m.venue} ${m.asset} market`, "utilization", m.utilizationPct, m.utilizationChange1dBps);
+    const share = ix.depthUsd > 0 && m.depthUsd != null ? m.depthUsd / ix.depthUsd : null;
+    const minor = share != null && share < 0.05;
+    const name = `${m.venue} ${m.asset} market${minor ? ` (${(share * 100).toFixed(1)}% of ${ix.label}'s depth)` : ""}`;
+    addMove(name, "borrow", m.borrowPct, m.borrowChange1dBps, minor);
+    addMove(name, "supply", m.supplyPct, m.supplyChange1dBps, minor);
+    addMove(name, "utilization", m.utilizationPct, m.utilizationChange1dBps, minor);
   }
 }
 /* The headline and each bitcoin-collateral market, with any phase-in share
@@ -344,8 +351,12 @@ for (const ix of facts.indices){
   const bc = facts.bitcoinCollateralUsdc;
   if (bc?.published) addMove("BTC-COLLATERAL-USDC rate", "borrow", bc.borrowPct, bc.borrowChange1dBps);
   for (const m of bc?.markets || []){
-    const share = m.phasingIn ? ` (phasing in, ${m.phaseInPctOfFullWeight}% of the way to full weight)` : "";
-    addMove(`${m.chain} ${m.venue || "Morpho"} ${m.collateral}/${m.loan || "USDC"} market${share}`, "borrow", m.borrowPct, m.borrowChange1dBps);
+    /* Two markets can share a chain and a pair (Ethereum WBTC/USDC from 14
+       October 2026): the one at full weight says so, so the name is unique. */
+    const twin = (bc.markets || []).filter(x => x.chain === m.chain && x.collateral === m.collateral && (x.loan || "USDC") === (m.loan || "USDC")).length > 1;
+    const share = m.phasingIn ? ` (phasing in, ${m.phaseInPctOfFullWeight}% of the way to full weight)` : twin ? " (full weight)" : "";
+    const minor = typeof m.weightInHeadline === "number" && m.weightInHeadline < 0.05;
+    addMove(`${m.chain} ${m.venue || "Morpho"} ${m.collateral}/${m.loan || "USDC"} market${share}`, "borrow", m.borrowPct, m.borrowChange1dBps, minor);
   }
 }
 facts.moves = moves;
@@ -380,7 +391,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 4. Utilization explains the rate. A cheap rate at low utilization means nobody is borrowing. A cheap rate above 90% means the pool is nearly empty and withdrawals may be constrained. Say which when it matters.
 
-5. Read depth in the asset itself, depthChange1dNativePercent, wherever it exists: dollar depth also moves with the asset's price, so a dollar fall can be price alone. Report utilization and native depth as numbers, side by side, and stop there. Do not translate them into what borrowers or suppliers did: the reader can see the numbers, and SBOR publishes measurements, not explanations.
+5. Read depth in the asset itself, depthChange1dNativePercent, wherever it exists: dollar depth also moves with the asset's price, so a dollar fall can be price alone. Report utilization and native depth as numbers, side by side, and stop there. Never call a market small, thin, large or deep, and never say it moved "off a thin base": its depth is the number, and its share is already in its name. Do not translate them into what borrowers or suppliers did: the reader can see the numbers, and SBOR publishes measurements, not explanations.
 
 6. A single venue is not a market. When an index covers one venue, its rate is a reading of that venue. SBOR-BTC covers one venue today.
 
@@ -410,7 +421,7 @@ Never say "actually" as filler, as in "utilization actually eased". Either it ea
 
 If an index was unchanged, one clause is enough: "SBOR-BTC unchanged at 1.31%." Not its supply, utilization, depth and venue count as well.
 
-**Order.** Largest move first, and give it the most words. Then anything else that crossed a threshold. Then, only if you are under the limit and they have not appeared, the remaining index levels in one short sentence. SOFR only if it moved 10 basis points or more.
+**Order.** Data events come first when there are any. Otherwise the first sentence is always the headline, BTC-COLLATERAL-USD, with its level and its change (or "unchanged"), every day. Then the largest other moves, giving the largest the most words. A move marked minor (a market with under 5% of its index or of the headline) never leads and never comes before a move that is not minor: put minor moves last, in one sentence at most, or leave them out. Then, only if you are under the limit and they have not appeared, the remaining index levels in one short sentence. SOFR only if it moved 10 basis points or more.
 
 **The test.** If a reader can skim the first two sentences and know what happened, it is right. If they have to read to the end to find the important thing, it is wrong.
 
