@@ -309,6 +309,14 @@ try {
   }
 } catch (e) { log(`change feed not read: ${e.message}`); }
 facts.flags = flags;
+/* Where depth has a native unit (BTC, STX), the writer gets only the native
+   change. On 19 October 2026 a test brief wrote SBOR-BTC's dollar change (+1.4%,
+   all bitcoin's price) as "native depth up 1.4% to 567.7 BTC"; in bitcoin it was
+   flat. The flags above already carry both, labelled. */
+for (const ix of facts.indices){
+  if (ix.depthUnit) delete ix.depthChange1dPercent;
+  for (const m of ix.markets || []) if (m.depthUnit) delete m.depthChange1dPercent;
+}
 
 /* Every move written out whole: what moved, from where, to where. On 23
    September the model paired the Zest STX market's 150 bps fall with the
