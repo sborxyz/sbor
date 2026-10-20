@@ -102,7 +102,11 @@ export const MARKETS = [
   { chain: "Base",     collateral: "cbBTC",  loan: "USDC",  id: "0x9103c3b4e834476c9a62ea009ba2c884ee42e94e6e314a26f04d312434191836", live: true },
   { chain: "Ethereum", collateral: "cbBTC",  loan: "USDC",  id: "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64", live: true },
   { chain: "Ethereum", collateral: "WBTC",   loan: "USDC",  id: "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49", live: true },
-  { chain: "Arc",      collateral: "cirBTC", loan: "USDC",  id: "0xc2db905f174e5defcce01d321b09f15f78856a36a21b90cc7e1abbc29225815d", live: true, eligibleFrom: "2026-10-02" },
+  /* Rule 8.2: borrowers on this market are paid MORPHO under MIP 134 (Morpho
+     API, 20 Oct 2026: borrow reward 0.17% APR), so it carries zero weight and
+     is published as context. If the rewards end, it re-enters with a new
+     eligibleFrom and a fresh 30-day phase-in. */
+  { chain: "Arc",      collateral: "cirBTC", loan: "USDC",  id: "0xc2db905f174e5defcce01d321b09f15f78856a36a21b90cc7e1abbc29225815d", live: true, eligibleFrom: "2026-10-02", flags: ["borrowerIncentive"] },
   { chain: "Ethereum", collateral: "kBTC",   loan: "RLUSD", id: "0x15bb2a6af0c909eed19fb1f2ceeead34ecbdcba626de752c6b09389ee14eec32" },
   { chain: "Ethereum", collateral: "kBTC",   loan: "PYUSD", id: "0xe51f9aaad25d0e755429cf77076b3c2d37cb1228ed81f8a5482f2102c220eef5" },
   { chain: "Ethereum", collateral: "WBTC",   loan: "USDT",  id: "0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99" },
@@ -383,7 +387,8 @@ export async function bitcoinCollateral(granite = null, prev = null, today = new
   const { counted, context, notRead, notReadIds, guard } = await collect(granite);
   for (const m of counted){
     m.phaseIn = round(phaseIn(m.eligibleFrom, today), 4);
-    m.wsize = m.sizeUsd * m.phaseIn;
+    /* Rule 8.2: a market whose borrowers are paid rewards carries zero weight. */
+    m.wsize = m.flags?.includes("borrowerIncentive") ? 0 : m.sizeUsd * m.phaseIn;
   }
   const head = weighPhased(counted);
   const cont = continuityFrom(prev);

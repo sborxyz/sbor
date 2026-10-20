@@ -169,11 +169,15 @@ const facts = {
          the brief called Ethereum's WBTC market "still phasing in"; only
          Arc's was. */
       const lm = (latest.bitcoinCollateralUsdc?.markets || []).find(x => m.i ? String(x.marketId || "").startsWith(m.i) : x.chain === m.c && x.collateral === m.a);
-      const phasingIn = typeof lm?.phaseIn === "number" && lm.phaseIn < 1;
+      /* Rule 8.2: a market whose borrowers are paid rewards carries zero weight
+         and is context, never "phasing in". */
+      const zeroWeight = (lm?.flags || []).includes("borrowerIncentive");
+      const phasingIn = !zeroWeight && typeof lm?.phaseIn === "number" && lm.phaseIn < 1;
       return { chain: m.c, ...(m.v && { venue: m.v }), collateral: m.a, ...(m.l && { loan: m.l }), borrowPct: F(m.b), borrowChange1dBps: bps(m.b, a?.b),
                utilizationPct: F(m.u), depthUsd: m.d,
                ...(typeof lm?.weight === "number" && { weightInHeadline: lm.weight }),
-               phasingIn, ...(phasingIn && { phaseInPctOfFullWeight: Math.round(lm.phaseIn * 100) }) };
+               phasingIn, ...(phasingIn && { phaseInPctOfFullWeight: Math.round(lm.phaseIn * 100) }),
+               ...(zeroWeight && { zeroWeight: true }) };
     })
   } : null
 };
@@ -368,8 +372,9 @@ for (const ix of facts.indices){
     /* Two markets can share a chain and a pair (Ethereum WBTC/USDC from 14
        October 2026): the one at full weight says so, so the name is unique. */
     const twin = (bc.markets || []).filter(x => x.chain === m.chain && x.collateral === m.collateral && (x.loan || "USDC") === (m.loan || "USDC")).length > 1;
-    const share = m.phasingIn ? ` (phasing in, ${m.phaseInPctOfFullWeight}% of the way to full weight)` : twin ? " (full weight)" : "";
-    const minor = typeof m.weightInHeadline === "number" && m.weightInHeadline < 0.05;
+    const share = m.zeroWeight ? " (borrowers paid rewards, zero weight, context only)"
+      : m.phasingIn ? ` (phasing in, ${m.phaseInPctOfFullWeight}% of the way to full weight)` : twin ? " (full weight)" : "";
+    const minor = m.zeroWeight || (typeof m.weightInHeadline === "number" && m.weightInHeadline < 0.05);
     addMove(`${m.chain} ${m.venue || "Morpho"} ${m.collateral}/${m.loan || "USDC"} market${share}`, "borrow", m.borrowPct, m.borrowChange1dBps, minor);
   }
 }
@@ -377,7 +382,7 @@ facts.moves = moves;
 /* The headline weight only decides what is minor; the writer never sees it. On
    19 October 2026 a test brief turned Base cbBTC's 71.76% weight (0.7176) into
    "751 bps of headline weight". */
-for (const m of facts.bitcoinCollateralUsdc?.markets || []) delete m.weightInHeadline;
+for (const m of facts.bitcoinCollateralUsdc?.markets || []) { delete m.weightInHeadline; delete m.zeroWeight; }
 
 log(`brief for ${facts.date}: ${flags.length} flag(s)`);
 
