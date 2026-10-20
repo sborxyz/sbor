@@ -99,7 +99,9 @@ if (prior){
 
 ${sign(moved.d)} bps in a day.
 
-${moved.key === "borrow" ? "Cheapest to borrow" : "Best paying to supply"} now: ${best.venue} ${best.asset} at ${pct(best[moved.key])}, utilization ${pct(best.utilization)}.
+${ix.markets.length === 1
+  ? `One market behind it: ${best.venue} ${best.asset}, utilization ${pct(best.utilization)}.`
+  : `${moved.key === "borrow" ? "Lowest borrow rate" : "Highest supply rate"}: ${best.venue} ${best.asset} at ${pct(best[moved.key])}, utilization ${pct(best.utilization)}.`}
 
 ${LINK}`
     });
