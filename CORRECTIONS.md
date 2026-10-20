@@ -1,10 +1,20 @@
 # SBOR corrections
 
-*Created 24 September 2026. Last updated 10 October 2026.*
+*Created 24 September 2026. Last updated 20 October 2026.*
 
 SBOR never rewrites a published fixing. When a published figure turns out to be wrong, the record keeps what was published, and this page says what was wrong, when it was found, and what changed. It lists corrections to published figures only; fixes to the site and documentation are visible in the repository's public history.
 
 Newest first.
+
+---
+
+### 20 October 2026: Arc's cirBTC/USDC market weighted while its borrowers were paid rewards
+
+**What was wrong.** Rule 8 of the methodology gives zero weight to a market whose borrowers are paid rewards. Borrowers on Morpho's cirBTC/USDC market on Arc are paid MORPHO under Morpho governance proposal MIP 134, which funds borrow-side rewards on Arc; Morpho's public API showed a borrow reward of 0.17% a year on 20 October. SBOR had no daily check for borrower rewards, so the market kept its weight. Found on 20 October while reviewing the Morpho governance forum.
+
+**The effect.** In the fixing of 20 October the market carried 4.7% of the headline's weight. Without it, BTC-COLLATERAL-USD would have been 4.86% to borrow rather than 4.74%, and BTC-COLLATERAL-USDC 4.96% rather than 4.82%. The effect was smaller on earlier days, while the market was phasing in. The date the rewards began is being confirmed, and this entry will give the full range. Published fixings are not rewritten.
+
+**What changed.** From the fixing of 21 October, the market carries zero weight and is published as context, with its own rate unchanged. If the rewards end, it re-enters the rate with a new 30-day phase-in.
 
 ---
 
