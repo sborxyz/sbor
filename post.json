@@ -1,7 +1,22 @@
 {
-  "fixing": "2026-10-19T08:30:38Z",
-  "comparedWith": "2026-10-18",
-  "top": null,
-  "otherCount": 0,
-  "drafts": []
+  "fixing": "2026-10-20T08:30:45Z",
+  "comparedWith": "2026-10-19",
+  "top": {
+    "why": "SBOR-BTC supply moved +53 bps",
+    "chars": 152,
+    "text": "SBOR-BTC supply rate: 0.81% to 1.34%.\n\n+53 bps in a day.\n\nBest paying to supply now: Zest V2 sBTC at 1.34%, utilization 99.97%.\n\nsbor.xyz"
+  },
+  "otherCount": 1,
+  "drafts": [
+    {
+      "why": "SBOR-BTC supply moved +53 bps",
+      "chars": 152,
+      "text": "SBOR-BTC supply rate: 0.81% to 1.34%.\n\n+53 bps in a day.\n\nBest paying to supply now: Zest V2 sBTC at 1.34%, utilization 99.97%.\n\nsbor.xyz"
+    },
+    {
+      "why": "Zest V2 sBTC utilization crossed above 80%",
+      "chars": 177,
+      "text": "Zest V2 sBTC is now 99.97% utilized, up from 70.62%.\n\nBorrow 1.50%, supply 1.34%.\n\nAbove 80% a lending market prices steeply and withdrawals get harder.\n\nsbor.xyz"
+    }
+  ]
 }
