@@ -232,6 +232,35 @@ const flags = [];
     flags.push(`The bitcoin-collateral USDC rate is withheld today: markets that could not be read carried too much of its weight.`);
   if (bc?.published && bc.borrowChange1dBps != null && Math.abs(bc.borrowChange1dBps) >= 25)
     flags.push(`Borrowing USDC against bitcoin (BTC-COLLATERAL-USDC) moved ${sg(bc.borrowChange1dBps)} bps to ${bc.borrowPct}%.`);
+
+  /* A market that carried weight yesterday and carries zero weight today
+     because its borrowers are paid rewards (rule 8) steps the rate by itself.
+     Measure that step so the brief can split it from market moves. On 21
+     October 2026 Arc went to zero weight and the brief reported the whole
+     +34 bps as one move. */
+  try {
+    const prevFix = d1.date ? await get(`/api/v1/archive/${d1.date}.json`) : null;
+    for (const [key, code] of [["bitcoinCollateralUsd", "BTC-COLLATERAL-USD"], ["bitcoinCollateralUsdc", "BTC-COLLATERAL-USDC"]]){
+      const ms = latest[key]?.markets || [];
+      const prevMs = prevFix?.[key]?.markets || [];
+      const zeroToday = m => (m.flags || []).includes("borrowerIncentive");
+      const newlyZero = ms.filter(m => zeroToday(m)
+        && prevMs.some(p => String(p.marketId) === String(m.marketId) && (p.weight || 0) > 0));
+      if (!newlyZero.length || typeof latest[key]?.borrow !== "number") continue;
+      const size = m => (m.depthUsd || 0) * (typeof m.phaseIn === "number" ? m.phaseIn : 1);
+      const rate = include => {
+        const w = ms.map(m => (m.weight || 0) > 0 || include(m) ? size(m) : 0);
+        const tot = w.reduce((a, x) => a + x, 0);
+        return tot ? ms.reduce((a, m, i) => a + m.borrow * w[i], 0) / tot : null;
+      };
+      const now = rate(() => false), withThem = rate(m => newlyZero.includes(m));
+      if (now == null || withThem == null) continue;
+      const step = Math.round((now - withThem) * 100);
+      if (!step) continue;
+      const names = newlyZero.map(m => `${m.chain} ${m.venue || "Morpho"} ${m.collateral}/${m.loan || "USDC"}`).join(", ");
+      flags.push(`METHODOLOGY STEP: ${names} carries zero weight from today because its borrowers are paid rewards (methodology rule 8). That alone moved ${code} ${sg(step)} bps; the rest of today's change in ${code} is market moves. Say this in one sentence, with the figure, before any move in ${code}.`);
+    }
+  } catch (e) { log("zero-weight check skipped:", e.message); }
 }
 for (const ix of facts.indices){
   if (!ix.published && ix.publishedYesterday) flags.push(`${ix.label} is not published today. It was yesterday.`);
@@ -408,7 +437,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 1. Every number you write must appear in the JSON you are given. You cannot fetch anything, and any figure not in the payload does not exist. If you are unsure of a number, leave it out. A benchmark that publishes an invented figure has failed at the only thing it does.
 
-2. Never state a cause. Report what moved, not why. Never describe what borrowers or suppliers did, and never write "consistent with", "suggests", "points to", "driven by" or "as borrowers/suppliers". "Consistent with borrowers repaying", "suppliers pulling out" and "borrowers leaving the pool" are all causes. State the numbers and stop. "STX utilization rose 5 points and the rate followed" is right. "Someone levered up" is not, however obvious it seems.
+2. Never state a cause. Report what moved, not why. Never describe what borrowers or suppliers did, and never write "consistent with", "suggests", "points to", "driven by", "drove", "led by", "on the back of", "thanks to" or "as borrowers/suppliers". Never say one rate or market drove, led or accounted for another's move: give each rate's own move and stop. "Consistent with borrowers repaying", "suppliers pulling out" and "borrowers leaving the pool" are all causes. State the numbers and stop. "STX utilization rose 5 points and the rate followed" is right. "Someone levered up" is not, however obvious it seems.
 
 3. Never blend a staking yield with a lending rate. PoX and protocol yield come from holding an asset. Borrow and supply rates come from the loan. They are different instruments and adding them is the most common mistake in this ecosystem.
 
@@ -422,7 +451,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 8. From 14 October 2026 (methodology 1.13.0), bitcoinCollateralUsd is the SBOR headline, BTC-COLLATERAL-USD: what it costs to borrow any dollar stablecoin against plain bitcoin, across every eligible market on every chain SBOR reads. perStablecoin holds the rate for each stablecoin with $25M or more of weight, and bitcoinCollateralUsdc is its USDC rate, BTC-COLLATERAL-USDC. Before that date bitcoinCollateralUsdc covered Morpho markets on Base, Ethereum and Arc only. Markets added under 1.13.0 phase in over 30 days from 14 October, so in those weeks the headline glides as their weight grows: a change in the headline from phase-in is not a market move. Phase-in changes a market's weight in the headline, never the market's own rate. A move in a market's own borrow or supply rate is a market move in that market, whether or not it is phasing in: report it with its level and size, and no cause. Never comment on phase-in beside a market's move, either to blame it or to rule it out: give the market's name as written, its level and its change, and stop. A stablecoin rate appearing for the first time is its weight crossing $25M, not new lending. Only a market with phasingIn true is phasing in; every other market carries its full weight and must never be called new or phasing in. Describe a phasing-in market as that share of the way to its full weight (phaseInPctOfFullWeight), never as its weight in the rate. Take each market's share only from that market's own phrase in "moves", where it is written into the market's name, and never carry one market's share to another with "also". Report these rates on their own when flagged. Never average them with SBOR-USD or rank the two as if they measured the same thing: a dollar on Stacks is borrowed against any crypto collateral, not only bitcoin.
 
-9. A flag marked DATA EVENT comes first and is never a market move. Say the index is not published, or is missing a market, and why, in one sentence, and do not interpret any change in that index or its remaining markets. A DATA NOTE is one sentence, no interpretation.
+9. A flag marked METHODOLOGY STEP comes before any move in that rate: say in one sentence which market now carries zero weight and why, and how many basis points of the rate's change came from that alone, using the flag's figure. It is not a market move. A flag marked DATA EVENT comes first and is never a market move. Say the index is not published, or is missing a market, and why, in one sentence, and do not interpret any change in that index or its remaining markets. A DATA NOTE is one sentence, no interpretation.
 
 10. If nothing crossed a threshold, say so in one line and stop. Most days are quiet and a brief that manufactures drama is worse than no brief.
 
