@@ -355,6 +355,7 @@ a{color:var(--accent)}
         <tbody id="hd-rows"></tbody>
       </table>
     </div>
+    <p class="hdmeta" id="hd-mkt-note" style="margin-top:14px"></p>
     <button type="button" class="morebtn" id="hd-more" hidden></button>
   </section>
   <section>
@@ -719,7 +720,8 @@ en:{
   hdSubSize:(dp,n)=>`${dp} supplied · ${n} ${n === 1 ? "market" : "markets"}`, hdNotPub:"not published today",
   hdMktH:"Every market behind the rate", hdMktP:"Only markets whose sole collateral is plain bitcoin, weighted by what is supplied. Markets added on 14 October 2026 reach full weight over 30 days.",
   hdMeta:(v,c,w)=>`${v} ${v === 1 ? "venue" : "venues"} · ${c} ${c === 1 ? "chain" : "chains"} carrying weight · largest market ${w} of the weight`,
-  hdCols:["Market","Chain","Borrow","Supplied","Weight"],
+  hdCols:["Market","Chain","Borrow","Supply","Utilization","Supplied","Weight"],
+  hdMktNote:"Borrow is what borrowers pay. Supply is what lenders earn. Utilization is how much of the lenders' money is borrowed right now. When utilization rises, both rates rise, and that's why each market's rate is where it is.",
   hdPhasing:p=>`phasing in, ${p}`, hdFlags:{ lenderIncentive:"lender rewards", synthetic:"synthetic dollar" },
   hdMore:n=>`Show all ${n} markets`, hdLess:"Show fewer",
   hdStxH:"On Bitcoin's own layers", hdStxLink:"SBOR Stacks, all three indices",
@@ -862,7 +864,8 @@ pt:{
   hdSubSize:(dp,n)=>`${dp} fornecidos · ${n} ${n === 1 ? "mercado" : "mercados"}`, hdNotPub:"não publicada hoje",
   hdMktH:"Todos os mercados por trás da taxa", hdMktP:"Só mercados cuja única garantia é bitcoin puro, ponderados pelo que está fornecido. Mercados incluídos em 14 de outubro de 2026 chegam ao peso cheio em 30 dias.",
   hdMeta:(v,c,w)=>`${v} ${v === 1 ? "plataforma" : "plataformas"} · ${c} ${c === 1 ? "rede" : "redes"} com peso · o maior mercado tem ${w} do peso`,
-  hdCols:["Mercado","Rede","Tomador","Fornecido","Peso"],
+  hdCols:["Mercado","Rede","Tomador","Credor","Utilização","Fornecido","Peso"],
+  hdMktNote:"Tomador é o que quem toma emprestado paga. Credor é o que quem empresta recebe. Utilização é quanto do dinheiro dos credores está emprestado agora. Quando a utilização sobe, as duas taxas sobem, e é por isso que cada mercado tem a taxa que tem.",
   hdPhasing:p=>`entrando aos poucos, ${p}`, hdFlags:{ lenderIncentive:"recompensa ao fornecedor", synthetic:"dólar sintético" },
   hdMore:n=>`Mostrar os ${n} mercados`, hdLess:"Mostrar menos",
   hdStxH:"Nas camadas do próprio Bitcoin", hdStxLink:"SBOR Stacks, os três índices",
@@ -1052,11 +1055,11 @@ function renderHead(){
     <div class="v">${typeof v.borrow === "number" ? fmt(v.borrow) + '<span class="pct">%</span>' : '<span class="pct">' + t.hdNotPub + '</span>'}</div>
     <div class="sz">${typeof v.borrow === "number" ? t.hdSubSize(depth(v.depthUsd || 0), HEAD.markets.filter(m => m.group === code.replace("BTC-COLLATERAL-", "")).length || v.markets) : esc(v.withheld || "")}</div></div>`).join(""));
 
-  set("hd-mkt-h", t.hdMktH); set("hd-mkt-p", t.hdMktP);
+  set("hd-mkt-h", t.hdMktH); set("hd-mkt-p", t.hdMktP); set("hd-mkt-note", t.hdMktNote);
   if (typeof HEAD.largestConstituentWeight === "number")
     set("hd-meta", t.hdMeta(HEAD.venues, HEAD.chains, (HEAD.largestConstituentWeight * 100).toFixed(1) + "%"));
   const c = t.hdCols;
-  set("hd-thead", `<th>${c[0]}</th><th>${c[1]}</th><th class="r">${c[2]}</th><th class="r">${c[3]}</th><th class="r">${c[4]}</th>`);
+  set("hd-thead", `<th>${c[0]}</th><th>${c[1]}</th><th class="r">${c[2]}</th><th class="r">${c[3]}</th><th class="r">${c[4]}</th><th class="r">${c[5]}</th><th class="r">${c[6]}</th>`);
   const ms = [...HEAD.markets].sort((a, b) => (b.weight || 0) - (a.weight || 0) || (b.depthUsd || 0) - (a.depthUsd || 0));
   const shown = HEAD_ALL ? ms : ms.slice(0, 8);
   set("hd-rows", shown.map(m => {
@@ -1067,8 +1070,10 @@ function renderHead(){
     return `<tr><td><span class="venue">${esc(m.venue)}</span><span class="asset">${esc(m.collateral)} / ${esc(m.loan)}</span>${notes.length ? `<span class="mflag">${esc(notes.join(", "))}</span>` : ""}</td>
       <td data-l="${c[1]}" style="color:var(--ink-soft);font-size:14px">${esc(m.chain)}</td>
       <td class="r num" data-l="${c[2]}">${pc(m.borrow)}%</td>
-      <td class="r num" data-l="${c[3]}">${depth(m.depthUsd || 0)}</td>
-      <td class="r num" data-l="${c[4]}">${((m.weight || 0) * 100).toFixed(1)}%</td></tr>`;
+      <td class="r num" data-l="${c[3]}">${pc(m.supply)}%</td>
+      <td class="r num" data-l="${c[4]}">${typeof m.utilization === "number" ? m.utilization.toFixed(1) + "%" : "n/a"}</td>
+      <td class="r num" data-l="${c[5]}">${depth(m.depthUsd || 0)}</td>
+      <td class="r num" data-l="${c[6]}">${((m.weight || 0) * 100).toFixed(1)}%</td></tr>`;
   }).join(""));
   const more = document.getElementById("hd-more");
   more.hidden = ms.length <= 8;
