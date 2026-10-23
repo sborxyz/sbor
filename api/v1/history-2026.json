@@ -12759,5 +12759,616 @@
         }
       ]
     }
+  },
+  {
+    "date": "2026-10-23",
+    "fixedAt": "2026-10-23T08:31:01Z",
+    "methodologyVersion": "1.13.0",
+    "btcUsdc": {
+      "b": 5.18,
+      "s": 4.65,
+      "u": 90.3,
+      "d": 2456736442,
+      "markets": [
+        {
+          "c": "Base",
+          "i": "0x9103c3b4",
+          "v": "Morpho",
+          "a": "cbBTC",
+          "l": "USDC",
+          "b": 5.23,
+          "s": 4.7,
+          "u": 90.13,
+          "d": 1785962079,
+          "w": 0.7902
+        },
+        {
+          "c": "Ethereum",
+          "i": "0x64d65c9a",
+          "v": "Morpho",
+          "a": "cbBTC",
+          "l": "USDC",
+          "b": 5.01,
+          "s": 4.5,
+          "u": 90.09,
+          "d": 343222243,
+          "w": 0.1519
+        },
+        {
+          "c": "Ethereum",
+          "i": "0x3a85e619",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "USDC",
+          "b": 5.01,
+          "s": 4.5,
+          "u": 90.06,
+          "d": 128450105,
+          "w": 0.0568
+        },
+        {
+          "c": "Arc",
+          "i": "0xc2db905f",
+          "v": "Morpho",
+          "a": "cirBTC",
+          "l": "USDC",
+          "b": 3.58,
+          "s": 3.37,
+          "u": 94.27,
+          "d": 190476194,
+          "w": 0
+        },
+        {
+          "c": "Ethereum",
+          "i": "0x09dc9e7e",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "USDC",
+          "b": 5.01,
+          "s": 4.5,
+          "u": 90.07,
+          "d": 1541569,
+          "w": 0.0002
+        },
+        {
+          "c": "Arbitrum",
+          "i": "0xe6392ff1",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "USDC",
+          "b": 3.01,
+          "s": 2.52,
+          "u": 84,
+          "d": 2076178,
+          "w": 0.0003
+        },
+        {
+          "c": "Stacks",
+          "i": "SP3M2BYF7R",
+          "v": "Granite",
+          "a": "sBTC",
+          "l": "USDCx",
+          "b": 1.45,
+          "s": 0.26,
+          "u": 23.55,
+          "d": 5008075,
+          "w": 0.0007
+        }
+      ]
+    },
+    "btcCollateralUsd": {
+      "b": 5.06,
+      "s": 4.55,
+      "u": 90.29,
+      "d": 3111582789,
+      "wd": 2456676077,
+      "sub": {
+        "BTC-COLLATERAL-USDC": {
+          "b": 5.18,
+          "s": 4.65,
+          "d": 2456736442,
+          "wd": 2260222173
+        },
+        "BTC-COLLATERAL-RLUSD": {
+          "b": 4.13,
+          "s": 3.73,
+          "d": 293517774,
+          "wd": 88055332
+        },
+        "BTC-COLLATERAL-PYUSD": {
+          "b": 4.2,
+          "s": 3.78,
+          "d": 129160602,
+          "wd": 38748181
+        },
+        "BTC-COLLATERAL-USDT": {
+          "b": 3.75,
+          "s": 3.38,
+          "d": 113770442,
+          "wd": 34131133
+        },
+        "BTC-COLLATERAL-USD1": {
+          "b": 1.8,
+          "s": 1.45,
+          "d": 105581025,
+          "wd": 31674308
+        }
+      },
+      "markets": [
+        {
+          "c": "Base",
+          "i": "0x9103c3b4",
+          "v": "Morpho",
+          "a": "cbBTC",
+          "l": "USDC",
+          "b": 5.23,
+          "s": 4.7,
+          "u": 90.13,
+          "d": 1785962079,
+          "w": 0.727,
+          "p": 1
+        },
+        {
+          "c": "Ethereum",
+          "i": "0x64d65c9a",
+          "v": "Morpho",
+          "a": "cbBTC",
+          "l": "USDC",
+          "b": 5.01,
+          "s": 4.5,
+          "u": 90.09,
+          "d": 343222243,
+          "w": 0.1397,
+          "p": 1
+        },
+        {
+          "c": "Ethereum",
+          "i": "0x3a85e619",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "USDC",
+          "b": 5.01,
+          "s": 4.5,
+          "u": 90.06,
+          "d": 128450105,
+          "w": 0.0523,
+          "p": 1
+        },
+        {
+          "c": "Arc",
+          "i": "0xc2db905f",
+          "v": "Morpho",
+          "a": "cirBTC",
+          "l": "USDC",
+          "b": 3.58,
+          "s": 3.37,
+          "u": 94.27,
+          "d": 190476194,
+          "w": 0,
+          "p": 0.7
+        },
+        {
+          "c": "Ethereum",
+          "i": "0x15bb2a6a",
+          "v": "Morpho",
+          "a": "kBTC",
+          "l": "RLUSD",
+          "b": 4.29,
+          "s": 3.88,
+          "u": 90.68,
+          "d": 264974421,
+          "w": 0.0324,
+          "p": 0.3
+        },
+        {
+          "c": "Ethereum",
+          "i": "0xe51f9aaa",
+          "v": "Morpho",
+          "a": "kBTC",
+          "l": "PYUSD",
+          "b": 4.2,
+          "s": 3.78,
+          "u": 90.12,
+          "d": 126278153,
+          "w": 0.0154,
+          "p": 0.3
+        },
+        {
+          "c": "Ethereum",
+          "i": "0xa921ef34",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "USDT",
+          "b": 3.69,
+          "s": 3.34,
+          "u": 90.61,
+          "d": 91360626,
+          "w": 0.0112,
+          "p": 0.3
+        },
+        {
+          "c": "Ethereum",
+          "i": "0xa128dddc",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "RLUSD",
+          "b": 2.33,
+          "s": 2.08,
+          "u": 89.48,
+          "d": 24352863,
+          "w": 0.003,
+          "p": 0.3
+        },
+        {
+          "c": "Ethereum",
+          "i": "0x4fe72543",
+          "v": "Morpho",
+          "a": "cbBTC",
+          "l": "USDT",
+          "b": 3.57,
+          "s": 3.22,
+          "u": 90.43,
+          "d": 12129075,
+          "w": 0.0015,
+          "p": 0.3
+        },
+        {
+          "c": "Ethereum",
+          "i": "0xffd01061",
+          "v": "Morpho",
+          "a": "cbBTC",
+          "l": "RLUSD",
+          "b": 4.4,
+          "s": 3.69,
+          "u": 84.09,
+          "d": 4190491,
+          "w": 0.0005,
+          "p": 0.3
+        },
+        {
+          "c": "Ethereum",
+          "i": "0x3c5a244b",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "USDT",
+          "b": 3.57,
+          "s": 3.22,
+          "u": 90.43,
+          "d": 7457546,
+          "w": 0.0009,
+          "p": 0.3
+        },
+        {
+          "c": "Ethereum",
+          "i": "0xd8a8e666",
+          "v": "Morpho",
+          "a": "cbBTC",
+          "l": "PYUSD",
+          "b": 4.06,
+          "s": 3.65,
+          "u": 90.02,
+          "d": 1689218,
+          "w": 0.0002,
+          "p": 0.3
+        },
+        {
+          "c": "Ethereum",
+          "i": "0x09dc9e7e",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "USDC",
+          "b": 5.01,
+          "s": 4.5,
+          "u": 90.07,
+          "d": 1541569,
+          "w": 0.0002,
+          "p": 0.3
+        },
+        {
+          "c": "Ethereum",
+          "i": "0xbe50eed7",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "PYUSD",
+          "b": 4.34,
+          "s": 3.91,
+          "u": 90.21,
+          "d": 1193231,
+          "w": 0.0001,
+          "p": 0.3
+        },
+        {
+          "c": "Arbitrum",
+          "i": "0xe6392ff1",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "USDC",
+          "b": 3.01,
+          "s": 2.52,
+          "u": 84,
+          "d": 2076178,
+          "w": 0.0003,
+          "p": 0.3
+        },
+        {
+          "c": "Arbitrum",
+          "i": "0xed06d9e8",
+          "v": "Morpho",
+          "a": "WBTC",
+          "l": "USDT0",
+          "b": 2.89,
+          "s": 2.47,
+          "u": 85.66,
+          "d": 1082028,
+          "w": 0.0001,
+          "p": 0.3
+        },
+        {
+          "c": "BNB Chain",
+          "i": "0xd9c00925",
+          "v": "Lista",
+          "a": "BTCB",
+          "l": "USD1",
+          "b": 1.8,
+          "s": 1.45,
+          "u": 89.71,
+          "d": 105581025,
+          "w": 0.0129,
+          "p": 0.3
+        },
+        {
+          "c": "BNB Chain",
+          "i": "0xae82d976",
+          "v": "Lista",
+          "a": "BTCB",
+          "l": "U",
+          "b": 3.02,
+          "s": 2.41,
+          "u": 89.07,
+          "d": 12816503,
+          "w": 0.0016,
+          "p": 0.3
+        },
+        {
+          "c": "BNB Chain",
+          "i": "0x975f4cf3",
+          "v": "Lista",
+          "a": "BTCB",
+          "l": "USDT",
+          "b": 9.15,
+          "s": 7.78,
+          "u": 95.01,
+          "d": 1741166,
+          "w": 0.0002,
+          "p": 0.3
+        },
+        {
+          "c": "Stacks",
+          "i": "SP3M2BYF7R",
+          "v": "Granite",
+          "a": "sBTC",
+          "l": "USDCx",
+          "b": 1.45,
+          "s": 0.26,
+          "u": 23.55,
+          "d": 5008075,
+          "w": 0.0006,
+          "p": 0.3
+        }
+      ]
+    },
+    "SBOR-PoX": {
+      "apy": 12.4,
+      "cycle": 145,
+      "measurement": 2,
+      "cycleStart": "2026-10-08",
+      "cycleEnd": "2026-10-22",
+      "btcPaid": 10.080575,
+      "stxLocked": 493445945,
+      "stxPerBtc": 254858.08,
+      "stxPerBtcSmoothed": 229077.83
+    },
+    "ctx": {
+      "sofr": 3.88,
+      "sofrDate": "2026-10-21",
+      "btcUsd": 81721,
+      "stxUsd": 0.321523,
+      "sbtcSupply": 2478.36514216,
+      "burnBlock": 972740,
+      "nativeStacking": 10.29,
+      "stBtc": 1.72,
+      "liquidityCostBps": 107,
+      "ststxDiscount": null,
+      "stbtcCarryBps": 21,
+      "stbtcRatio": 1.00285209,
+      "stbtcRealizedApy": 1.72,
+      "npmLastDay": 10,
+      "npmLastWeek": 214
+    },
+    "external": [
+      {
+        "v": "Aave V3, Ethereum",
+        "a": "USDC",
+        "b": 4.59,
+        "s": 3.86,
+        "u": 93.78,
+        "d": 2388967199,
+        "db": "supplied",
+        "vs": "SBOR-USD"
+      },
+      {
+        "v": "Aave V3, Ethereum",
+        "a": "WBTC",
+        "b": 0.31,
+        "s": 0,
+        "u": 2.05,
+        "d": 2770488213,
+        "db": "supplied",
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Aave V3, Ethereum",
+        "a": "cbBTC",
+        "b": 0.29,
+        "s": 0,
+        "u": 0.8,
+        "d": 1415308844,
+        "db": "supplied",
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Aave V3, Base",
+        "a": "cbBTC",
+        "b": 0.65,
+        "s": 0.01,
+        "u": 3,
+        "d": 244305855,
+        "db": "supplied",
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Aave V3, Base",
+        "a": "USDC",
+        "b": 5.48,
+        "s": 4.45,
+        "u": 90.59,
+        "d": 191041418,
+        "db": "supplied",
+        "vs": "SBOR-USD"
+      },
+      {
+        "v": "HyperLend, Hyperliquid L1",
+        "a": "UBTC",
+        "b": 1.22,
+        "s": 0.21,
+        "u": 21.29,
+        "d": 11448447,
+        "db": "supplied",
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "HyperLend, Hyperliquid L1",
+        "a": "USDC",
+        "b": 5.2,
+        "s": 4.2,
+        "u": 90.13,
+        "d": 52637893,
+        "db": "supplied",
+        "vs": "SBOR-USD"
+      },
+      {
+        "v": "Kamino, Solana",
+        "a": "cbBTC",
+        "b": 0.38,
+        "s": 0.01,
+        "u": 3.55,
+        "d": 51659323,
+        "db": "supplied",
+        "vs": "SBOR-BTC"
+      },
+      {
+        "v": "Kamino, Solana",
+        "a": "USDC",
+        "b": 5.84,
+        "s": 4.25,
+        "u": 89.32,
+        "d": 133237905,
+        "db": "supplied",
+        "vs": "SBOR-USD"
+      }
+    ],
+    "SBOR-USD": {
+      "borrow": 2.77,
+      "supply": 0.88,
+      "allInSupply": 0.88,
+      "venues": 2,
+      "largestConstituentWeight": 0.65,
+      "depthUsd": 15563208,
+      "utilization": 55.59,
+      "markets": [
+        {
+          "v": "Zest V2",
+          "a": "USDCx",
+          "b": 3.44,
+          "s": 1.22,
+          "u": 72.05,
+          "py": null,
+          "d": 10115454,
+          "w": 0.65
+        },
+        {
+          "v": "Granite",
+          "a": "USDCx",
+          "b": 1.45,
+          "s": 0.26,
+          "u": 23.55,
+          "py": null,
+          "d": 5008075,
+          "w": 0.3218
+        },
+        {
+          "v": "Zest V2",
+          "a": "USDh",
+          "b": 2.47,
+          "s": 0,
+          "u": 41.59,
+          "py": null,
+          "d": 439679,
+          "w": 0.0283
+        }
+      ]
+    },
+    "SBOR-BTC": {
+      "borrow": 1.51,
+      "supply": 1.36,
+      "allInSupply": 1.36,
+      "venues": 1,
+      "largestConstituentWeight": 1,
+      "depthUsd": 23697240,
+      "utilization": 100,
+      "markets": [
+        {
+          "v": "Zest V2",
+          "a": "sBTC",
+          "b": 1.51,
+          "s": 1.36,
+          "u": 100,
+          "py": null,
+          "d": 23697240,
+          "w": 1
+        }
+      ]
+    },
+    "SBOR-STX": {
+      "borrow": 1.66,
+      "supply": 0.73,
+      "allInSupply": 6.34,
+      "venues": 1,
+      "largestConstituentWeight": 0.608,
+      "depthUsd": 6121961,
+      "utilization": 30.63,
+      "markets": [
+        {
+          "v": "Zest V2",
+          "a": "stSTX",
+          "b": 0.86,
+          "s": 0.03,
+          "u": 5.3,
+          "py": 9.22,
+          "d": 3721912,
+          "w": 0.608
+        },
+        {
+          "v": "Zest V2",
+          "a": "STX",
+          "b": 2.91,
+          "s": 1.82,
+          "u": 69.92,
+          "py": null,
+          "d": 2400049,
+          "w": 0.392
+        }
+      ]
+    }
   }
 ]

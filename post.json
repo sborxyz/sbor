@@ -1,22 +1,27 @@
 {
-  "fixing": "2026-10-22T08:31:03Z",
-  "comparedWith": "2026-10-21",
+  "fixing": "2026-10-23T08:31:01Z",
+  "comparedWith": "2026-10-22",
   "top": {
-    "why": "SBOR-BTC supply moved -47 bps",
-    "chars": 138,
-    "text": "SBOR-BTC supply rate: 1.34% to 0.87%.\n\n-47 bps in a day.\n\nOne market behind it: Zest V2 sBTC, utilization 76.39%.\n\nsbor.xyz"
+    "why": "PoX cycle 144 to 145",
+    "chars": 144,
+    "text": "Reward cycle 145 settled.\n\n10.08 BTC paid to STX stackers, against 493,445,945 STX locked.\n\nSBOR-PoX: 10.13% to 12.40%.\n\nsbor.xyz"
   },
-  "otherCount": 1,
+  "otherCount": 2,
   "drafts": [
     {
-      "why": "SBOR-BTC supply moved -47 bps",
-      "chars": 138,
-      "text": "SBOR-BTC supply rate: 1.34% to 0.87%.\n\n-47 bps in a day.\n\nOne market behind it: Zest V2 sBTC, utilization 76.39%.\n\nsbor.xyz"
+      "why": "PoX cycle 144 to 145",
+      "chars": 144,
+      "text": "Reward cycle 145 settled.\n\n10.08 BTC paid to STX stackers, against 493,445,945 STX locked.\n\nSBOR-PoX: 10.13% to 12.40%.\n\nsbor.xyz"
     },
     {
-      "why": "Zest V2 sBTC utilization fell back below 80%",
-      "chars": 136,
-      "text": "Zest V2 sBTC is back to 76.39% utilized, down from 99.99%.\n\nBorrow 1.29%, supply 0.87%.\n\nThe squeeze has eased.\n\nsbor.xyz"
+      "why": "SBOR-BTC supply moved +49 bps",
+      "chars": 139,
+      "text": "SBOR-BTC supply rate: 0.87% to 1.36%.\n\n+49 bps in a day.\n\nOne market behind it: Zest V2 sBTC, utilization 100.00%.\n\nsbor.xyz"
+    },
+    {
+      "why": "Zest V2 sBTC utilization crossed above 80%",
+      "chars": 178,
+      "text": "Zest V2 sBTC is now 100.00% utilized, up from 76.39%.\n\nBorrow 1.51%, supply 1.36%.\n\nAbove 80% a lending market prices steeply and withdrawals get harder.\n\nsbor.xyz"
     }
   ]
 }
