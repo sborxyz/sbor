@@ -4,7 +4,7 @@
 market rate, read from contract state on Ethereum, Base, Arc, Arbitrum, BNB Chain and Stacks.**
 
 A single venue's number cannot tell anyone, human or agent, whether the rate
-they are offered is fair. SBOR, the Stacks Bitcoin Offered Rate, is a benchmark
+they are offered is fair. SBOR, the Standard Bitcoin Offered Rate, is a benchmark
 for exactly that. On Stacks, where it started, it publishes one borrow
 and one supply rate per currency: the SBOR indices. Beyond Stacks, it publishes
 what it costs to borrow dollars against bitcoin: from the fixing of 14 October
@@ -267,9 +267,8 @@ api/v1/                 published data
 ## Independence
 
 **Independent:** no token, and no stake in or payment from any venue SBOR
-measures, and holds no stake in Stacks, the Stacks Foundation, or any
-protocol in the index, and publishes whatever the market does, including numbers
-unfavorable to the ecosystem. It does not trade on its own rate. Grant funding,
+measures. It publishes whatever the market does, including numbers unfavorable
+to any venue or chain, and it does not trade on its own rate. Grant funding,
 when received, is disclosed.
 
 Published fixings are never rewritten. Corrections to published figures are
