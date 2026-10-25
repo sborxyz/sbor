@@ -1,12 +1,14 @@
 # SBOR and the IOSCO Principles for Financial Benchmarks
 
-*A self-assessment. Created 24 September 2026. Last updated 9 October 2026.*
+*A self-assessment. Created 24 September 2026. Last updated 25 October 2026.*
 
 The International Organization of Securities Commissions published its Principles for Financial Benchmarks in July 2013, after the manipulation of major interest rate benchmarks. There are 19 of them, in four groups: governance, the quality of the benchmark, the quality of the methodology, and accountability. They were endorsed by the G20 and are the standard against which benchmark administrators describe themselves.
 
 **This is a self-assessment, not an audit or a certification.** SBOR is not a regulated benchmark administrator, and nobody has verified what follows. IOSCO itself says the Principles should be applied in proportion to the size and risk of each benchmark and its administrator, and that is how this page reads them. Where SBOR does not yet meet a principle, it says so, and says what exists in the meantime.
 
-**Scope.** The three SBOR indices: SBOR-USD, SBOR-BTC and SBOR-STX. SBOR also publishes references that are not indices, such as SBOR-PoX, the bitcoin-collateral USDC rate and the comparison with other chains. The same practices apply to them, but they never enter a fixing.
+**Scope.** SBOR's headline rate, `BTC-COLLATERAL-USD`, published since 14 October 2026 under methodology 1.13.0: what it costs to borrow any dollar stablecoin against plain bitcoin, across every eligible market SBOR reads, with a rate per stablecoin beside it (`BTC-COLLATERAL-USDC`, `-RLUSD`, `-PYUSD`, `-USDT`, `-USD1`). And the three SBOR indices on Stacks: SBOR-USD, SBOR-BTC and SBOR-STX. SBOR also publishes references that are not benchmarks, such as SBOR-PoX and the comparison with other chains. The same practices apply to them, but they never enter a fixing.
+
+The white paper, *A Reference Rate for Bitcoin-Backed Credit* ([sbor.xyz/whitepaper](https://sbor.xyz/whitepaper)), sets out the principles. This page records how far SBOR meets them today, and is updated as that changes.
 
 ## Summary
 
@@ -50,9 +52,11 @@ SBOR defines its indices, writes and publishes the methodology, computes and pub
 
 SBOR reads rates directly from lending contracts and depends on public infrastructure to do so. The sources:
 
+- **Morpho contract state** on Ethereum, Base, Arbitrum and Arc, and **Lista** on BNB Chain, for the headline rate.
 - **Stacks contract state** for Zest and Granite, through the Hiro API.
-- **Ethereum, Base and Arc contract state** for Aave and Morpho, and **Hyperliquid and Solana contract state** for HyperLend and Kamino in the comparison, through public RPC endpoints, several per chain with automatic failover.
+- **Ethereum and Base contract state** for Aave in the comparison, and **Hyperliquid and Solana contract state** for HyperLend and Kamino in the comparison, through public RPC endpoints, several per chain with automatic failover.
 - **DefiLlama** to select the comparison markets and give their size, as a fallback if a contract read fails, and as a cross-check on Zest's market sizes, which are read from the Zest contracts since 1 October 2026. Each market states its source.
+- **DefiLlama's price service** for the depeg guard: a market carries zero weight if its stablecoin is below $0.98 or its bitcoin token more than 2% below bitcoin, and if prices cannot be read the fixing says the guard was not applied.
 - **CoinGecko** for prices, **Bitflow** for the bitcoin to STX rate, the **New York Fed** for SOFR, and **StackingDAO's** published method for the stBTC yield.
 
 Every read is checked, and a source that fails or returns something implausible is left out rather than replaced with an estimate.
@@ -61,7 +65,7 @@ Every read is checked, and a source that fails or returns something implausible 
 
 ### 3. Conflicts of interest: met
 
-SBOR has no token, takes no payment from any venue it measures, holds no stake in one, and does not trade on its own rate. Grant funding, when received, is disclosed. If SBOR ever charges for services, paying will buy delivery or guarantees, never an earlier look at a fixing or a different number.
+SBOR has no token and does not trade on its own rate. Who pays for a service never changes the number: if SBOR charges for services, including to a venue it measures, paying buys delivery or guarantees, never an earlier look at a fixing or a different number. Grant funding, when received, is disclosed, and so is any paying relationship with a venue SBOR measures.
 
 ### 4. Control framework: partly met
 
@@ -86,13 +90,13 @@ There is no oversight function independent of the people who produce the rate. W
 
 ### 6. Benchmark design: met
 
-Each index measures the cost of borrowing and the return on supplying one currency on Stacks, weighted by the depth of each lending market, as effective annual rates read from contract state. The design, its rationale and its limits are set out in the methodology.
+The headline measures what it costs to borrow dollar stablecoins against plain bitcoin, and what suppliers earn, as a supply-weighted average of the effective annual rates read from each eligible market's contract state. Each Stacks index does the same for one currency on Stacks. The rates are those the lending contracts set at the fixing, not individual loans: the white paper explains the difference from a transaction-based rate such as SOFR. The design, its rationale and its limits are set out in the methodology.
 
 ### 7. Data sufficiency: partly met
 
 The inputs are the rates lending contracts actually charge and pay at the moment of the fixing: live market state, not quotes, estimates or submissions.
 
-**The limit:** some indices rest on few venues. Every fixing publishes the number of venues and the weight of the largest, so a reader can see when an index is effectively a single market. When a market cannot be read, or its rate is set by the protocol rather than by the market, the index is left out: SBOR-BTC was withheld for sixteen days while its only market's rate was held at zero by design.
+**The limit:** some rates rest on few venues, and the headline is concentrated: on 25 October 2026 its largest market, Morpho's cbBTC/USDC market on Base, carried 71% of its weight. Every fixing publishes the number of markets and venues and the weight of the largest, so a reader can see how representative a rate is. New markets phase in over 30 days, and a market whose borrowers are paid rewards carries zero weight (applied to Arc's cirBTC/USDC market from 21 October 2026). When a market cannot be read, or its rate is set by the protocol rather than by the market, the index is left out: SBOR-BTC was withheld for sixteen days while its only market's rate was held at zero by design.
 
 ### 8. Hierarchy of data inputs: met
 
@@ -120,7 +124,7 @@ The methodology states what is measured, where each input comes from, how market
 
 Every fixing records the methodology version that produced it, and published fixings are never rewritten, so every historical figure can be traced to the method in force at the time. Changes are documented when they are made.
 
-**Partly met from 9 October 2026:** methodology 1.13.0 was announced five days before it took effect, with its full rules published in METHODOLOGY-1.13.0.md and the new rates computed every day on real contract data as a preview. A formal comment period for material changes is not yet set.
+**Partly met from 9 October 2026:** methodology 1.13.0, which made `BTC-COLLATERAL-USD` the headline, was announced five days before it took effect, with its full rules published in METHODOLOGY-1.13.0.md and the new rates computed every day on real contract data as a preview. A formal comment period for material changes is not yet set.
 
 ### 13. Transition: partly met
 

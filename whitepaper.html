@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>try{var t=localStorage.getItem("sbor-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F1F2ED;--ink:#131A1F;--soft:#5C646B;--accent:#1D4E6B;--rule:#CBCFC4;--ok:#2E6B3F;--bad:#8A2F2F}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#12171B;--ink:#E7E9E4;--soft:#9AA2A8;--accent:#7FB3D1;--rule:#2A3339;--ok:#8CC79B;--bad:#E09090;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#12171B;--ink:#E7E9E4;--soft:#9AA2A8;--accent:#7FB3D1;--rule:#2A3339;--ok:#8CC79B;--bad:#E09090;color-scheme:dark}
+.theme{float:right;font:inherit;font-size:15px;line-height:1;background:none;border:1px solid var(--rule);color:var(--soft);padding:5px 9px;cursor:pointer}
+.theme:hover{color:var(--ink)}
+.theme:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 "IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:720px;margin:0 auto;padding:48px 24px 64px}
+.mark{font:500 13px/1 "IBM Plex Mono",ui-monospace,Menlo,monospace;letter-spacing:.08em;color:var(--soft);text-decoration:none}
+.bar{height:6px;background:var(--accent);margin:0 0 40px}
+h1{font-weight:600;font-size:34px;line-height:1.2;margin:18px 0 6px}
+.date{color:var(--soft);font-size:14px;margin:0 0 28px}
+h2{font-size:20px;font-weight:600;margin:36px 0 8px}
+a{color:var(--accent)}
+.dl{display:inline-block;margin:6px 0 4px;padding:10px 16px;border:1px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:600}
+.dl:hover{background:var(--accent);color:var(--paper)}
+.mono{font:14px/1.5 "IBM Plex Mono",ui-monospace,Menlo,monospace;overflow-wrap:anywhere}
+.hash{padding:10px 12px;border:1px solid var(--rule);margin:6px 0}
+button.chk{font:inherit;font-size:15px;background:none;border:1px solid var(--rule);color:var(--ink);padding:7px 12px;cursor:pointer}
+#chk{margin-left:10px;font-size:15px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:15px;margin-top:6px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--soft);font-weight:400;font-size:13px}
+td.r{white-space:nowrap}
+.soft{color:var(--soft);font-size:15px}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--rule);color:var(--soft);font-size:14px}
+@media (max-width:560px){h1{font-size:28px} th:nth-child(3),td:nth-child(3){display:none}}
+</style>
+<title>White paper · SBOR</title>
+<meta name="description" content="A Reference Rate for Bitcoin-Backed Credit: the SBOR white paper, with its SHA-256 stamped on Arc, Base, Hyperliquid, Solana, Stacks and Bitcoin.">
+</head>
+<body>
+<div class="bar"></div>
+<main>
+<button class="theme" id="themeBtn" type="button" aria-label="Switch theme" title="Switch theme">&#9680;</button>
+<a class="mark" href="/">SBOR · STANDARD BITCOIN OFFERED RATE</a>
+<h1>A Reference Rate for Bitcoin-Backed Credit</h1>
+<p class="date">The SBOR white paper, version 1 · Guy Zaniratto</p>
+
+<p>Credit is priced against reference rates. A dollar loan says "SOFR plus a spread," and anyone can check the first half. Loans against bitcoin are priced venue by venue, each at its own rate, so a borrower, a fund or an AI agent cannot tell how an offer compares with the market. This paper proposes a reference rate for bitcoin-backed credit: a daily fixing read directly from lending contract state, one borrow and one supply rate built from every eligible market, weighted by size, with every input shown, posted on-chain where contracts can read it, and never rewritten. It sets out what such a rate must be, how the Standard Bitcoin Offered Rate (SBOR) computes it, the rules learned by running it, and what becomes possible once lenders and borrowers use the same rate.</p>
+
+<a class="dl" id="pdf" href="/SBOR_White_Paper_v1.pdf" download="SBOR_White_Paper_v1.pdf">Download the PDF</a>
+
+<h2>Stamped on-chain</h2>
+<p>The paper itself is not on-chain. Its fingerprint is. The SHA-256 below was posted on each chain listed, and each block's time is the date it was stamped. Any change to the PDF, even one character, gives a different hash. Later versions get their own stamp, and this one stays.</p>
+<div class="hash mono" id="hash">Stamps are posted on publication day.</div>
+<p><button class="chk" id="chkBtn" type="button">Check this PDF in your browser</button><span id="chk"></span></p>
+<div id="stamps"></div>
+
+<h2>Check it yourself</h2>
+<p class="soft">Download the PDF and run <span class="mono">shasum -a 256 SBOR_White_Paper_v1.pdf</span>. The result must equal the hash above and the hash in every transaction. On Stacks, the contract <span class="mono" id="stx">sbor-whitepaper-v1</span> holds the hash as a constant anyone can read. On Bitcoin, the OP_RETURN reads "SBOR WP1 " followed by the hash. An <a href="/SBOR_White_Paper_v1.pdf.ots" id="ots">OpenTimestamps proof</a> anchors the same hash in Bitcoin a second way. The full record is in <a href="/whitepaper-stamps.json">whitepaper-stamps.json</a>.</p>
+
+<footer><a href="/">sbor.xyz</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="mailto:contact@sbor.xyz">contact@sbor.xyz</a></footer>
+</main>
+<script>
+(function(){
+  var b=document.getElementById("themeBtn"); if(!b) return;
+  function now(){var s=document.documentElement.getAttribute("data-theme");if(s==="dark"||s==="light")return s;return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+  function label(){var l=now()==="dark"?"Switch to light theme":"Switch to dark theme";b.setAttribute("aria-label",l);b.title=l;}
+  b.addEventListener("click",function(){var n=now()==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("sbor-theme",n)}catch(e){}label();});
+  label();
+})();
+
+/* The record the stamping workflow commits. Until it exists, the page says
+   the stamps come on publication day and the check compares nothing. */
+var REC = null;
+var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); };
+fetch("/whitepaper-stamps.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(rec){
+  if (!rec || !rec.paper) return;
+  REC = rec;
+  document.getElementById("hash").innerHTML = "sha256 " + esc(rec.paper.sha256);
+  if (rec.paper.file) document.getElementById("pdf").href = "/" + encodeURI(rec.paper.file);
+  var st = (rec.stamps || []).find(function(s){ return s.chain === "Stacks" && s.contract; });
+  if (st) document.getElementById("stx").textContent = st.contract;
+  var rows = (rec.stamps || []).map(function(s){
+    var when = s.at ? new Date(s.at).toISOString().slice(0, 16).replace("T", " ") + " UTC" : "awaiting confirmation";
+    return "<tr><td>" + esc(s.chain) + "</td><td>" + esc(when) + "</td><td>" + esc(s.kind) + "</td><td class=\"r\"><a href=\"" + esc(s.url) + "\" rel=\"noopener\">transaction</a></td></tr>";
+  }).join("");
+  if (rows) document.getElementById("stamps").innerHTML = "<table><thead><tr><th>Chain</th><th>Stamped</th><th>How</th><th></th></tr></thead><tbody>" + rows + "</tbody></table>";
+}).catch(function(){});
+
+/* Hash the PDF this page links, here in the browser, and compare. */
+document.getElementById("chkBtn").addEventListener("click", function(){
+  var out = document.getElementById("chk");
+  if (!REC){ out.textContent = "No stamp yet to compare with."; return; }
+  if (!(window.crypto && crypto.subtle)){ out.textContent = "This browser cannot hash files; use the command below."; return; }
+  out.textContent = "Checking...";
+  fetch(document.getElementById("pdf").href, { cache: "no-store" })
+    .then(function(r){ return r.arrayBuffer(); })
+    .then(function(buf){ return crypto.subtle.digest("SHA-256", buf); })
+    .then(function(d){
+      var hex = Array.from(new Uint8Array(d)).map(function(x){ return x.toString(16).padStart(2, "0"); }).join("");
+      var same = hex === REC.paper.sha256;
+      out.className = same ? "ok" : "bad";
+      out.textContent = same ? "Matches: this is the stamped paper." : "Does not match: sha256 " + hex;
+    }).catch(function(e){ out.className = "bad"; out.textContent = "Could not check: " + e.message; });
+});
+</script>
+</body>
+</html>

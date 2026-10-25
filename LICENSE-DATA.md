@@ -92,7 +92,7 @@ number can be checked rather than trusted.
 
 ---
 
-**SBOR takes no payment from any venue it measures**, holds no stake in any
-protocol in its indices, and does not trade on its own rate.
+**SBOR is independent:** no token, it never trades on its own rate, and who
+pays for a service never changes the number.
 
 Questions: contact@sbor.xyz · [sbor.xyz](https://sbor.xyz)

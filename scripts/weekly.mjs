@@ -117,8 +117,8 @@ L.push(`Use it as a yardstick. Borrowing above SBOR means paying more than`);
 L.push(`the market. Supplying below it means earning less.`);
 L.push(``);
 L.push(`It is published as a public good. Free to reference, no key, no`);
-L.push(`registration, no fee. It is independent: no token, and no stake in`);
-L.push(`or payment from any venue it measures.`);
+L.push(`registration, no fee. It is independent: no token, it never trades`);
+L.push(`on its own rate, and who pays for a service never changes the number.`);
 L.push(``);
 L.push(`  Data and methodology   https://sbor.xyz`);
 L.push(`  API                    https://sbor.xyz/api/v1/latest.json`);
@@ -212,7 +212,7 @@ const html = `<div style="background:${P};color:${INK};font-family:'IBM Plex San
   </p>
   <p style="color:${SOFT};font-size:14px;margin:0 0 14px">
     It is published as a public good. Free to reference, no key, no registration, no fee.
-    SBOR is independent: no token, and no stake in or payment from any venue it measures.
+    SBOR is independent: no token, it never trades on its own rate, and who pays for a service never changes the number.
   </p>
 
   <table style="border-collapse:collapse;font-size:13px;margin-bottom:18px">

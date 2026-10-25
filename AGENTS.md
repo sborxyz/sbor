@@ -43,7 +43,7 @@ The remote and local servers are built from the same code and give the same answ
 
 ## Governance
 
-- **Independent:** no token, and no stake in or payment from any venue SBOR measures.
+- **Independent:** no token, it never trades on its own rate, and who pays for a service never changes the number.
 - **License:** the data is free to use, including commercially, with attribution. See [LICENSE-DATA.md](https://github.com/sborxyz/sbor/blob/main/LICENSE-DATA.md).
 - **Standards:** a self-assessment against the IOSCO Principles for Financial Benchmarks, in [IOSCO.md](https://github.com/sborxyz/sbor/blob/main/IOSCO.md).
 - **Source:** every fixing is a public commit at [github.com/sborxyz/sbor](https://github.com/sborxyz/sbor).

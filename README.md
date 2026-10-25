@@ -266,10 +266,10 @@ api/v1/                 published data
 
 ## Independence
 
-**Independent:** no token, and no stake in or payment from any venue SBOR
-measures. It publishes whatever the market does, including numbers unfavorable
-to any venue or chain, and it does not trade on its own rate. Grant funding,
-when received, is disclosed.
+**Independent:** no token, it never trades on its own rate, and who pays for a
+service never changes the number. It publishes whatever the market does,
+including numbers unfavorable to any venue or chain. Grant funding, when
+received, is disclosed.
 
 Published fixings are never rewritten. Corrections to published figures are
 listed in [CORRECTIONS.md](CORRECTIONS.md). A self-assessment against the IOSCO

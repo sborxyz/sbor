@@ -523,7 +523,7 @@ It does not rank, rate, endorse, or advise.
 
 ## Governance
 
-Independent: no token, and no stake in or payment from any venue SBOR measures.
+Independent: no token, it never trades on its own rate, and who pays for a service never changes the number.
 Published fixings are never rewritten.
 
 - Corrections to published figures: https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md

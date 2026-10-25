@@ -99,5 +99,5 @@ The server is remote, needs no key and no sign-in, and all six tools are read-on
 - Rates are effective APY percentages. The fixing is published once a day; every tool states its age, and `compare_rate` refuses data more than 48 hours old.
 - `BTC-COLLATERAL-USDC` is a reference, not an SBOR index. It is published only when every Morpho market it covers was read. The collateral is custodial wrapped bitcoin.
 - `SBOR-USD` measures a dollar on Stacks, borrowed against any crypto collateral, not only bitcoin. It is not a benchmark for a Base loan.
-- SBOR is independent: no token, and no stake in or payment from any venue it measures. The data is free to use, including commercially, with attribution.
+- SBOR is independent: no token, it never trades on its own rate, and who pays for a service never changes the number. The data is free to use, including commercially, with attribution.
 - Registry: `xyz.sbor/sbor`. Methodology: https://sbor.xyz/llms.txt. For agents: https://github.com/sborxyz/sbor/blob/main/AGENTS.md
