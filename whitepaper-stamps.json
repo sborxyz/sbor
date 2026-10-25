@@ -1,0 +1,59 @@
+{
+  "paper": {
+    "title": "A Reference Rate for Bitcoin-Backed Credit",
+    "version": 1,
+    "file": "SBOR_White_Paper_v1.pdf",
+    "bytes": 88402,
+    "sha256": "eb87f320b33ff590a6bab498167ee2d192525f7c3edc28604a2af13a66cfe638",
+    "page": "https://sbor.xyz/whitepaper",
+    "text": "SBOR white paper v1 | A Reference Rate for Bitcoin-Backed Credit | sha256:eb87f320b33ff590a6bab498167ee2d192525f7c3edc28604a2af13a66cfe638 | https://sbor.xyz/whitepaper"
+  },
+  "stamps": [
+    {
+      "chain": "Arc",
+      "kind": "transaction data",
+      "tx": "0x5a192aa64e435e2edc50eb3ebc7d5aa5116155f3558eee38f6ca8be316af9981",
+      "url": "https://explorer.arc.io/tx/0x5a192aa64e435e2edc50eb3ebc7d5aa5116155f3558eee38f6ca8be316af9981",
+      "block": 27819682,
+      "at": "2026-10-25T16:01:29.000Z"
+    },
+    {
+      "chain": "Hyperliquid",
+      "kind": "transaction data",
+      "tx": "0xaad8846e37047e2f20c9d77c4c24cb394a44d2e8d3be5c309e5960c2998bda94",
+      "url": "https://hyperevmscan.io/tx/0xaad8846e37047e2f20c9d77c4c24cb394a44d2e8d3be5c309e5960c2998bda94",
+      "block": 49498825,
+      "at": "2026-10-25T16:01:36.000Z"
+    },
+    {
+      "chain": "Solana",
+      "kind": "memo",
+      "tx": "5GGnUfk9oJUZoqCE9SYgPNNBKA2eoboLGZxhZNtSs8h5VNmgipP4ymb5xMwPvD1xT77BUGeu5LthAwqhGiMjRapS",
+      "url": "https://solscan.io/tx/5GGnUfk9oJUZoqCE9SYgPNNBKA2eoboLGZxhZNtSs8h5VNmgipP4ymb5xMwPvD1xT77BUGeu5LthAwqhGiMjRapS",
+      "block": 461317589,
+      "at": "2026-10-25T16:01:37.000Z"
+    },
+    {
+      "chain": "Stacks",
+      "kind": "contract",
+      "tx": "0x01e1364df6132ad1a59b38899f6177035b0a224b5af16773625169c2c8ff5181",
+      "url": "https://explorer.hiro.so/txid/0x01e1364df6132ad1a59b38899f6177035b0a224b5af16773625169c2c8ff5181?chain=mainnet",
+      "contract": "SP3V51CEH9M04JANTNTK3SCQTTAHX3DW9B5S94CC8.sbor-whitepaper-v1",
+      "block": 9315165,
+      "at": "2026-10-25T16:04:01.000Z"
+    },
+    {
+      "chain": "Bitcoin",
+      "kind": "OP_RETURN",
+      "tx": "a75c851d4db941b4d8a1e437c5e8c4ecefb95cc3e44e64c29c2188503349034b",
+      "url": "https://mempool.space/tx/a75c851d4db941b4d8a1e437c5e8c4ecefb95cc3e44e64c29c2188503349034b",
+      "block": null,
+      "at": null
+    }
+  ],
+  "opentimestamps": {
+    "file": "SBOR_White_Paper_v1.pdf.ots",
+    "note": "OpenTimestamps proof anchoring the same hash in Bitcoin; verify with the ots client."
+  },
+  "check": "shasum -a 256 SBOR_White_Paper_v1.pdf"
+}
