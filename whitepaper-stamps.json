@@ -55,8 +55,8 @@
       "kind": "OP_RETURN",
       "tx": "a75c851d4db941b4d8a1e437c5e8c4ecefb95cc3e44e64c29c2188503349034b",
       "url": "https://mempool.space/tx/a75c851d4db941b4d8a1e437c5e8c4ecefb95cc3e44e64c29c2188503349034b",
-      "block": null,
-      "at": null
+      "block": 973094,
+      "at": "2026-10-25T16:23:04.000Z"
     }
   ],
   "opentimestamps": {
