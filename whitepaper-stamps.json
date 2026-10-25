@@ -18,6 +18,14 @@
       "at": "2026-10-25T16:01:29.000Z"
     },
     {
+      "chain": "Base",
+      "kind": "transaction data",
+      "tx": "0xab42e0730780291c00c131750ec4697dcba8c95b0d6a0a4a7863381e57a869f2",
+      "url": "https://basescan.org/tx/0xab42e0730780291c00c131750ec4697dcba8c95b0d6a0a4a7863381e57a869f2",
+      "block": 53077372,
+      "at": "2026-10-25T16:01:31.000Z"
+    },
+    {
       "chain": "Hyperliquid",
       "kind": "transaction data",
       "tx": "0xaad8846e37047e2f20c9d77c4c24cb394a44d2e8d3be5c309e5960c2998bda94",
