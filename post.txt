@@ -1,15 +1,15 @@
-SBOR post drafts, fixing 2026-10-24T08:30:57Z
-Compared with 2026-10-23
+SBOR post drafts, fixing 2026-10-25T08:30:55Z
+Compared with 2026-10-24
 
 1 thing worth saying. Pick one. Do not post more than one a day.
 
---- 1. SBOR-BTC supply moved -37 bps (138 chars)
+--- 1. SBOR-BTC supply moved +30 bps (138 chars)
 
-SBOR-BTC supply rate: 1.36% to 0.99%.
+SBOR-BTC supply rate: 0.99% to 1.29%.
 
--37 bps in a day.
++30 bps in a day.
 
-One market behind it: Zest V2 sBTC, utilization 83.81%.
+One market behind it: Zest V2 sBTC, utilization 97.61%.
 
 sbor.xyz
 
