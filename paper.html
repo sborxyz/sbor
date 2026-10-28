@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>try{var t=localStorage.getItem("sbor-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F1F2ED;--ink:#131A1F;--soft:#5C646B;--accent:#1D4E6B;--rule:#CBCFC4}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#12171B;--ink:#E7E9E4;--soft:#9AA2A8;--accent:#7FB3D1;--rule:#2A3339;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#12171B;--ink:#E7E9E4;--soft:#9AA2A8;--accent:#7FB3D1;--rule:#2A3339;color-scheme:dark}
+.theme{float:right;font:inherit;font-size:15px;line-height:1;background:none;border:1px solid var(--rule);color:var(--soft);padding:5px 9px;cursor:pointer}
+.theme:hover{color:var(--ink)}
+.theme:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 "IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:720px;margin:0 auto;padding:48px 24px 64px}
+.mark{font:500 13px/1 "IBM Plex Mono",ui-monospace,Menlo,monospace;letter-spacing:.08em;color:var(--soft);text-decoration:none}
+.bar{height:6px;background:var(--accent);margin:0 0 40px}
+h1{font-weight:600;font-size:34px;line-height:1.2;margin:18px 0 6px}
+.date{color:var(--soft);font-size:14px;margin:0 0 32px}
+h2{font-size:20px;font-weight:600;margin:36px 0 8px}
+a{color:var(--accent)}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--rule);color:var(--soft);font-size:14px}
+h2{scroll-margin-top:16px}
+p{margin:0 0 16px}
+ul,ol{padding-left:22px;margin:0 0 16px}
+li{margin:0 0 8px}
+.note{border:1px solid var(--rule);padding:14px 16px;margin:0 0 32px;font-size:15px;line-height:1.55}
+.note .mono{font:13px/1.5 "IBM Plex Mono",ui-monospace,Menlo,monospace;overflow-wrap:anywhere;color:var(--soft)}
+.dl{display:inline-block;margin:10px 12px 0 0;padding:8px 14px;border:1px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:600;font-size:15px}
+.dl:hover{background:var(--accent);color:var(--paper)}
+.abs{font-size:17px}
+.eq{display:flex;flex-wrap:wrap;gap:8px 56px;margin:20px 0 24px}
+.eq math{margin:0;font-size:19px}
+.disc{color:var(--soft);font-size:14px;margin-top:32px}
+@media (max-width:560px){h1{font-size:28px}.eq math{font-size:18px}}
+</style>
+<title>A Reference Rate for Bitcoin-Backed Credit · SBOR white paper</title>
+<meta name="description" content="The SBOR white paper, version 1, to read online: a daily reference rate for bitcoin-backed credit, read from lending contract state and posted on-chain.">
+<link rel="canonical" href="https://sbor.xyz/paper.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Reference Rate for Bitcoin-Backed Credit">
+<meta property="og:description" content="The SBOR white paper, version 1. Read online.">
+<meta property="og:url" content="https://sbor.xyz/paper.html">
+<meta property="og:image" content="https://sbor.xyz/og-whitepaper.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sbor.xyz/og-whitepaper.png">
+</head>
+<body>
+<div class="bar"></div>
+<main>
+<button class="theme" id="themeBtn" type="button" aria-label="Switch theme" title="Switch theme">&#9680;</button>
+<a class="mark" href="/">SBOR · STANDARD BITCOIN OFFERED RATE</a>
+<article>
+<h1>A Reference Rate for Bitcoin-Backed Credit</h1>
+<p class="date">The SBOR white paper, version 1 · Guy Zaniratto · <a href="mailto:contact@sbor.xyz">contact@sbor.xyz</a></p>
+<div class="note">This is a reading copy, with the same text as the PDF. The PDF is the original: its fingerprint was stamped on-chain on October 25, 2026, and this page is not.
+<div class="mono">SHA-256 eb87f320b33ff590a6bab498167ee2d192525f7c3edc28604a2af13a66cfe638</div>
+<a class="dl" href="/SBOR_White_Paper_v1.pdf" download="SBOR_White_Paper_v1.pdf">Download the PDF</a><a class="dl" href="/#paper">See the stamps</a></div>
+<p class="abs"><strong>Abstract.</strong> Credit is priced against reference rates. A dollar loan says "SOFR plus a spread," and anyone can check the first half. Loans against bitcoin are priced venue by venue, each at its own rate, so a borrower, a fund or an AI agent cannot tell how an offer compares with the market. This paper proposes a reference rate for bitcoin-backed credit: a daily fixing read directly from lending contract state, one borrow and one supply rate built from every eligible market, weighted by size, with every input shown, posted on-chain where contracts can read it, and never rewritten. It sets out what such a rate must be, how the Standard Bitcoin Offered Rate (SBOR) computes it, the rules learned by running it, and what becomes possible once lenders and borrowers use the same rate.</p>
+<h2 id="introduction">1. Introduction</h2>
+<p>Mature credit markets run on reference rates. In dollars, floating-rate loans and interest-rate swaps are written as a spread over SOFR, the Secured Overnight Financing Rate: what it costs to borrow dollars overnight against US Treasury bonds, published by the Federal Reserve Bank of New York every business day [1]. The lender and the borrower negotiate the spread. The rate underneath comes from the market's own trades, under published rules, so neither side sets it and anyone can check it.</p>
+<p>Bitcoin has become collateral. It is lent against on most major blockchains and by lenders off-chain. Most of these loans carry a variable rate, and a few lenders now offer fixed rates on-chain. Each of those loans is priced on its own, offer by offer, with nothing shared underneath.</p>
+<p>A dollar loan can point to SOFR. A loan against bitcoin should be able to point to a rate the same way: dated, read from the market itself, and readable by the contracts that settle it. This paper describes a rate built to be that number.</p>
+<h2 id="every-venue-quotes-its-own-rate">2. Every venue quotes its own rate</h2>
+<p>A lending venue's rate describes only its own pool: how much lenders have put in, how much borrowers have taken out, and the formula that venue chose for how its rate moves as the pool fills up. It says nothing about the market. The same dollar, borrowed on the same chain on the same day, can cost twice as much at one venue as at the next. Both rates are correct. Neither is the market rate.</p>
+<p>Bitcoin credit is also spread across chains that do not talk to each other. On some days, supplying dollars on one chain pays more than borrowing them on another. Without a shared rate, nobody sees the gap.</p>
+<p>This matters more when the borrower is software. A person can open three apps and compare. An AI agent needs one number it can trust, read the same way every day, before it signs.</p>
+<h2 id="what-a-reference-rate-must-be">3. What a reference rate must be</h2>
+<p>Not every published number can carry a loan. For a rate to be written into agreements and read by contracts, it has to pass six tests:</p>
+<ul>
+<li><strong>Read from the market.</strong> Computed from what borrowers pay and suppliers earn, as the lending contracts set it, not from anyone's estimate.</li>
+<li><strong>Dated.</strong> One number for one day, fixed at a known time, so two parties can agree on which rate applied.</li>
+<li><strong>Shown in full.</strong> Every input published beside the result, so anyone can recompute it.</li>
+<li><strong>Never rewritten.</strong> Once published, it stands. Errors are corrected forward, in public.</li>
+<li><strong>Independent.</strong> Computed under public rules, by someone with nothing to gain from the rate being higher or lower.</li>
+<li><strong>Readable where loans settle.</strong> On-chain, so a contract can reference it without trusting a server.</li>
+</ul>
+<p>SBOR is built to pass these tests. The rest of this paper describes how.</p>
+<h2 id="the-fixing">4. The fixing</h2>
+<p>Once a day, at a time recorded with the fixing, SBOR reads the state of each eligible lending contract: its borrow rate, its supply rate, how much is supplied and how much is lent. It publishes one borrow rate and one supply rate per currency, weighted by the size of each market:</p>
+<div class="eq"><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">SBOR</mtext><mtext mathvariant="normal">borrow</mtext></msub><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub><msub><mi>r</mi><mi>i</mi></msub></mrow><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{SBOR}_{\text{borrow}} = \frac{\sum_i w_i r_i}{\sum_i w_i}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">SBOR</mtext><mtext mathvariant="normal">supply</mtext></msub><mo>=</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub><msub><mi>s</mi><mi>i</mi></msub></mrow><mrow><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>w</mi><mi>i</mi></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{SBOR}_{\text{supply}} = \frac{\sum_i w_i s_i}{\sum_i w_i}</annotation></semantics></math></div>
+<p>Here <em>r</em> and <em>s</em> are each market's borrow and supply rate, and <em>w</em> is what is supplied to it, scaled by its phase-in (section 5). Contracts usually return nominal rates. Each one is converted the same way to an effective annual rate, <em>e</em><sup><em>r</em></sup> − 1, so that markets can be compared.</p>
+<p>For example, if one market has $300 million supplied at a 5% borrow rate and another has $100 million at 3%, the borrow rate is (300 × 5 + 100 × 3) ÷ 400 = 4.5%.</p>
+<p>The headline reference is the cost of borrowing dollars against bitcoin: every eligible market that lends a dollar stablecoin against bitcoin alone, on every chain SBOR reads. Here, dollars means dollar stablecoins, and bitcoin includes bitcoin held one to one as a token on another chain. Each of these carries risks of its own. Each stablecoin also gets its own rate once enough of it is lent, so a borrower can compare like with like. Beside the headline, SBOR publishes a rate per currency on Bitcoin's own layers, and the same assets on other chains for comparison.</p>
+<p>Every fixing shows every market behind it, with its rate, its utilization and its weight. A reader never has to take the number on trust.</p>
+<p>SBOR measures the rates lending contracts charge at the moment of the fixing. It is not built from individual loans, the way SOFR is built from each day's repo trades. It shows what the market's pools are charging, which is not always the price of one large new loan: a big loan can move a pool's rate as it is taken.</p>
+<p>SBOR uses a weighted average rather than SOFR's median. Each market is weighted by what lenders have supplied to it, a measure of its size, so larger markets count for more. Every fixing also shows the largest market's share, so any reader can judge how representative the rate is.</p>
+<h2 id="rules-learned-by-running-it">5. Rules learned by running it</h2>
+<p>A formula is easy. Trust comes from the rules around it, applied the same way every day. Most of these were learned by publishing the fixing day after day and watching what broke:</p>
+<ul>
+<li><strong>Read the contract, not the interface.</strong> SBOR has recorded a contract charging zero while its app still displayed a positive rate. Parameters change, contracts upgrade, markets pause, and the screen is often the last to know.</li>
+<li><strong>Read at the source.</strong> Every relay between a contract and its reader is a place for a number to lag or drift. SBOR reads rates directly from contract state. Outside data is used only to price tokens and to cross-check, never as a rate.</li>
+<li><strong>Never estimate.</strong> A market that cannot be read is left out and the gap is marked. A rate that cannot be stood behind is withheld, with the reason published. A missing rate means unknown, never zero. A benchmark that always has an answer is sometimes guessing.</li>
+<li><strong>Collateral is part of the price.</strong> A dollar borrowed against bitcoin alone and a dollar borrowed against a basket of tokens are different loans, just as a dollar rate and a bitcoin rate are different prices. Each gets its own reference, and none is blended into another.</li>
+<li><strong>Rewards are not rates.</strong> Token incentives and staking yields sit next to lending rates and are easy to add in. They are paid by someone else, for something else, and they end. SBOR measures only what borrowers pay and suppliers earn.</li>
+<li><strong>Only what holds its peg.</strong> A stablecoin that slips from its dollar, or a wrapped bitcoin that slips from bitcoin, by more than the methodology allows, carries no weight that day. If prices cannot be read, the fixing says so.</li>
+<li><strong>Phase in, never jump.</strong> A new market enters at zero weight and reaches full weight over a fixed window, so new coverage alone does not make the rate jump. A market that fails or leaves can still move it, and the fixing says why.</li>
+<li><strong>Never rewrite, and publish the method.</strong> A published fixing is never deleted. A mistake is disclosed in a public note, and the correction or withdrawal is recorded beside the original. The methodology is versioned, and every fixing records the version that produced it [4].</li>
+</ul>
+<p>These rules cost something. On the days SBOR withholds a rate, it has less to show. That is the point: a reference rate is worth what it refuses to publish.</p>
+<h2 id="on-chain">6. On-chain</h2>
+<p>A dollar loan references SOFR in a contract written in English. A loan on a blockchain is a contract written in code, and code can only reference what it can read. So after each fixing, SBOR posts the day's rates on-chain, on the blockchains it supports. Any app or contract there can read the rate, with its date, without asking SBOR's servers.</p>
+<p>Posting on-chain also makes the record permanent in a second place. Each day's rates stay readable on every chain they were posted to, with the time they were posted, so a change made later would show. Posting on-chain does not prove the calculation. That rests on the published method, the public code and the record, which anyone can check.</p>
+<h2 id="for-agents">7. For agents</h2>
+<p>Software holds wallets and borrows. An agent offered a loan needs to know one thing first: how does this rate compare with the market? SBOR answers in a form any agent can call. Give it a rate and a side, and it returns the gap to the market.</p>
+<p>Say SBOR is 5.00% and the agent is offered 6.00%. The offer sits 1 percentage point, or 100 basis points, above the market. That is a starting point, not a verdict: collateral, fees and other terms can justify a different rate.</p>
+<p>What the agent does with that gap is its owner's policy: borrow, renegotiate or walk away. The benchmark's job is narrower, and it does not change: say how far an offer sits from the market. When the benchmark's own data is too old, incomplete or withheld, it says so and gives no verdict. SBOR refuses to answer rather than guess.</p>
+<h2 id="what-a-reference-rate-makes-possible">8. What a reference rate makes possible</h2>
+<p>Once a rate is shared, people can write it into agreements. The products below exist in traditional credit because SOFR exists. Each becomes possible against bitcoin the same way, though each would also need its own contract terms, risk controls and, where they apply, regulatory approvals:</p>
+<ol type="1">
+<li><strong>A floating loan.</strong> The rate resets to SBOR plus a fixed spread. The borrower knows the formula and can check every reset.</li>
+<li><strong>A fixed-rate loan.</strong> The lender quotes a fixed rate for 90 days, and both sides can see how far it sits from the market.</li>
+<li><strong>Averages over time.</strong> Compounded averages over 30, 90 and 180 days, built from the daily record the way the SOFR averages are. They look back, not forward.</li>
+<li><strong>A rate swap.</strong> One side pays fixed, the other pays SBOR. A lender or a vault can hedge, settled by a contract that reads the rate on-chain.</li>
+<li><strong>A mark.</strong> A fund or treasury values a position against the market rate of the day, from a record anyone can audit.</li>
+<li><strong>A check.</strong> A person or an agent compares any offer against the benchmark before signing.</li>
+</ol>
+<p>Each of them needs a number that stays honest for years.</p>
+<h2 id="independence">9. Independence</h2>
+<p>LIBOR was built on banks' estimates of what they could borrow at. Some of those banks shaded their estimates in their own favor [3], and the scandal ended in billions of dollars in fines. In US dollar markets, SOFR became LIBOR's main replacement, and it is calculated from actual transactions [6]. The lesson is plain: a benchmark must be computed from what the market did, under public rules, by someone with nothing to gain from where the rate lands.</p>
+<p>SBOR follows that lesson by design:</p>
+<ul>
+<li>It reads contract state. There is nothing to submit, and no one to ask.</li>
+<li>It has no token.</li>
+<li>It never trades on its own rate.</li>
+<li>Anything it detects is published to everyone at once, never to a private channel.</li>
+<li>Its code, data and corrections are public [5], and it publishes a self-assessment, not a certification, against the IOSCO Principles for Financial Benchmarks [2].</li>
+</ul>
+<p>Independence also needs governance: who runs the fixing, who can change the method, and how errors and disputes are handled. SBOR's public self-assessment against the IOSCO Principles [7] sets out what is in place and what is still to be built, and it is updated as that changes.</p>
+<h2 id="conclusion">10. Conclusion</h2>
+<p>Bitcoin is becoming the collateral of a new credit market. That market will need what every credit market has needed: a rate everyone can point to and no single party controls. SBOR reads the contracts, publishes one dated number a day with every input shown, posts it where contracts can read it, and never rewrites it. The last lesson is the simplest: a plain rate published every day, the same way, is worth more than a clever one published now and then. A benchmark is not declared. It is earned, one fixing at a time. The record has started.</p>
+<h2 id="references">References</h2>
+<ol type="1">
+<li>Federal Reserve Bank of New York, "Secured Overnight Financing Rate," <a href="https://www.newyorkfed.org/markets/reference-rates/sofr" rel="noopener">newyorkfed.org/markets/reference-rates/sofr</a>.</li>
+<li>IOSCO, "Principles for Financial Benchmarks," July 2013.</li>
+<li>HM Treasury, "The Wheatley Review of LIBOR: final report," September 2012.</li>
+<li>SBOR methodology and version history, <a href="https://sbor.xyz/llms.txt" rel="noopener">sbor.xyz/llms.txt</a>.</li>
+<li>SBOR public record and code, <a href="https://github.com/sborxyz/sbor" rel="noopener">github.com/sborxyz/sbor</a>.</li>
+<li>Alternative Reference Rates Committee, "Second Report," Federal Reserve Bank of New York, March 2018.</li>
+<li>SBOR, self-assessment against the IOSCO Principles for Financial Benchmarks, <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" rel="noopener">github.com/sborxyz/sbor/blob/main/IOSCO.md</a>.</li>
+</ol>
+<p class="disc">SBOR is a published statistic, not investment advice. It is not approved or certified by any regulator, and it carries no guarantee of accuracy, availability or liquidity. Anyone who uses it is responsible for judging whether it suits their purpose and for the laws that apply.</p>
+
+</article>
+<footer><a href="/">sbor.xyz</a> · <a href="/#paper">White paper</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="mailto:contact@sbor.xyz">contact@sbor.xyz</a></footer>
+</main>
+<script>
+(function(){
+  var b=document.getElementById("themeBtn"); if(!b) return;
+  function now(){var s=document.documentElement.getAttribute("data-theme");if(s==="dark"||s==="light")return s;return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+  function label(){var l=now()==="dark"?"Switch to light theme":"Switch to dark theme";b.setAttribute("aria-label",l);b.title=l;}
+  b.addEventListener("click",function(){var n=now()==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("sbor-theme",n)}catch(e){}label();});
+  label();
+})();
+</script>
+</body>
+</html>

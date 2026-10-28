@@ -299,7 +299,7 @@ a{color:var(--accent)}
 .wp h2{font-size:20px;font-weight:600;margin:36px 0 8px}
 .wp p{margin:0 0 16px}
 .wp a{color:var(--accent)}
-.wp .dl{display:inline-block;margin:6px 0 4px;padding:10px 16px;border:1px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:600}
+.wp .dl{display:inline-block;margin:6px 10px 4px 0;padding:10px 16px;border:1px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:600}
 .wp .dl:hover{background:var(--accent);color:var(--paper)}
 .wp .mono{font:14px/1.5 "IBM Plex Mono",ui-monospace,Menlo,monospace;overflow-wrap:anywhere}
 .wp .hash{padding:10px 12px;border:1px solid var(--rule);margin:6px 0}
@@ -582,7 +582,7 @@ a{color:var(--accent)}
 
 <p>Credit is priced against reference rates. A dollar loan says "SOFR plus a spread," and anyone can check the first half. Loans against bitcoin are priced venue by venue, each at its own rate, so a borrower, a fund or an AI agent cannot tell how an offer compares with the market. This paper proposes a reference rate for bitcoin-backed credit: a daily fixing read directly from lending contract state, one borrow and one supply rate built from every eligible market, weighted by size, with every input shown, posted on-chain where contracts can read it, and never rewritten. It sets out what such a rate must be, how the Standard Bitcoin Offered Rate (SBOR) computes it, the rules learned by running it, and what becomes possible once lenders and borrowers use the same rate.</p>
 
-<a class="dl" id="wp-pdf" href="/SBOR_White_Paper_v1.pdf" download="SBOR_White_Paper_v1.pdf">Download the PDF</a>
+<a class="dl" id="wp-read" href="/paper.html">Read online</a> <a class="dl" id="wp-pdf" href="/SBOR_White_Paper_v1.pdf" download="SBOR_White_Paper_v1.pdf">Download the PDF</a>
 
 <h2>Stamped on-chain</h2>
 <p>The paper itself is not on-chain. Its fingerprint is. The SHA-256 below was posted on each chain listed, and each block's time is the date it was stamped. Any change to the PDF, even one character, gives a different hash. Later versions get their own stamp, and this one stays.</p>
