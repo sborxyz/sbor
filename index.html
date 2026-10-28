@@ -210,6 +210,7 @@ tr.ownrow .venue{color:var(--accent)}
 .poxk{font-size:13.5px;color:var(--ink-soft)}
 .poxv{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;
   font-size:clamp(46px,8vw,84px);line-height:.98;font-weight:500;letter-spacing:-.03em;margin-top:6px;color:var(--accent)}
+.stxt{font-size:15px;line-height:1.55;color:var(--ink)}
 .poxv .pct{font-size:.42em;font-weight:400;letter-spacing:0;margin-left:.08em;color:var(--ink-soft)}
 .coverage{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-soft);margin-bottom:14px;letter-spacing:.01em}
 .foot-note{margin-top:16px;color:var(--ink-soft);font-size:13.5px;max-width:70ch}
@@ -500,6 +501,23 @@ a{color:var(--accent)}
       <div class="coverage" id="poxCycFormula" style="margin:14px 0 0"></div>
     </section>
 
+    <section id="ststx-sec" data-tabpage="staking" hidden>
+      <div class="sec-h">
+        <div>
+          <h2 id="t-ststxH"></h2>
+          <p id="t-ststxP"></p>
+        </div>
+      </div>
+      <div class="poxbox">
+        <div class="poxk" id="t-ststxK"></div>
+        <div class="poxv"><span class="num" id="ststxVal">n/a</span><span class="pct">%</span></div>
+        <p class="stxt" id="ststxMeta" style="margin:12px 0 0"></p>
+      </div>
+      <svg class="chart poxchart" id="ststxChart" viewBox="0 0 1120 200" preserveAspectRatio="none" role="img" aria-label="stSTX yield history"></svg>
+      <p class="stxt" id="ststxChartNote" style="margin:12px 0 0"></p>
+      <p class="stxt" id="t-stakeCtx" style="margin:10px 0 0"></p>
+    </section>
+
     <section data-tabpage="rates">
       <div class="sec-h">
         <div>
@@ -728,6 +746,13 @@ en:{
   termPending:"not yet",
   termSofr:"one rate: in a repo, borrower and lender get the same",
   deltaBorrow:"", deltaSupply:"",
+  chartThin:"Not enough history yet to draw this.",
+  ststxH:"stSTX, the liquid staking token",
+  ststxP:"What STX earns through StackingDAO while staying liquid. stSTX can be traded or lent while it earns.",
+  ststxK:"stSTX yield",
+  ststxMeta:"StackingDAO's figure, net of its commission, recorded with each fixing.",
+  ststxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}.`,
+  stakeCtx:(n,l)=>`Native stacking, locked for the cycle: ${n}% (StackingDAO). The gap to stSTX, ${l} basis points, is what liquidity costs. These yields are context, never part of an index.`,
   poxH:"Bitcoin staking yield, from PoX (Proof of Transfer)",
   poxP:"What PoX pays STX stakers, in bitcoin, from what miners commit. The bitcoin paid over one two week reward cycle, divided by the STX locked, annualized. A staking yield on a locked position, not a lending rate, so it sits beside the indices and never inside them.",
   poxChartNote:(n,first,last)=>`${n} daily readings, ${first} to ${last}. Each reading annualizes the most recently completed two week cycle, so a marked line is the day a cycle settled and everything to its right is derived from that cycle. The drift between markers is the BTC to STX rate, which is averaged over seven days.`,
@@ -872,6 +897,13 @@ pt:{
   termPending:"ainda não",
   termSofr:"uma taxa só: no repo, quem toma e quem empresta têm a mesma",
   deltaBorrow:"", deltaSupply:"",
+  chartThin:"Ainda não há histórico suficiente para desenhar isso.",
+  ststxH:"stSTX, o token de staking líquido",
+  ststxP:"O que o STX rende pela StackingDAO sem perder liquidez. O stSTX pode ser negociado ou emprestado enquanto rende.",
+  ststxK:"Rendimento do stSTX",
+  ststxMeta:"Número da StackingDAO, líquido da comissão, registrado a cada fixing.",
+  ststxChartNote:(n,first,last)=>`${n} leituras diárias, de ${first} a ${last}.`,
+  stakeCtx:(n,l)=>`Staking nativo, travado no ciclo: ${n}% (StackingDAO). A diferença para o stSTX, ${l} pontos-base, é o custo da liquidez. Esses rendimentos são contexto, nunca parte de um índice.`,
   poxH:"Rendimento do staking de bitcoin, via PoX (Proof of Transfer)",
   poxP:"O que o PoX paga a quem faz staking de STX, em bitcoin, a partir do que os mineradores comprometem. O bitcoin pago em um ciclo de recompensa de duas semanas, dividido pelo STX travado, anualizado. É um rendimento de staking sobre uma posição travada, não uma taxa de crédito, por isso fica ao lado dos índices e nunca dentro deles.",
   poxChartNote:(n,first,last)=>`${n} leituras diárias, de ${first} a ${last}. Cada leitura anualiza o último ciclo de duas semanas concluído, então uma linha marcada é o dia em que um ciclo fechou, e tudo à direita dela vem daquele ciclo. A variação entre marcadores é a relação BTC para STX, que é suavizada em sete dias.`,
@@ -1056,6 +1088,7 @@ function computed(key){
 
 let HISTORY = [];   /* filled by boot() from api/v1/history.json */
 let POX = null;     /* filled by boot() from api/v1/latest.json */
+let RAW_IDX = {};   /* the indices as published, for the staking tab */
 let METHOD_VERSION = "1.0.0";
 let EXTERNAL = null;   /* filled by boot() from api/v1/latest.json */
 let BTCREF = null;     /* the bitcoin-collateral USDC reference, from the same file */
@@ -1277,6 +1310,7 @@ function renderChrome(){
     set("poxMeta", t.poxMissing);
     drawPox(); drawPoxCycles();
   } else { psec.hidden = true; }
+  renderStstx();
   set("t-cons-foot", t.consFoot);
   set("t-method-h", t.methodH);
   set("t-signup-h", t.signupH); set("t-signup-p", t.signupP);
@@ -1378,6 +1412,60 @@ function drawPox(){
   g += `<path d="${v.map((n,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(n).toFixed(1)).join(" ")}" fill="none" style="stroke:var(--accent)" stroke-width="2"/>`;
   el.innerHTML = g;
   set("poxChartNote", t.poxChartNote(rows.length, rows[0].date, rows[rows.length-1].date));
+}
+
+/* A plain line chart in the PoX chart's style: one or two series over the
+   same dates, the first drawn strong, the second light. */
+/* Month first, as SBOR writes dates: "September 11" (or "11 de setembro" in Portuguese). */
+const mdate = d => new Date(d + "T00:00:00Z").toLocaleDateString(lang === "pt" ? "pt-BR" : "en-US", { month:"long", day:"numeric", timeZone:"UTC" });
+function drawLines(el, dates, series, thin){
+  const W=1120,H=200,PL=58,PR=14,PT=16,PB=24;
+  const all = series.flatMap(s => s.v.filter(n => typeof n === "number"));
+  if (dates.length < 2 || !all.length){
+    el.innerHTML = `<text x="560" y="100" text-anchor="middle" font-family="IBM Plex Sans" font-size="14" style="fill:var(--ink-soft)">${thin}</text>`;
+    return false;
+  }
+  const span = (Math.max(...all) - Math.min(...all)) || 1;
+  const lo = Math.max(0, Math.min(...all) - span*0.3), hi = Math.max(...all) + span*0.3;
+  const x = i => PL + i*(W-PL-PR)/(dates.length-1);
+  const y = n => PT + (hi-n)*(H-PT-PB)/(hi-lo);
+  let g = "";
+  for (let k=0;k<=3;k++){
+    const n = lo+(hi-lo)*k/3, yy = y(n);
+    g += `<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" style="stroke:var(--rule-soft)"/>`;
+    g += `<text x="${PL-10}" y="${yy+4}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${n.toFixed(1)}%</text>`;
+  }
+  g += `<text x="${PL}" y="${H-7}" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${mdate(dates[0])}</text>`;
+  g += `<text x="${W-PR}" y="${H-7}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${mdate(dates[dates.length-1])}</text>`;
+  series.slice().reverse().forEach(s => {
+    let d = "", pen = false;
+    s.v.forEach((n,i) => { if (typeof n !== "number"){ pen = false; return; } d += (pen?"L":"M")+x(i).toFixed(1)+" "+y(n).toFixed(1)+" "; pen = true; });
+    g += `<path d="${d.trim()}" fill="none" style="stroke:var(--accent);opacity:${s.light ? .35 : 1}" stroke-width="2"/>`;
+  });
+  el.innerHTML = g;
+  return true;
+}
+
+/* stSTX: StackingDAO's yield, as recorded with the stSTX market each day. */
+function renderStstx(){
+  const t = T(), sec = document.getElementById("ststx-sec");
+  if (!sec) return;
+  const pick = ix => ((ix || {}).markets || []).find(m => (m.asset || m.a) === "stSTX");
+  const now = pick(RAW_IDX["SBOR-STX"]);
+  const rows = HISTORY.map(h => ({ date: h.date, m: pick(h["SBOR-STX"]) }))
+    .filter(r => r.m && typeof (r.m.py ?? r.m.protocolYield) === "number");
+  if (!now && !rows.length){ sec.hidden = true; return; }
+  sec.hidden = false;
+  set("t-ststxH", t.ststxH); set("t-ststxP", t.ststxP); set("t-ststxK", t.ststxK);
+  const py = now && typeof now.protocolYield === "number" ? now.protocolYield : null;
+  document.getElementById("ststxVal").textContent = py == null ? "n/a" : py.toFixed(2);
+  set("ststxMeta", t.ststxMeta);
+  const ok = drawLines(document.getElementById("ststxChart"), rows.map(r => r.date),
+    [{ v: rows.map(r => r.m.py ?? r.m.protocolYield) }], t.chartThin);
+  set("ststxChartNote", ok ? t.ststxChartNote(rows.length, mdate(rows[0].date), mdate(rows[rows.length-1].date)) : "");
+  const st = (CONTEXT || {}).staking;
+  set("t-stakeCtx", st && typeof st.nativeStackingApy === "number" && typeof st.liquidityCostBps === "number"
+    ? t.stakeCtx(st.nativeStackingApy.toFixed(2), st.liquidityCostBps) : "");
 }
 
 /* One row per completed reward cycle, from the daily record. BTC paid and STX
@@ -1678,6 +1766,7 @@ async function boot(){
     if (d.bitcoinCollateralUsdc) BTCREF = d.bitcoinCollateralUsdc;
     if (d.bitcoinCollateralUsd?.markets?.length){ HEAD = d.bitcoinCollateralUsd; STXIDX = d.indices || {}; }
     if (d.context) CONTEXT = d.context;
+    if (d.indices) RAW_IDX = d.indices;
     if (d.methodologyVersion) METHOD_VERSION = d.methodologyVersion;
     for (const [label, ix] of Object.entries(d.indices || {}))
       TERM_DATA[label] = { termAverages: ix.termAverages, seriesBegan: ix.seriesBegan };
