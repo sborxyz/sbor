@@ -291,6 +291,26 @@ a{color:var(--accent)}
   .sofrbox{background:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* White paper tab: the same reading layout as sbor.xyz/whitepaper */
+.wp{max-width:720px;font-size:17px;line-height:1.6}
+.wp h1{font-weight:600;font-size:34px;line-height:1.2;margin:0 0 6px}
+.wp .date{color:var(--ink-soft);font-size:14px;margin:0 0 28px}
+.wp h2{font-size:20px;font-weight:600;margin:36px 0 8px}
+.wp p{margin:0 0 16px}
+.wp a{color:var(--accent)}
+.wp .dl{display:inline-block;margin:6px 0 4px;padding:10px 16px;border:1px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:600}
+.wp .dl:hover{background:var(--accent);color:var(--paper)}
+.wp .mono{font:14px/1.5 "IBM Plex Mono",ui-monospace,Menlo,monospace;overflow-wrap:anywhere}
+.wp .hash{padding:10px 12px;border:1px solid var(--rule);margin:6px 0}
+.wp button.chk{font:inherit;font-size:15px;background:none;border:1px solid var(--rule);color:var(--ink);padding:7px 12px;cursor:pointer}
+.wp #wp-chk{margin-left:10px;font-size:15px}
+.wp .ok{color:var(--up)}.wp .bad{color:var(--down)}
+.wp table{width:100%;border-collapse:collapse;font-size:15px;margin-top:6px}
+.wp th,.wp td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+.wp th{color:var(--ink-soft);font-weight:400;font-size:13px}
+.wp td.r{white-space:nowrap}
+.wp .soft{color:var(--ink-soft);font-size:15px}
+@media (max-width:560px){.wp h1{font-size:28px}.wp th:nth-child(3),.wp td:nth-child(3){display:none}}
 </style>
 </head>
 <body>
@@ -321,7 +341,7 @@ a{color:var(--accent)}
     <a href="#staking" data-tab="staking" id="tab-staking">Staking</a>
     <a href="#agents" data-tab="agents" id="tab-agents">For AI agents</a>
     <a href="#methodology" data-tab="methodology" id="tab-method">Methodology</a>
-    <a href="/whitepaper" id="tab-paper">White paper</a>
+    <a href="#paper" data-tab="paper" id="tab-paper">White paper</a>
   </nav>
 </div>
 
@@ -535,6 +555,27 @@ a{color:var(--accent)}
       </div>
       <p class="foot-note" id="t-sources"></p>
       <p class="foot-note" id="t-govern"></p>
+    </section>
+
+    <section id="paper-sec" data-tabpage="paper" lang="en">
+      <div class="wp">
+<h1>A Reference Rate for Bitcoin-Backed Credit</h1>
+<p class="date">The SBOR white paper, version 1 · Guy Zaniratto</p>
+
+<p>Credit is priced against reference rates. A dollar loan says "SOFR plus a spread," and anyone can check the first half. Loans against bitcoin are priced venue by venue, each at its own rate, so a borrower, a fund or an AI agent cannot tell how an offer compares with the market. This paper proposes a reference rate for bitcoin-backed credit: a daily fixing read directly from lending contract state, one borrow and one supply rate built from every eligible market, weighted by size, with every input shown, posted on-chain where contracts can read it, and never rewritten. It sets out what such a rate must be, how the Standard Bitcoin Offered Rate (SBOR) computes it, the rules learned by running it, and what becomes possible once lenders and borrowers use the same rate.</p>
+
+<a class="dl" id="wp-pdf" href="/SBOR_White_Paper_v1.pdf" download="SBOR_White_Paper_v1.pdf">Download the PDF</a>
+
+<h2>Stamped on-chain</h2>
+<p>The paper itself is not on-chain. Its fingerprint is. The SHA-256 below was posted on each chain listed, and each block's time is the date it was stamped. Any change to the PDF, even one character, gives a different hash. Later versions get their own stamp, and this one stays.</p>
+<div class="hash mono" id="wp-hash">Stamps are posted on publication day.</div>
+<p><button class="chk" id="wp-chkBtn" type="button">Check this PDF in your browser</button><span id="wp-chk"></span></p>
+<div id="wp-stamps"></div>
+
+<h2>Check it yourself</h2>
+<p class="soft">Download the PDF and run <span class="mono">shasum -a 256 SBOR_White_Paper_v1.pdf</span>. The result must equal the hash above and the hash in every transaction. On Stacks, the contract <span class="mono" id="wp-stx">sbor-whitepaper-v1</span> holds the hash as a constant anyone can read. On Bitcoin, the OP_RETURN reads "SBOR WP1 " followed by the hash. An <a href="/SBOR_White_Paper_v1.pdf.ots" id="ots">OpenTimestamps proof</a> anchors the same hash in Bitcoin a second way. The full record is in <a href="/whitepaper-stamps.json">whitepaper-stamps.json</a>.</p>
+
+      </div>
     </section>
 
     <section id="dev" data-tabpage="agents">
@@ -1661,7 +1702,7 @@ async function boot(){
    and the tabs only choose what is shown. The hiding rule applies only once
    tabs-ready is set, so if this ever failed the page would show everything
    rather than nothing, and readers that do not run scripts see it all. */
-const TABS = ["rates", "stacks", "staking", "agents", "methodology"];
+const TABS = ["rates", "stacks", "staking", "agents", "methodology", "paper"];
 function currentTab(){
   const h = decodeURIComponent(location.hash.slice(1));
   if (h === "method") return "methodology";   // the first name, kept working
@@ -1679,6 +1720,12 @@ function showTab(){
   document.querySelectorAll("[data-tabpage]").forEach(el => el.classList.toggle("tab-on", el.dataset.tabpage === tab));
   document.querySelectorAll("#tabs a").forEach(a => a.setAttribute("aria-current", a.dataset.tab === tab ? "page" : "false"));
   document.body.classList.add("tabs-ready");
+  /* On a phone the tab bar scrolls sideways: bring the open tab into view. */
+  const nav = document.getElementById("tabs"), on = nav && nav.querySelector('a[aria-current="page"]');
+  if (nav && on && nav.scrollWidth > nav.clientWidth) {
+    const l = on.offsetLeft - nav.offsetLeft, r = l + on.offsetWidth;
+    if (l < nav.scrollLeft || r > nav.scrollLeft + nav.clientWidth) nav.scrollLeft = Math.max(0, r - nav.clientWidth + 24);
+  }
 }
 window.addEventListener("hashchange", () => {
   showTab();
@@ -1686,6 +1733,43 @@ window.addEventListener("hashchange", () => {
 });
 showTab();
 boot();
+/* White paper tab: the stamp record and the in-browser hash check, as on sbor.xyz/whitepaper. */
+(function(){
+/* The record the stamping workflow commits. Until it exists, the page says
+   the stamps come on publication day and the check compares nothing. */
+var WP_REC = null;
+var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); };
+fetch("/whitepaper-stamps.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(rec){
+  if (!rec || !rec.paper) return;
+  WP_REC = rec;
+  document.getElementById("wp-hash").innerHTML = "sha256 " + esc(rec.paper.sha256);
+  if (rec.paper.file) document.getElementById("wp-pdf").href = "/" + encodeURI(rec.paper.file);
+  var st = (rec.stamps || []).find(function(s){ return s.chain === "Stacks" && s.contract; });
+  if (st) document.getElementById("wp-stx").textContent = st.contract;
+  var rows = (rec.stamps || []).map(function(s){
+    var when = s.at ? new Date(s.at).toISOString().slice(0, 16).replace("T", " ") + " UTC" : "awaiting confirmation";
+    return "<tr><td>" + esc(s.chain) + "</td><td>" + esc(when) + "</td><td>" + esc(s.kind) + "</td><td class=\"r\"><a href=\"" + esc(s.url) + "\" rel=\"noopener\">transaction</a></td></tr>";
+  }).join("");
+  if (rows) document.getElementById("wp-stamps").innerHTML = "<table><thead><tr><th>Chain</th><th>Stamped</th><th>How</th><th></th></tr></thead><tbody>" + rows + "</tbody></table>";
+}).catch(function(){});
+
+/* Hash the PDF this page links, here in the browser, and compare. */
+document.getElementById("wp-chkBtn").addEventListener("click", function(){
+  var out = document.getElementById("wp-chk");
+  if (!WP_REC){ out.textContent = "No stamp yet to compare with."; return; }
+  if (!(window.crypto && crypto.subtle)){ out.textContent = "This browser cannot hash files; use the command below."; return; }
+  out.textContent = "Checking...";
+  fetch(document.getElementById("wp-pdf").href, { cache: "no-store" })
+    .then(function(r){ return r.arrayBuffer(); })
+    .then(function(buf){ return crypto.subtle.digest("SHA-256", buf); })
+    .then(function(d){
+      var hex = Array.from(new Uint8Array(d)).map(function(x){ return x.toString(16).padStart(2, "0"); }).join("");
+      var same = hex === WP_REC.paper.sha256;
+      out.className = same ? "ok" : "bad";
+      out.textContent = same ? "Matches: this is the stamped paper." : "Does not match: sha256 " + hex;
+    }).catch(function(e){ out.className = "bad"; out.textContent = "Could not check: " + e.message; });
+});
+})();
 </script>
 </body>
 </html>
