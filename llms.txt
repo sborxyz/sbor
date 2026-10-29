@@ -176,6 +176,18 @@ statistic. Its purpose is to be referenced by other contracts, models, and
 agreements: a loan priced at SBOR plus a spread, a swap settled against it, or
 a risk model measuring whether a given rate is above or below market.
 
+## The white paper
+
+"A Reference Rate for Bitcoin-Backed Credit", v1, by Guy Zaniratto, published
+on October 25, 2026: why loans against bitcoin need a reference rate, what
+such a rate must be, and how SBOR computes it. Read it as a web page at
+https://sbor.xyz/paper.html (same text as the PDF). The stamped original is
+https://sbor.xyz/SBOR_White_Paper_v1.pdf, SHA-256
+eb87f320b33ff590a6bab498167ee2d192525f7c3edc28604a2af13a66cfe638, stamped on
+Arc, Base, Hyperliquid, Solana, Stacks and Bitcoin; the record is
+https://sbor.xyz/whitepaper-stamps.json. The paper is frozen: any change is a
+new version with its own stamp.
+
 ## Method
 
 Within a currency, the fixing is the depth-weighted average of borrow and

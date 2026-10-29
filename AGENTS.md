@@ -1,6 +1,6 @@
 # SBOR AGENTS.md
 
-*Created 24 September 2026. Last updated 9 October 2026.*
+*Created 24 September 2026. Last updated October 28, 2026 (the white paper).*
 
 > SBOR publishes benchmark lending rates for Bitcoin DeFi, read from lending contract state and published once a day: what it costs to borrow, and what supplying earns, in each currency on Stacks, and what it costs to borrow dollars against bitcoin. From the fixing of 14 October 2026 (methodology 1.13.0) the SBOR headline is `BTC-COLLATERAL-USD`, every dollar stablecoin lent against plain bitcoin, with a rate per stablecoin; before that date, `BTC-COLLATERAL-USDC`, from Morpho on Base, Ethereum and Arc. Each day's fixing is also posted on-chain, on Arc, Base, Hyperliquid, Solana and Stacks: contract addresses in [llms.txt](https://sbor.xyz/llms.txt). Free to use, including commercially.
 
@@ -30,6 +30,7 @@ The remote and local servers are built from the same code and give the same answ
 | Did a lending protocol change its own parameters? | [api/v1/changes.json](https://sbor.xyz/api/v1/changes.json) |
 | Where does supplying an asset at one venue pay more than borrowing it at another? | [api/v1/inversions.json](https://sbor.xyz/api/v1/inversions.json) and [api/v1/inversion-log.json](https://sbor.xyz/api/v1/inversion-log.json) |
 | How is it all calculated? | [llms.txt](https://sbor.xyz/llms.txt), or `get_methodology` |
+| Why a reference rate for bitcoin-backed credit, and how SBOR builds it? | the white paper, v1: read it as a web page at [sbor.xyz/paper.html](https://sbor.xyz/paper.html); the stamped original is [SBOR_White_Paper_v1.pdf](https://sbor.xyz/SBOR_White_Paper_v1.pdf), with its stamps in [whitepaper-stamps.json](https://sbor.xyz/whitepaper-stamps.json) |
 
 ## Rules for using the numbers
 
