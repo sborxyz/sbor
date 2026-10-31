@@ -1,8 +1,8 @@
 {
   "note": "Every fixing ever published, one file a day, complete and unabridged. To read a specific date, fetch /api/v1/archive/YYYY-MM-DD.json. These files are never rewritten. If one of them ever disagrees with the series in history.json, the archive is authoritative.",
   "first": "2026-09-03",
-  "last": "2026-10-30",
-  "count": 58,
+  "last": "2026-10-31",
+  "count": 59,
   "pattern": "/api/v1/archive/{date}.json",
   "dates": [
     "2026-09-03",
@@ -62,6 +62,7 @@
     "2026-10-27",
     "2026-10-28",
     "2026-10-29",
-    "2026-10-30"
+    "2026-10-30",
+    "2026-10-31"
   ]
 }
