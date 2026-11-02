@@ -1,7 +1,17 @@
 {
-  "fixing": "2026-11-01T08:30:57Z",
-  "comparedWith": "2026-10-31",
-  "top": null,
+  "fixing": "2026-11-02T08:31:09Z",
+  "comparedWith": "2026-11-01",
+  "top": {
+    "why": "SBOR-BTC supply moved -37 bps",
+    "chars": 138,
+    "text": "SBOR-BTC supply rate: 1.34% to 0.97%.\n\n-37 bps in a day.\n\nOne market behind it: Zest V2 sBTC, utilization 82.55%.\n\nsbor.xyz"
+  },
   "otherCount": 0,
-  "drafts": []
+  "drafts": [
+    {
+      "why": "SBOR-BTC supply moved -37 bps",
+      "chars": 138,
+      "text": "SBOR-BTC supply rate: 1.34% to 0.97%.\n\n-37 bps in a day.\n\nOne market behind it: Zest V2 sBTC, utilization 82.55%.\n\nsbor.xyz"
+    }
+  ]
 }
