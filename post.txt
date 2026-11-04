@@ -1,15 +1,15 @@
-SBOR post drafts, fixing 2026-11-03T08:30:50Z
-Compared with 2026-11-02
+SBOR post drafts, fixing 2026-11-04T08:31:01Z
+Compared with 2026-11-03
 
 1 thing worth saying. Pick one. Do not post more than one a day.
 
---- 1. Zest V2 STX utilization crossed above 80% (176 chars)
+--- 1. SBOR-STX supply moved +27 bps (145 chars)
 
-Zest V2 STX is now 80.82% utilized, up from 79.66%.
+SBOR-STX supply rate: 0.95% to 1.22%.
 
-Borrow 3.38%, supply 2.44%.
++27 bps in a day.
 
-Above 80% a lending market prices steeply and withdrawals get harder.
+Highest supply rate: Zest V2 STX at 3.28%, utilization 86.51%.
 
 sbor.xyz
 

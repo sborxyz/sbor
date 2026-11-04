@@ -1,17 +1,17 @@
 {
-  "fixing": "2026-11-03T08:30:50Z",
-  "comparedWith": "2026-11-02",
+  "fixing": "2026-11-04T08:31:01Z",
+  "comparedWith": "2026-11-03",
   "top": {
-    "why": "Zest V2 STX utilization crossed above 80%",
-    "chars": 176,
-    "text": "Zest V2 STX is now 80.82% utilized, up from 79.66%.\n\nBorrow 3.38%, supply 2.44%.\n\nAbove 80% a lending market prices steeply and withdrawals get harder.\n\nsbor.xyz"
+    "why": "SBOR-STX supply moved +27 bps",
+    "chars": 145,
+    "text": "SBOR-STX supply rate: 0.95% to 1.22%.\n\n+27 bps in a day.\n\nHighest supply rate: Zest V2 STX at 3.28%, utilization 86.51%.\n\nsbor.xyz"
   },
   "otherCount": 0,
   "drafts": [
     {
-      "why": "Zest V2 STX utilization crossed above 80%",
-      "chars": 176,
-      "text": "Zest V2 STX is now 80.82% utilized, up from 79.66%.\n\nBorrow 3.38%, supply 2.44%.\n\nAbove 80% a lending market prices steeply and withdrawals get harder.\n\nsbor.xyz"
+      "why": "SBOR-STX supply moved +27 bps",
+      "chars": 145,
+      "text": "SBOR-STX supply rate: 0.95% to 1.22%.\n\n+27 bps in a day.\n\nHighest supply rate: Zest V2 STX at 3.28%, utilization 86.51%.\n\nsbor.xyz"
     }
   ]
 }
