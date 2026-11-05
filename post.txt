@@ -1,15 +1,15 @@
-SBOR post drafts, fixing 2026-11-04T08:31:01Z
-Compared with 2026-11-03
+SBOR post drafts, fixing 2026-11-05T08:30:43Z
+Compared with 2026-11-04
 
 1 thing worth saying. Pick one. Do not post more than one a day.
 
---- 1. SBOR-STX supply moved +27 bps (145 chars)
+--- 1. SBOR-STX borrow moved +31 bps (145 chars)
 
-SBOR-STX supply rate: 0.95% to 1.22%.
+SBOR-STX borrow rate: 2.10% to 2.41%.
 
-+27 bps in a day.
++31 bps in a day.
 
-Highest supply rate: Zest V2 STX at 3.28%, utilization 86.51%.
+Lowest borrow rate: Zest V2 stSTX at 0.84%, utilization 5.17%.
 
 sbor.xyz
 
