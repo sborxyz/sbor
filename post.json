@@ -1,17 +1,17 @@
 {
-  "fixing": "2026-11-05T08:30:43Z",
-  "comparedWith": "2026-11-04",
+  "fixing": "2026-11-06T08:30:52Z",
+  "comparedWith": "2026-11-05",
   "top": {
-    "why": "SBOR-STX borrow moved +31 bps",
-    "chars": 145,
-    "text": "SBOR-STX borrow rate: 2.10% to 2.41%.\n\n+31 bps in a day.\n\nLowest borrow rate: Zest V2 stSTX at 0.84%, utilization 5.17%.\n\nsbor.xyz"
+    "why": "PoX cycle 145 to 146",
+    "chars": 143,
+    "text": "Reward cycle 146 settled.\n\n8.92 BTC paid to STX stackers, against 493,352,377 STX locked.\n\nSBOR-PoX: 13.45% to 11.47%.\n\nsbor.xyz"
   },
   "otherCount": 0,
   "drafts": [
     {
-      "why": "SBOR-STX borrow moved +31 bps",
-      "chars": 145,
-      "text": "SBOR-STX borrow rate: 2.10% to 2.41%.\n\n+31 bps in a day.\n\nLowest borrow rate: Zest V2 stSTX at 0.84%, utilization 5.17%.\n\nsbor.xyz"
+      "why": "PoX cycle 145 to 146",
+      "chars": 143,
+      "text": "Reward cycle 146 settled.\n\n8.92 BTC paid to STX stackers, against 493,352,377 STX locked.\n\nSBOR-PoX: 13.45% to 11.47%.\n\nsbor.xyz"
     }
   ]
 }
