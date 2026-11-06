@@ -59,6 +59,7 @@ How to call it:
 - HTTP: `GET https://sbor.xyz/api/v1/latest.json`, no key, CORS open
 - Plain text, today's fixing: https://sbor.xyz/latest.txt
 - The short version for agents: https://github.com/sborxyz/sbor/blob/main/AGENTS.md
+- What to build on SBOR, with the pieces to build with: https://github.com/sborxyz/sbor/blob/main/BUILD.md
 
 Four things to get right:
 
@@ -248,6 +249,17 @@ withheld index returns on its own once the market can be read. Methodology
 
 Moving averages: an average is published only once the full window exists. A
 200-day average appears on day 200, not before.
+
+Term averages: 30, 90 and 180 day compounded averages of the daily fixings,
+actual/365, the way SOFR's are built. Published for each Stacks index and, from
+6 November 2026, for the headline, BTC-COLLATERAL-USD, counted from its first
+fixing on 14 October 2026 (bitcoinCollateralUsd.termAverages; the 30 day
+average first appears with the fixing of 12 November 2026). Not for the rate per
+stablecoin: that answers what an offer costs today, while the headline is what a
+contract settles against. An average runs on through a methodology change, as
+SOFR's do: past fixings are never recomputed under new rules, and each average
+lists every methodology version inside its window in methodologyVersions. This
+is an addition to what is published, not a change to the fixing.
 
 Revisions: published fixings are never rewritten. Corrections appear as a new
 fixing with a note.

@@ -368,6 +368,15 @@ a{color:var(--accent)}
     <div class="sec-h"><div><h2 id="hd-sub-h"></h2></div><p id="hd-sub-p"></p></div>
     <div class="subcards" id="hd-subs"></div>
   </section>
+  <section id="hd-terms-sec" hidden>
+    <div class="sec-h"><div><h2 id="hd-terms-h"></h2><p id="hd-terms-p"></p></div></div>
+    <div class="tscroll">
+      <table class="terms">
+        <thead><tr id="hd-terms-head"></tr></thead>
+        <tbody id="hd-terms-body"></tbody>
+      </table>
+    </div>
+  </section>
   <section id="markets">
     <div class="sec-h"><div><h2 id="hd-mkt-h"></h2></div><p id="hd-mkt-p"></p></div>
     <p class="hdmeta" id="hd-meta"></p>
@@ -783,6 +792,8 @@ en:{
   hdBorrowK:"SBOR borrow, every dollar stablecoin", hdSupplyK:"SBOR supply",
   hdSofr:(s,b)=>`A dollar secured by US Treasuries costs ${s} today (SOFR). A dollar secured by bitcoin costs ${b}.`,
   hdWithheld:r=>`SBOR is not published in this fixing. ${r}`,
+  hdTermsH:"Term averages",
+  hdTermsP:"The headline over the last 30, 90 and 180 days, compounded daily, the way SOFR's averages are built, counted from its first fixing on 14 October 2026. For anything that settles over weeks or months, use an average rather than one day's rate. An average appears only once every day in its window has a fixing, and runs on through a methodology change: the data lists every version inside its window.",
   hdSubH:"By stablecoin", hdSubP:"The same bitcoin, borrowed in each dollar. A stablecoin gets its own rate once $25M or more of it carries weight.",
   hdSubSize:(dp,n)=>`${dp} supplied · ${n} ${n === 1 ? "market" : "markets"}`, hdNotPub:"not published today",
   hdMktH:"Every market behind the rate", hdMktP:"Only markets whose sole collateral is plain bitcoin, weighted by what is supplied. Markets added on 14 October 2026 reach full weight over 30 days.",
@@ -796,7 +807,7 @@ en:{
   hdStxP:"Borrow / supply. Granite's USDCx market on Stacks takes only sBTC as collateral, so it is also one of the markets behind the SBOR headline.",
   hdChainH:"Posted on-chain after every fixing", hdChainP:"Any contract on these chains can read the day's rate, with its date. Agents connect at mcp.sbor.xyz.",
   devMcpH:"As an MCP tool",
-  devRemote:`Or connect by address, with nothing to install: Claude on the web, ChatGPT, and any client that accepts a URL. No key and no sign-in. The short version for agents is <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>.`,
+  devRemote:`Or connect by address, with nothing to install: Claude on the web, ChatGPT, and any client that accepts a URL. No key and no sign-in. The short version for agents is <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>. Ideas for what to build on SBOR, free for commercial use: <a href="https://github.com/sborxyz/sbor/blob/main/BUILD.md" target="_blank" rel="noopener">BUILD.md</a>.`,
   govern:`Independent: no token, it never trades on its own rate, and who pays for a service never changes the number. Published fixings are never rewritten; corrections to published figures are listed in <a href="https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>. How SBOR measures up to the IOSCO Principles for Financial Benchmarks: <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" target="_blank" rel="noopener">self-assessment</a>.`,
   devMcpP:"Before your agent borrows, check the rate. If an offer is more than 50 basis points above the benchmark, stop and ask a human. Works in Claude Desktop, Cursor and any MCP client.",
   devH:"Use the data",
@@ -934,6 +945,8 @@ pt:{
   hdBorrowK:"SBOR tomador, toda stablecoin em dólar", hdSupplyK:"SBOR fornecedor",
   hdSofr:(s,b)=>`Um dólar garantido por títulos do Tesouro americano custa ${s} hoje (SOFR). Um dólar garantido por bitcoin custa ${b}.`,
   hdWithheld:r=>`O SBOR não foi publicado neste fixing. ${r}`,
+  hdTermsH:"Médias de prazo",
+  hdTermsP:"A taxa principal nos últimos 30, 90 e 180 dias, composta diariamente, como as médias do SOFR, contada a partir do seu primeiro fixing, em 14 de outubro de 2026. Para algo que liquida ao longo de semanas ou meses, use uma média, não a taxa de um dia. Uma média só aparece quando todos os dias da janela têm fixing, e continua através de uma mudança de metodologia: os dados listam cada versão dentro da janela.",
   hdSubH:"Por stablecoin", hdSubP:"O mesmo bitcoin, emprestado em cada dólar. Uma stablecoin ganha taxa própria quando US$ 25M ou mais dela passam a ter peso.",
   hdSubSize:(dp,n)=>`${dp} fornecidos · ${n} ${n === 1 ? "mercado" : "mercados"}`, hdNotPub:"não publicada hoje",
   hdMktH:"Todos os mercados por trás da taxa", hdMktP:"Só mercados cuja única garantia é bitcoin puro, ponderados pelo que está fornecido. Mercados incluídos em 14 de outubro de 2026 chegam ao peso cheio em 30 dias.",
@@ -947,7 +960,7 @@ pt:{
   hdStxP:"Tomador / fornecedor. O mercado de USDCx da Granite na Stacks aceita só sBTC como garantia, então também é um dos mercados por trás da taxa principal do SBOR.",
   hdChainH:"Publicado on-chain a cada fixing", hdChainP:"Qualquer contrato nessas redes pode ler a taxa do dia, com a data. Agentes se conectam em mcp.sbor.xyz.",
   devMcpH:"Como ferramenta MCP",
-  devRemote:`Ou conecte pelo endereço, sem instalar nada: Claude na web, ChatGPT e qualquer cliente que aceite um URL. Sem chave e sem login. A versão curta para agentes está em <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>.`,
+  devRemote:`Ou conecte pelo endereço, sem instalar nada: Claude na web, ChatGPT e qualquer cliente que aceite um URL. Sem chave e sem login. A versão curta para agentes está em <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>. Ideias do que construir sobre o SBOR, livre para uso comercial: <a href="https://github.com/sborxyz/sbor/blob/main/BUILD.md" target="_blank" rel="noopener">BUILD.md</a>.`,
   govern:`Independente: sem token, nunca opera com a própria taxa, e quem paga por um serviço nunca muda o número. Fixings publicados nunca são reescritos; as correções de valores publicados estão em <a href="https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>. Como o SBOR se compara aos Princípios da IOSCO para benchmarks financeiros: <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" target="_blank" rel="noopener">autoavaliação</a>.`,
   devMcpP:"Antes de o seu agente tomar um empréstimo, confira a taxa. Se uma oferta estiver mais de 50 pontos-base acima do benchmark, pare e pergunte a um humano. Funciona no Claude Desktop, no Cursor e em qualquer cliente MCP.",
   devH:"Use os dados",
@@ -1108,6 +1121,7 @@ function layout113(){
 
 function renderHead(){
   if (!HEAD) return;
+  renderHeadTerms();
   const t = T(), esc = x => String(x ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
   const pc = v => typeof v === "number" ? fmt(v) : "n/a";
   const day = new Date(fixingDate + "T00:00:00Z").toLocaleDateString(lang === "pt" ? "pt-BR" : "en-GB", { day:"numeric", month:"short", year:"numeric", timeZone:"UTC" });
@@ -1184,7 +1198,10 @@ function termFromDate(label, began, n){
   let start = began, prev = null;
   for (const r of rows){
     if (prev && day(prev) < r.date) start = r.date;          /* a missing day */
-    const ok = r[label] && !r[label].withdrawn && typeof r[label].borrow === "number";
+    /* The headline is stored in each history row as btcCollateralUsd. */
+    const ok = label === HEADLINE_LABEL
+      ? r.btcCollateralUsd && typeof r.btcCollateralUsd.b === "number"
+      : r[label] && !r[label].withdrawn && typeof r[label].borrow === "number";
     if (!ok) start = day(r.date);                             /* a withdrawn day */
     prev = r.date;
   }
@@ -1373,6 +1390,7 @@ function renderChrome(){
 }
 
 let TERM_DATA = {};   /* label -> { termAverages, seriesBegan } from latest.json */
+const HEADLINE_LABEL = "BTC-COLLATERAL-USD";
 
 /* PoX is charted on its own, never in the lending index chart, because a
    staking yield and a lending rate are different instruments. */
@@ -1521,6 +1539,43 @@ function drawPoxCycles(){
     + t.poxCycFormula.map(x => `<li>${x}</li>`).join("") + `</ol>` + worked);
 }
 
+/* One table row of averages for one series and side, as SOFR shows it: a
+   line for what borrowers pay and a line for what suppliers earn. Shared by
+   the Stacks indices' table and the headline's. */
+function termLine(label, side, first, t){
+  const d = TERM_DATA[label] || {};
+  const av = d.termAverages || {};
+  return `<tr${first ? ' class="tfirst"' : ""}><td><span class="venue">${first ? label : ""}</span><span class="asset">${side === "borrow" ? t.termBorrow : t.termSupply}</span></td>` +
+    [30,90,180].map(n => {
+      const v = av[`d${n}`];
+      if (v && typeof v[side] === "number")
+        return `<td class="r num" data-l="${t.termCol(n)}">${v[side].toFixed(2)}%</td>`;
+      const from = termFromDate(label, d.seriesBegan, n);
+      return `<td class="r pend" data-l="${t.termCol(n)}">${from ? t.termFrom(from) : t.termPending}</td>`;
+    }).join("") + `</tr>`;
+}
+
+/* The headline's term averages, on the Rates tab under the headline. Shown
+   once the fixing carries them. SOFR's averages sit beside them, as the
+   dollar rate the headline is modelled on. */
+function renderHeadTerms(){
+  const sec = document.getElementById("hd-terms-sec");
+  if (!sec) return;
+  if (!TERM_DATA[HEADLINE_LABEL]){ sec.hidden = true; return; }
+  const t = T();
+  sec.hidden = false;
+  set("hd-terms-h", t.hdTermsH); set("hd-terms-p", t.hdTermsP);
+  set("hd-terms-head", `<th></th>` + [30,90,180].map(d => `<th class="r">${t.termCol(d)}</th>`).join(""));
+  const sr = CONTEXT?.sofr;
+  const sofrRow = sr && (sr.average30day || sr.average90day || sr.average180day)
+    ? `<tr><td><span class="venue">SOFR</span><span class="asset">${t.termSofr}</span></td>` +
+      [sr.average30day, sr.average90day, sr.average180day].map((v,i) =>
+        `<td class="r num" data-l="${t.termCol([30,90,180][i])}">${typeof v === "number" ? v.toFixed(2)+"%" : "n/a"}</td>`).join("") +
+      `</tr>`
+    : "";
+  set("hd-terms-body", termLine(HEADLINE_LABEL, "borrow", true, t) + termLine(HEADLINE_LABEL, "supply", false, t) + sofrRow);
+}
+
 function renderTerms(){
   const t = T();
   const labels = Object.keys(INDICES).map(k => INDICES[k].label);
@@ -1537,21 +1592,9 @@ function renderTerms(){
         `<td class="r num" data-l="${t.termCol([30,90,180][i])}">${typeof v === "number" ? v.toFixed(2)+"%" : "n/a"}</td>`).join("") +
       `</tr>`
     : "";
-  set("termsBody", labels.map(label => {
-    const d = TERM_DATA[label] || {};
-    const av = d.termAverages || {};
-    /* One number per cell, as SOFR shows it: a line for what borrowers pay
-       and a line for what suppliers earn. */
-    const line = (side, first) => `<tr${first ? ' class="tfirst"' : ""}><td><span class="venue">${first ? label : ""}</span><span class="asset">${side === "borrow" ? t.termBorrow : t.termSupply}</span></td>` +
-      [30,90,180].map(n => {
-        const v = av[`d${n}`];
-        if (v && typeof v[side] === "number")
-          return `<td class="r num" data-l="${t.termCol(n)}">${v[side].toFixed(2)}%</td>`;
-        const from = termFromDate(label, d.seriesBegan, n);
-        return `<td class="r pend" data-l="${t.termCol(n)}">${from ? t.termFrom(from) : t.termPending}</td>`;
-      }).join("") + `</tr>`;
-    return line("borrow", true) + line("supply", false);
-  }).join("") + sofrRow);
+  set("termsBody", labels.map(label =>
+    termLine(label, "borrow", true, t) + termLine(label, "supply", false, t)
+  ).join("") + sofrRow);
 }
 
 function render(){
@@ -1770,6 +1813,9 @@ async function boot(){
     if (d.methodologyVersion) METHOD_VERSION = d.methodologyVersion;
     for (const [label, ix] of Object.entries(d.indices || {}))
       TERM_DATA[label] = { termAverages: ix.termAverages, seriesBegan: ix.seriesBegan };
+    /* The headline's averages, from its first fixing under 1.13.0. */
+    if (d.bitcoinCollateralUsd?.termAverages)
+      TERM_DATA[HEADLINE_LABEL] = { termAverages: d.bitcoinCollateralUsd.termAverages, seriesBegan: d.bitcoinCollateralUsd.seriesBegan };
   }catch(e){ console.warn("Live fixing unavailable, showing bundled snapshot.", e); }
   try{
     const v = await fetch("/api/v1/inversions.json", { cache:"no-store" });

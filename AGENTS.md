@@ -42,6 +42,10 @@ The remote and local servers are built from the same code and give the same answ
 6. **A dollar on Stacks is borrowed against crypto collateral, not only bitcoin.** Do not describe SBOR-USD as bitcoin-backed. The bitcoin-collateral rates (`BTC-COLLATERAL-USD` and the rate per stablecoin) are separate, from markets whose only collateral is plain bitcoin, and are never averaged with the Stacks indices.
 7. **Published fixings are never rewritten.** Corrections are listed in [CORRECTIONS.md](https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md).
 
+## Building on SBOR
+
+The data is free for commercial use under CC BY 4.0. Ideas and the pieces to build with: [BUILD.md](https://github.com/sborxyz/sbor/blob/main/BUILD.md).
+
 ## Governance
 
 - **Independent:** no token, it never trades on its own rate, and who pays for a service never changes the number.

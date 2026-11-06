@@ -133,6 +133,8 @@ No key and no sign-in. The remote server is built from the same code as the
 local one, so both give the same answers. Then call `compare_rate`. Setup for
 each client is in [mcp/](mcp/), and the short version for agents is
 [AGENTS.md](AGENTS.md).
+Ideas for what to build on SBOR, and the pieces to build with, are in
+[BUILD.md](BUILD.md).
 
 **Over plain HTTP**, no key, no registration, no fee, CORS open. Licensed
 CC BY 4.0, so you can build on it commercially without asking.
@@ -201,7 +203,10 @@ authoritative record.
 - **Fixings are never rewritten.** Corrections appear as a new fixing with a
   note, or as a visible withdrawal record.
 - **Term averages** over 30, 90 and 180 days are compounded, actual/365, and
-  publish only once the full window of fixings exists. They are the same three
+  publish only once the full window of fixings exists. They cover each Stacks
+  index and the headline, BTC-COLLATERAL-USD (from 12 November 2026 for its
+  30-day average), and run on through a methodology change, listing every
+  version inside the window. They are the same three
   windows the Federal Reserve Bank of New York publishes for SOFR, and the SOFR
   averages are shown beside them.
 - **Incentive campaigns are not part of any rate.** Temporary programs that pay

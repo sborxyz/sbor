@@ -292,8 +292,13 @@ let priorTerms = {};
 try {
   const pa = JSON.parse(readFileSync(`api/v1/archive/${prior?.date}.json`, "utf8"));
   for (const [l, x] of Object.entries(pa.indices || {})) priorTerms[l] = x.termAverages || {};
+  if (pa.bitcoinCollateralUsd) priorTerms["BTC-COLLATERAL-USD"] = pa.bitcoinCollateralUsd.termAverages || {};
 } catch {}
-for (const [label, ix] of Object.entries(latest.indices)){
+/* The Stacks indices, and the headline, which has its own averages from its
+   first fixing under 1.13.0. */
+const averaged = { ...latest.indices,
+  ...(latest.bitcoinCollateralUsd && { "BTC-COLLATERAL-USD": latest.bitcoinCollateralUsd }) };
+for (const [label, ix] of Object.entries(averaged)){
   for (const [k, v] of Object.entries(ix.termAverages || {})){
     if (!v || typeof v.borrow !== "number") continue;
     const days = k.replace("d", "");
