@@ -75,6 +75,7 @@ jobs:
             console.log("  depeg guard: " + hu.depegGuard + (hu.notRead ? "\n  not read: " + JSON.stringify(hu.notRead) : ""));
             const bu2 = d.bitcoinCollateralUsdc;
             console.log("  BTC-COLLATERAL-USDC: " + (bu2?.borrow != null ? "borrow " + bu2.borrow + "%, " + bu2.markets.length + " markets" : "WITHHELD " + (bu2?.withheld || "")));
+            console.log("  term averages: " + JSON.stringify(hu.termAverages ?? "NONE") + ", series began " + (hu.seriesBegan ?? "?"));
             console.log("\nLATEST.TXT\n" + require("fs").readFileSync("latest.txt", "utf8"));
           }
           const pv = d.methodologyPreview;
@@ -90,6 +91,7 @@ jobs:
           console.log("\nINDICES, each market and where its size came from");
           for (const [label, ix] of Object.entries(d.indices || {})){
             console.log("  " + label + ": borrow " + ix.borrow + "%  supply " + ix.supply + "%  " + ix.markets.length + " market(s)");
+            console.log("     term averages: " + JSON.stringify(ix.termAverages ?? "NONE"));
             for (const m of ix.markets) console.log("     " + (m.venue + " " + m.asset).padEnd(18) + "borrow " + String(m.borrow).padStart(5) + "%  depth $" + (m.depthUsd/1e6).toFixed(2) + "M  size from " + (m.depthSource || "?") + (m.depthCheck ? "  check $" + (m.depthCheck.depthUsd/1e6).toFixed(2) + "M " + m.depthCheck.source : "") + (m.stxPerStstx ? "  stSTX rate " + m.stxPerStstx : "") + "  weight " + m.weight);
           }
           for (const [label, w] of Object.entries(d.withheld || {})) console.log("  " + label + ": WITHHELD. " + w.reason);
