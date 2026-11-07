@@ -772,7 +772,7 @@ en:{
   poxCycVs:c=>`vs cycle ${c}`,
   poxCycLine:(c,btc,dBtc,stx,dStx,p)=>`Cycle ${c} paid ${btc} BTC to stakers, ${dBtc} on cycle ${p}, with ${stx} STX locked, ${dStx}.`,
   poxCycWord:v=>v.startsWith("-") ? `down ${v.slice(1)}` : `up ${v.replace("+","")}`,
-  poxCycNote:"From cycle 143, measured on the chain's exact cycle window with that cycle's own STX locked. BTC paid and STX locked are fixed for a cycle; the yield shown is the one published the day the cycle settled, since the daily figure after that moves with the BTC to STX rate. Earlier cycles were measured another way and are not shown.",
+  poxCycNote:"From cycle 143, measured on the chain's exact cycle window with that cycle's own STX locked. BTC paid and STX locked are fixed for a cycle; the yield shown is the one published the day the cycle settled, since the daily figure after that moves with the BTC to STX rate. Earlier cycles were measured another way and are not shown. Why other PoX figures can differ. SBOR-PoX divides all the bitcoin paid in a reward cycle by all the STX locked that cycle, values the STX at a short average of the STX to BTC rate, and compounds over the cycles in a year. A figure that counts only STX-only stackers, leaving out the Bitcoin Staking bonds' share of the payout, that annualizes without compounding, or that values STX at another rate or moment, will read differently. All of these are reasonable choices. SBOR publishes its inputs (bitcoin paid, STX locked, the rate used and the spot rate) so anyone can redo the sum their way.",
   poxCycNone:"No completed cycle in the record yet.",
   poxCycFormulaH:"How each number is calculated",
   poxCycFormula:[
@@ -925,7 +925,7 @@ pt:{
   poxCycVs:c=>`vs ciclo ${c}`,
   poxCycLine:(c,btc,dBtc,stx,dStx,p)=>`O ciclo ${c} pagou ${btc} BTC a stakers, ${dBtc} sobre o ciclo ${p}, com ${stx} STX travados, ${dStx}.`,
   poxCycWord:v=>v.startsWith("-") ? `queda de ${v.slice(1)}` : `alta de ${v.replace("+","")}`,
-  poxCycNote:"A partir do ciclo 143, medido na janela exata do ciclo na rede, com o STX travado daquele ciclo. BTC pago e STX travado são fixos em um ciclo; o rendimento mostrado é o publicado no dia em que o ciclo fechou, porque o número diário depois disso varia com a relação BTC para STX. Ciclos anteriores foram medidos de outra forma e não aparecem.",
+  poxCycNote:"A partir do ciclo 143, medido na janela exata do ciclo na rede, com o STX travado daquele ciclo. BTC pago e STX travado são fixos em um ciclo; o rendimento mostrado é o publicado no dia em que o ciclo fechou, porque o número diário depois disso varia com a relação BTC para STX. Ciclos anteriores foram medidos de outra forma e não aparecem. Por que outros números do PoX podem diferir. O SBOR-PoX divide todo o bitcoin pago em um ciclo de recompensa por todo o STX travado naquele ciclo, avalia o STX por uma média curta da relação STX para BTC e compõe ao longo dos ciclos de um ano. Um número que conta só quem faz staking apenas de STX, deixando de fora a parte do pagamento que vai para os bonds de Bitcoin Staking, que anualiza sem compor, ou que avalia o STX por outra cotação ou em outro momento, vai dar diferente. Todas essas escolhas são razoáveis. O SBOR publica seus dados de entrada (bitcoin pago, STX travado, a cotação usada e a cotação spot) para que qualquer um refaça a conta do seu jeito.",
   poxCycNone:"Ainda não há ciclo concluído no registro.",
   poxCycFormulaH:"Como cada número é calculado",
   poxCycFormula:[

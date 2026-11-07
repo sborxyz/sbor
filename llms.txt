@@ -393,6 +393,15 @@ and the spot midpoint (stxPerBtc) are published.
 Because it annualizes a single two week cycle, a change in one cycle's payout
 moves it considerably. Read the cycle number before comparing two fixings.
 
+Why other PoX figures can differ. SBOR-PoX divides all the bitcoin paid in a
+reward cycle by all the STX locked that cycle, values the STX at a short average
+of the STX to BTC rate, and compounds over the cycles in a year. A figure that
+counts only STX-only stackers, leaving out the Bitcoin Staking bonds' share of
+the payout, that annualizes without compounding, or that values STX at another
+rate or moment, will read differently. All of these are reasonable choices.
+SBOR publishes its inputs (bitcoin paid, STX locked, the rate used and the spot
+rate) so anyone can redo the sum their way.
+
 From the fixing of 25 September 2026 (measurement 2), each cycle is measured
 over the chain's own cycle boundaries and against that cycle's own STX locked.
 Before that, the window started 350 bitcoin blocks early and the STX locked was
