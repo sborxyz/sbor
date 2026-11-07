@@ -1,17 +1,17 @@
 {
-  "fixing": "2026-11-06T08:30:52Z",
-  "comparedWith": "2026-11-05",
+  "fixing": "2026-11-07T08:30:56Z",
+  "comparedWith": "2026-11-06",
   "top": {
-    "why": "PoX cycle 145 to 146",
-    "chars": 143,
-    "text": "Reward cycle 146 settled.\n\n8.92 BTC paid to STX stackers, against 493,352,377 STX locked.\n\nSBOR-PoX: 13.45% to 11.47%.\n\nsbor.xyz"
+    "why": "Granite USDCx utilization fell below 20%",
+    "chars": 134,
+    "text": "Granite USDCx: $5.0M supplied, now only 19.12% of it borrowed, down from 23.65%.\n\nBorrow 1.27%, supply 0.18%.\n\nsbor.xyz"
   },
   "otherCount": 0,
   "drafts": [
     {
-      "why": "PoX cycle 145 to 146",
-      "chars": 143,
-      "text": "Reward cycle 146 settled.\n\n8.92 BTC paid to STX stackers, against 493,352,377 STX locked.\n\nSBOR-PoX: 13.45% to 11.47%.\n\nsbor.xyz"
+      "why": "Granite USDCx utilization fell below 20%",
+      "chars": 134,
+      "text": "Granite USDCx: $5.0M supplied, now only 19.12% of it borrowed, down from 23.65%.\n\nBorrow 1.27%, supply 0.18%.\n\nsbor.xyz"
     }
   ]
 }

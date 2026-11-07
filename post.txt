@@ -1,15 +1,13 @@
-SBOR post drafts, fixing 2026-11-06T08:30:52Z
-Compared with 2026-11-05
+SBOR post drafts, fixing 2026-11-07T08:30:56Z
+Compared with 2026-11-06
 
 1 thing worth saying. Pick one. Do not post more than one a day.
 
---- 1. PoX cycle 145 to 146 (143 chars)
+--- 1. Granite USDCx utilization fell below 20% (134 chars)
 
-Reward cycle 146 settled.
+Granite USDCx: $5.0M supplied, now only 19.12% of it borrowed, down from 23.65%.
 
-8.92 BTC paid to STX stackers, against 493,352,377 STX locked.
-
-SBOR-PoX: 13.45% to 11.47%.
+Borrow 1.27%, supply 0.18%.
 
 sbor.xyz
 
