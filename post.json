@@ -1,17 +1,7 @@
 {
-  "fixing": "2026-11-07T08:30:56Z",
-  "comparedWith": "2026-11-06",
-  "top": {
-    "why": "Granite USDCx utilization fell below 20%",
-    "chars": 134,
-    "text": "Granite USDCx: $5.0M supplied, now only 19.12% of it borrowed, down from 23.65%.\n\nBorrow 1.27%, supply 0.18%.\n\nsbor.xyz"
-  },
+  "fixing": "2026-11-08T08:31:01Z",
+  "comparedWith": "2026-11-07",
+  "top": null,
   "otherCount": 0,
-  "drafts": [
-    {
-      "why": "Granite USDCx utilization fell below 20%",
-      "chars": 134,
-      "text": "Granite USDCx: $5.0M supplied, now only 19.12% of it borrowed, down from 23.65%.\n\nBorrow 1.27%, supply 0.18%.\n\nsbor.xyz"
-    }
-  ]
+  "drafts": []
 }
