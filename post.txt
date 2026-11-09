@@ -1,10 +1,16 @@
-SBOR post drafts, fixing 2026-11-08T08:31:01Z
-Compared with 2026-11-07
+SBOR post drafts, fixing 2026-11-09T08:30:43Z
+Compared with 2026-11-08
 
-Nothing moved enough to be worth posting.
+1 thing worth saying. Pick one. Do not post more than one a day.
 
-Thresholds: a rate moving 25 bps, the staking yield moving 50 bps or
-changing cycle, an index appearing or dropping out, utilization
-crossing 80% or 20% in either direction, an inversion, or a term
-average publishing. A level that has not moved since yesterday is
-not news and is deliberately not flagged.
+--- 1. INVERSION on USDCx: supply Zest V2 1.28% vs borrow Granite 1.27% (188 chars)
+
+USDCx is inverted across venues.
+
+Supplying at Zest V2 pays 1.28%. Borrowing the same asset at Granite costs 1.27%.
+
++1 bps, before fees, gas and liquidation risk.
+
+sbor.xyz
+
+Check the numbers against the site before posting. Never state a cause.
