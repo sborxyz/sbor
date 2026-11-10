@@ -1,11 +1,23 @@
 {
   "schema": "sbor.v1",
-  "checked": "2026-11-09T22:39:18Z",
-  "basedOnFixing": "2026-11-09T08:30:43Z",
+  "checked": "2026-11-10T07:41:13Z",
+  "basedOnFixing": "2026-11-10T00:28:24Z",
   "status": "live",
-  "basedOnFixingAgeHours": 14.1,
+  "basedOnFixingAgeHours": 7.2,
   "statusNote": "Live. Detections are published the moment they are found, to everyone at once.",
   "minimumEdgeBps": 10,
   "note": "An inversion is the same asset costing less to borrow at one venue than it pays to supply at another. Rates are compared as published by SBOR, before fees, gas, liquidation risk and any minimum position size. SBOR does not trade on its own rate and does not represent that any inversion is executable.",
-  "inversions": []
+  "inversions": [
+    {
+      "asset": "USDCx",
+      "index": "SBOR-USD",
+      "borrowVenue": "Granite",
+      "borrowRate": 1.27,
+      "borrowUtilization": 19.03,
+      "supplyVenue": "Zest V2",
+      "supplyRate": 1.38,
+      "supplyUtilization": 76.57,
+      "edgeBps": 11
+    }
+  ]
 }
