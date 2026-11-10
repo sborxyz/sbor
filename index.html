@@ -374,6 +374,7 @@ a{color:var(--accent)}
   <section id="hd-chart-sec" hidden>
     <div class="sec-h"><div><h2 id="hd-chart-h"></h2><p id="hd-chart-p"></p></div></div>
     <svg class="chart" id="hdChart" viewBox="0 0 1120 280" preserveAspectRatio="none" role="img" aria-label="SBOR and SOFR over time"></svg>
+    <p class="coverage" id="hd-chart-note" style="margin:12px 0 0"></p>
     <div class="legend" id="hd-chart-legend"></div>
   </section>
   <section id="hd-terms-sec" hidden>
@@ -804,6 +805,7 @@ en:{
   hdChartH:"SBOR and SOFR over time",
   hdChartP:"The headline every day since its first fixing on 14 October 2026. SOFR, what a dollar costs against US Treasuries, is shown beside it for scale. It is never part of SBOR.",
   hdChartLegend:["SBOR borrow","SBOR supply","SOFR"],
+  hdChartNote:(s,b)=>`Over this period SOFR moved ${s} points and SBOR borrow moved ${b} points.`,
   hdTermsH:"Term averages",
   hdTermsP:"The headline over the last 30, 90 and 180 days, compounded daily, the way SOFR's averages are built, counted from its first fixing on 14 October 2026. For anything that settles over weeks or months, use an average rather than one day's rate. An average appears only once every day in its window has a fixing, and runs on through a methodology change: the data lists every version inside its window.",
   hdSubH:"By stablecoin", hdSubP:"The same bitcoin, borrowed in each dollar. A stablecoin gets its own rate once $25M or more of it carries weight.",
@@ -961,6 +963,7 @@ pt:{
   hdChartH:"SBOR e SOFR ao longo do tempo",
   hdChartP:"A taxa principal a cada dia desde o seu primeiro fixing, em 14 de outubro de 2026. O SOFR, o custo de um dólar garantido por títulos do Tesouro americano, aparece ao lado como escala. Ele nunca faz parte do SBOR.",
   hdChartLegend:["SBOR tomador","SBOR fornecedor","SOFR"],
+  hdChartNote:(s,b)=>`Neste período o SOFR variou ${s} ponto e o SBOR tomador variou ${b} pontos.`,
   hdTermsH:"Médias de prazo",
   hdTermsP:"A taxa principal nos últimos 30, 90 e 180 dias, composta diariamente, como as médias do SOFR, contada a partir do seu primeiro fixing, em 14 de outubro de 2026. Para algo que liquida ao longo de semanas ou meses, use uma média, não a taxa de um dia. Uma média só aparece quando todos os dias da janela têm fixing, e continua através de uma mudança de metodologia: os dados listam cada versão dentro da janela.",
   hdSubH:"Por stablecoin", hdSubP:"O mesmo bitcoin, emprestado em cada dólar. Uma stablecoin ganha taxa própria quando US$ 25M ou mais dela passam a ter peso.",
@@ -1601,7 +1604,7 @@ function drawHeadChart(){
   const t = T();
   sec.hidden = false;
   set("hd-chart-h", t.hdChartH); set("hd-chart-p", t.hdChartP);
-  const W=1120,H=280,PL=58,PR=14,PT=18,PB=26;
+  const W=1120,H=280,PL=58,PR=64,PT=18,PB=26;
   const b = rows.map(r => r.borrow), sp = rows.map(r => r.supply), so = rows.map(r => r.sofr);
   const vals = [...b, ...sp, ...so].filter(v => v != null);
   const span = (Math.max(...vals)-Math.min(...vals)) || 1;
@@ -1620,14 +1623,24 @@ function drawHeadChart(){
   }
   g += `<text x="${PL}" y="${H-8}" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${rows[0].date}</text>`;
   g += `<text x="${W-PR}" y="${H-8}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${rows[rows.length-1].date}</text>`;
-  g += `<path d="${path(so)}" fill="none" style="stroke:var(--down)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  g += `<path d="${path(so)}" fill="none" style="stroke:var(--up)" stroke-width="1.5"/>`;
   g += `<path d="${path(sp)}" fill="none" style="stroke:var(--ink-soft)" stroke-width="1.5"/>`;
   g += `<path d="${path(b)}" fill="none" style="stroke:var(--accent)" stroke-width="2"/>`;
+  /* Each line's latest value at its right end, so SOFR reads as a rate of
+     its own and not as a baseline. Labels are nudged apart if they touch. */
+  const lastOf = arr => { for (let i = arr.length - 1; i >= 0; i--) if (arr[i] != null) return arr[i]; return null; };
+  const ends = [[lastOf(b), "var(--accent)"], [lastOf(sp), "var(--ink-soft)"], [lastOf(so), "var(--up)"]]
+    .filter(([v]) => v != null).map(([v, c]) => ({ v, c, yy: y(v) + 4 })).sort((a, z) => a.yy - z.yy);
+  for (let i = 1; i < ends.length; i++) if (ends[i].yy - ends[i-1].yy < 13) ends[i].yy = ends[i-1].yy + 13;
+  for (const e of ends)
+    g += `<text x="${W-PR+6}" y="${e.yy.toFixed(1)}" font-family="IBM Plex Mono" font-size="11" style="fill:${e.c}">${e.v.toFixed(2)}%</text>`;
   document.getElementById("hdChart").innerHTML = g;
+  const rng = arr => { const v = arr.filter(x => x != null); return v.length ? (Math.max(...v) - Math.min(...v)).toFixed(2) : "n/a"; };
+  set("hd-chart-note", t.hdChartNote(rng(so), rng(b)));
   set("hd-chart-legend", [
     `<span><i class="swatch" style="background:var(--accent)"></i>${t.hdChartLegend[0]}</span>`,
     `<span><i class="swatch" style="background:var(--ink-soft)"></i>${t.hdChartLegend[1]}</span>`,
-    `<span><i class="swatch" style="background:var(--down)"></i>${t.hdChartLegend[2]}</span>`].join(""));
+    `<span><i class="swatch" style="background:var(--up)"></i>${t.hdChartLegend[2]}</span>`].join(""));
 }
 
 /* The headline's term averages, on the Rates tab under the headline. Shown
