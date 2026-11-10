@@ -47,7 +47,15 @@ jobs:
           LAST=$(node -e 'try{console.log(JSON.parse(require("fs").readFileSync("api/v1/latest.json","utf8")).fixing.slice(0,10))}catch(e){console.log("")}')
           SCHEDULED=false
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.trigger }}" = "scheduled" ]; then SCHEDULED=true; fi
-          if [ "$SCHEDULED" = "true" ] && [ "$LAST" = "$TODAY" ]; then
+          # A backup that GitHub delays past midnight UTC must never fix the
+          # next day early: on 10 November 2026 one did, at 00:28 UTC. So a
+          # scheduled run before 08:00 UTC always stops. A run by hand still
+          # proceeds at any hour.
+          HOUR=$(date -u +%H)
+          if [ "$SCHEDULED" = "true" ] && [ "$((10#$HOUR))" -lt 8 ]; then
+            echo "Too early ($HOUR:00 UTC). A scheduled fixing never runs before 08:00 UTC."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          elif [ "$SCHEDULED" = "true" ] && [ "$LAST" = "$TODAY" ]; then
             echo "Today was already fixed ($LAST). This backup attempt is not needed."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
