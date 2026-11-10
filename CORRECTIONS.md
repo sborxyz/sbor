@@ -1,10 +1,20 @@
 # SBOR corrections
 
-*Created 24 September 2026. Last updated 20 October 2026.*
+*Created 24 September 2026. Last updated November 10, 2026.*
 
 SBOR never rewrites a published fixing. When a published figure turns out to be wrong, the record keeps what was published, and this page says what was wrong, when it was found, and what changed. It lists corrections to published figures only; fixes to the site and documentation are visible in the repository's public history.
 
 Newest first.
+
+---
+
+### November 10, 2026: the day's fixing taken at 00:28 UTC instead of 08:30
+
+**What was wrong.** SBOR fixes once a day at 08:30 UTC. GitHub, where the fixing runs, sometimes drops or delays scheduled runs, so backup runs follow later in the day, and the first successful fixing of a day is final. On November 9, GitHub delayed one of those backups by more than seven hours. It started at 00:27 UTC on November 10, found no fixing yet for that date, and took the November 10 fixing at 00:28 UTC, eight hours early.
+
+**The effect.** The fixing of November 10 was read from the lending contracts at 00:28 UTC rather than 08:30 UTC. Every rate in it is a real reading of contract state at that moment; nothing was estimated. It was published and posted on-chain as usual. A published fixing is never rewritten, so it stands as published.
+
+**What changed.** From November 10, a scheduled run that starts before 08:00 UTC stops without fixing. The 08:30 UTC fixing and the later backups are unchanged.
 
 ---
 
