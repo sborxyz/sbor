@@ -391,6 +391,7 @@ a{color:var(--accent)}
       <table>
         <thead><tr id="hd-thead"></tr></thead>
         <tbody id="hd-rows"></tbody>
+        <tfoot id="hd-total"></tfoot>
       </table>
     </div>
     <p class="hdmeta" id="hd-mkt-note" style="margin-top:14px"></p>
@@ -795,7 +796,7 @@ en:{
   tabRates:"Rates", tabStaking:"Staking", tabAgents:"For AI agents", tabMethod:"Methodology", tabStacks:"Stacks",
   noticeLive:'<strong>Methodology 1.13.0 took effect on 14 October 2026.</strong> SBOR\'s headline now covers every dollar stablecoin lent against plain bitcoin, on the Rates tab. The Stacks indices below do not change. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Read the notice</a>.',
   hdH:"What it costs to borrow dollars against bitcoin.",
-  hdStamp:(d,n,c,dp)=>`Fixing of <span class="num">${d}</span>, 08:30 UTC · read from contract state: ${n} markets on ${c} chains · <span class="num">${dp}</span> supplied`,
+  hdStamp:(d,n,c,dp)=>`Fixing of <span class="num">${d}</span>, 08:30 UTC · Sourced from ${n} markets on ${c} chains · <span class="num">${dp}</span> supplied`,
   hdBorrowK:"Borrow rate · all dollar stablecoins", hdSupplyK:"Supply rate",
   hdSofr:(s,b)=>`A dollar secured by US Treasuries costs ${s} today (SOFR). A dollar secured by bitcoin costs ${b}.`,
   hdWithheld:r=>`SBOR is not published in this fixing. ${r}`,
@@ -811,6 +812,7 @@ en:{
   hdCols:["Market","Chain","Borrow","Supply","Utilization","Supplied","Weight"],
   hdMktNote:"Borrow is what borrowers pay. Supply is what lenders earn. Utilization is how much of the lenders' money is borrowed right now. When utilization rises, both rates rise, and that's why each market's rate is where it is.",
   hdPhasing:p=>`phasing in, ${p}`, hdFlags:{ lenderIncentive:"lender rewards", synthetic:"synthetic dollar" },
+  hdTotal:n=>`Total, all ${n} markets`,
   hdMore:n=>`Show all ${n} markets`, hdLess:"Show fewer",
   hdStxH:"On Bitcoin's own layers", hdStxLink:"SBOR Stacks, all three indices",
   hdStxSub:{ "SBOR-USD":"Dollars on Stacks, any crypto collateral", "SBOR-BTC":"sBTC on Stacks", "SBOR-STX":"STX on Stacks" },
@@ -951,7 +953,7 @@ pt:{
   tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes de IA", tabMethod:"Metodologia", tabStacks:"Stacks",
   noticeLive:'<strong>A metodologia 1.13.0 entrou em vigor em 14 de outubro de 2026.</strong> A taxa principal do SBOR agora cobre toda stablecoin em dólar emprestada contra bitcoin puro, na aba Taxas. Os índices da Stacks abaixo não mudam. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Leia o aviso</a>.',
   hdH:"Quanto custa tomar dólares emprestados com bitcoin como garantia.",
-  hdStamp:(d,n,c,dp)=>`Fixing de <span class="num">${d}</span>, 08:30 UTC · lido do estado dos contratos: ${n} mercados em ${c} redes · <span class="num">${dp}</span> fornecidos`,
+  hdStamp:(d,n,c,dp)=>`Fixing de <span class="num">${d}</span>, 08:30 UTC · Origem: ${n} mercados em ${c} redes · <span class="num">${dp}</span> fornecidos`,
   hdBorrowK:"Taxa do tomador · todas as stablecoins em dólar", hdSupplyK:"Taxa do fornecedor",
   hdSofr:(s,b)=>`Um dólar garantido por títulos do Tesouro americano custa ${s} hoje (SOFR). Um dólar garantido por bitcoin custa ${b}.`,
   hdWithheld:r=>`O SBOR não foi publicado neste fixing. ${r}`,
@@ -967,6 +969,7 @@ pt:{
   hdCols:["Mercado","Rede","Tomador","Credor","Utilização","Fornecido","Peso"],
   hdMktNote:"Tomador é o que quem toma emprestado paga. Credor é o que quem empresta recebe. Utilização é quanto do dinheiro dos credores está emprestado agora. Quando a utilização sobe, as duas taxas sobem, e é por isso que cada mercado tem a taxa que tem.",
   hdPhasing:p=>`entrando aos poucos, ${p}`, hdFlags:{ lenderIncentive:"recompensa ao fornecedor", synthetic:"dólar sintético" },
+  hdTotal:n=>`Total, todos os ${n} mercados`,
   hdMore:n=>`Mostrar os ${n} mercados`, hdLess:"Mostrar menos",
   hdStxH:"Nas camadas do próprio Bitcoin", hdStxLink:"SBOR Stacks, os três índices",
   hdStxSub:{ "SBOR-USD":"Dólares na Stacks, qualquer garantia cripto", "SBOR-BTC":"sBTC na Stacks", "SBOR-STX":"STX na Stacks" },
@@ -1178,6 +1181,12 @@ function renderHead(){
       <td class="r num" data-l="${c[5]}">${depth(m.depthUsd || 0)}</td>
       <td class="r num" data-l="${c[6]}">${((m.weight || 0) * 100).toFixed(1)}%</td></tr>`;
   }).join(""));
+  /* The total of every market, shown or not, so the supplied figure at the
+     top of the page matches a number in the table. */
+  const wsum = ms.reduce((a, m) => a + (m.weight || 0), 0);
+  set("hd-total", `<tr class="tfirst"><td><span class="venue">${t.hdTotal(ms.length)}</span></td><td></td><td></td><td></td><td></td>
+      <td class="r num" data-l="${c[5]}"><strong>${depth(HEAD.depthUsd || 0)}</strong></td>
+      <td class="r num" data-l="${c[6]}">${(wsum * 100).toFixed(0)}%</td></tr>`);
   const more = document.getElementById("hd-more");
   more.hidden = ms.length <= 8;
   more.textContent = HEAD_ALL ? t.hdLess : t.hdMore(ms.length);
