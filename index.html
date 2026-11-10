@@ -809,7 +809,7 @@ en:{
   hdSubH:"By stablecoin", hdSubP:"The same bitcoin, borrowed in each dollar. A stablecoin gets its own rate once $25M or more of it carries weight.",
   hdSubSize:(dp,n)=>`${dp} supplied · ${n} ${n === 1 ? "market" : "markets"}`, hdNotPub:"not published today",
   hdMktH:"Every market behind the rate", hdMktP:"Only markets whose sole collateral is plain bitcoin, weighted by what is supplied. Markets added on 14 October 2026 reach full weight over 30 days.",
-  hdMeta:(v,c,w,all)=>`Read from ${all} chains · ${c} of them carry weight today, across ${v} ${v === 1 ? "venue" : "venues"} · largest market ${w} of the weight`,
+  hdMeta:(m,w)=>`One market, ${m}, makes up ${w} of today's rate.`,
   hdCols:["Market","Chain","Borrow","Supply","Utilization","Supplied","Weight"],
   hdMktNote:"Borrow is what borrowers pay. Supply is what lenders earn. Utilization is how much of the lenders' money is borrowed right now. When utilization rises, both rates rise, and that's why each market's rate is where it is.",
   hdPhasing:p=>`phasing in, ${p}`, hdFlags:{ lenderIncentive:"lender rewards", synthetic:"synthetic dollar" },
@@ -966,7 +966,7 @@ pt:{
   hdSubH:"Por stablecoin", hdSubP:"O mesmo bitcoin, emprestado em cada dólar. Uma stablecoin ganha taxa própria quando US$ 25M ou mais dela passam a ter peso.",
   hdSubSize:(dp,n)=>`${dp} fornecidos · ${n} ${n === 1 ? "mercado" : "mercados"}`, hdNotPub:"não publicada hoje",
   hdMktH:"Todos os mercados por trás da taxa", hdMktP:"Só mercados cuja única garantia é bitcoin puro, ponderados pelo que está fornecido. Mercados incluídos em 14 de outubro de 2026 chegam ao peso cheio em 30 dias.",
-  hdMeta:(v,c,w,all)=>`Lido de ${all} redes · ${c} delas têm peso hoje, em ${v} ${v === 1 ? "plataforma" : "plataformas"} · o maior mercado tem ${w} do peso`,
+  hdMeta:(m,w)=>`Um mercado, ${m}, responde por ${w} da taxa de hoje.`,
   hdCols:["Mercado","Rede","Tomador","Credor","Utilização","Fornecido","Peso"],
   hdMktNote:"Tomador é o que quem toma emprestado paga. Credor é o que quem empresta recebe. Utilização é quanto do dinheiro dos credores está emprestado agora. Quando a utilização sobe, as duas taxas sobem, e é por isso que cada mercado tem a taxa que tem.",
   hdPhasing:p=>`entrando aos poucos, ${p}`, hdFlags:{ lenderIncentive:"recompensa ao fornecedor", synthetic:"dólar sintético" },
@@ -1163,8 +1163,10 @@ function renderHead(){
     <div class="sz">${typeof v.borrow === "number" ? t.hdSubSize(depth(v.depthUsd || 0), HEAD.markets.filter(m => m.group === code.replace("BTC-COLLATERAL-", "")).length || v.markets) : esc(v.withheld || "")}</div></div>`).join(""));
 
   set("hd-mkt-h", t.hdMktH); set("hd-mkt-p", t.hdMktP); set("hd-mkt-note", t.hdMktNote);
-  if (typeof HEAD.largestConstituentWeight === "number")
-    set("hd-meta", t.hdMeta(HEAD.venues, HEAD.chains, (HEAD.largestConstituentWeight * 100).toFixed(1) + "%", new Set(HEAD.markets.map(m => m.chain)).size));
+  /* The one market that makes up most of the rate, named, with its share. */
+  const top = [...HEAD.markets].sort((a, b) => (b.weight || 0) - (a.weight || 0))[0];
+  if (top && typeof top.weight === "number")
+    set("hd-meta", esc(t.hdMeta(`${top.collateral}/${top.loan} ${lang === "pt" ? "na" : "on"} ${top.chain}`, (top.weight * 100).toFixed(1) + "%")));
   const c = t.hdCols;
   set("hd-thead", `<th>${c[0]}</th><th>${c[1]}</th><th class="r">${c[2]}</th><th class="r">${c[3]}</th><th class="r">${c[4]}</th><th class="r">${c[5]}</th><th class="r">${c[6]}</th>`);
   const ms = [...HEAD.markets].sort((a, b) => (b.weight || 0) - (a.weight || 0) || (b.depthUsd || 0) - (a.depthUsd || 0));
