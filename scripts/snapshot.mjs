@@ -34,7 +34,7 @@ export function snapshotText(d){
   /* Methodology 1.13.0, from 14 October 2026: the headline first. */
   if (head){
     parts.push(pct(head.borrow)
-      ? `SBOR, dollars borrowed against bitcoin (BTC-COLLATERAL-USD): borrow ${pct(head.borrow)}, supply ${pct(head.supply)}, across ${usd(head.depthUsd)} on ${head.chains} chains.`
+      ? `SBOR, dollars borrowed against bitcoin (BTC-COLLATERAL-USD): borrow ${pct(head.borrow)}, supply ${pct(head.supply)}, read from ${head.markets.length} markets on ${new Set(head.markets.map(m => m.chain)).size} chains, ${usd(head.depthUsd)} supplied.`
       : `SBOR (BTC-COLLATERAL-USD): not published in this fixing.`);
     if (ref && pct(ref.borrow)) parts.push(`BTC-COLLATERAL-USDC: borrow ${pct(ref.borrow)}.`);
     parts.push("SBOR Stacks:");

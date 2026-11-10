@@ -167,6 +167,8 @@ a.venue:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .bar.phase i{background:repeating-linear-gradient(45deg,var(--accent) 0 3px,transparent 3px 6px)}
 .terms td,.terms th{white-space:nowrap}
 .terms .pend{color:var(--ink-soft)}
+.terms .pend .dash{display:block;font-family:"IBM Plex Mono",monospace}
+.terms .pend .avail{display:block;font-size:12.5px}
 .invbox{border:1px solid var(--rule);border-left:2px solid var(--down);padding:16px 18px;margin-bottom:8px;font-size:15px}
 .invnone{color:var(--ink-soft);font-size:15px}
 .sofrbox{border:1px solid var(--rule);padding:22px 24px 20px;margin-bottom:20px;
@@ -368,6 +370,11 @@ a{color:var(--accent)}
     <div class="sec-h"><div><h2 id="hd-sub-h"></h2></div><p id="hd-sub-p"></p></div>
     <div class="subcards" id="hd-subs"></div>
   </section>
+  <section id="hd-chart-sec" hidden>
+    <div class="sec-h"><div><h2 id="hd-chart-h"></h2><p id="hd-chart-p"></p></div></div>
+    <svg class="chart" id="hdChart" viewBox="0 0 1120 280" preserveAspectRatio="none" role="img" aria-label="SBOR and SOFR over time"></svg>
+    <div class="legend" id="hd-chart-legend"></div>
+  </section>
   <section id="hd-terms-sec" hidden>
     <div class="sec-h"><div><h2 id="hd-terms-h"></h2><p id="hd-terms-p"></p></div></div>
     <div class="tscroll">
@@ -407,7 +414,7 @@ a{color:var(--accent)}
   <div class="wrap intro-in">
     <h2 id="t-introH"></h2>
     <p id="t-introP"></p>
-    <p class="snapshot" id="snapshot"><!-- snapshot:start -->SBOR fixing of 9 November 2026, 08:30 UTC. SBOR, dollars borrowed against bitcoin (BTC-COLLATERAL-USD): borrow 5.43%, supply 4.83%, across $3.1B on 5 chains. BTC-COLLATERAL-USDC: borrow 5.87%. SBOR Stacks: SBOR-USD: borrow 2.74%, supply 0.89%. SBOR-BTC: borrow 1.33%, supply 0.98%. SBOR-STX: borrow 2.69%, supply 1.78%. Effective annual rates, read from lending contract state. Plain text: <a href="/latest.txt">latest.txt</a>. Data: <a href="/api/v1/latest.json">latest.json</a>.<!-- snapshot:end --></p>
+    <p class="snapshot" id="snapshot"><!-- snapshot:start -->SBOR fixing of 9 November 2026, 08:30 UTC. SBOR, dollars borrowed against bitcoin (BTC-COLLATERAL-USD): borrow 5.43%, supply 4.83%, read from 19 markets on 6 chains, $3.1B supplied. BTC-COLLATERAL-USDC: borrow 5.87%. SBOR Stacks: SBOR-USD: borrow 2.74%, supply 0.89%. SBOR-BTC: borrow 1.33%, supply 0.98%. SBOR-STX: borrow 2.69%, supply 1.78%. Effective annual rates, read from lending contract state. Plain text: <a href="/latest.txt">latest.txt</a>. Data: <a href="/api/v1/latest.json">latest.json</a>.<!-- snapshot:end --></p>
     <p id="t-introUse"></p>
     <p class="sofrtop" id="notice" style="grid-column:1 / -1;margin-top:10px"></p>
   </div>
@@ -751,7 +758,7 @@ en:{
   themeToDark:"Switch to dark theme", themeToLight:"Switch to light theme",
   termBorrow:"borrow, what borrowers pay", termSupply:"supply, what suppliers earn",
   termCol:d=>`${d}-day`,
-  termFrom:d=>`from ${d}`,
+  termFrom:d=>`<span class="dash">–</span><span class="avail">available ${d}</span>`,
   termPending:"not yet",
   termSofr:"one rate: in a repo, borrower and lender get the same",
   deltaBorrow:"", deltaSupply:"",
@@ -788,16 +795,19 @@ en:{
   tabRates:"Rates", tabStaking:"Staking", tabAgents:"For AI agents", tabMethod:"Methodology", tabStacks:"Stacks",
   noticeLive:'<strong>Methodology 1.13.0 took effect on 14 October 2026.</strong> SBOR\'s headline now covers every dollar stablecoin lent against plain bitcoin, on the Rates tab. The Stacks indices below do not change. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Read the notice</a>.',
   hdH:"What it costs to borrow dollars against bitcoin.",
-  hdStamp:(d,n,c,dp)=>`Fixing of <span class="num">${d}</span>, 08:30 UTC · ${n} markets · ${c} chains · <span class="num">${dp}</span> supplied · read from contract state`,
-  hdBorrowK:"SBOR borrow, every dollar stablecoin", hdSupplyK:"SBOR supply",
+  hdStamp:(d,n,c,dp)=>`Fixing of <span class="num">${d}</span>, 08:30 UTC · read from contract state: ${n} markets on ${c} chains · <span class="num">${dp}</span> supplied`,
+  hdBorrowK:"Borrow rate · all dollar stablecoins", hdSupplyK:"Supply rate",
   hdSofr:(s,b)=>`A dollar secured by US Treasuries costs ${s} today (SOFR). A dollar secured by bitcoin costs ${b}.`,
   hdWithheld:r=>`SBOR is not published in this fixing. ${r}`,
+  hdChartH:"SBOR and SOFR over time",
+  hdChartP:"The headline every day since its first fixing on 14 October 2026. SOFR, what a dollar costs against US Treasuries, is shown beside it for scale. It is never part of SBOR.",
+  hdChartLegend:["SBOR borrow","SBOR supply","SOFR"],
   hdTermsH:"Term averages",
   hdTermsP:"The headline over the last 30, 90 and 180 days, compounded daily, the way SOFR's averages are built, counted from its first fixing on 14 October 2026. For anything that settles over weeks or months, use an average rather than one day's rate. An average appears only once every day in its window has a fixing, and runs on through a methodology change: the data lists every version inside its window.",
   hdSubH:"By stablecoin", hdSubP:"The same bitcoin, borrowed in each dollar. A stablecoin gets its own rate once $25M or more of it carries weight.",
   hdSubSize:(dp,n)=>`${dp} supplied · ${n} ${n === 1 ? "market" : "markets"}`, hdNotPub:"not published today",
   hdMktH:"Every market behind the rate", hdMktP:"Only markets whose sole collateral is plain bitcoin, weighted by what is supplied. Markets added on 14 October 2026 reach full weight over 30 days.",
-  hdMeta:(v,c,w)=>`${v} ${v === 1 ? "venue" : "venues"} · ${c} ${c === 1 ? "chain" : "chains"} carrying weight · largest market ${w} of the weight`,
+  hdMeta:(v,c,w,all)=>`Read from ${all} chains · ${c} of them carry weight today, across ${v} ${v === 1 ? "venue" : "venues"} · largest market ${w} of the weight`,
   hdCols:["Market","Chain","Borrow","Supply","Utilization","Supplied","Weight"],
   hdMktNote:"Borrow is what borrowers pay. Supply is what lenders earn. Utilization is how much of the lenders' money is borrowed right now. When utilization rises, both rates rise, and that's why each market's rate is where it is.",
   hdPhasing:p=>`phasing in, ${p}`, hdFlags:{ lenderIncentive:"lender rewards", synthetic:"synthetic dollar" },
@@ -805,7 +815,7 @@ en:{
   hdStxH:"On Bitcoin's own layers", hdStxLink:"SBOR Stacks, all three indices",
   hdStxSub:{ "SBOR-USD":"Dollars on Stacks, any crypto collateral", "SBOR-BTC":"sBTC on Stacks", "SBOR-STX":"STX on Stacks" },
   hdStxP:"Borrow / supply. Granite's USDCx market on Stacks takes only sBTC as collateral, so it is also one of the markets behind the SBOR headline.",
-  hdChainH:"Posted on-chain after every fixing", hdChainP:"Any contract on these chains can read the day's rate, with its date. Agents connect at mcp.sbor.xyz.",
+  hdChainH:"Posted on 5 chains after every fixing", hdChainP:"These are the chains SBOR is published to. Any contract on them can read the day's rate, with its date. The chains SBOR reads from are in the markets table above. Agents connect at mcp.sbor.xyz.",
   devMcpH:"As an MCP tool",
   devRemote:`Or connect by address, with nothing to install: Claude on the web, ChatGPT, and any client that accepts a URL. No key and no sign-in. The short version for agents is <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>. Ideas for what to build on SBOR, free for commercial use: <a href="https://github.com/sborxyz/sbor/blob/main/BUILD.md" target="_blank" rel="noopener">BUILD.md</a>.`,
   govern:`Independent: no token, it never trades on its own rate, and who pays for a service never changes the number. Published fixings are never rewritten; corrections to published figures are listed in <a href="https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>. How SBOR measures up to the IOSCO Principles for Financial Benchmarks: <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" target="_blank" rel="noopener">self-assessment</a>.`,
@@ -830,7 +840,7 @@ en:{
   consH:"Constituents",
   thead:["Market","Borrow APY","Supply APY","Utilization","Protocol yield","Depth","Weight",""],
   coverage:(n,pct)=>`${n} ${n===1?"venue":"venues"} in this index · largest constituent ${pct}% of depth`,
-  sources:"Lending rates are read from Zest and Granite contract state on Stacks mainnet, and from Aave and Morpho contract state on Ethereum, Base and Arc. In the comparison, HyperLend on Hyperliquid and Kamino on Solana are read from their contracts too. Market sizes are read from the contracts; DefiLlama selects the comparison markets, gives their size and serves as a cross-check. Protocol yield comes from StackingDAO. The BTC to STX rate used for the staking yield is quoted from Bitflow. SOFR comes from the Federal Reserve Bank of New York.",
+  sources:"The SBOR headline is read from contract state: Morpho on Ethereum, Base, Arbitrum and Arc, Lista on BNB Chain, and Granite on Stacks. The three Stacks indices are read from Zest and Granite contract state on Stacks mainnet. In the comparison, Aave on Ethereum and Base, HyperLend on Hyperliquid and Kamino on Solana are read from their contracts too. Market sizes are read from the contracts; DefiLlama selects the comparison markets, gives their size and serves as a cross-check. Protocol yield comes from StackingDAO. The BTC to STX rate used for the staking yield is quoted from Bitflow. SOFR comes from the Federal Reserve Bank of New York.",
   consFoot:"Hatched weights are phasing in. A market becomes eligible once its lending depth stays above the inclusion floor for 30 consecutive days. Protocol yield is yield carried by the asset itself rather than by the loan. It is displayed but excluded from the fixing.",
   methodH:"Methodology",
   methodA:[
@@ -860,7 +870,7 @@ en:{
   signupSending:"Sending...",
   signupOk:"You are subscribed. The first report lands on Monday.",
   signupErr:"That did not go through. Try again, or email contact@sbor.xyz",
-  disclaimer:"The published fixings are free to use, including commercially, with no permission required and no license to negotiate, under CC BY 4.0. Attribution is the only condition: name SBOR and link to sbor.xyz where practical. Agents are explicitly welcome. SBOR is provided as is, without warranty. It is a statistic, not investment advice, and nobody earns SBOR. It is a tool for making better decisions, not a recommendation to make any. Rates are read from contract state on Stacks mainnet."
+  disclaimer:"The published fixings are free to use, including commercially, with no permission required and no license to negotiate, under CC BY 4.0. Attribution is the only condition: name SBOR and link to sbor.xyz where practical. Agents are explicitly welcome. SBOR is provided as is, without warranty. It is a statistic, not investment advice, and nobody earns SBOR. It is a tool for making better decisions, not a recommendation to make any. Rates are read from contract state on Ethereum, Base, Arbitrum, Arc, BNB Chain and Stacks."
 },
 pt:{
   fullname:"Standard Bitcoin Offered Rate",
@@ -904,7 +914,7 @@ pt:{
   themeToDark:"Mudar para o tema escuro", themeToLight:"Mudar para o tema claro",
   termBorrow:"tomar, o que quem toma paga", termSupply:"fornecer, o que quem fornece recebe",
   termCol:d=>`${d} dias`,
-  termFrom:d=>`a partir de ${d}`,
+  termFrom:d=>`<span class="dash">–</span><span class="avail">disponível em ${d}</span>`,
   termPending:"ainda não",
   termSofr:"uma taxa só: no repo, quem toma e quem empresta têm a mesma",
   deltaBorrow:"", deltaSupply:"",
@@ -941,16 +951,19 @@ pt:{
   tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes de IA", tabMethod:"Metodologia", tabStacks:"Stacks",
   noticeLive:'<strong>A metodologia 1.13.0 entrou em vigor em 14 de outubro de 2026.</strong> A taxa principal do SBOR agora cobre toda stablecoin em dólar emprestada contra bitcoin puro, na aba Taxas. Os índices da Stacks abaixo não mudam. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Leia o aviso</a>.',
   hdH:"Quanto custa tomar dólares emprestados com bitcoin como garantia.",
-  hdStamp:(d,n,c,dp)=>`Fixing de <span class="num">${d}</span>, 08:30 UTC · ${n} mercados · ${c} redes · <span class="num">${dp}</span> fornecidos · lido do estado dos contratos`,
-  hdBorrowK:"SBOR tomador, toda stablecoin em dólar", hdSupplyK:"SBOR fornecedor",
+  hdStamp:(d,n,c,dp)=>`Fixing de <span class="num">${d}</span>, 08:30 UTC · lido do estado dos contratos: ${n} mercados em ${c} redes · <span class="num">${dp}</span> fornecidos`,
+  hdBorrowK:"Taxa do tomador · todas as stablecoins em dólar", hdSupplyK:"Taxa do fornecedor",
   hdSofr:(s,b)=>`Um dólar garantido por títulos do Tesouro americano custa ${s} hoje (SOFR). Um dólar garantido por bitcoin custa ${b}.`,
   hdWithheld:r=>`O SBOR não foi publicado neste fixing. ${r}`,
+  hdChartH:"SBOR e SOFR ao longo do tempo",
+  hdChartP:"A taxa principal a cada dia desde o seu primeiro fixing, em 14 de outubro de 2026. O SOFR, o custo de um dólar garantido por títulos do Tesouro americano, aparece ao lado como escala. Ele nunca faz parte do SBOR.",
+  hdChartLegend:["SBOR tomador","SBOR fornecedor","SOFR"],
   hdTermsH:"Médias de prazo",
   hdTermsP:"A taxa principal nos últimos 30, 90 e 180 dias, composta diariamente, como as médias do SOFR, contada a partir do seu primeiro fixing, em 14 de outubro de 2026. Para algo que liquida ao longo de semanas ou meses, use uma média, não a taxa de um dia. Uma média só aparece quando todos os dias da janela têm fixing, e continua através de uma mudança de metodologia: os dados listam cada versão dentro da janela.",
   hdSubH:"Por stablecoin", hdSubP:"O mesmo bitcoin, emprestado em cada dólar. Uma stablecoin ganha taxa própria quando US$ 25M ou mais dela passam a ter peso.",
   hdSubSize:(dp,n)=>`${dp} fornecidos · ${n} ${n === 1 ? "mercado" : "mercados"}`, hdNotPub:"não publicada hoje",
   hdMktH:"Todos os mercados por trás da taxa", hdMktP:"Só mercados cuja única garantia é bitcoin puro, ponderados pelo que está fornecido. Mercados incluídos em 14 de outubro de 2026 chegam ao peso cheio em 30 dias.",
-  hdMeta:(v,c,w)=>`${v} ${v === 1 ? "plataforma" : "plataformas"} · ${c} ${c === 1 ? "rede" : "redes"} com peso · o maior mercado tem ${w} do peso`,
+  hdMeta:(v,c,w,all)=>`Lido de ${all} redes · ${c} delas têm peso hoje, em ${v} ${v === 1 ? "plataforma" : "plataformas"} · o maior mercado tem ${w} do peso`,
   hdCols:["Mercado","Rede","Tomador","Credor","Utilização","Fornecido","Peso"],
   hdMktNote:"Tomador é o que quem toma emprestado paga. Credor é o que quem empresta recebe. Utilização é quanto do dinheiro dos credores está emprestado agora. Quando a utilização sobe, as duas taxas sobem, e é por isso que cada mercado tem a taxa que tem.",
   hdPhasing:p=>`entrando aos poucos, ${p}`, hdFlags:{ lenderIncentive:"recompensa ao fornecedor", synthetic:"dólar sintético" },
@@ -958,7 +971,7 @@ pt:{
   hdStxH:"Nas camadas do próprio Bitcoin", hdStxLink:"SBOR Stacks, os três índices",
   hdStxSub:{ "SBOR-USD":"Dólares na Stacks, qualquer garantia cripto", "SBOR-BTC":"sBTC na Stacks", "SBOR-STX":"STX na Stacks" },
   hdStxP:"Tomador / fornecedor. O mercado de USDCx da Granite na Stacks aceita só sBTC como garantia, então também é um dos mercados por trás da taxa principal do SBOR.",
-  hdChainH:"Publicado on-chain a cada fixing", hdChainP:"Qualquer contrato nessas redes pode ler a taxa do dia, com a data. Agentes se conectam em mcp.sbor.xyz.",
+  hdChainH:"Publicado em 5 redes a cada fixing", hdChainP:"Estas são as redes onde o SBOR é publicado. Qualquer contrato nelas pode ler a taxa do dia, com a data. As redes de onde o SBOR lê estão na tabela de mercados acima. Agentes se conectam em mcp.sbor.xyz.",
   devMcpH:"Como ferramenta MCP",
   devRemote:`Ou conecte pelo endereço, sem instalar nada: Claude na web, ChatGPT e qualquer cliente que aceite um URL. Sem chave e sem login. A versão curta para agentes está em <a href="https://github.com/sborxyz/sbor/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a>. Ideias do que construir sobre o SBOR, livre para uso comercial: <a href="https://github.com/sborxyz/sbor/blob/main/BUILD.md" target="_blank" rel="noopener">BUILD.md</a>.`,
   govern:`Independente: sem token, nunca opera com a própria taxa, e quem paga por um serviço nunca muda o número. Fixings publicados nunca são reescritos; as correções de valores publicados estão em <a href="https://github.com/sborxyz/sbor/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>. Como o SBOR se compara aos Princípios da IOSCO para benchmarks financeiros: <a href="https://github.com/sborxyz/sbor/blob/main/IOSCO.md" target="_blank" rel="noopener">autoavaliação</a>.`,
@@ -983,7 +996,7 @@ pt:{
   consH:"Componentes",
   thead:["Mercado","APY de empréstimo","APY de depósito","Utilização","Rendimento do protocolo","Profundidade","Peso",""],
   coverage:(n,pct)=>`${n} ${n===1?"plataforma":"plataformas"} neste índice · maior componente com ${pct}% da profundidade`,
-  sources:"As taxas de crédito são lidas do estado dos contratos da Zest e da Granite na mainnet da Stacks, e dos contratos da Aave e da Morpho na Ethereum, na Base e na Arc. Na comparação, a HyperLend na Hyperliquid e a Kamino na Solana também são lidas dos contratos. O tamanho dos mercados é lido dos contratos; a DefiLlama seleciona os mercados da comparação, dá o tamanho deles e serve de conferência. O rendimento do protocolo vem da StackingDAO. A relação BTC para STX usada no rendimento do staking é cotada na Bitflow. O SOFR vem do Federal Reserve Bank of New York.",
+  sources:"A taxa principal do SBOR é lida do estado dos contratos: Morpho na Ethereum, na Base, na Arbitrum e na Arc, Lista na BNB Chain e Granite na Stacks. Os três índices da Stacks são lidos do estado dos contratos da Zest e da Granite na mainnet da Stacks. Na comparação, a Aave na Ethereum e na Base, a HyperLend na Hyperliquid e a Kamino na Solana também são lidas dos contratos. O tamanho dos mercados é lido dos contratos; a DefiLlama seleciona os mercados da comparação, dá o tamanho deles e serve de conferência. O rendimento do protocolo vem da StackingDAO. A relação BTC para STX usada no rendimento do staking é cotada na Bitflow. O SOFR vem do Federal Reserve Bank of New York.",
   consFoot:"Pesos hachurados estão em entrada gradual. Um mercado se torna elegível quando sua profundidade de crédito permanece acima do piso de inclusão por 30 dias consecutivos. Rendimento do protocolo é o rendimento gerado pelo próprio ativo, e não pelo empréstimo. Ele é exibido, mas fica fora do fixing.",
   methodH:"Metodologia",
   methodA:[
@@ -1013,7 +1026,7 @@ pt:{
   signupSending:"Enviando...",
   signupOk:"Inscrição confirmada. O primeiro relatório chega na segunda.",
   signupErr:"Não foi possível enviar. Tente de novo ou escreva para contact@sbor.xyz",
-  disclaimer:"Os fixings publicados são livres para uso, inclusive comercial, sem necessidade de permissão e sem licença a negociar, sob CC BY 4.0. A atribuição é a única condição: cite o SBOR e coloque um link para sbor.xyz quando for possível. Agentes são explicitamente bem-vindos. O SBOR é fornecido como está, sem garantia. É uma estatística, não uma recomendação de investimento, e ninguém recebe SBOR. É uma ferramenta para decidir melhor, não uma orientação sobre o que decidir. As taxas são lidas do estado dos contratos na mainnet da Stacks."
+  disclaimer:"Os fixings publicados são livres para uso, inclusive comercial, sem necessidade de permissão e sem licença a negociar, sob CC BY 4.0. A atribuição é a única condição: cite o SBOR e coloque um link para sbor.xyz quando for possível. Agentes são explicitamente bem-vindos. O SBOR é fornecido como está, sem garantia. É uma estatística, não uma recomendação de investimento, e ninguém recebe SBOR. É uma ferramenta para decidir melhor, não uma orientação sobre o que decidir. As taxas são lidas do estado dos contratos na Ethereum, Base, Arbitrum, Arc, BNB Chain e Stacks."
 }};
 
 const INDEX_COPY = {
@@ -1122,6 +1135,7 @@ function layout113(){
 function renderHead(){
   if (!HEAD) return;
   renderHeadTerms();
+  drawHeadChart();
   const t = T(), esc = x => String(x ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
   const pc = v => typeof v === "number" ? fmt(v) : "n/a";
   const day = new Date(fixingDate + "T00:00:00Z").toLocaleDateString(lang === "pt" ? "pt-BR" : "en-GB", { day:"numeric", month:"short", year:"numeric", timeZone:"UTC" });
@@ -1146,7 +1160,7 @@ function renderHead(){
 
   set("hd-mkt-h", t.hdMktH); set("hd-mkt-p", t.hdMktP); set("hd-mkt-note", t.hdMktNote);
   if (typeof HEAD.largestConstituentWeight === "number")
-    set("hd-meta", t.hdMeta(HEAD.venues, HEAD.chains, (HEAD.largestConstituentWeight * 100).toFixed(1) + "%"));
+    set("hd-meta", t.hdMeta(HEAD.venues, HEAD.chains, (HEAD.largestConstituentWeight * 100).toFixed(1) + "%", new Set(HEAD.markets.map(m => m.chain)).size));
   const c = t.hdCols;
   set("hd-thead", `<th>${c[0]}</th><th>${c[1]}</th><th class="r">${c[2]}</th><th class="r">${c[3]}</th><th class="r">${c[4]}</th><th class="r">${c[5]}</th><th class="r">${c[6]}</th>`);
   const ms = [...HEAD.markets].sort((a, b) => (b.weight || 0) - (a.weight || 0) || (b.depthUsd || 0) - (a.depthUsd || 0));
@@ -1542,6 +1556,11 @@ function drawPoxCycles(){
 /* One table row of averages for one series and side, as SOFR shows it: a
    line for what borrowers pay and a line for what suppliers earn. Shared by
    the Stacks indices' table and the headline's. */
+/* 2026-11-12 -> 12 Nov 2026, in the page's language. */
+function shortDay(iso){
+  return new Date(iso + "T00:00:00Z").toLocaleDateString(lang === "pt" ? "pt-BR" : "en-GB", { day:"numeric", month:"short", year:"numeric", timeZone:"UTC" });
+}
+
 function termLine(label, side, first, t){
   const d = TERM_DATA[label] || {};
   const av = d.termAverages || {};
@@ -1551,8 +1570,52 @@ function termLine(label, side, first, t){
       if (v && typeof v[side] === "number")
         return `<td class="r num" data-l="${t.termCol(n)}">${v[side].toFixed(2)}%</td>`;
       const from = termFromDate(label, d.seriesBegan, n);
-      return `<td class="r pend" data-l="${t.termCol(n)}">${from ? t.termFrom(from) : t.termPending}</td>`;
+      return `<td class="r pend" data-l="${t.termCol(n)}">${from ? t.termFrom(shortDay(from)) : t.termPending}</td>`;
     }).join("") + `</tr>`;
+}
+
+/* The headline over time, with SOFR beside it for scale. Read from the same
+   history file as every other chart; hidden until two fixings exist. */
+function drawHeadChart(){
+  const sec = document.getElementById("hd-chart-sec");
+  if (!sec) return;
+  const rows = HISTORY
+    .filter(r => r.btcCollateralUsd && typeof r.btcCollateralUsd.b === "number")
+    .sort((a,b) => a.date.localeCompare(b.date))
+    .map(r => ({ date:r.date, borrow:r.btcCollateralUsd.b,
+                 supply:typeof r.btcCollateralUsd.s === "number" ? r.btcCollateralUsd.s : null,
+                 sofr:typeof r.ctx?.sofr === "number" ? r.ctx.sofr : null }));
+  if (rows.length < 2){ sec.hidden = true; return; }
+  const t = T();
+  sec.hidden = false;
+  set("hd-chart-h", t.hdChartH); set("hd-chart-p", t.hdChartP);
+  const W=1120,H=280,PL=58,PR=14,PT=18,PB=26;
+  const b = rows.map(r => r.borrow), sp = rows.map(r => r.supply), so = rows.map(r => r.sofr);
+  const vals = [...b, ...sp, ...so].filter(v => v != null);
+  const span = (Math.max(...vals)-Math.min(...vals)) || 1;
+  const lo = Math.max(0, Math.min(...vals)-span*0.15), hi = Math.max(...vals)+span*0.15;
+  const x = i => PL + i*(W-PL-PR)/(rows.length-1);
+  const y = v => PT + (hi-v)*(H-PT-PB)/(hi-lo);
+  const path = arr => { let d="",pen=false;
+    arr.forEach((v,i)=>{ if(v==null){pen=false;return;}
+      d += (pen?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)+" "; pen=true; });
+    return d.trim(); };
+  let g = "";
+  for (let k=0;k<=4;k++){
+    const v = lo+(hi-lo)*k/4, yy = y(v);
+    g += `<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" style="stroke:var(--rule-soft)"/>`;
+    g += `<text x="${PL-10}" y="${yy+4}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${v.toFixed(1)}%</text>`;
+  }
+  g += `<text x="${PL}" y="${H-8}" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${rows[0].date}</text>`;
+  g += `<text x="${W-PR}" y="${H-8}" text-anchor="end" font-family="IBM Plex Mono" font-size="11" style="fill:var(--ink-soft)">${rows[rows.length-1].date}</text>`;
+  g += `<path d="${path(so)}" fill="none" style="stroke:var(--down)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  g += `<path d="${path(sp)}" fill="none" style="stroke:var(--ink-soft)" stroke-width="1.5"/>`;
+  g += `<path d="${path(b)}" fill="none" style="stroke:var(--accent)" stroke-width="2"/>`;
+  document.getElementById("hdChart").innerHTML = g;
+  set("hd-chart-legend", [
+    `<span><i class="swatch" style="background:var(--accent)"></i>${t.hdChartLegend[0]}</span>`,
+    `<span><i class="swatch" style="background:var(--ink-soft)"></i>${t.hdChartLegend[1]}</span>`,
+    `<span><i class="swatch" style="background:var(--down)"></i>${t.hdChartLegend[2]}</span>`].join(""));
 }
 
 /* The headline's term averages, on the Rates tab under the headline. Shown
