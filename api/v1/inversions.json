@@ -1,10 +1,9 @@
 {
   "schema": "sbor.v1",
-  "checked": "2026-11-11T06:59:26Z",
-  "basedOnFixing": "2026-11-10T00:28:24Z",
+  "checked": "2026-11-11T17:23:39Z",
+  "basedOnFixing": "2026-11-11T08:30:50Z",
   "status": "live",
-  "basedOnFixingAgeHours": 30.5,
-  "staleWarning": "This check is based on the fixing of 2026-11-10, 30.5 hours ago. There is no fixing for today yet, so rates may have moved. Treat this result as stale.",
+  "basedOnFixingAgeHours": 8.9,
   "statusNote": "Live. Detections are published the moment they are found, to everyone at once.",
   "minimumEdgeBps": 10,
   "note": "An inversion is the same asset costing less to borrow at one venue than it pays to supply at another. Rates are compared as published by SBOR, before fees, gas, liquidation risk and any minimum position size. SBOR does not trade on its own rate and does not represent that any inversion is executable.",
@@ -16,9 +15,9 @@
       "borrowRate": 1.27,
       "borrowUtilization": 19.03,
       "supplyVenue": "Zest V2",
-      "supplyRate": 1.38,
-      "supplyUtilization": 76.57,
-      "edgeBps": 11
+      "supplyRate": 1.69,
+      "supplyUtilization": 84.78,
+      "edgeBps": 42
     }
   ]
 }
