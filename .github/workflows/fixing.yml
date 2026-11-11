@@ -148,7 +148,7 @@ jobs:
         run: |
           if [ -z "$TG_TOKEN" ]; then exit 0; fi
           MSG=$(printf 'SBOR morning brief FAILED on %s.\n\nThe fixing itself was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
-          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+          curl -sS --retry 3 --retry-delay 5 --retry-all-errors -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
             --data-urlencode "chat_id=$TG_CHAT" \
             --data-urlencode "disable_web_page_preview=true" \
             --data-urlencode "text=$MSG" > /dev/null
@@ -161,7 +161,7 @@ jobs:
         run: |
           if [ -z "$TG_TOKEN" ]; then exit 0; fi
           MSG=$(printf 'SBOR post draft FAILED on %s.\n\nThe fixing itself was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
-          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+          curl -sS --retry 3 --retry-delay 5 --retry-all-errors -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
             --data-urlencode "chat_id=$TG_CHAT" \
             --data-urlencode "disable_web_page_preview=true" \
             --data-urlencode "text=$MSG" > /dev/null
@@ -174,7 +174,7 @@ jobs:
         run: |
           if [ -z "$TG_TOKEN" ]; then exit 0; fi
           MSG=$(printf 'SBOR change feed FAILED on %s.\n\nThe fixing itself was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
-          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+          curl -sS --retry 3 --retry-delay 5 --retry-all-errors -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
             --data-urlencode "chat_id=$TG_CHAT" \
             --data-urlencode "disable_web_page_preview=true" \
             --data-urlencode "text=$MSG" > /dev/null
@@ -222,7 +222,7 @@ jobs:
         run: |
           if [ -z "$TG_TOKEN" ]; then exit 0; fi
           MSG=$(printf 'SBOR fixing FAILED on %s.\n\nNo fixing was published. Check the run:\nhttps://github.com/sborxyz/sbor/actions' "$(date -u +%Y-%m-%d)")
-          curl -sS -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+          curl -sS --retry 3 --retry-delay 5 --retry-all-errors -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
             --data-urlencode "chat_id=$TG_CHAT" \
             --data-urlencode "disable_web_page_preview=true" \
             --data-urlencode "text=$MSG" > /dev/null
