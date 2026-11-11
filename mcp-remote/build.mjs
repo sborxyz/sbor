@@ -167,10 +167,17 @@ Tools: \${[...server.tools.keys()].join(", ")}.
 Local version: npx -y sbor-mcp. Registry: xyz.sbor/sbor. Site: https://sbor.xyz
 \`;
 
+/* Proof for Meta's Muse connector review that SBOR controls this host. Muse
+   checks this one exact path for this one exact value. Only SBOR's own
+   challenge is answered: an echo of any token would let anyone claim the host. */
+const MUSE_CHALLENGE = "d0306ec2fa93f0488b0d6179c7c3fa20a8d121138ed4a112cc4be85c053b9606";
+
 export default {
   async fetch(request){
     const url = new URL(request.url);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
+    if (request.method === "GET" && url.pathname === "/.well-known/muse-challenge/" + MUSE_CHALLENGE)
+      return new Response("muse-challenge=" + MUSE_CHALLENGE, { headers: { "content-type": "text/plain; charset=utf-8", ...CORS } });
     if (url.pathname !== "/mcp"){
       if (request.method === "GET") return new Response(ABOUT, { headers: { "content-type": "text/plain; charset=utf-8", ...CORS } });
       return new Response("Not found", { status: 404, headers: CORS });
