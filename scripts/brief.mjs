@@ -269,7 +269,7 @@ for (const ix of facts.indices){
     flags.push(`${ix.label} borrow moved ${ix.borrowChange1dBps > 0 ? "+" : ""}${ix.borrowChange1dBps} bps to ${ix.borrowPct}%.`);
   for (const m of ix.markets){
     if (m.utilizationPct != null && m.utilizationPct >= 90)
-      flags.push(`${m.venue} ${m.asset} is ${m.utilizationPct}% utilized. Withdrawals may be constrained.`);
+      flags.push(`${m.venue} ${m.asset} is ${m.utilizationPct}% utilized.`);
     if (m.utilizationChange1dBps != null && Math.abs(m.utilizationChange1dBps) >= 300)
       flags.push(`${m.venue} ${m.asset} utilization moved ${m.utilizationChange1dBps > 0 ? "+" : ""}${m.utilizationChange1dBps} basis points to ${m.utilizationPct}%.`);
     if (m.borrowChange1dBps != null && Math.abs(m.borrowChange1dBps) >= 40)
@@ -441,7 +441,7 @@ Before you send, reread every number you wrote and check its unit against the fi
 
 3. Never blend a staking yield with a lending rate. PoX and protocol yield come from holding an asset. Borrow and supply rates come from the loan. They are different instruments and adding them is the most common mistake in this ecosystem.
 
-4. Utilization explains the rate. A cheap rate at low utilization means nobody is borrowing. A cheap rate above 90% means the pool is nearly empty and withdrawals may be constrained. Say which when it matters.
+4. Utilization explains the rate. A cheap rate at low utilization means nobody is borrowing. A cheap rate above 90% means the pool is nearly empty. Say which when it matters.
 
 5. Read depth in the asset itself, depthChange1dNativePercent, wherever it exists: dollar depth also moves with the asset's price, so a dollar fall can be price alone. Report utilization and native depth as numbers, side by side, and stop there. Never call a market small, thin, large or deep, and never say it moved "off a thin base": its depth is the number, and its share is already in its name. Do not translate them into what borrowers or suppliers did: the reader can see the numbers, and SBOR publishes measurements, not explanations.
 
