@@ -419,7 +419,7 @@ const fail = m => { el.innerHTML = `<div class="err">${m}</div>`; };
       const am = (a?.markets || []).find(x => x.v === m.v && x.a === m.a);
 
       if (m.u != null && m.u >= 90)
-        flags.push(`${m.v} ${m.a} is ${F(m.u)}% utilized. Withdrawals may be constrained.`);
+        flags.push(`${m.v} ${m.a} is ${F(m.u)}% utilized.`);
 
       /* A large move in utilization matters wherever it starts from. A jump of
          500 bps in a day is somebody sizeable arriving or leaving, and the
