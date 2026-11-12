@@ -100,5 +100,22 @@
     "supplyRate": 1.69,
     "supplyUtilization": 84.78,
     "edgeBps": 42
+  },
+  {
+    "firstSeen": "2026-11-12T11:45:06Z",
+    "lastSeen": "2026-11-12T11:45:06Z",
+    "checks": 1,
+    "maxEdgeBps": 40,
+    "lastEdgeBps": 40,
+    "status": "live",
+    "asset": "USDCx",
+    "index": "SBOR-USD",
+    "borrowVenue": "Granite",
+    "borrowRate": 1.27,
+    "borrowUtilization": 19.03,
+    "supplyVenue": "Zest V2",
+    "supplyRate": 1.67,
+    "supplyUtilization": 84.27,
+    "edgeBps": 40
   }
 ]
