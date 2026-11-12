@@ -1,45 +1,25 @@
-SBOR post drafts, fixing 2026-11-11T08:30:50Z
-Compared with 2026-11-10
+SBOR post drafts, fixing 2026-11-12T08:30:42Z
+Compared with 2026-11-11
 
-4 things worth saying. Pick one. Do not post more than one a day.
+2 things worth saying. Pick one. Do not post more than one a day.
 
---- 1. INVERSION on USDCx: supply Zest V2 1.69% vs borrow Granite 1.27% (189 chars)
+--- 1. INVERSION on USDCx: supply Zest V2 1.67% vs borrow Granite 1.27% (189 chars)
 
 USDCx is inverted across venues.
 
-Supplying at Zest V2 pays 1.69%. Borrowing the same asset at Granite costs 1.27%.
+Supplying at Zest V2 pays 1.67%. Borrowing the same asset at Granite costs 1.27%.
 
-+42 bps, before fees, gas and liquidation risk.
-
-sbor.xyz
-
---- 2. SBOR-USD borrow moved +26 bps (146 chars)
-
-SBOR-USD borrow rate: 2.83% to 3.09%.
-
-+26 bps in a day.
-
-Lowest borrow rate: Granite USDCx at 1.27%, utilization 19.03%.
++40 bps, before fees, gas and liquidation risk.
 
 sbor.xyz
 
---- 3. SBOR-STX borrow moved +25 bps (145 chars)
+--- 2. BTC-COLLATERAL-USD 30-day average first published (189 chars)
 
-SBOR-STX borrow rate: 2.44% to 2.69%.
+BTC-COLLATERAL-USD now has a 30 day average.
 
-+25 bps in a day.
+Borrow 5.46%, supply 4.89%.
 
-Lowest borrow rate: Zest V2 stSTX at 0.73%, utilization 4.48%.
-
-sbor.xyz
-
---- 4. Zest V2 USDCx utilization crossed above 80% (178 chars)
-
-Zest V2 USDCx is now 84.78% utilized, up from 76.57%.
-
-Borrow 4.06%, supply 1.69%.
-
-Above 80% a lending market prices steeply and withdrawals get harder.
+Compounded from 30 daily fixings. Term averages publish only once the full window exists.
 
 sbor.xyz
 

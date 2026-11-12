@@ -1,32 +1,22 @@
 {
-  "fixing": "2026-11-11T08:30:50Z",
-  "comparedWith": "2026-11-10",
+  "fixing": "2026-11-12T08:30:42Z",
+  "comparedWith": "2026-11-11",
   "top": {
-    "why": "INVERSION on USDCx: supply Zest V2 1.69% vs borrow Granite 1.27%",
+    "why": "INVERSION on USDCx: supply Zest V2 1.67% vs borrow Granite 1.27%",
     "chars": 189,
-    "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.69%. Borrowing the same asset at Granite costs 1.27%.\n\n+42 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
+    "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.67%. Borrowing the same asset at Granite costs 1.27%.\n\n+40 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
   },
-  "otherCount": 3,
+  "otherCount": 1,
   "drafts": [
     {
-      "why": "INVERSION on USDCx: supply Zest V2 1.69% vs borrow Granite 1.27%",
+      "why": "INVERSION on USDCx: supply Zest V2 1.67% vs borrow Granite 1.27%",
       "chars": 189,
-      "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.69%. Borrowing the same asset at Granite costs 1.27%.\n\n+42 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
+      "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.67%. Borrowing the same asset at Granite costs 1.27%.\n\n+40 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
     },
     {
-      "why": "SBOR-USD borrow moved +26 bps",
-      "chars": 146,
-      "text": "SBOR-USD borrow rate: 2.83% to 3.09%.\n\n+26 bps in a day.\n\nLowest borrow rate: Granite USDCx at 1.27%, utilization 19.03%.\n\nsbor.xyz"
-    },
-    {
-      "why": "SBOR-STX borrow moved +25 bps",
-      "chars": 145,
-      "text": "SBOR-STX borrow rate: 2.44% to 2.69%.\n\n+25 bps in a day.\n\nLowest borrow rate: Zest V2 stSTX at 0.73%, utilization 4.48%.\n\nsbor.xyz"
-    },
-    {
-      "why": "Zest V2 USDCx utilization crossed above 80%",
-      "chars": 178,
-      "text": "Zest V2 USDCx is now 84.78% utilized, up from 76.57%.\n\nBorrow 4.06%, supply 1.69%.\n\nAbove 80% a lending market prices steeply and withdrawals get harder.\n\nsbor.xyz"
+      "why": "BTC-COLLATERAL-USD 30-day average first published",
+      "chars": 189,
+      "text": "BTC-COLLATERAL-USD now has a 30 day average.\n\nBorrow 5.46%, supply 4.89%.\n\nCompounded from 30 daily fixings. Term averages publish only once the full window exists.\n\nsbor.xyz"
     }
   ]
 }
