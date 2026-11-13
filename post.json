@@ -1,22 +1,17 @@
 {
-  "fixing": "2026-11-12T08:30:42Z",
-  "comparedWith": "2026-11-11",
+  "fixing": "2026-11-13T08:30:47Z",
+  "comparedWith": "2026-11-12",
   "top": {
-    "why": "INVERSION on USDCx: supply Zest V2 1.67% vs borrow Granite 1.27%",
+    "why": "INVERSION on USDCx: supply Zest V2 1.61% vs borrow Granite 1.27%",
     "chars": 189,
-    "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.67%. Borrowing the same asset at Granite costs 1.27%.\n\n+40 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
+    "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.61%. Borrowing the same asset at Granite costs 1.27%.\n\n+34 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
   },
-  "otherCount": 1,
+  "otherCount": 0,
   "drafts": [
     {
-      "why": "INVERSION on USDCx: supply Zest V2 1.67% vs borrow Granite 1.27%",
+      "why": "INVERSION on USDCx: supply Zest V2 1.61% vs borrow Granite 1.27%",
       "chars": 189,
-      "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.67%. Borrowing the same asset at Granite costs 1.27%.\n\n+40 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
-    },
-    {
-      "why": "BTC-COLLATERAL-USD 30-day average first published",
-      "chars": 189,
-      "text": "BTC-COLLATERAL-USD now has a 30 day average.\n\nBorrow 5.46%, supply 4.89%.\n\nCompounded from 30 daily fixings. Term averages publish only once the full window exists.\n\nsbor.xyz"
+      "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.61%. Borrowing the same asset at Granite costs 1.27%.\n\n+34 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
     }
   ]
 }
