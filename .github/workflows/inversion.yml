@@ -47,8 +47,10 @@ jobs:
             git push
           fi
 
+      # Only when an inversion opens or closes: a standing one is not repeated
+      # at every three-hour check.
       - name: Alert
-        if: steps.check.outputs.found == 'true'
+        if: steps.check.outputs.alert == 'true'
         env:
           TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}

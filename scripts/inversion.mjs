@@ -115,10 +115,19 @@ try { log_ = JSON.parse(readFileSync("api/v1/inversion-log.json", "utf8")); } ca
    September it was 75 minutes, left from when the check ran hourly, which
    would have split every inversion into one-check episodes. */
 const EXTEND_WITHIN_MS = 210 * 60 * 1000;
+const samePair = (e, f) => e.asset === f.asset && e.borrowVenue === f.borrowVenue && e.supplyVenue === f.supplyVenue;
+/* The Telegram alert fires only when something changes: an inversion opens,
+   or one that was open is no longer seen. A standing inversion is checked
+   every three hours and would otherwise repeat the same alert all day. */
+const opened = [], closed = [];
+for (const e of log_)
+  if (!e.closedAt && Date.parse(stamp) - Date.parse(e.lastSeen) <= EXTEND_WITHIN_MS && !found.some(f => samePair(e, f))){
+    e.closedAt = stamp;
+    closed.push(e);
+  }
 for (const f of found){
-  const last = [...log_].reverse().find(e =>
-    e.asset === f.asset && e.borrowVenue === f.borrowVenue && e.supplyVenue === f.supplyVenue);
-  if (last && Date.parse(stamp) - Date.parse(last.lastSeen) <= EXTEND_WITHIN_MS){
+  const last = [...log_].reverse().find(e => samePair(e, f));
+  if (last && !last.closedAt && Date.parse(stamp) - Date.parse(last.lastSeen) <= EXTEND_WITHIN_MS){
     last.lastSeen = stamp;
     last.checks = (last.checks || 1) + 1;
     last.maxEdgeBps = Math.max(last.maxEdgeBps ?? last.edgeBps, f.edgeBps);
@@ -127,6 +136,7 @@ for (const f of found){
     log_.push({ firstSeen: stamp, lastSeen: stamp, checks: 1,
                 maxEdgeBps: f.edgeBps, lastEdgeBps: f.edgeBps,
                 status: STATUS, ...f });
+    opened.push(f);
   }
 }
 writeFileSync("api/v1/inversion-log.json", JSON.stringify(log_, null, 2) + "\n");
@@ -143,14 +153,17 @@ if (!found.length){
 if (process.env.GITHUB_OUTPUT){
   const { appendFileSync } = await import("node:fs");
   appendFileSync(process.env.GITHUB_OUTPUT, `found=${found.length ? "true" : "false"}\n`);
+  appendFileSync(process.env.GITHUB_OUTPUT, `alert=${opened.length || closed.length ? "true" : "false"}\n`);
   appendFileSync(process.env.GITHUB_OUTPUT, `count=${found.length}\n`);
   appendFileSync(process.env.GITHUB_OUTPUT, `stale=${stale ? "true" : "false"}\n`);
   appendFileSync(process.env.GITHUB_OUTPUT, `age_hours=${ageHours.toFixed(1)}\n`);
   appendFileSync(process.env.GITHUB_OUTPUT, `last_fixing=${latest.fixing}\n`);
 }
 
-writeFileSync("inversion-alert.txt", found.length
-  ? found.map(f =>
+/* The alert carries only what changed: the inversions that opened, then the
+   ones that closed. */
+writeFileSync("inversion-alert.txt", [
+  ...opened.map(f =>
 `${f.asset} is inverted across venues.
 
 Supplying at ${f.supplyVenue} pays ${pct(f.supplyRate)}, utilization ${f.supplyUtilization == null ? "n/a" : pct(f.supplyUtilization)}.
@@ -158,5 +171,11 @@ Borrowing the same asset at ${f.borrowVenue} costs ${pct(f.borrowRate)}, utiliza
 
 Edge ${f.edgeBps} bps, before fees, gas and liquidation risk.
 
-Status: ${STATUS}. Checked ${stamp}.`).join("\n\n")
-  : "");
+Status: ${STATUS}. Checked ${stamp}.`),
+  ...closed.map(e =>
+`${e.asset} is no longer inverted: supply at ${e.supplyVenue} against borrow at ${e.borrowVenue}.
+
+Open from ${e.firstSeen} to ${e.lastSeen}, ${e.checks || 1} check${(e.checks || 1) > 1 ? "s" : ""}, largest edge ${e.maxEdgeBps ?? e.edgeBps} bps.
+
+Checked ${stamp}.`)
+].join("\n\n"));
