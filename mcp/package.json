@@ -1,6 +1,6 @@
 {
   "name": "sbor-mcp",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Check a lending rate before your agent borrows. What it costs to borrow dollars against bitcoin, per stablecoin, plus the Stacks indices, read from contract state on six chains and posted on-chain on five. Free, no key, no rate limit.",
   "type": "module",
   "bin": {

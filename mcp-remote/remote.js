@@ -48,7 +48,7 @@ class McpServer {
 }
 
 /* ---------------- tool code, verbatim from mcp/server.mjs ---------------- */
-const VERSION = "1.3.0";
+const VERSION = "1.4.0";
 const BASE = process.env.SBOR_BASE || "https://sbor.xyz";
 const UA = `sbor-mcp/${VERSION}`;
 const TIMEOUT_MS = 10_000;
@@ -162,6 +162,37 @@ function freshness(d){
   return `Fixing ${d.fixing}, ${a.toFixed(1)} hours old, methodology ${d.methodologyVersion}.`;
 }
 
+/* Fixings withdrawn after publication are recorded in history.json, which is
+   cached separately from latest.json. checked is false when history.json has
+   no row for the fixing's date yet, or cannot be read: a withdrawal then
+   cannot be ruled out, which is never read as "none". */
+const HISTORY_KEYS = { btcUsdc: BTC_REF, btcCollateralUsd: HEADLINE };
+async function withdrawals(d){
+  const date = String(d.fixing ?? "").slice(0, 10);
+  let h;
+  try { h = await getJson("/api/v1/history.json", 60_000); } catch { return { byLabel: {}, checked: false, date }; }
+  if (!Array.isArray(h)) return { byLabel: {}, checked: false, date };
+  const row = h.find(r => r?.date === date);
+  const byLabel = {};
+  for (const [k, v] of Object.entries(row ?? {}))
+    if (v && typeof v === "object" && v.withdrawn) byLabel[HISTORY_KEYS[k] ?? k] = String(v.reason ?? "Withdrawn after publication.");
+  return { byLabel, checked: Boolean(row), date };
+}
+const withdrawnLine = (code, w) =>
+  `${code}: the fixing of ${w.date} was WITHDRAWN after publication. ${w.byLabel[code]} It is not a valid reading. Do not use it.`;
+const uncheckedLine = w => w.checked ? "" :
+  `Not yet confirmed: SBOR's record of withdrawals has no entry for ${w.date} yet, or could not be read, so a withdrawal of this fixing cannot be ruled out. Read again in a few minutes before acting on it.`;
+
+/* Compounded 30, 90 and 180-day averages, the way SOFR's are built. Each is
+   published only once its full window of fixings exists. */
+function termLine(label, ta){
+  if (!ta) return "";
+  const part = (k, n) => ta[k]
+    ? `${n}-day borrow ${pct(ta[k].borrow)}, supply ${pct(ta[k].supply)}`
+    : `${n}-day not yet (needs ${n} days of fixings)`;
+  return `${label} term averages, compounded daily: ${part("d30", 30)}; ${part("d90", 90)}; ${part("d180", 180)}. For anything that settles over weeks or months, use an average rather than one day's rate.`;
+}
+
 const server = new McpServer({ name: "sbor", version: VERSION });
 
 /* ------------------------------------------------------------------ */
@@ -177,15 +208,21 @@ server.registerTool("get_rate", {
     "Use this to judge whether a lending offer is good: " +
     "borrowing above the SBOR borrow rate means paying more than the market, " +
     "supplying below the supply rate means earning less. Returns every currency " +
-    "index unless one is named. Always read the freshness line first.",
+    "index unless one is named, with the compounded 30, 90 and 180-day averages once each window is full. " +
+    "Always read the freshness line first. A fixing withdrawn after publication is reported as withdrawn, never as a rate.",
   inputSchema: {
     index: z.enum(BENCHMARKS).optional().describe(`${HEADLINE} for borrowing any dollar stablecoin against bitcoin, BTC-COLLATERAL-<stablecoin> for one stablecoin, or a Stacks currency index. Omit for all of them.`)
   }
 }, async ({ index }) => {
   try {
     const d = await getJson("/api/v1/latest.json");
+    const w = await withdrawals(d);
+    if (index && w.byLabel[index])
+      return text([freshness(d), withdrawnLine(index, w), `Source: ${BASE}/api/v1/history.json`].join("\n"));
     if (isBtc(index))
-      return text([freshness(d), btcLine(d, index), ONCHAIN, `Source: ${BASE}/api/v1/latest.json`].join("\n"));
+      return text([freshness(d), uncheckedLine(w), btcLine(d, index),
+        index === HEADLINE ? termLine(HEADLINE, d.bitcoinCollateralUsd?.termAverages) : "",
+        ONCHAIN, `Source: ${BASE}/api/v1/latest.json`].filter(Boolean).join("\n"));
     if (index && !d.indices[index])
       return text(`${index} is not published in the current fixing. `
         + `When a market cannot be read, or its rate is not set by the market, SBOR `
@@ -194,18 +231,22 @@ server.registerTool("get_rate", {
         + `Published today: ${Object.keys(d.indices).join(", ")}.`);
 
     const wanted = index ? { [index]: d.indices[index] } : d.indices;
-    const lines = Object.entries(wanted).map(([label, ix]) => {
+    const lines = Object.entries(wanted).flatMap(([label, ix]) => {
+      if (w.byLabel[label]) return [withdrawnLine(label, w)];
       const n = ix.venues.length;
       const conc = `${n} ${n === 1 ? "venue, so a reading of that venue rather than a market average" : "venues"}`
         + `, largest ${(ix.largestConstituentWeight * 100).toFixed(0)}% of depth`;
       const allIn = ix.allInSupplyDiffers ? `, ${pct(ix.allInSupply)} all in with protocol yield` : "";
-      return `${label}: borrow ${pct(ix.borrow)}, supply ${pct(ix.supply)}${allIn} (${conc})`;
+      return [`${label}: borrow ${pct(ix.borrow)}, supply ${pct(ix.supply)}${allIn} (${conc})`, termLine(label, ix.termAverages)];
     });
 
     const omitted = INDICES.filter(l => !d.indices[l]);
+    const btc = index ? [] : (w.byLabel[HEADLINE] ? [withdrawnLine(HEADLINE, w)]
+      : [...btcLines(d), termLine(HEADLINE, d.bitcoinCollateralUsd?.termAverages)]);
     return text([
       freshness(d),
-      ...(index ? [] : btcLines(d)),
+      uncheckedLine(w),
+      ...btc,
       ...(index || !d.bitcoinCollateralUsd ? [] : ["SBOR Stacks, lending on Stacks:"]),
       ...lines,
       omitted.length ? `Not published: ${omitted.join(", ")}. A market that cannot be read is omitted, not estimated.` : "",
@@ -251,6 +292,12 @@ server.registerTool("compare_rate", {
       return refuse(`The fixing timestamp "${d.fixing}" could not be read, so the age of the data is unknown. No verdict. Fall back to your own logic.`);
     if (a > STALE_AFTER_HOURS)
       return refuse(`The last fixing is ${a.toFixed(1)} hours old, past the ${STALE_AFTER_HOURS} hour limit. No verdict on stale data. Fall back to your own logic.`);
+
+    /* A withdrawn fixing is not a benchmark, and one whose withdrawal cannot
+       be ruled out yet does not get a verdict either. */
+    const w = await withdrawals(d);
+    if (w.byLabel[index]) return refuse(withdrawnLine(index, w) + " No verdict.");
+    if (!w.checked) return refuse(`${uncheckedLine(w)} No verdict.`);
 
     /* The bitcoin-collateral reference has the same shape where it matters:
        a borrow and supply rate, and markets. */
@@ -329,21 +376,28 @@ server.registerTool("list_markets", {
 }, async ({ index }) => {
   try {
     const d = await getJson("/api/v1/latest.json");
+    const w = await withdrawals(d);
+    if (index && w.byLabel[index]) return text([freshness(d), withdrawnLine(index, w)].join("\n"));
+    /* A market at weight 0 is read and listed but is not part of the rate
+       today. It is never a venue to route to on SBOR's account. */
+    const zero = m => m.weight === 0 ? " [weight 0: listed, not part of the rate today]" : "";
     if (isBtc(index)){
       const ref = btcRate(d, index);
       if (ref.absent) return text(ref.absent);
       if (!ref.markets?.length) return text(`${index} is not published in the current fixing. Treat it as unknown, not as zero.`);
-      return text([freshness(d), "", `${index}, ${btcWhat(d, index)}.`, ...ref.markets.map(m =>
+      return text([freshness(d), uncheckedLine(w), `${index}, ${btcWhat(d, index)}.`, ...ref.markets.map(m =>
         `  ${m.venue}, ${m.asset}${m.flags?.length ? ` [${m.flags.join(", ")}]` : ""}: borrow ${pct(m.borrow)}, supply ${pct(m.supply)}, `
         + `utilization ${pct(m.utilization)}, depth ${usd(m.depthUsd)}`
         + (typeof m.weight === "number" ? `, weight ${(m.weight * 100).toFixed(1)}%` : "")
-        + (typeof m.phaseIn === "number" && m.phaseIn < 1 ? `, phasing in (${(m.phaseIn * 100).toFixed(0)}% of its full weight)` : "")),
+        + (typeof m.phaseIn === "number" && m.phaseIn < 1 ? `, phasing in (${(m.phaseIn * 100).toFixed(0)}% of its full weight)` : "")
+        + zero(m)),
         ref.notRead ? `Not read today: ${ref.notRead.join("; ")}. A rate is withheld when the markets not read carried a quarter or more of its weight.` : "",
         "", `Source: ${BASE}/api/v1/latest.json`].filter(Boolean).join("\n"));
     }
-    const entries = index
+    const all = index
       ? (d.indices[index] ? [[index, d.indices[index]]] : [])
       : Object.entries(d.indices);
+    const entries = all.filter(([label]) => !w.byLabel[label]);
     if (!entries.length) return text(`${index} is not published in the current fixing. Treat it as unknown, not as zero.`);
 
     const out = entries.map(([label, ix]) =>
@@ -351,8 +405,10 @@ server.registerTool("list_markets", {
         `  ${m.venue} ${m.asset}: borrow ${pct(m.borrow)}, supply ${pct(m.supply)}, `
         + `utilization ${pct(m.utilization)}, depth ${usd(m.depthUsd)}, weight ${(m.weight * 100).toFixed(1)}%`
         + (m.protocolYield ? `, plus ${pct(m.protocolYield)} protocol yield from holding the asset, not from the loan` : "")
+        + zero(m)
       ).join("\n")).join("\n\n");
-    return text([freshness(d), "", out, "", `Source: ${BASE}/api/v1/latest.json`].join("\n"));
+    const gone = all.filter(([label]) => w.byLabel[label]).map(([label]) => withdrawnLine(label, w));
+    return text([freshness(d), ...(w.checked ? [] : [uncheckedLine(w)]), ...gone, "", out, "", `Source: ${BASE}/api/v1/latest.json`].join("\n"));
   } catch (e) { return fail(e); }
 });
 

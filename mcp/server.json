@@ -7,12 +7,12 @@
     "source": "github",
     "subfolder": "mcp"
   },
-  "version": "1.3.0",
+  "version": "1.4.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "sbor-mcp",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "transport": {
         "type": "stdio"
       }
@@ -24,6 +24,16 @@
     {
       "type": "streamable-http",
       "url": "https://mcp.sbor.xyz/mcp"
+    }
+  ],
+  "icons": [
+    {
+      "src": "https://sbor.xyz/icon-512.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ],
+      "theme": "light"
     }
   ]
 }
