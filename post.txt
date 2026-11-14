@@ -1,15 +1,25 @@
-SBOR post drafts, fixing 2026-11-13T08:30:47Z
-Compared with 2026-11-12
+SBOR post drafts, fixing 2026-11-14T08:31:21Z
+Compared with 2026-11-13
 
-1 thing worth saying. Pick one. Do not post more than one a day.
+2 things worth saying. Pick one. Do not post more than one a day.
 
---- 1. INVERSION on USDCx: supply Zest V2 1.61% vs borrow Granite 1.27% (189 chars)
+--- 1. INVERSION on USDCx: supply Zest V2 1.56% vs borrow Granite 1.24% (189 chars)
 
 USDCx is inverted across venues.
 
-Supplying at Zest V2 pays 1.61%. Borrowing the same asset at Granite costs 1.27%.
+Supplying at Zest V2 pays 1.56%. Borrowing the same asset at Granite costs 1.24%.
 
-+34 bps, before fees, gas and liquidation risk.
++32 bps, before fees, gas and liquidation risk.
+
+sbor.xyz
+
+--- 2. SBOR-BTC 30-day average first published (179 chars)
+
+SBOR-BTC now has a 30 day average.
+
+Borrow 1.39%, supply 1.08%.
+
+Compounded from 30 daily fixings. Term averages publish only once the full window exists.
 
 sbor.xyz
 
