@@ -1,5 +1,5 @@
-SBOR post drafts, fixing 2026-11-15T08:30:49Z
-Compared with 2026-11-14
+SBOR post drafts, fixing 2026-11-16T08:30:45Z
+Compared with 2026-11-15
 
 2 things worth saying. Pick one. Do not post more than one a day.
 
@@ -13,13 +13,13 @@ Supplying at Zest V2 pays 1.46%. Borrowing the same asset at Granite costs 1.22%
 
 sbor.xyz
 
---- 2. Zest V2 USDCx utilization fell back below 80% (137 chars)
+--- 2. SBOR-STX borrow moved -88 bps (145 chars)
 
-Zest V2 USDCx is back to 78.83% utilized, down from 81.44%.
+SBOR-STX borrow rate: 2.65% to 1.77%.
 
-Borrow 3.77%, supply 1.46%.
+-88 bps in a day.
 
-The squeeze has eased.
+Lowest borrow rate: Zest V2 stSTX at 0.74%, utilization 4.51%.
 
 sbor.xyz
 
