@@ -79,6 +79,15 @@ jobs:
           SBOR_FIXING: "1"
         run: node scripts/fetch.mjs
 
+      # The list of withdrawn fixings, small enough for every reader to check
+      # on each call instead of downloading the whole history. Like the
+      # drafter, it can never stop the fixing publishing; a stale file only
+      # makes readers report the check as unconfirmed.
+      - name: List withdrawn fixings
+        if: steps.guard.outputs.skip != 'true'
+        continue-on-error: true
+        run: node scripts/withdrawals.mjs
+
       # The change feed: compares the protocol parameters this fixing read
       # with the last known ones and records any difference in
       # api/v1/changes.json. Before the drafter and the commit, so the change
