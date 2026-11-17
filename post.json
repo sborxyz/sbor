@@ -1,22 +1,17 @@
 {
-  "fixing": "2026-11-16T08:30:45Z",
-  "comparedWith": "2026-11-15",
+  "fixing": "2026-11-17T08:30:59Z",
+  "comparedWith": "2026-11-16",
   "top": {
     "why": "INVERSION on USDCx: supply Zest V2 1.46% vs borrow Granite 1.22%",
     "chars": 189,
     "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.46%. Borrowing the same asset at Granite costs 1.22%.\n\n+24 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
   },
-  "otherCount": 1,
+  "otherCount": 0,
   "drafts": [
     {
       "why": "INVERSION on USDCx: supply Zest V2 1.46% vs borrow Granite 1.22%",
       "chars": 189,
       "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.46%. Borrowing the same asset at Granite costs 1.22%.\n\n+24 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
-    },
-    {
-      "why": "SBOR-STX borrow moved -88 bps",
-      "chars": 145,
-      "text": "SBOR-STX borrow rate: 2.65% to 1.77%.\n\n-88 bps in a day.\n\nLowest borrow rate: Zest V2 stSTX at 0.74%, utilization 4.51%.\n\nsbor.xyz"
     }
   ]
 }

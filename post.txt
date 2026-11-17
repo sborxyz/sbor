@@ -1,7 +1,7 @@
-SBOR post drafts, fixing 2026-11-16T08:30:45Z
-Compared with 2026-11-15
+SBOR post drafts, fixing 2026-11-17T08:30:59Z
+Compared with 2026-11-16
 
-2 things worth saying. Pick one. Do not post more than one a day.
+1 thing worth saying. Pick one. Do not post more than one a day.
 
 --- 1. INVERSION on USDCx: supply Zest V2 1.46% vs borrow Granite 1.22% (189 chars)
 
@@ -10,16 +10,6 @@ USDCx is inverted across venues.
 Supplying at Zest V2 pays 1.46%. Borrowing the same asset at Granite costs 1.22%.
 
 +24 bps, before fees, gas and liquidation risk.
-
-sbor.xyz
-
---- 2. SBOR-STX borrow moved -88 bps (145 chars)
-
-SBOR-STX borrow rate: 2.65% to 1.77%.
-
--88 bps in a day.
-
-Lowest borrow rate: Zest V2 stSTX at 0.74%, utilization 4.51%.
 
 sbor.xyz
 
