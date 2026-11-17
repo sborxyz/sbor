@@ -27,6 +27,8 @@ const prior = [...history].reverse().find(r => r.date <= cutoff) || null;
 
 const EXPECTED = ["SBOR-USD","SBOR-BTC","SBOR-STX"];
 const missing = EXPECTED.filter(l => !latest.indices[l]);
+/* SBOR's own reason when it withheld an index on purpose, as { reason } or text. */
+const reasonFor = l => { const v = latest.withheld?.[l], t = typeof v === "string" ? v : v?.reason; return typeof t === "string" && t.trim() ? t.trim() : null; };
 
 const L = [];
 L.push(`SBOR WEEKLY RATE REPORT`);
@@ -51,9 +53,13 @@ for (const [label, ix] of Object.entries(latest.indices)){
 if (missing.length){
   L.push(`NOT PUBLISHED THIS WEEK`);
   for (const m of missing){
-    L.push(`  ${m}: no readable lending market. When a venue's contract state`);
-    L.push(`  cannot be read, the index is omitted rather than published with a`);
-    L.push(`  figure SBOR cannot stand behind.`);
+    const why = reasonFor(m);
+    if (why) L.push(`  ${m}: ${why}`);
+    else {
+      L.push(`  ${m}: no readable lending market. When a venue's contract state`);
+      L.push(`  cannot be read, the index is omitted rather than published with a`);
+      L.push(`  figure SBOR cannot stand behind.`);
+    }
   }
   L.push(``);
 }
@@ -183,7 +189,9 @@ const html = `<div style="background:${P};color:${INK};font-family:'IBM Plex San
 
   ${missing.length ? `<p style="margin:0 0 6px"><strong>Not published this week</strong></p>
   <ul style="margin:0 0 18px;padding-left:20px;color:${SOFT};font-size:14px">
-    ${missing.map(m => `<li><strong>${m}</strong> no readable lending market. When contract state cannot be read, the index is omitted rather than published with a figure SBOR cannot stand behind.</li>`).join("")}
+    ${missing.map(m => reasonFor(m)
+      ? `<li><strong>${m}</strong> ${reasonFor(m).replace(/[&<>]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;" })[c])}</li>`
+      : `<li><strong>${m}</strong> no readable lending market. When contract state cannot be read, the index is omitted rather than published with a figure SBOR cannot stand behind.</li>`).join("")}
   </ul>` : ""}
 
   ${poxLine}

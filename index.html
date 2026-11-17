@@ -355,6 +355,7 @@ a{color:var(--accent)}
   <div class="fixing">
     <h1 id="hd-h"></h1>
     <p class="stamp" id="hd-stamp"></p>
+    <p class="sofrtop" id="hd-stale" hidden></p>
     <div class="rates">
       <div class="rate">
         <div class="rate-k" id="hd-borrow-k"></div>
@@ -418,6 +419,7 @@ a{color:var(--accent)}
     <h2 id="t-introH"></h2>
     <p id="t-introP"></p>
     <p class="snapshot" id="snapshot"><!-- snapshot:start -->SBOR fixing of 17 November 2026, 08:30 UTC. SBOR, dollars borrowed against bitcoin (BTC-COLLATERAL-USD): borrow 4.81%, supply 4.13%, sourced from 19 markets on 6 chains, $2.9B supplied. BTC-COLLATERAL-USDC: borrow 5.20%. SBOR Stacks: SBOR-USD: borrow 2.89%, supply 1.00%. SBOR-BTC: borrow 1.31%, supply 0.94%. SBOR-STX: borrow 1.76%, supply 0.97%. Effective annual rates, read from lending contract state. Plain text: <a href="/latest.txt">latest.txt</a>. Data: <a href="/api/v1/latest.json">latest.json</a>.<!-- snapshot:end --></p>
+    <p class="sofrtop" id="liveNote" style="grid-column:1 / -1" hidden></p>
     <p id="t-introUse"></p>
     <p class="sofrtop" id="notice" style="grid-column:1 / -1;margin-top:10px"></p>
   </div>
@@ -798,7 +800,9 @@ en:{
   tabRates:"Rates", tabStaking:"Staking", tabAgents:"For AI agents", tabMethod:"Methodology", tabStacks:"Stacks",
   noticeLive:'<strong>Methodology 1.13.0 took effect on 14 October 2026.</strong> SBOR\'s headline now covers every dollar stablecoin lent against plain bitcoin, on the Rates tab. The Stacks indices below do not change. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Read the notice</a>.',
   hdH:"What it costs to borrow dollars against bitcoin.",
-  hdStamp:(d,n,c,dp)=>`Fixing of <span class="num">${d}</span>, 08:30 UTC · Sourced from ${n} markets on ${c} chains · <span class="num">${dp}</span> supplied`,
+  hdStamp:(d,tm,n,c,dp)=>`Fixing of <span class="num">${d}</span>, ${tm} UTC · Sourced from ${n} markets on ${c} chains · <span class="num">${dp}</span> supplied`,
+  hdStale:(d,h)=>`<strong>Today's fixing is not published yet.</strong> These are the rates of the last fixing, ${d}, ${h} hours ago.`,
+  liveNote:`<strong>Live rates could not be loaded.</strong> The summary in this section is the latest published fixing. The tables below show example figures from September 1, 2026, not today's rates. Reload the page, or read <a href="/latest.txt">latest.txt</a>.`,
   hdBorrowK:"Borrow rate · all USD stablecoins", hdSupplyK:"Supply rate",
   hdSofr:(s,b)=>`A dollar secured by US Treasuries costs ${s} today (SOFR). A dollar secured by bitcoin costs ${b}.`,
   hdWithheld:r=>`SBOR is not published in this fixing. ${r}`,
@@ -956,7 +960,9 @@ pt:{
   tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes de IA", tabMethod:"Metodologia", tabStacks:"Stacks",
   noticeLive:'<strong>A metodologia 1.13.0 entrou em vigor em 14 de outubro de 2026.</strong> A taxa principal do SBOR agora cobre toda stablecoin em dólar emprestada contra bitcoin puro, na aba Taxas. Os índices da Stacks abaixo não mudam. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Leia o aviso</a>.',
   hdH:"Quanto custa tomar dólares emprestados com bitcoin como garantia.",
-  hdStamp:(d,n,c,dp)=>`Fixing de <span class="num">${d}</span>, 08:30 UTC · Origem: ${n} mercados em ${c} redes · <span class="num">${dp}</span> fornecidos`,
+  hdStamp:(d,tm,n,c,dp)=>`Fixing de <span class="num">${d}</span>, ${tm} UTC · Origem: ${n} mercados em ${c} redes · <span class="num">${dp}</span> fornecidos`,
+  hdStale:(d,h)=>`<strong>O fixing de hoje ainda não foi publicado.</strong> Estas são as taxas do último fixing, ${d}, há ${h} horas.`,
+  liveNote:`<strong>Não foi possível carregar as taxas ao vivo.</strong> O resumo nesta seção é o último fixing publicado. As tabelas abaixo mostram valores de exemplo de 1 de setembro de 2026, não as taxas de hoje. Recarregue a página ou leia <a href="/latest.txt">latest.txt</a>.`,
   hdBorrowK:"Taxa do tomador · todas as stablecoins em USD", hdSupplyK:"Taxa do fornecedor",
   hdSofr:(s,b)=>`Um dólar garantido por títulos do Tesouro americano custa ${s} hoje (SOFR). Um dólar garantido por bitcoin custa ${b}.`,
   hdWithheld:r=>`O SBOR não foi publicado neste fixing. ${r}`,
@@ -1064,7 +1070,9 @@ const INDICES = {
 };
 
 let lang = "en", current = "USD", currentRange = 90, fixingDate = "2026-09-01";
-let ABSENT = [];   /* indices missing from the fixing, with the published reason if withdrawn */
+let ABSENT = [];   /* indices missing from the fixing, with SBOR's reason when it withheld them */
+let FIXING_ISO = null;   /* the fixing's own timestamp: the stamp shows when it was really taken */
+let LIVE = false;        /* false until latest.json is read: the bundled figures are only an example */
 try { const s = localStorage.getItem("sbor-lang"); if (s === "pt" || s === "en") lang = s; } catch {}
 
 const T = () => I18N[lang];
@@ -1149,7 +1157,13 @@ function renderHead(){
   /* The stamp counts every market read, the way depthUsd counts every market in full;
      how many carry weight today is in the markets section below. */
   set("hd-h", t.hdH);
-  set("hd-stamp", t.hdStamp(day, HEAD.markets.length, new Set(HEAD.markets.map(m => m.chain)).size, depth(HEAD.depthUsd || 0)));
+  const tm = FIXING_ISO && /T\d{2}:\d{2}/.test(FIXING_ISO) ? FIXING_ISO.slice(11, 16) : "08:30";
+  set("hd-stamp", t.hdStamp(day, tm, HEAD.markets.length, new Set(HEAD.markets.map(m => m.chain)).size, depth(HEAD.depthUsd || 0)));
+  /* SBOR fixes once a day, so a fixing more than 26 hours old means today's is
+     missing. Said plainly above the rates, never left for the reader to work out. */
+  const age = FIXING_ISO ? (Date.now() - Date.parse(FIXING_ISO)) / 36e5 : NaN, st = document.getElementById("hd-stale");
+  if (Number.isFinite(age) && age > 26){ st.hidden = false; set("hd-stale", t.hdStale(`${day}, ${tm} UTC`, Math.floor(age))); }
+  else st.hidden = true;
   set("hd-borrow-k", t.hdBorrowK); set("hd-supply-k", t.hdSupplyK);
   set("hd-borrow", pc(HEAD.borrow)); set("hd-supply", pc(HEAD.supply));
   const sofr = CONTEXT?.sofr?.rate, sl = document.getElementById("hd-sofr");
@@ -1391,7 +1405,8 @@ function renderChrome(){
   const an = document.getElementById("absentNote");
   if (ABSENT.length){
     an.hidden = false;
-    set("absentNote", ABSENT.map(x => t.absentNote(x.label, x.reason || t.absentGeneric)).join("<br>"));
+    const escA = x => String(x).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
+    set("absentNote", ABSENT.map(x => t.absentNote(x.label, x.reason ? escA(x.reason) : t.absentGeneric)).join("<br>"));
   } else an.hidden = true;
   set("t-disclaimer", t.disclaimer);
   document.getElementById("t-signup-btn").textContent = t.signupBtn;
@@ -1697,6 +1712,10 @@ function render(){
   const venues = new Set(ix.markets.map(m => m.venue)).size;
   const largest = Math.max(...ix.markets.map(m => m.weight));
   set("coverage", t.coverage(venues, (largest*100).toFixed(0)));
+  /* If the live file could not be read, say so: the bundled figures are an
+     example from 1 September, and the plain-text line above stays visible. */
+  const ln = document.getElementById("liveNote");
+  if (ln){ ln.hidden = LIVE; if (!LIVE) set("liveNote", t.liveNote); }
 
   /* Outside Stacks and SOFR both belong to the index being shown. A dollar
      market does not explain a bitcoin rate, so only rows marked comparable to
@@ -1879,7 +1898,11 @@ async function boot(){
     const map = { "SBOR-USD":"USD", "SBOR-BTC":"BTC", "SBOR-STX":"STX" };
     const present = new Set(Object.keys(d.indices || {}));
     ABSENT = Object.keys(map).filter(label => !present.has(label))
-      .map(label => ({ label, reason: d.withdrawn?.[label]?.reason || null }));
+      .map(label => {
+        /* latest.json keeps SBOR's reason under withheld, as { reason } or as text. */
+        const v = d.withheld?.[label], why = typeof v === "string" ? v : v?.reason;
+        return { label, reason: typeof why === "string" && why.trim() ? why.trim() : null };
+      });
     for (const [label,k] of Object.entries(map))
       if (!present.has(label)) delete INDICES[k];
     if (!INDICES[current]) current = Object.keys(INDICES)[0];
@@ -1891,7 +1914,8 @@ async function boot(){
         depth:(m.depthUsd||0)/1e6, phaseIn:m.phaseIn ?? 1
       }));
     }
-    if (d.fixing) fixingDate = d.fixing.slice(0,10);
+    if (d.fixing){ fixingDate = d.fixing.slice(0,10); FIXING_ISO = d.fixing; }
+    LIVE = true;
     if (d.poxReference) POX = d.poxReference;
     if (d.externalReference) EXTERNAL = d.externalReference;
     if (d.bitcoinCollateralUsdc) BTCREF = d.bitcoinCollateralUsdc;
@@ -1917,7 +1941,7 @@ async function boot(){
   renderChrome(); render(); renderHead();
   /* The plain-text rates are for readers that do not run this script, such
      as many crawlers. Once the live table is drawn, they are not needed. */
-  if (INDICES && Object.keys(INDICES).length) document.getElementById("snapshot")?.setAttribute("hidden", "");
+  if (LIVE && INDICES && Object.keys(INDICES).length) document.getElementById("snapshot")?.setAttribute("hidden", "");
 }
 
 /* Sections as tabs, each with its own link: sbor.xyz/#methodology and so on. The
