@@ -1,0 +1,36 @@
+name: Test the MCP server
+
+# Runs the MCP server's tests on every change to it. Read-only: it starts the
+# server against a fixed snapshot in mcp/test/fixtures and checks its answers
+# on the bad days SBOR has had (a withdrawn fixing, a withheld index, a missing
+# file, stale data). It never runs the fixing, never commits and never deploys.
+
+on:
+  push:
+    paths: ["mcp/**", "mcp-remote/**", ".github/workflows/test-mcp.yml"]
+  pull_request:
+    paths: ["mcp/**", "mcp-remote/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        working-directory: mcp
+        run: npm install --no-audit --no-fund
+      - name: Test the server
+        working-directory: mcp
+        run: npm test
+      - name: The remote server is built from this server
+        run: |
+          cp mcp-remote/remote.js /tmp/remote.before.js
+          node mcp-remote/build.mjs
+          cmp mcp-remote/remote.js /tmp/remote.before.js || { echo "mcp-remote/remote.js is out of date: run node mcp-remote/build.mjs"; exit 1; }
