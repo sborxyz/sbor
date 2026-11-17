@@ -12,7 +12,7 @@ import { externalReference } from "./external.mjs";
 import { bitcoinCollateralUsdc } from "./morpho.mjs";
 import { methodologyPreview, bitcoinCollateral, EFFECTIVE as V113 } from "./preview.mjs";
 import { contextBlock } from "./context.mjs";
-import { termAverages, pickIndex, pickHeadline } from "./terms.mjs";
+import { termAverages, pickIndex, pickHeadline, V114 } from "./terms.mjs";
 
 const POOLS_URL = "https://yields.llama.fi/pools";
 const STACKINGDAO_APY = "https://app.stackingdao.com/api/apy?v=2";
@@ -132,7 +132,11 @@ const TODAY = new Date().toISOString().slice(0, 10);
    The morning job never sets it. */
 const METHOD_DATE = process.env.SBOR_METHOD_DATE || TODAY;
 const IS_113 = METHOD_DATE >= V113;
-const METHODOLOGY_VERSION = IS_113 ? "1.13.0" : "1.12.0";
+/* 1.14.0 takes effect with the fixing of 23 November 2026 (METHODOLOGY-1.14.0.md),
+   announced on 18 November: term averages carry the last published rate for up
+   to three missing days in a row. The fixing itself does not change. */
+const IS_114 = METHOD_DATE >= V114;
+const METHODOLOGY_VERSION = IS_114 ? "1.14.0" : IS_113 ? "1.13.0" : "1.12.0";
 
 /* Below this, on both sides at once, a funded market is not showing a market rate. */
 const RATE_FLOOR = 0.05;
@@ -772,7 +776,7 @@ const main = async () => {
       "A funded market whose borrow and supply rates both read below 0.05% is excluded from the fixing rather than published as a rate of effectively zero: lenders and borrowers do not set such a rate, so it is either a reporting failure or a rate held down by the protocol by design.",
       "The record is sharded by year at /api/v1/history-YYYY.json, indexed at /api/v1/history-index.json. history.json carries a rolling 200 day window for convenience.",
       "context records SOFR, spot prices, sBTC supply and the Bitcoin block height alongside each fixing. None of it enters an index or affects a rate. It is kept so a past fixing can be read in the conditions of its day.",
-      "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses, published for each Stacks index and for the headline, BTC-COLLATERAL-USD (bitcoinCollateralUsd.termAverages, from its first fixing on 14 October 2026). An average is null until its full window of fixings exists. Averages run on through a methodology change, as SOFR's do: past fixings are never recomputed, and methodologyVersions lists every version inside the window.",
+      "termAverages are compounded averages of the daily fixings over 30, 90 and 180 days, actual/365, the same construction SOFR uses, published for each Stacks index and for the headline, BTC-COLLATERAL-USD (bitcoinCollateralUsd.termAverages, from its first fixing on 14 October 2026). An average is null until its full window of fixings exists. From methodology 1.14.0 (fixing of 23 November 2026), a day with no published rate takes the last published rate, for up to three days in a row, and every carried day is listed in carried; a longer gap leaves the average null. Averages run on through a methodology change, as SOFR's do: past fixings are never recomputed, and methodologyVersions lists every version inside the window.",
       "allInSupply adds protocol yield to the lending rate, which is what a supplier actually receives. The fixing itself is the lending rate alone, because protocol yield comes from the asset and can change or end independently of the lending market.",
       "Protocol yield for stSTX and stSTXbtc is sourced from StackingDAO, which derives it from PoX reward claims net of pool commission over stSTX supply. Where a source cannot be reached, the index is marked allInSupplyIncomplete and the yield is left out rather than estimated.",
       "StackingDAO's stBTC figure is recorded in context as their estimated net yield on the Bitcoin Staking bond, per the method they published on 15 September 2026: 3.0% on bonded sBTC, diluted by an unbonded liquidity buffer, less commission and a payment to stSTX holders for STX locked in the bond. It is a staking yield, not a lending rate, and enters no index."
@@ -896,7 +900,7 @@ const main = async () => {
       record = JSON.parse(readFileSync(`api/v1/history-${Number(year) - 1}.json`, "utf8")).concat(history);
     } catch {}
     for (const [label, ix] of Object.entries(indices)){
-      ix.termAverages = termAverages(record, pickIndex(label), day);
+      ix.termAverages = termAverages(record, pickIndex(label), day, IS_114);
       const first = record.find(r => r[label] && !r[label].withdrawn);
       if (first) ix.seriesBegan = first.date;
     }
@@ -904,7 +908,7 @@ const main = async () => {
        headline: the rate per stablecoin answers what an offer costs today,
        the headline is what a contract settles against. */
     if (btcUsd){
-      btcUsd.termAverages = termAverages(record, pickHeadline, day);
+      btcUsd.termAverages = termAverages(record, pickHeadline, day, IS_114);
       const first = record.find(pickHeadline);
       if (first) btcUsd.seriesBegan = first.date;
     }

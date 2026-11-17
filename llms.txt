@@ -15,7 +15,17 @@
 > limit, open to any agent on any chain. Anyone may reference it without
 > permission.
 
-## Notice: methodology 1.13.0 takes effect on 14 October 2026
+## Notice: methodology 1.14.0 takes effect on 23 November 2026
+
+Announced 18 November 2026. From the fixing of 23 November 2026, a term
+average carries the last published rate across a day with no published rate
+(withheld, withdrawn after publication, or no fixing), for up to three days in
+a row, as SOFR's averages do. Each average lists the carried days in
+`carried`. A longer gap leaves the average null, as before. The daily fixings
+do not change, and no published average would have been different. Full
+rules: https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.14.0.md
+
+## Notice: methodology 1.13.0 took effect on 14 October 2026
 
 Announced 9 October 2026. From the fixing of 14 October 2026, the bitcoin
 rate widens from USDC to every dollar stablecoin lent against plain 1:1
@@ -259,7 +269,10 @@ stablecoin: that answers what an offer costs today, while the headline is what a
 contract settles against. An average runs on through a methodology change, as
 SOFR's do: past fixings are never recomputed under new rules, and each average
 lists every methodology version inside its window in methodologyVersions. This
-is an addition to what is published, not a change to the fixing.
+is an addition to what is published, not a change to the fixing. From
+methodology 1.14.0 (fixing of 23 November 2026), a day with no published rate
+takes the last published rate, for up to three days in a row; every carried
+day is listed in the average's carried. A longer gap leaves it null.
 
 Revisions: published fixings are never rewritten. Corrections appear as a new
 fixing with a note.
