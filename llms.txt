@@ -335,6 +335,12 @@ On the EVM chains (Arc, Base, Hyperliquid), the contract is the same:
   post rates. Source: contracts/SBORFixings.sol, and contracts/sbor-fixings.clar
   for Stacks. Each live page reads its chain directly in the browser. The JSON
   at sbor.xyz/api remains the authoritative record.
+- A fixing withdrawn after publication stays on-chain: SBOR never rewrites a
+  published fixing, and the contracts have no way to mark one as withdrawn.
+  Every withdrawn fixing is listed, with its date, rate and reason, at
+  https://sbor.xyz/api/v1/withdrawals.json and in CORRECTIONS.md. A contract or
+  agent reading a rate on-chain should check its date there before relying on
+  it. The next fixing replaces the latest value as usual.
 
 ## Context: stSTX on the market, and the stBTC loop's carry
 
