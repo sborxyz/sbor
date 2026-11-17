@@ -255,11 +255,46 @@ async function graniteCollateralCheck(){
   return present;
 }
 
+/* Audit item 2A (November 17, 2026): a market that could not be read for a
+   network reason is tried again inside the same run, after 1, 2 and 3
+   minutes, before it is left out. A market that answered with something
+   wrong (another loan or collateral, nothing supplied) is a real answer and
+   is not retried. The first pass is unchanged: every market once, in order.
+   Only the daily fixing waits; a direct run tries once. SBOR_RETRY_WAIT_MS
+   shortens the waits, for tests only. */
+const RETRY_WAITS_MS = [60_000, 120_000, 180_000];
+const TRANSIENT = /every .+ endpoint failed|returned \d+ words|responded 5\d\d|responded 429|timeout|timed out|aborted|fetch failed|ECONN|ETIMEDOUT|EAI_AGAIN|socket/i;
+const isTransient = e => TRANSIENT.test(String(e?.message ?? e));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const retrying = () => process.env.SBOR_FIXING === "1" || process.env.SBOR_RETRY === "1";
+const waitMs = ms => Number(process.env.SBOR_RETRY_WAIT_MS) > 0 ? Number(process.env.SBOR_RETRY_WAIT_MS) : ms;
+
 async function collect(granite){
   const read = [], notRead = [], notReadIds = [];
+  let failed = [];
   for (const m of MARKETS){
     try { read.push(await readMarket(m)); }
-    catch (e) { notReadIds.push(m.id); notRead.push(`${m.chain} ${m.collateral}/${m.loan} ${m.id.slice(0, 10)}: ${e.message}`); log(`  preview ${m.chain} ${m.collateral}/${m.loan}: not read. ${e.message}`); }
+    catch (e) { failed.push({ m, e }); }
+  }
+  /* Retry rounds: only markets that failed for a network reason, in order. */
+  if (retrying()){
+    for (const [i, wait] of RETRY_WAITS_MS.entries()){
+      const again = failed.filter(f => isTransient(f.e));
+      if (!again.length) break;
+      log(`  ${again.length} market(s) not read for a network reason: ${again.map(f => `${f.m.chain} ${f.m.collateral}/${f.m.loan}`).join(", ")}. Trying again in ${Math.round(waitMs(wait) / 1000)} s (round ${i + 2} of ${RETRY_WAITS_MS.length + 1}).`);
+      await sleep(waitMs(wait));
+      for (const f of again){
+        try { read.push(await readMarket(f.m)); f.done = true; log(`  ${f.m.chain} ${f.m.collateral}/${f.m.loan}: read on round ${i + 2}.`); }
+        catch (e) { f.e = e; }
+      }
+      failed = failed.filter(f => !f.done);
+    }
+  }
+  /* Keep the published order: the order markets are listed in. */
+  const order = new Map(MARKETS.map((m, i) => [m.id.toLowerCase(), i]));
+  read.sort((p, q) => (order.get(String(p.marketId).toLowerCase()) ?? 0) - (order.get(String(q.marketId).toLowerCase()) ?? 0));
+  for (const { m, e } of failed){
+    notReadIds.push(m.id); notRead.push(`${m.chain} ${m.collateral}/${m.loan} ${m.id.slice(0, 10)}: ${e.message}`); log(`  preview ${m.chain} ${m.collateral}/${m.loan}: not read. ${e.message}`);
   }
   if (granite && typeof granite.borrow === "number" && granite.depthUsd > 0){
     const g = {
@@ -270,7 +305,18 @@ async function collect(granite){
       marketId: GRANITE_STATE.replace("/", "."), inBtcCollateralUsdcToday: false, eligibleFrom: EFFECTIVE, source: "contract"
     };
     try {
-      const present = await graniteCollateralCheck();
+      let present;
+      try { present = await graniteCollateralCheck(); }
+      catch (e) {
+        if (!retrying() || !isTransient(e)) throw e;
+        let last = e;
+        for (const wait of RETRY_WAITS_MS){
+          log(`  Stacks Granite USDCx collateral list not read (${last.message}). Trying again in ${Math.round(waitMs(wait) / 1000)} s.`);
+          await sleep(waitMs(wait));
+          try { present = await graniteCollateralCheck(); break; } catch (e2) { last = e2; if (!isTransient(e2)) break; }
+        }
+        if (!present) throw last;
+      }
       g.collateralCheck = present;
       if (present.length === 1 && present[0] === SBTC) read.push(g);
       else notReadIds.push(g.marketId), notRead.push(`Stacks Granite USDCx: collateral list is ${present.join(", ") || "empty"}, not sBTC alone`);
