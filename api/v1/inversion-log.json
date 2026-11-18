@@ -154,8 +154,8 @@
   },
   {
     "firstSeen": "2026-11-13T11:27:48Z",
-    "lastSeen": "2026-11-18T01:13:45Z",
-    "checks": 53,
+    "lastSeen": "2026-11-18T03:05:19Z",
+    "checks": 54,
     "maxEdgeBps": 34,
     "lastEdgeBps": 24,
     "status": "live",
