@@ -154,10 +154,10 @@
   },
   {
     "firstSeen": "2026-11-13T11:27:48Z",
-    "lastSeen": "2026-11-18T06:05:22Z",
-    "checks": 55,
+    "lastSeen": "2026-11-18T09:05:11Z",
+    "checks": 56,
     "maxEdgeBps": 34,
-    "lastEdgeBps": 24,
+    "lastEdgeBps": 25,
     "status": "live",
     "asset": "USDCx",
     "index": "SBOR-USD",
