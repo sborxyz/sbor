@@ -50,6 +50,12 @@ Published beside them, never inside them: a Proof of Transfer staking
 reference, and the same asset classes on the largest lending markets on
 Ethereum, Base, Hyperliquid and Solana, for comparison.
 
+### Methodology 1.14.0, from November 23, 2026
+
+Term averages carry the last published rate across a day with no published
+rate, for up to three days in a row, and list every carried day
+([notice](METHODOLOGY-1.14.0.md)). The daily fixings do not change.
+
 ### Beyond Stacks: borrowing dollars against bitcoin
 
 From the fixing of 14 October 2026, methodology 1.13.0
