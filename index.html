@@ -218,6 +218,19 @@ tr.ownrow .venue{color:var(--accent)}
 .coverage{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-soft);margin-bottom:14px;letter-spacing:.01em}
 .foot-note{margin-top:16px;color:var(--ink-soft);font-size:13.5px;max-width:70ch}
 
+/* Use cases tab: what the rate is for, from a first loan to an institution. */
+.uses-lead{color:var(--ink-soft);max-width:none;margin-bottom:8px}
+.uses-step{padding:26px 0 8px;border-top:1px solid var(--rule-soft);margin-top:22px}
+.uses-step h3{font-size:15.5px;font-weight:600;margin-bottom:14px}
+.uses-step h3 span{display:inline-block;color:var(--accent);font-weight:500;margin-right:12px}
+.uses-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 40px}
+.uses-grid p{color:var(--ink-soft);max-width:56ch;margin-bottom:12px}
+.uses-grid p strong{color:var(--ink);font-weight:500}
+.uses-build{margin-top:26px;padding-top:22px;border-top:1px solid var(--rule-soft);color:var(--ink-soft);max-width:none}
+#uses-sec .foot-note{max-width:none}
+.uses-build strong{color:var(--ink);font-weight:500}
+@media (max-width:720px){.uses-grid{grid-template-columns:1fr}}
+
 .method{display:grid;grid-template-columns:1fr 1fr;gap:40px}
 .method > div{min-width:0}
 .method p{max-width:58ch;color:var(--ink-soft);margin-bottom:14px}
@@ -341,6 +354,7 @@ a{color:var(--accent)}
 <div class="wrap">
   <nav class="tabs" id="tabs" aria-label="Sections">
     <a href="#rates" data-tab="rates" id="tab-rates">Rates</a>
+    <a href="#uses" data-tab="uses" id="tab-uses">Use cases</a>
     <a href="#stacks" data-tab="stacks" id="tab-stacks" hidden>Stacks</a>
     <a href="#staking" data-tab="staking" id="tab-staking">Staking</a>
     <a href="#agents" data-tab="agents" id="tab-agents">For AI agents</a>
@@ -586,6 +600,14 @@ a{color:var(--accent)}
     </section>
 
 
+    <section id="uses-sec" data-tabpage="uses">
+      <div class="sec-h"><div><h2 id="t-usesH"></h2></div></div>
+      <p class="uses-lead" id="t-usesP"></p>
+      <div id="uses-steps"></div>
+      <p class="uses-build" id="t-usesBuild"></p>
+      <p class="foot-note" id="t-usesFoot"></p>
+    </section>
+
     <section data-tabpage="methodology">
       <div class="sec-h"><div><h2 id="t-method-h"></h2></div></div>
       <div class="method">
@@ -797,6 +819,33 @@ en:{
   poxMissing:"SBOR-PoX could not be read for today's fixing and is omitted today. The history and every cycle below are unchanged.",
   poxMeta:(c,btc,stx,x,w)=>`Read fresh each day from the bitcoin actually paid out in completed reward cycle ${c}${w} · ${btc} BTC paid to stakers · ${stx} STX locked · converted at ${x} STX per BTC, averaged over 7 days`,
   csv:"Download CSV",
+  tabUses:"Use cases",
+  usesH:"What can I do with SBOR?",
+  usesP:"SBOR is one number, published every day: what it costs to borrow dollars against bitcoin. Here is what it is for, from a first loan to an institution.",
+  usesSteps:[
+    { n:"1", h:"People who borrow", items:[
+      ["Check if a loan is fair.", "Say you are offered 7% and SBOR shows the market at 5%. Now you know you would pay 2% too much."],
+      ["Let your AI check for you.", "Connect SBOR to Claude or ChatGPT. Your agent checks the rate before it borrows, and stops to ask you when the offer is too high."]
+    ]},
+    { n:"2", h:"Lenders and platforms", items:[
+      ["Price a loan off the market.", "\u201cSBOR plus 2%.\u201d When the market moves, the loan moves with it, and the borrower can check every change."],
+      ["Show your rate against the market.", "A fixed-rate lender puts its rate beside SBOR, so customers see how it compares."]
+    ]},
+    { n:"3", h:"Funds, family offices and treasuries", items:[
+      ["Value positions every day.", "Mark bitcoin-backed loans against SBOR, from a public record any auditor can check."],
+      ["See where the capacity is.", "Every market on every chain, with how much is lent out and where there is room."],
+      ["Settle long agreements on an average.", "A deal that runs for months settles on SBOR\u2019s 30, 90 or 180 day average, so one strange day cannot change the bill."]
+    ]},
+    { n:"4", h:"Institutions", items:[
+      ["Bitcoin miners: check every credit offer.", "A miner that borrows against its bitcoin to fund power and machines checks each offer against the market, and brings the benchmark to the negotiation."],
+      ["Digital asset treasury companies: show what your borrowing costs.", "A company holding bitcoin on its balance sheet reports its cost of debt against the market, day by day, to its board, auditors and investors."],
+      ["Banks and lenders: write it into the contract.", "A credit line against bitcoin priced at \u201cSBOR plus a spread\u201d, the way dollar loans are written on SOFR."],
+      ["Asset managers and funds: hedge the rate.", "A swap where one side pays fixed and the other pays SBOR, settled against the rate posted on-chain."],
+      ["Risk teams: feed your models.", "A daily history of rates and utilization, free to download, never rewritten."]
+    ]}
+  ],
+  usesBuild:`<strong>Builders:</strong> free data, an AI connector and the rate posted on five blockchains. See <a href="#agents">For AI agents</a> and <a href="https://github.com/sborxyz/sbor/blob/main/BUILD.md" target="_blank" rel="noopener">BUILD.md</a>.`,
+  usesFoot:`Free to use, including commercially. SBOR is a published statistic, not investment advice. Tell us how you use it: <a href="mailto:contact@sbor.xyz">contact@sbor.xyz</a>`,
   tabRates:"Rates", tabStaking:"Staking", tabAgents:"For AI agents", tabMethod:"Methodology", tabStacks:"Stacks",
   noticeLive:'<strong>Methodology 1.13.0 took effect on 14 October 2026.</strong> SBOR\'s headline now covers every dollar stablecoin lent against plain bitcoin, on the Rates tab. The Stacks indices below do not change. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Read the notice</a>.',
   hdH:"What it costs to borrow dollars against bitcoin.",
@@ -959,6 +1008,33 @@ pt:{
   poxMissing:"O SBOR-PoX não pôde ser lido no fixing de hoje e foi omitido hoje. O histórico e cada ciclo abaixo não mudam.",
   poxMeta:(c,btc,stx,x,w)=>`Lido todo dia a partir do bitcoin efetivamente pago no ciclo de recompensa ${c}, já concluído${w} · ${btc} BTC pagos a stakers · ${stx} STX travados · convertido a ${x} STX por BTC, média de 7 dias`,
   csv:"Baixar CSV",
+  tabUses:"Usos",
+  usesH:"O que posso fazer com o SBOR?",
+  usesP:"O SBOR é um número, publicado todos os dias: quanto custa tomar dólares emprestados com bitcoin como garantia. Veja para que ele serve, do primeiro empréstimo a uma instituição.",
+  usesSteps:[
+    { n:"1", h:"Quem toma empréstimo", items:[
+      ["Veja se um empréstimo é justo.", "Suponha que lhe ofereçam 7% e o SBOR mostre o mercado em 5%. Agora você sabe que pagaria 2% a mais."],
+      ["Deixe sua IA conferir por você.", "Conecte o SBOR ao Claude ou ao ChatGPT. Seu agente confere a taxa antes de tomar o empréstimo, e interrompe para perguntar a você quando a oferta está alta demais."]
+    ]},
+    { n:"2", h:"Credores e plataformas", items:[
+      ["Precifique um empréstimo pelo mercado.", "\u201cSBOR mais 2%.\u201d Quando o mercado se move, o empréstimo acompanha, e o tomador pode conferir cada mudança."],
+      ["Mostre sua taxa ao lado do mercado.", "Um credor de taxa fixa coloca sua taxa ao lado do SBOR, para que os clientes vejam a comparação."]
+    ]},
+    { n:"3", h:"Fundos, family offices e tesourarias", items:[
+      ["Avalie posições todos os dias.", "Marque empréstimos lastreados em bitcoin contra o SBOR, a partir de um registro público que qualquer auditor pode conferir."],
+      ["Veja onde há capacidade.", "Todos os mercados em todas as redes, com quanto está emprestado e onde há espaço."],
+      ["Liquide contratos longos por uma média.", "Um contrato de vários meses é liquidado pela média de 30, 90 ou 180 dias do SBOR, e assim um dia atípico não muda a conta."]
+    ]},
+    { n:"4", h:"Instituições", items:[
+      ["Mineradores de bitcoin: confiram cada oferta de crédito.", "Um minerador que toma crédito com seu bitcoin como garantia, para pagar energia e máquinas, confere cada oferta contra o mercado e leva a referência para a negociação."],
+      ["Empresas de tesouraria em ativos digitais: mostrem quanto custa sua dívida.", "Uma empresa com bitcoin no balanço informa seu custo de dívida contra o mercado, dia a dia, ao conselho, aos auditores e aos investidores."],
+      ["Bancos e credores: escrevam no contrato.", "Uma linha de crédito com garantia em bitcoin precificada em \u201cSBOR mais um spread\u201d, como os empréstimos em dólar são escritos sobre a SOFR."],
+      ["Gestoras e fundos: protejam-se da taxa.", "Um swap em que um lado paga taxa fixa e o outro paga o SBOR, liquidado contra a taxa publicada on-chain."],
+      ["Equipes de risco: alimentem seus modelos.", "Um histórico diário de taxas e de utilização, gratuito para baixar, nunca reescrito."]
+    ]}
+  ],
+  usesBuild:`<strong>Quem constrói:</strong> dados gratuitos, um conector de IA e a taxa publicada em cinco blockchains. Veja <a href="#agents">Para agentes de IA</a> e <a href="https://github.com/sborxyz/sbor/blob/main/BUILD.md" target="_blank" rel="noopener">BUILD.md</a>.`,
+  usesFoot:`Uso livre, inclusive comercial. O SBOR é uma estatística publicada, não uma recomendação de investimento. Conte como você usa: <a href="mailto:contact@sbor.xyz">contact@sbor.xyz</a>`,
   tabRates:"Taxas", tabStaking:"Staking", tabAgents:"Para agentes de IA", tabMethod:"Metodologia", tabStacks:"Stacks",
   noticeLive:'<strong>A metodologia 1.13.0 entrou em vigor em 14 de outubro de 2026.</strong> A taxa principal do SBOR agora cobre toda stablecoin em dólar emprestada contra bitcoin puro, na aba Taxas. Os índices da Stacks abaixo não mudam. <a href="https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md" target="_blank" rel="noopener">Leia o aviso</a>.',
   hdH:"Quanto custa tomar dólares emprestados com bitcoin como garantia.",
@@ -1377,6 +1453,8 @@ function renderChrome(){
   renderStstx();
   set("t-cons-foot", t.consFoot);
   set("t-method-h", t.methodH);
+  set("tab-uses", t.tabUses); set("t-usesH", t.usesH); set("t-usesP", t.usesP); set("t-usesBuild", t.usesBuild); set("t-usesFoot", t.usesFoot);
+  set("uses-steps", t.usesSteps.map(st => `<div class="uses-step"><h3><span>${st.n}</span>${st.h}</h3><div class="uses-grid">${st.items.map(([a, b]) => `<p><strong>${a}</strong> ${b}</p>`).join("")}</div></div>`).join(""));
   set("t-signup-h", t.signupH); set("t-signup-p", t.signupP);
   set("t-devH", t.devH); set("t-devP", t.devP);
   set("tab-rates", t.tabRates); set("tab-staking", t.tabStaking); set("tab-agents", t.tabAgents); set("tab-method", t.tabMethod); set("tab-stacks", t.tabStacks);
@@ -1953,7 +2031,7 @@ async function boot(){
    and the tabs only choose what is shown. The hiding rule applies only once
    tabs-ready is set, so if this ever failed the page would show everything
    rather than nothing, and readers that do not run scripts see it all. */
-const TABS = ["rates", "stacks", "staking", "agents", "methodology", "paper"];
+const TABS = ["rates", "uses", "stacks", "staking", "agents", "methodology", "paper"];
 function currentTab(){
   const h = decodeURIComponent(location.hash.slice(1));
   if (h === "method") return "methodology";   // the first name, kept working
