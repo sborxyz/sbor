@@ -481,7 +481,9 @@ If an index was unchanged, one clause is enough: "SBOR-BTC unchanged at 1.31%." 
 
 **Precision.** Give a level and its change together: "4.05%, up 50 basis points". Do not give a change without its level. Round to whole basis points and two decimal places on rates.
 
-The flags array is what crossed a threshold. Use it as your agenda, not as your text: write it properly rather than listing it back. Do not mention that flags exist.`;
+The flags array is what crossed a threshold. Use it as your agenda, not as your text: write it properly rather than listing it back. Do not mention that flags exist.
+
+Write only the finished text. Never correct yourself inside it ("wait", "...", "I mean"): decide what is true first, then write the sentence once.`;
 
 /* One call to the model. Thinking is adaptive at low effort, inside a 6000
    token cap that leaves room for the brief itself. Until 15 October 2026 this
@@ -518,12 +520,24 @@ async function call(thinking){
   return text;
 }
 
+/* A draft that changes its mind mid-sentence: a trailing-off "..." or a
+   "wait," / "scratch that" / "correction:" / "I mean". */
+const selfCorrects = t => /\.\.\.|\u2026|\bwait\b\s*[,.:!]|\bscratch that\b|\bcorrection\s*:|\bactually,? no\b|\bI mean\b|\bsorry\b/i.test(String(t));
+
 /* Adaptive thinking first, because it writes better. If that fails for any
    reason, one more attempt with thinking off, which is terser but reliable.
    Only if both fail does the brief go out as raw findings. */
 async function write(){
   try {
-    return await call(true);
+    const draft = await call(true);
+    if (!selfCorrects(draft)) return draft;
+    /* On 18 November 2026 a brief went out reading "the Zest V2 STX... wait,
+       that's SBOR-STX." A draft that corrects itself in the text is written
+       again, once; the second draft is sent either way, with a log line. */
+    log("the draft corrects itself in the text; writing it again");
+    const again = await call(true);
+    if (selfCorrects(again)) log("the second draft also corrects itself; sending it as written");
+    return again;
   } catch (e) {
     log(`first attempt failed, retrying with thinking off. ${e.name === "TimeoutError" ? "timed out" : e.message}`);
     return await call(false);
