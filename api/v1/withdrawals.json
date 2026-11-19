@@ -1,8 +1,8 @@
 {
   "schema": "sbor.v1",
   "note": "Every fixing withdrawn after publication. A withdrawn fixing stays in the archive and the history as published, but it is not a valid reading. asOf is the date of the latest fixing this list was built with: a fixing dated after asOf has not been checked yet.",
-  "asOf": "2026-11-18",
-  "fixing": "2026-11-18T08:31:12Z",
+  "asOf": "2026-11-19",
+  "fixing": "2026-11-19T08:31:15Z",
   "count": 1,
   "withdrawals": [
     {
