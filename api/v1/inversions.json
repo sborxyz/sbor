@@ -1,9 +1,9 @@
 {
   "schema": "sbor.v1",
-  "checked": "2026-11-19T20:55:28Z",
+  "checked": "2026-11-19T21:05:15Z",
   "basedOnFixing": "2026-11-19T08:31:15Z",
   "status": "live",
-  "basedOnFixingAgeHours": 12.4,
+  "basedOnFixingAgeHours": 12.6,
   "statusNote": "Live. Detections are published the moment they are found, to everyone at once.",
   "minimumEdgeBps": 10,
   "note": "An inversion is the same asset costing less to borrow at one venue than it pays to supply at another. Rates are compared as published by SBOR, before fees, gas, liquidation risk and any minimum position size. SBOR does not trade on its own rate and does not represent that any inversion is executable.",
