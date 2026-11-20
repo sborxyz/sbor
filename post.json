@@ -1,17 +1,17 @@
 {
-  "fixing": "2026-11-19T08:31:15Z",
-  "comparedWith": "2026-11-18",
+  "fixing": "2026-11-20T08:31:20Z",
+  "comparedWith": "2026-11-19",
   "top": {
-    "why": "INVERSION on USDCx: supply Zest V2 1.42% vs borrow Granite 1.21%",
+    "why": "INVERSION on USDCx: supply Zest V2 1.38% vs borrow Granite 1.19%",
     "chars": 189,
-    "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.42%. Borrowing the same asset at Granite costs 1.21%.\n\n+21 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
+    "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.38%. Borrowing the same asset at Granite costs 1.19%.\n\n+19 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
   },
   "otherCount": 0,
   "drafts": [
     {
-      "why": "INVERSION on USDCx: supply Zest V2 1.42% vs borrow Granite 1.21%",
+      "why": "INVERSION on USDCx: supply Zest V2 1.38% vs borrow Granite 1.19%",
       "chars": 189,
-      "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.42%. Borrowing the same asset at Granite costs 1.21%.\n\n+21 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
+      "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.38%. Borrowing the same asset at Granite costs 1.19%.\n\n+19 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
     }
   ]
 }
