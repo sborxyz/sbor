@@ -167,6 +167,7 @@
     "supplyVenue": "Zest V2",
     "supplyRate": 1.61,
     "supplyUtilization": 82.63,
-    "edgeBps": 34
+    "edgeBps": 34,
+    "closedAt": "2026-11-21T09:05:14Z"
   }
 ]
