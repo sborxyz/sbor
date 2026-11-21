@@ -29,6 +29,7 @@ const UTIL_LOW = 20;           // or down through this
 
 const log = (...a) => console.error(...a);
 const bps = (a, b) => Math.round((a - b) * 100);
+const INVERSION_MIN_BPS = 10;   // keep equal to MIN_EDGE_BPS in scripts/inversion.mjs
 const sign = n => (n > 0 ? "+" : "") + n;
 const pct = n => n.toFixed(2) + "%";
 
@@ -261,7 +262,11 @@ ${LINK}`
       for (const supplyAt of ms){
         if (borrowAt.venue === supplyAt.venue) continue;
         const edge = supplyAt.supply - borrowAt.borrow;
-        if (edge > 0 && (!best || edge > best.edge))
+        /* Same minimum as the inversion monitor (scripts/inversion.mjs,
+           MIN_EDGE_BPS = 10). Below it the monitor calls the pair closed, and
+           on November 21, 2026 the brief drafted "+3 bps, inverted" beside the
+           monitor's own "no longer inverted". */
+        if (bps(supplyAt.supply, borrowAt.borrow) >= INVERSION_MIN_BPS && (!best || edge > best.edge))
           best = { borrowAt, supplyAt, edge };
       }
     if (!best) continue;

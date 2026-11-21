@@ -13,6 +13,13 @@ on:
 permissions:
   contents: write
 
+# cron-job.org and GitHub's own schedule can start a run in the same minute
+# (November 20, 2026: 12:05:06 and 12:05:26). Run them one after the other,
+# never side by side, so the second never pushes over the first.
+concurrency:
+  group: inversion-monitor
+  cancel-in-progress: false
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -44,7 +51,13 @@ jobs:
             echo "No change."
           else
             git commit -m "inversion check $(date -u +%Y-%m-%dT%H:%MZ) [skip netlify]"
-            git push
+            # Another job (the fixing, a publisher) may have pushed since this
+            # run checked out. Take the newer main first, then push; retry twice.
+            for i in 1 2 3; do
+              if git pull --rebase --quiet && git push; then exit 0; fi
+              sleep 5
+            done
+            exit 1
           fi
 
       # Only when an inversion opens or closes: a standing one is not repeated
