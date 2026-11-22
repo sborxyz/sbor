@@ -1,35 +1,15 @@
-SBOR post drafts, fixing 2026-11-21T08:30:53Z
-Compared with 2026-11-20
+SBOR post drafts, fixing 2026-11-22T08:30:59Z
+Compared with 2026-11-21
 
-3 things worth saying. Pick one. Do not post more than one a day.
+1 thing worth saying. Pick one. Do not post more than one a day.
 
---- 1. INVERSION on USDCx: supply Zest V2 1.19% vs borrow Granite 1.16% (188 chars)
+--- 1. Zest V2 STX utilization crossed above 80% (176 chars)
 
-USDCx is inverted across venues.
+Zest V2 STX is now 80.06% utilized, up from 79.81%.
 
-Supplying at Zest V2 pays 1.19%. Borrowing the same asset at Granite costs 1.16%.
+Borrow 3.34%, supply 2.39%.
 
-+3 bps, before fees, gas and liquidation risk.
-
-sbor.xyz
-
---- 2. PoX cycle 146 to 147 (143 chars)
-
-Reward cycle 147 settled.
-
-8.84 BTC paid to STX stackers, against 513,862,268 STX locked.
-
-SBOR-PoX: 11.45% to 10.91%.
-
-sbor.xyz
-
---- 3. Zest V2 STX utilization fell back below 80% (135 chars)
-
-Zest V2 STX is back to 79.81% utilized, down from 84.83%.
-
-Borrow 3.33%, supply 2.37%.
-
-The squeeze has eased.
+Above 80% a lending market prices steeply and withdrawals get harder.
 
 sbor.xyz
 

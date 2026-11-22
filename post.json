@@ -1,27 +1,17 @@
 {
-  "fixing": "2026-11-21T08:30:53Z",
-  "comparedWith": "2026-11-20",
+  "fixing": "2026-11-22T08:30:59Z",
+  "comparedWith": "2026-11-21",
   "top": {
-    "why": "INVERSION on USDCx: supply Zest V2 1.19% vs borrow Granite 1.16%",
-    "chars": 188,
-    "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.19%. Borrowing the same asset at Granite costs 1.16%.\n\n+3 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
+    "why": "Zest V2 STX utilization crossed above 80%",
+    "chars": 176,
+    "text": "Zest V2 STX is now 80.06% utilized, up from 79.81%.\n\nBorrow 3.34%, supply 2.39%.\n\nAbove 80% a lending market prices steeply and withdrawals get harder.\n\nsbor.xyz"
   },
-  "otherCount": 2,
+  "otherCount": 0,
   "drafts": [
     {
-      "why": "INVERSION on USDCx: supply Zest V2 1.19% vs borrow Granite 1.16%",
-      "chars": 188,
-      "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.19%. Borrowing the same asset at Granite costs 1.16%.\n\n+3 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
-    },
-    {
-      "why": "PoX cycle 146 to 147",
-      "chars": 143,
-      "text": "Reward cycle 147 settled.\n\n8.84 BTC paid to STX stackers, against 513,862,268 STX locked.\n\nSBOR-PoX: 11.45% to 10.91%.\n\nsbor.xyz"
-    },
-    {
-      "why": "Zest V2 STX utilization fell back below 80%",
-      "chars": 135,
-      "text": "Zest V2 STX is back to 79.81% utilized, down from 84.83%.\n\nBorrow 3.33%, supply 2.37%.\n\nThe squeeze has eased.\n\nsbor.xyz"
+      "why": "Zest V2 STX utilization crossed above 80%",
+      "chars": 176,
+      "text": "Zest V2 STX is now 80.06% utilized, up from 79.81%.\n\nBorrow 3.34%, supply 2.39%.\n\nAbove 80% a lending market prices steeply and withdrawals get harder.\n\nsbor.xyz"
     }
   ]
 }
