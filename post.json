@@ -1,17 +1,7 @@
 {
-  "fixing": "2026-11-22T08:30:59Z",
-  "comparedWith": "2026-11-21",
-  "top": {
-    "why": "Zest V2 STX utilization crossed above 80%",
-    "chars": 176,
-    "text": "Zest V2 STX is now 80.06% utilized, up from 79.81%.\n\nBorrow 3.34%, supply 2.39%.\n\nAbove 80% a lending market prices steeply and withdrawals get harder.\n\nsbor.xyz"
-  },
+  "fixing": "2026-11-23T08:30:50Z",
+  "comparedWith": "2026-11-22",
+  "top": null,
   "otherCount": 0,
-  "drafts": [
-    {
-      "why": "Zest V2 STX utilization crossed above 80%",
-      "chars": 176,
-      "text": "Zest V2 STX is now 80.06% utilized, up from 79.81%.\n\nBorrow 3.34%, supply 2.39%.\n\nAbove 80% a lending market prices steeply and withdrawals get harder.\n\nsbor.xyz"
-    }
-  ]
+  "drafts": []
 }

@@ -1,16 +1,10 @@
-SBOR post drafts, fixing 2026-11-22T08:30:59Z
-Compared with 2026-11-21
+SBOR post drafts, fixing 2026-11-23T08:30:50Z
+Compared with 2026-11-22
 
-1 thing worth saying. Pick one. Do not post more than one a day.
+Nothing moved enough to be worth posting.
 
---- 1. Zest V2 STX utilization crossed above 80% (176 chars)
-
-Zest V2 STX is now 80.06% utilized, up from 79.81%.
-
-Borrow 3.34%, supply 2.39%.
-
-Above 80% a lending market prices steeply and withdrawals get harder.
-
-sbor.xyz
-
-Check the numbers against the site before posting. Never state a cause.
+Thresholds: a rate moving 25 bps, the staking yield moving 50 bps or
+changing cycle, an index appearing or dropping out, utilization
+crossing 80% or 20% in either direction, an inversion, or a term
+average publishing. A level that has not moved since yesterday is
+not news and is deliberately not flagged.
