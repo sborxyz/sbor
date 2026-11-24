@@ -690,10 +690,69 @@ async function handle(msg, ua){
 
 const ABOUT = `SBOR MCP server. Benchmark lending rates for Bitcoin DeFi, for agents.
 
+Is a rate you were offered fair? Open, no key needed:
+https://mcp.sbor.xyz/check?rate=6.5&stablecoin=USDC
+
 Connect an MCP client to https://mcp.sbor.xyz/mcp (Streamable HTTP, no key).
 Tools: ${[...server.tools.keys()].join(", ")}.
 Local version: npx -y sbor-mcp. Registry: xyz.sbor/sbor. Site: https://sbor.xyz
 `;
+
+/* /check: the compare_rate tool for agents and people that can open a web
+   page but do not speak MCP. Most consumer agents browse rather than connect
+   (a16z and The Prompting Company, November 2026: connector use under 5% of
+   runs), so the same check answers at a plain address. It calls the tool's own
+   handler, so the answer is word for word the MCP answer. GET only, plain text
+   (format=json for JSON), nothing stored. */
+const STABLES = ["USD", "USDC", "USDT", "RLUSD", "PYUSD", "USD1"];
+const CHECK_HELP = `SBOR rate check. Is a rate you were offered fair?
+
+Open: https://mcp.sbor.xyz/check?rate=6.5&stablecoin=USDC
+  rate        the rate offered, as a percentage (6.5 means 6.5%)
+  side        borrow (default) or supply
+  stablecoin  USD (all dollar stablecoins, default), USDC, USDT, RLUSD, PYUSD or USD1
+  index       instead of stablecoin, a Stacks index: SBOR-USD, SBOR-BTC or SBOR-STX
+  format      text (default) or json
+
+It compares the offer with SBOR, the daily reference rate for borrowing dollars
+against bitcoin, read from the lending contracts. Free, no key. Not financial advice.
+Site: https://sbor.xyz
+`;
+const textRes = (t, status = 200) =>
+  new Response(t, { status, headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store", ...CORS } });
+
+async function check(url, ua){
+  const q = url.searchParams;
+  const want = q.get("format") === "json" ? "json" : "text";
+  const bad = msg => want === "json" ? json({ error: msg, help: "https://mcp.sbor.xyz/check" }, 400) : textRes(msg + "\n\n" + CHECK_HELP, 400);
+  if (!q.has("rate")) return want === "json" ? bad("rate is required") : textRes(CHECK_HELP);
+  const raw = String(q.get("rate")).trim().replace(/%$/, "").replace(",", ".");
+  const rate = Number(raw);
+  if (!raw || !Number.isFinite(rate)) return bad(`rate must be a number, got "${String(q.get("rate")).slice(0, 20)}"`);
+  const side = (q.get("side") || "borrow").toLowerCase();
+  if (!["borrow", "supply"].includes(side)) return bad("side must be borrow or supply");
+  let index;
+  if (q.has("index")){
+    index = String(q.get("index")).toUpperCase();
+    if (!BENCHMARKS.includes(index)) return bad(`index must be one of ${BENCHMARKS.join(", ")}`);
+  } else {
+    const coin = String(q.get("stablecoin") || "USD").toUpperCase();
+    if (!STABLES.includes(coin)) return bad(`stablecoin must be one of ${STABLES.join(", ")}`);
+    index = "BTC-COLLATERAL-" + coin;
+  }
+  usage("check", { benchmark: index, side, ua });
+  const t = server.tools.get("compare_rate");
+  for (const [k, s] of Object.entries(t.cfg.inputSchema)){
+    const problem = s.check(k, { rate, side, index }[k]);
+    if (problem) return bad(problem);
+  }
+  let res;
+  try { res = await t.handler({ rate, side, index }); }
+  catch (e) { res = { isError: true, content: [{ type: "text", text: `SBOR check failed: ${e?.message}` }] }; }
+  const body = res.content.map(c => c.text).join("\n");
+  if (want === "json") return json({ rate, side, benchmark: index, verdict: res.isError ? null : body, refused: res.isError ? body : null, source: "https://sbor.xyz" });
+  return textRes(`SBOR rate check: ${rate}% to ${side}, compared with ${index}.\n\n${body}\n\nSource: SBOR, https://sbor.xyz (data CC BY 4.0). Check another rate: https://mcp.sbor.xyz/check\n`);
+}
 
 /* Proof for Meta's Muse connector review that SBOR controls this host. Muse
    checks this one exact path for this one exact value. Only SBOR's own
@@ -706,6 +765,8 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     if (request.method === "GET" && url.pathname === "/.well-known/muse-challenge/" + MUSE_CHALLENGE)
       return new Response("muse-challenge=" + MUSE_CHALLENGE, { headers: { "content-type": "text/plain; charset=utf-8", ...CORS } });
+    if (request.method === "GET" && (url.pathname === "/check" || url.pathname === "/check/"))
+      return check(url, String(request.headers.get("user-agent") || "none").slice(0, 60));
     if (url.pathname !== "/mcp"){
       if (request.method === "GET") return new Response(ABOUT, { headers: { "content-type": "text/plain; charset=utf-8", ...CORS } });
       return new Response("Not found", { status: 404, headers: CORS });

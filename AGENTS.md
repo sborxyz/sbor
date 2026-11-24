@@ -1,6 +1,6 @@
 # SBOR AGENTS.md
 
-*Created 24 September 2026. Last updated October 28, 2026 (the white paper).*
+*Created 24 September 2026. Last updated November 24, 2026 (the rate check address).*
 
 > SBOR publishes benchmark lending rates for Bitcoin DeFi, read from lending contract state and published once a day: what it costs to borrow, and what supplying earns, in each currency on Stacks, and what it costs to borrow dollars against bitcoin. From the fixing of 14 October 2026 (methodology 1.13.0) the SBOR headline is `BTC-COLLATERAL-USD`, every dollar stablecoin lent against plain bitcoin, with a rate per stablecoin; before that date, `BTC-COLLATERAL-USDC`, from Morpho on Base, Ethereum and Arc. Each day's fixing is also posted on-chain, on Arc, Base, Hyperliquid, Solana and Stacks: contract addresses in [llms.txt](https://sbor.xyz/llms.txt). Free to use, including commercially.
 
@@ -20,7 +20,7 @@ The remote and local servers are built from the same code and give the same answ
 | Question | Where |
 |---|---|
 | What does it cost to borrow or supply right now? | [api/v1/latest.json](https://sbor.xyz/api/v1/latest.json), or the MCP tool `get_rate` |
-| Is this rate I was offered fair? | the MCP tool `compare_rate` |
+| Is this rate I was offered fair? | the MCP tool `compare_rate`, or without MCP open [mcp.sbor.xyz/check?rate=6.5&stablecoin=USDC](https://mcp.sbor.xyz/check?rate=6.5&stablecoin=USDC) (plain text, same answer; `format=json` for JSON). For people: [sbor.xyz/is-my-rate-fair](https://sbor.xyz/is-my-rate-fair) |
 | Which markets make up a rate? | `latest.json`, or `list_markets` |
 | How has a rate moved? | [api/v1/history.json](https://sbor.xyz/api/v1/history.json), or `get_history` |
 | What does the same asset cost on other chains? | `externalReference` in `latest.json`, or `compare_chains` |

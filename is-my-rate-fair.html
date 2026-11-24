@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>try{var t=localStorage.getItem("sbor-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F1F2ED;--ink:#131A1F;--soft:#5C646B;--accent:#1D4E6B;--rule:#CBCFC4}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#12171B;--ink:#E7E9E4;--soft:#9AA2A8;--accent:#7FB3D1;--rule:#2A3339;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#12171B;--ink:#E7E9E4;--soft:#9AA2A8;--accent:#7FB3D1;--rule:#2A3339;color-scheme:dark}
+.theme{float:right;font:inherit;font-size:15px;line-height:1;background:none;border:1px solid var(--rule);color:var(--soft);padding:5px 9px;cursor:pointer}
+.theme:hover{color:var(--ink)}
+.theme:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 "IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:720px;margin:0 auto;padding:48px 24px 64px}
+.mark{font:500 13px/1 "IBM Plex Mono",ui-monospace,Menlo,monospace;letter-spacing:.08em;color:var(--soft);text-decoration:none}
+.bar{height:6px;background:var(--accent);margin:0 0 40px}
+h1{font-weight:600;font-size:34px;line-height:1.2;margin:18px 0 10px}
+.lead{font-size:19px;margin:0 0 28px}
+h2{font-size:20px;font-weight:600;margin:36px 0 8px;scroll-margin-top:16px}
+a{color:var(--accent)}
+p{margin:0 0 16px}
+ol,ul{padding-left:22px;margin:0 0 16px}
+li{margin:0 0 8px}
+.today{border:1px solid var(--rule);border-left:4px solid var(--accent);padding:16px 18px 2px;margin:0 0 28px}
+form{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:end;border:1px solid var(--rule);padding:16px 18px;margin:0 0 12px}
+label{display:flex;flex-direction:column;font-size:14px;color:var(--soft);gap:4px}
+input,select{font:inherit;font-size:16px;padding:7px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);min-width:0}
+input{width:110px}
+button.go{font:inherit;font-weight:600;font-size:16px;padding:8px 16px;border:1px solid var(--accent);background:var(--accent);color:var(--paper);cursor:pointer}
+.mono{font:14px/1.5 "IBM Plex Mono",ui-monospace,Menlo,monospace;overflow-wrap:anywhere}
+.small{font-size:14px;color:var(--soft)}
+dt{font-weight:600;margin:18px 0 4px}
+dd{margin:0 0 8px}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--rule);color:var(--soft);font-size:14px}
+@media (max-width:560px){h1{font-size:28px}}
+</style>
+<title>Is my bitcoin loan rate fair? · SBOR</title>
+<meta name="description" content="Check any offer to borrow dollars against bitcoin against today's market rate, read from the lending contracts and published daily by SBOR. Free, with the date on every number.">
+<link rel="canonical" href="https://sbor.xyz/is-my-rate-fair">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Is my bitcoin loan rate fair?">
+<meta property="og:description" content="Compare any offer to borrow dollars against bitcoin with today's market rate, read from the lending contracts.">
+<meta property="og:url" content="https://sbor.xyz/is-my-rate-fair">
+<meta property="og:image" content="https://sbor.xyz/og.png?v=3">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sbor.xyz/og.png?v=3">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Is my rate to borrow USDC against bitcoin fair?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Compare it with today's market rate for the same stablecoin. SBOR publishes what it costs to borrow dollars against plain bitcoin every day, read from the lending contracts, with a rate per stablecoin. An offer more than 50 basis points above that rate is above the market. Check any rate at https://mcp.sbor.xyz/check?rate=6.5&stablecoin=USDC"}},
+    {"@type": "Question", "name": "What does it cost to borrow dollars against bitcoin today?",
+     "acceptedAnswer": {"@type": "Answer", "text": "SBOR publishes it every morning at 08:30 UTC as BTC-COLLATERAL-USD, with a rate per stablecoin and 30, 90 and 180 day averages. Today's numbers are at https://sbor.xyz/is-my-rate-fair and https://sbor.xyz/api/v1/latest.json"}},
+    {"@type": "Question", "name": "How do I compare a fixed-rate bitcoin loan with the market?",
+     "acceptedAnswer": {"@type": "Answer", "text": "SBOR's daily rate is variable. For a fixed rate or a loan that runs for months, compare with the 30, 90 or 180 day average, and expect some premium for fixing the rate."}},
+    {"@type": "Question", "name": "Why do different sources give different rates for bitcoin-backed loans?",
+     "acceptedAnswer": {"@type": "Answer", "text": "Rates differ by loan type and by day: fixed or variable, bitcoin as the only collateral or a pool of assets, and the date the rate was read. SBOR states all three for every number: variable, plain bitcoin only, and the date and time of each fixing."}}
+  ]
+}
+</script>
+</head>
+<body>
+<div class="bar"></div>
+<main>
+<button class="theme" id="themeBtn" type="button" aria-label="Switch theme" title="Switch theme">&#9680;</button>
+<a class="mark" href="/">SBOR · STANDARD BITCOIN OFFERED RATE</a>
+<article>
+<h1>Is my bitcoin loan rate fair?</h1>
+<p class="lead">Compare it with the market rate for the same loan. SBOR publishes that rate every day, read straight from the lending contracts, with the date on every number.</p>
+
+<div class="today" id="today">
+<!-- fair:start -->
+<p><strong>Today's market rate</strong> (SBOR fixing of November 24, 2026, 08:31 UTC): borrowing dollars against plain bitcoin costs <strong>4.51%</strong> a year (BTC-COLLATERAL-USD), read from 18 lending markets on 6 chains where lenders have supplied $2.8B.</p>
+<p>By stablecoin: USDC 4.80%, RLUSD 3.31%, PYUSD 4.20%, USDT 3.50%, USD1 1.80%.</p>
+<p>30 day average: 5.41%. For a loan that runs for months, or a fixed rate, compare with the average, not one day's rate.</p>
+<p>Example: an offer of 6.5% to borrow USDC against bitcoin is 170 basis points (1.70 percentage points) above today's USDC rate of 4.80%. SBOR's rule of thumb: more than 50 basis points above the market, stop and ask questions before you borrow.</p>
+<!-- fair:end -->
+</div>
+
+<h2>Check your rate</h2>
+<form action="https://mcp.sbor.xyz/check" method="get">
+  <label>Rate offered (%)<input name="rate" type="text" inputmode="decimal" required placeholder="6.5"></label>
+  <label>Stablecoin<select name="stablecoin"><option>USDC</option><option>USDT</option><option>RLUSD</option><option>PYUSD</option><option>USD1</option><option value="USD">Any dollar</option></select></label>
+  <label>I would<select name="side"><option value="borrow">borrow</option><option value="supply">lend</option></select></label>
+  <button class="go" type="submit">Check</button>
+</form>
+<p class="small">Or open it directly, which also works for AI assistants that can open a web page: <span class="mono"><a href="https://mcp.sbor.xyz/check?rate=6.5&amp;stablecoin=USDC">mcp.sbor.xyz/check?rate=6.5&amp;stablecoin=USDC</a></span></p>
+
+<h2>How to compare fairly</h2>
+<ol>
+<li><strong>Same stablecoin.</strong> USDC, USDT and other dollar stablecoins are different loans with different rates. Compare with the rate for yours.</li>
+<li><strong>Fixed or variable.</strong> SBOR's daily rate is variable. For a fixed rate, or a loan that runs for months, compare with the 30, 90 or 180 day average, and expect some premium for fixing.</li>
+<li><strong>Bitcoin only.</strong> SBOR counts markets where plain bitcoin is the only collateral. A loan against a pool of assets is priced differently.</li>
+<li><strong>All-in cost.</strong> Add fees to the rate. The loan-to-value ratio, the liquidation terms and who holds your bitcoin matter as much as the rate.</li>
+</ol>
+
+<h2>Questions</h2>
+<dl>
+<dt>What is SBOR?</dt>
+<dd>The Standard Bitcoin Offered Rate: the daily reference rate for borrowing dollars against bitcoin. It reads every eligible lending market straight from its contract, publishes one dated rate with every market behind it, and posts it on-chain on five chains. The way SOFR works for dollars backed by Treasuries.</dd>
+<dt>Can I trust the number?</dt>
+<dd>Every fixing is a public commit, published fixings are never rewritten, and every correction is logged in public. The method is versioned and self-assessed against the IOSCO Principles for Financial Benchmarks. SBOR has no token and never trades on its own rate.</dd>
+<dt>Does SBOR lend, or recommend lenders?</dt>
+<dd>No. SBOR publishes a statistic. It holds no money, routes no loans and recommends no one.</dd>
+<dt>Can my AI assistant check a rate for me?</dt>
+<dd>Yes. Any assistant that can open a web page can use the check link above. Claude and other assistants that connect to tools can add SBOR's MCP server at <span class="mono">mcp.sbor.xyz/mcp</span>, no key. See <a href="/#uses">what you can do with SBOR</a>.</dd>
+</dl>
+
+<p class="small">SBOR is a published statistic, not financial advice. Rates are effective annual rates (APY). Data free to use, including commercially, under CC BY 4.0.</p>
+</article>
+<footer><a href="/">sbor.xyz</a> · <a href="/#uses">Use cases</a> · <a href="/llms.txt">Methodology</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="mailto:contact@sbor.xyz">contact@sbor.xyz</a></footer>
+</main>
+<script>
+(function(){
+  var b=document.getElementById("themeBtn"); if(!b) return;
+  function now(){var s=document.documentElement.getAttribute("data-theme");if(s==="dark"||s==="light")return s;return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+  function label(){var l=now()==="dark"?"Switch to light theme":"Switch to dark theme";b.setAttribute("aria-label",l);b.title=l;}
+  b.addEventListener("click",function(){var n=now()==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("sbor-theme",n)}catch(e){}label();});
+  label();
+})();
+</script>
+</body>
+</html>

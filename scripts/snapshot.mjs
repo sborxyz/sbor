@@ -58,6 +58,37 @@ function setSpan(html, id, value){
   return html.replace(re, `$1${value}$3`);
 }
 
+/* The "Is my bitcoin loan rate fair?" page carries today's numbers as plain
+   text too, between <!-- fair:start --> and <!-- fair:end -->, because that is
+   the question people type into AI assistants, and those read pages without
+   running them. Numbers only from the fixing; nothing estimated. */
+export const FAIR_START = "<!-- fair:start -->", FAIR_END = "<!-- fair:end -->";
+export function fairText(d){
+  const t = new Date(d.fixing);
+  if (isNaN(t)) throw new Error("unreadable fixing time");
+  const head = d.bitcoinCollateralUsd;
+  if (!head || !pct(head.borrow)) throw new Error("no headline rate in this fixing");
+  const when = `${MONTHS[t.getUTCMonth()]} ${t.getUTCDate()}, ${t.getUTCFullYear()}, ${t.toISOString().slice(11, 16)} UTC`;
+  const rows = [];
+  rows.push(`<p><strong>Today's market rate</strong> (SBOR fixing of ${esc(when)}): borrowing dollars against plain bitcoin costs <strong>${pct(head.borrow)}</strong> a year (BTC-COLLATERAL-USD), read from ${head.markets.length} lending markets on ${new Set(head.markets.map(m => m.chain)).size} chains where lenders have supplied ${usd(head.depthUsd)}.</p>`);
+  const subs = Object.entries(head.subRates || {}).filter(([, v]) => pct(v?.borrow));
+  if (subs.length)
+    rows.push(`<p>By stablecoin: ${subs.map(([k, v]) => `${esc(k.replace("BTC-COLLATERAL-", ""))} ${pct(v.borrow)}`).join(", ")}.</p>`);
+  const t30 = head.termAverages?.d30;
+  if (t30 && pct(t30.borrow))
+    rows.push(`<p>30 day average: ${pct(t30.borrow)}. For a loan that runs for months, or a fixed rate, compare with the average, not one day's rate.</p>`);
+  const usdc = head.subRates?.["BTC-COLLATERAL-USDC"];
+  const ex = 6.5, base = pct(usdc?.borrow) ? usdc.borrow : head.borrow, label = pct(usdc?.borrow) ? "USDC" : "dollar stablecoins";
+  const gap = Math.round((ex - base) * 100);
+  rows.push(`<p>Example: an offer of ${ex.toFixed(1)}% to borrow ${label} against bitcoin is ${Math.abs(gap)} basis points (${(Math.abs(gap) / 100).toFixed(2)} percentage points) ${gap >= 0 ? "above" : "below"} today's ${label === "USDC" ? "USDC" : ""} rate of ${pct(base)}.${gap > 50 ? " SBOR's rule of thumb: more than 50 basis points above the market, stop and ask questions before you borrow." : ""}</p>`.replace("today's  rate", "today's rate"));
+  return rows.join("\n");
+}
+export function withFair(html, text){
+  const i = html.indexOf(FAIR_START), j = html.indexOf(FAIR_END);
+  if (i < 0 || j < 0 || j < i) throw new Error("fair markers not found");
+  return html.slice(0, i + FAIR_START.length) + "\n" + text + "\n" + html.slice(j);
+}
+
 export function withValues(html, d){
   const two = n => (typeof n === "number" && Number.isFinite(n)) ? n.toFixed(2) : "n/a";
   const usd = d.indices?.["SBOR-USD"];
@@ -84,5 +115,16 @@ if (import.meta.url === `file://${process.argv[1]}`){
     else log("snapshot: already current");
   } catch (e) {
     log(`snapshot: skipped, the page is unchanged. ${e.message}`);
+  }
+  /* Separately, so a problem with one page never stops the other. */
+  try {
+    const d = JSON.parse(readFileSync("api/v1/latest.json", "utf8"));
+    const page = "is-my-rate-fair.html";
+    const html = readFileSync(page, "utf8");
+    const next = withFair(html, fairText(d));
+    if (next !== html){ writeFileSync(page, next); log(`snapshot: ${page} updated`); }
+    else log(`snapshot: ${page} already current`);
+  } catch (e) {
+    log(`snapshot: is-my-rate-fair.html skipped, the page is unchanged. ${e.message}`);
   }
 }

@@ -110,7 +110,8 @@ jobs:
         continue-on-error: true
         run: node scripts/post.mjs
 
-      # Today's rates as plain text inside index.html, for readers that do not
+      # Today's rates as plain text inside index.html and is-my-rate-fair.html,
+      # for readers that do not
       # run the page's script, such as many AI crawlers. Like the drafter, it
       # can never stop the fixing publishing: on a problem it leaves the page
       # as it was.
@@ -124,7 +125,7 @@ jobs:
         run: |
           git config user.name  "sbor-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A api latest.txt post.txt post.json post-state.json index.html
+          git add -A api latest.txt post.txt post.json post-state.json index.html is-my-rate-fair.html
           if git diff --staged --quiet; then
             echo "No change, nothing to commit."
           else

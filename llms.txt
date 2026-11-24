@@ -66,6 +66,10 @@ How to call it:
 - MCP, remote: `https://mcp.sbor.xyz/mcp`, Streamable HTTP, no key, no sign-in,
   then the `compare_rate` tool
 - MCP, local: `npx -y sbor-mcp`, the same tools and the same answers
+- Without MCP, one address, the same answer as `compare_rate` in plain text:
+  `GET https://mcp.sbor.xyz/check?rate=6.5&stablecoin=USDC` (side=borrow or
+  supply; stablecoin USD, USDC, USDT, RLUSD, PYUSD or USD1; format=json for JSON)
+- For people: https://sbor.xyz/is-my-rate-fair, today's rate and a check form
 - HTTP: `GET https://sbor.xyz/api/v1/latest.json`, no key, CORS open
 - Plain text, today's fixing: https://sbor.xyz/latest.txt
 - The short version for agents: https://github.com/sborxyz/sbor/blob/main/AGENTS.md
