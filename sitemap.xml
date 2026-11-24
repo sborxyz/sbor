@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://sbor.xyz/</loc><changefreq>daily</changefreq></url>
+  <url><loc>https://sbor.xyz/is-my-rate-fair</loc><changefreq>daily</changefreq></url>
+  <url><loc>https://sbor.xyz/paper.html</loc></url>
+  <url><loc>https://sbor.xyz/whitepaper.html</loc></url>
+  <url><loc>https://sbor.xyz/llms.txt</loc></url>
+  <url><loc>https://sbor.xyz/stacks.html</loc></url>
+  <url><loc>https://sbor.xyz/base.html</loc></url>
+  <url><loc>https://sbor.xyz/arc.html</loc></url>
+  <url><loc>https://sbor.xyz/solana.html</loc></url>
+  <url><loc>https://sbor.xyz/hyperliquid.html</loc></url>
+  <url><loc>https://sbor.xyz/privacy.html</loc></url>
+  <url><loc>https://sbor.xyz/terms.html</loc></url>
+</urlset>
