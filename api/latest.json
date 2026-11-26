@@ -7,7 +7,7 @@
     "sbor.btc",
     "sbor.stx"
   ],
-  "fixing": "2026-11-25T08:31:00Z",
+  "fixing": "2026-11-26T08:30:50Z",
   "methodologyVersion": "1.14.0",
   "isDailyFixing": true,
   "basis": "APY, continuously compounded. Zest and Granite both publish nominal annual rates, converted here to a single effective basis so constituents are comparable. Each market also carries its nominal figure.",
@@ -65,8 +65,8 @@
       "currency": "USD",
       "headline": "What money costs in dollars on Stacks.",
       "borrow": 2.7,
-      "supply": 0.87,
-      "allInSupply": 0.87,
+      "supply": 0.88,
+      "allInSupply": 0.88,
       "allInSupplyDiffers": false,
       "venues": [
         "Zest V2",
@@ -77,12 +77,12 @@
         {
           "venue": "Zest V2",
           "asset": "USDCx",
-          "borrow": 3.51,
-          "supply": 1.27,
-          "utilization": 73.6,
-          "nominalBorrow": 3.45,
-          "nominalSupply": 1.26,
-          "depthUsd": 10144052,
+          "borrow": 3.52,
+          "supply": 1.28,
+          "utilization": 73.72,
+          "nominalBorrow": 3.46,
+          "nominalSupply": 1.27,
+          "depthUsd": 10144758,
           "depthSource": "contract",
           "phaseIn": 1,
           "weight": 0.6506
@@ -101,16 +101,16 @@
         {
           "venue": "Zest V2",
           "asset": "USDh",
-          "borrow": 1.52,
+          "borrow": 1.53,
           "supply": 0,
-          "utilization": 25.81,
-          "nominalBorrow": 1.51,
+          "utilization": 25.82,
+          "nominalBorrow": 1.52,
           "nominalSupply": 0,
-          "depthUsd": 438323,
+          "depthUsd": 438328,
           "depthSource": "contract",
           "depthCheck": {
             "source": "DefiLlama",
-            "depthUsd": 324107
+            "depthUsd": 324070
           },
           "phaseIn": 1,
           "weight": 0.0281
@@ -155,11 +155,11 @@
           "nominalBorrow": 1.31,
           "nominalSupply": 0.95,
           "protocolYieldSource": "Bitcoin protocol yield via dual stacking, paid on enrolment",
-          "depthUsd": 14575069,
+          "depthUsd": 14994865,
           "depthSource": "contract",
           "depthCheck": {
             "source": "DefiLlama",
-            "depthUsd": 2383933
+            "depthUsd": 2422284
           },
           "phaseIn": 1,
           "weight": 1
@@ -167,8 +167,8 @@
       ],
       "termAverages": {
         "d30": {
-          "borrow": 1.36,
-          "supply": 1.03,
+          "borrow": 1.35,
+          "supply": 1.02,
           "methodologyVersions": [
             "1.13.0",
             "1.14.0"
@@ -186,32 +186,32 @@
       "headline": "What money costs in STX on Stacks.",
       "borrow": 1.77,
       "supply": 0.93,
-      "allInSupply": 4.53,
+      "allInSupply": 4.58,
       "allInSupplyDiffers": true,
       "venues": [
         "Zest V2"
       ],
-      "largestConstituentWeight": 0.6199,
+      "largestConstituentWeight": 0.6204,
       "markets": [
         {
           "venue": "Zest V2",
           "asset": "stSTX",
           "borrow": 0.79,
           "supply": 0.02,
-          "utilization": 4.87,
+          "utilization": 4.86,
           "nominalBorrow": 0.79,
           "nominalSupply": 0.02,
-          "protocolYield": 5.81,
+          "protocolYield": 5.89,
           "protocolYieldSource": "PoX staking yield on the underlying, derived by StackingDAO from PoX reward claims net of pool commission",
-          "depthUsd": 3193998,
+          "depthUsd": 3254529,
           "depthSource": "contract",
           "depthCheck": {
             "source": "DefiLlama",
-            "depthUsd": 3003311
+            "depthUsd": 3072068
           },
-          "stxPerStstx": 1.199852,
+          "stxPerStstx": 1.200133,
           "phaseIn": 1,
-          "weight": 0.6199
+          "weight": 0.6204
         },
         {
           "venue": "Zest V2",
@@ -221,14 +221,14 @@
           "utilization": 80.38,
           "nominalBorrow": 3.3,
           "nominalSupply": 2.38,
-          "depthUsd": 1958828,
+          "depthUsd": 1991131,
           "depthSource": "contract",
           "depthCheck": {
             "source": "DefiLlama",
-            "depthUsd": 385263
+            "depthUsd": 387410
           },
           "phaseIn": 1,
-          "weight": 0.3801
+          "weight": 0.3796
         }
       ],
       "termAverages": {
@@ -254,7 +254,7 @@
     "period": "one reward cycle, about two weeks",
     "cyclesPerYear": 25.03,
     "annualisation": "Bitcoin paid over one reward cycle divided by STX locked, annualized over the cycles in a year.",
-    "apy": 10.66,
+    "apy": 10.67,
     "cycle": 147,
     "measurement": 2,
     "cycleStartBurnBlock": 974750,
@@ -262,18 +262,18 @@
     "cycleStartApprox": "2026-11-06",
     "cycleEndApprox": "2026-11-20",
     "cycleLengthBlocks": 2100,
-    "cycleYieldPct": 0.4056,
+    "cycleYieldPct": 0.406,
     "btcPaid": 8.837075,
     "stxLocked": 513862268,
-    "stxPerBtc": 227078.67,
-    "stxPerBtcSell": 225437.94,
-    "stxPerBtcBuy": 228719.4,
-    "crossSpreadBps": 145,
+    "stxPerBtc": 230051.19,
+    "stxPerBtcSell": 228842.23,
+    "stxPerBtcBuy": 231260.15,
+    "crossSpreadBps": 105,
     "crossNote": "Quoted in both directions and midpointed. Price impact always costs the taker, so a one sided quote would be an execution price and systematically below true mid rather than noisy around it.",
-    "stxPerBtcSmoothed": 235839.04,
+    "stxPerBtcSmoothed": 236067.24,
     "crossWindowDays": 7,
     "rateSource": "Bitflow",
-    "rateQuoteImpactBps": 20,
+    "rateQuoteImpactBps": 0,
     "note": "Bitcoin paid to stackers over one two week reward cycle, divided by the STX locked, annualized. The payout is in bitcoin against a position held in STX, so the figure depends on the BTC to STX rate. That rate is averaged over a short window rather than taken at the moment of the fixing, so the published yield describes staking economics rather than the currency wandering between fixings. The spot quote is published alongside it. It is a staking yield, not a lending rate, and is never blended into the lending indices. From 24 September 2026 (measurement 2) the cycle window is the chain's own and the STX locked is that cycle's; before that the window started 350 blocks early and the STX locked was the following cycle's, so earlier figures are close but not exact."
   },
   "bitcoinCollateralUsd": {
@@ -283,72 +283,72 @@
     "effectiveFrom": "2026-10-14",
     "notice": "https://github.com/sborxyz/sbor/blob/main/METHODOLOGY-1.13.0.md",
     "note": "What it costs to borrow dollars against bitcoin: every eligible market lending a dollar stablecoin against plain 1:1 bitcoin, priced by its own interest rate model, read from contract state, weighted by what is supplied times its phase-in. Markets added under methodology 1.13.0 entered at zero weight on 14 October 2026 and reach full weight over 30 days, so the rate glides rather than steps. depthUsd counts every market in full; weightedDepthUsd is what carries weight today. A rate per stablecoin is published once $25M or more of it is weighted in. Withheld when markets that could not be read carried a quarter or more of its weight when last read. continuity records that weight per market.",
-    "borrow": 4.44,
-    "supply": 3.61,
-    "nominalBorrow": 4.34,
-    "utilization": 81.64,
-    "depthUsd": 2771427826,
-    "weightedDepthUsd": 2652531594,
+    "borrow": 4.38,
+    "supply": 3.55,
+    "nominalBorrow": 4.28,
+    "utilization": 81.66,
+    "depthUsd": 2772852322,
+    "weightedDepthUsd": 2655979072,
     "constituents": 17,
     "venues": 3,
     "chains": 5,
-    "largestConstituentWeight": 0.6376,
+    "largestConstituentWeight": 0.6428,
     "subRates": {
       "BTC-COLLATERAL-USDC": {
-        "borrow": 4.74,
-        "supply": 3.82,
-        "nominalBorrow": 4.62,
-        "utilization": 80.54,
-        "depthUsd": 2237374329,
-        "weightedDepthUsd": 2118478097,
+        "borrow": 4.66,
+        "supply": 3.73,
+        "nominalBorrow": 4.55,
+        "utilization": 80.32,
+        "depthUsd": 2239249478,
+        "weightedDepthUsd": 2122376227,
         "markets": 6,
         "venues": 2,
         "chains": 4,
-        "largestConstituentWeight": 0.7983
+        "largestConstituentWeight": 0.8044
       },
       "BTC-COLLATERAL-RLUSD": {
-        "borrow": 3.15,
+        "borrow": 3.14,
         "supply": 2.71,
-        "nominalBorrow": 3.1,
-        "utilization": 86.1,
-        "depthUsd": 201382986,
-        "weightedDepthUsd": 201382986,
+        "nominalBorrow": 3.09,
+        "utilization": 86.27,
+        "depthUsd": 199292437,
+        "weightedDepthUsd": 199292437,
         "markets": 3,
         "venues": 1,
         "chains": 1,
-        "largestConstituentWeight": 0.8044
+        "largestConstituentWeight": 0.8024
       },
       "BTC-COLLATERAL-PYUSD": {
         "borrow": 4.2,
         "supply": 3.78,
         "nominalBorrow": 4.12,
         "utilization": 90.09,
-        "depthUsd": 120933609,
-        "weightedDepthUsd": 120933609,
+        "depthUsd": 120948569,
+        "weightedDepthUsd": 120948569,
         "markets": 2,
         "venues": 1,
         "chains": 1,
         "largestConstituentWeight": 0.9866
       },
       "BTC-COLLATERAL-USDT": {
-        "borrow": 3.48,
-        "supply": 2.98,
-        "nominalBorrow": 3.42,
-        "utilization": 85.86,
-        "depthUsd": 123388997,
-        "weightedDepthUsd": 123388997,
+        "borrow": 3.43,
+        "supply": 2.89,
+        "nominalBorrow": 3.37,
+        "utilization": 84.77,
+        "depthUsd": 125226682,
+        "weightedDepthUsd": 125226682,
         "markets": 4,
         "venues": 2,
         "chains": 2,
-        "largestConstituentWeight": 0.5664
+        "largestConstituentWeight": 0.5575
       },
       "BTC-COLLATERAL-USD1": {
-        "borrow": 1.82,
-        "supply": 1.33,
-        "nominalBorrow": 1.81,
-        "utilization": 81.26,
-        "depthUsd": 82572527,
-        "weightedDepthUsd": 82572527,
+        "borrow": 1.96,
+        "supply": 1.57,
+        "nominalBorrow": 1.94,
+        "utilization": 89.3,
+        "depthUsd": 82642823,
+        "weightedDepthUsd": 82642823,
         "markets": 1,
         "venues": 1,
         "chains": 1,
@@ -363,10 +363,10 @@
         "collateral": "cbBTC",
         "loan": "USDC",
         "group": "USDC",
-        "borrow": 5.04,
-        "supply": 4.18,
-        "nominalBorrow": 4.91,
-        "utilization": 83.26,
+        "borrow": 4.94,
+        "supply": 4.05,
+        "nominalBorrow": 4.82,
+        "utilization": 82.4,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x9103c3b4e834476c9a62ea009ba2c884ee42e94e6e314a26f04d312434191836",
@@ -375,12 +375,12 @@
         "inBtcCollateralUsdcToday": true,
         "eligibleFrom": null,
         "source": "contract",
-        "loanPrice": 0.9999,
-        "collateralVsBtc": 0.9956,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 0.9992,
         "phaseIn": 1,
-        "weight": 0.6376,
-        "depthUsd": 1691191821,
-        "borrowedUsd": 1408098673
+        "weight": 0.6428,
+        "depthUsd": 1707292223,
+        "borrowedUsd": 1406882952
       },
       {
         "chain": "Ethereum",
@@ -388,10 +388,10 @@
         "collateral": "cbBTC",
         "loan": "USDC",
         "group": "USDC",
-        "borrow": 3.57,
-        "supply": 2.39,
-        "nominalBorrow": 3.5,
-        "utilization": 67.36,
+        "borrow": 3.52,
+        "supply": 2.42,
+        "nominalBorrow": 3.46,
+        "utilization": 69.3,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
@@ -400,12 +400,12 @@
         "inBtcCollateralUsdcToday": true,
         "eligibleFrom": null,
         "source": "contract",
-        "loanPrice": 0.9999,
-        "collateralVsBtc": 0.9956,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 0.9992,
         "phaseIn": 1,
-        "weight": 0.0999,
-        "depthUsd": 265027846,
-        "borrowedUsd": 178516168
+        "weight": 0.0969,
+        "depthUsd": 257383002,
+        "borrowedUsd": 178362126
       },
       {
         "chain": "Ethereum",
@@ -413,10 +413,10 @@
         "collateral": "WBTC",
         "loan": "USDC",
         "group": "USDC",
-        "borrow": 3.57,
-        "supply": 2.39,
-        "nominalBorrow": 3.51,
-        "utilization": 67.24,
+        "borrow": 3.52,
+        "supply": 2.42,
+        "nominalBorrow": 3.46,
+        "utilization": 69.21,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49",
@@ -425,12 +425,12 @@
         "inBtcCollateralUsdcToday": true,
         "eligibleFrom": null,
         "source": "contract",
-        "loanPrice": 0.9999,
-        "collateralVsBtc": 1.001,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 1.0011,
         "phaseIn": 1,
-        "weight": 0.0577,
-        "depthUsd": 153051124,
-        "borrowedUsd": 102914038
+        "weight": 0.0559,
+        "depthUsd": 148561513,
+        "borrowedUsd": 102816858
       },
       {
         "chain": "Arc",
@@ -441,9 +441,9 @@
         "flags": [
           "borrowerIncentive"
         ],
-        "borrow": 4.49,
-        "supply": 4.08,
-        "nominalBorrow": 4.39,
+        "borrow": 4.55,
+        "supply": 4.13,
+        "nominalBorrow": 4.45,
         "utilization": 91,
         "lltv": 86,
         "fee": 0,
@@ -455,8 +455,8 @@
         "source": "contract",
         "phaseIn": 1,
         "weight": 0,
-        "depthUsd": 118896232,
-        "borrowedUsd": 108195568
+        "depthUsd": 116873250,
+        "borrowedUsd": 106354660
       },
       {
         "chain": "Ethereum",
@@ -465,9 +465,9 @@
         "loan": "RLUSD",
         "group": "RLUSD",
         "borrow": 3.3,
-        "supply": 2.86,
+        "supply": 2.87,
         "nominalBorrow": 3.25,
-        "utilization": 86.74,
+        "utilization": 87.25,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x15bb2a6af0c909eed19fb1f2ceeead34ecbdcba626de752c6b09389ee14eec32",
@@ -476,12 +476,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 1,
-        "collateralVsBtc": 0.9948,
+        "loanPrice": 0.9999,
+        "collateralVsBtc": 0.9985,
         "phaseIn": 1,
-        "weight": 0.0611,
-        "depthUsd": 161998340,
-        "borrowedUsd": 140519781
+        "weight": 0.0602,
+        "depthUsd": 159905580,
+        "borrowedUsd": 139514674
       },
       {
         "chain": "Ethereum",
@@ -492,7 +492,7 @@
         "borrow": 4.2,
         "supply": 3.78,
         "nominalBorrow": 4.12,
-        "utilization": 90.11,
+        "utilization": 90.1,
         "lltv": 86,
         "fee": 0,
         "marketId": "0xe51f9aaad25d0e755429cf77076b3c2d37cb1228ed81f8a5482f2102c220eef5",
@@ -501,12 +501,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9995,
-        "collateralVsBtc": 0.9948,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 0.9985,
         "phaseIn": 1,
-        "weight": 0.045,
-        "depthUsd": 119309620,
-        "borrowedUsd": 107504237
+        "weight": 0.0449,
+        "depthUsd": 119325427,
+        "borrowedUsd": 107513841
       },
       {
         "chain": "Ethereum",
@@ -514,10 +514,10 @@
         "collateral": "WBTC",
         "loan": "USDT",
         "group": "USDT",
-        "borrow": 3.49,
+        "borrow": 3.48,
         "supply": 3,
-        "nominalBorrow": 3.43,
-        "utilization": 86.22,
+        "nominalBorrow": 3.42,
+        "utilization": 86.49,
         "lltv": 86,
         "fee": 0,
         "marketId": "0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99",
@@ -526,12 +526,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9987,
-        "collateralVsBtc": 1.001,
+        "loanPrice": 0.9988,
+        "collateralVsBtc": 1.0011,
         "phaseIn": 1,
         "weight": 0.0263,
-        "depthUsd": 69888958,
-        "borrowedUsd": 60255058
+        "depthUsd": 69815808,
+        "borrowedUsd": 60380685
       },
       {
         "chain": "Ethereum",
@@ -539,10 +539,10 @@
         "collateral": "WBTC",
         "loan": "RLUSD",
         "group": "RLUSD",
-        "borrow": 2.48,
-        "supply": 2.06,
-        "nominalBorrow": 2.45,
-        "utilization": 83.36,
+        "borrow": 2.42,
+        "supply": 1.99,
+        "nominalBorrow": 2.4,
+        "utilization": 82.13,
         "lltv": 86,
         "fee": 0,
         "marketId": "0xa128dddc761075df9a9a60689f3a41a989b245aad506352c509c0c3a76a9ec6b",
@@ -551,12 +551,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 1,
-        "collateralVsBtc": 1.001,
+        "loanPrice": 0.9999,
+        "collateralVsBtc": 1.0011,
         "phaseIn": 1,
         "weight": 0.0144,
-        "depthUsd": 38233731,
-        "borrowedUsd": 31871887
+        "depthUsd": 38235854,
+        "borrowedUsd": 31404447
       },
       {
         "chain": "Ethereum",
@@ -564,10 +564,10 @@
         "collateral": "cbBTC",
         "loan": "USDT",
         "group": "USDT",
-        "borrow": 3.49,
-        "supply": 2.99,
-        "nominalBorrow": 3.43,
-        "utilization": 85.9,
+        "borrow": 3.36,
+        "supply": 2.77,
+        "nominalBorrow": 3.31,
+        "utilization": 82.79,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x4fe72543c5c95cd6b5f3cb516cd235ba882e2e705fe3424db6f99dfe5811d0d3",
@@ -576,12 +576,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9987,
-        "collateralVsBtc": 0.9956,
+        "loanPrice": 0.9988,
+        "collateralVsBtc": 0.9992,
         "phaseIn": 1,
-        "weight": 0.0185,
-        "depthUsd": 49016028,
-        "borrowedUsd": 42103039
+        "weight": 0.0192,
+        "depthUsd": 50980557,
+        "borrowedUsd": 42207607
       },
       {
         "chain": "Ethereum",
@@ -589,10 +589,10 @@
         "collateral": "cbBTC",
         "loan": "RLUSD",
         "group": "RLUSD",
-        "borrow": 4.24,
-        "supply": 3.66,
+        "borrow": 4.25,
+        "supply": 3.69,
         "nominalBorrow": 4.16,
-        "utilization": 86.39,
+        "utilization": 87.11,
         "lltv": 86,
         "fee": 0,
         "marketId": "0xffd010618ed3cb39bb2c5de0e3e58d3d2ec9f52187a180f29723c31756a939bc",
@@ -601,12 +601,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 1,
-        "collateralVsBtc": 0.9956,
+        "loanPrice": 0.9999,
+        "collateralVsBtc": 0.9992,
         "phaseIn": 1,
         "weight": 0.0004,
-        "depthUsd": 1150915,
-        "borrowedUsd": 994219
+        "depthUsd": 1151002,
+        "borrowedUsd": 1002654
       },
       {
         "chain": "Ethereum",
@@ -614,10 +614,10 @@
         "collateral": "WBTC",
         "loan": "USDT",
         "group": "USDT",
-        "borrow": 3.49,
+        "borrow": 3.48,
         "supply": 3,
-        "nominalBorrow": 3.43,
-        "utilization": 85.99,
+        "nominalBorrow": 3.42,
+        "utilization": 86.34,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x3c5a244b778095e1e1b2e44b7c2ecc9bf4fda9cd85cc22740e09205a7a4bf510",
@@ -626,12 +626,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9987,
-        "collateralVsBtc": 1.001,
+        "loanPrice": 0.9988,
+        "collateralVsBtc": 1.0011,
         "phaseIn": 1,
         "weight": 0.0012,
-        "depthUsd": 3250724,
-        "borrowedUsd": 2795347
+        "depthUsd": 3196993,
+        "borrowedUsd": 2760198
       },
       {
         "chain": "Ethereum",
@@ -642,7 +642,7 @@
         "borrow": 4.2,
         "supply": 3.74,
         "nominalBorrow": 4.11,
-        "utilization": 89.23,
+        "utilization": 89.34,
         "lltv": 86,
         "fee": 0,
         "marketId": "0xd8a8e6667f58aa9229e8979bd619742b1660ee856c200a93e407dbccb7222323",
@@ -651,12 +651,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9995,
-        "collateralVsBtc": 0.9956,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 0.9992,
         "phaseIn": 1,
         "weight": 0.0006,
-        "depthUsd": 1623989,
-        "borrowedUsd": 1449126
+        "depthUsd": 1623142,
+        "borrowedUsd": 1450179
       },
       {
         "chain": "Ethereum",
@@ -664,10 +664,10 @@
         "collateral": "WBTC",
         "loan": "USDC",
         "group": "USDC",
-        "borrow": 3.57,
-        "supply": 2.38,
-        "nominalBorrow": 3.51,
-        "utilization": 67.18,
+        "borrow": 3.52,
+        "supply": 2.42,
+        "nominalBorrow": 3.46,
+        "utilization": 69.25,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x09dc9e7eb5d8fc54b2bc41d1135fd4e99057a580f680321faeb90c7a21e631c1",
@@ -676,12 +676,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9999,
-        "collateralVsBtc": 1.001,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 1.0011,
         "phaseIn": 1,
         "weight": 0.0007,
-        "depthUsd": 1867577,
-        "borrowedUsd": 1254635
+        "depthUsd": 1813824,
+        "borrowedUsd": 1256013
       },
       {
         "chain": "Arbitrum",
@@ -689,10 +689,10 @@
         "collateral": "WBTC",
         "loan": "USDC",
         "group": "USDC",
-        "borrow": 4.57,
-        "supply": 4.12,
-        "nominalBorrow": 4.47,
-        "utilization": 90.32,
+        "borrow": 4.32,
+        "supply": 3.89,
+        "nominalBorrow": 4.23,
+        "utilization": 90.12,
         "lltv": 86,
         "fee": 0,
         "marketId": "0xe6392ff19d10454b099d692b58c361ef93e31af34ed1ef78232e07c78fe99169",
@@ -701,12 +701,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9999,
-        "collateralVsBtc": 0.9974,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 1.0013,
         "phaseIn": 1,
         "weight": 0.0009,
-        "depthUsd": 2330664,
-        "borrowedUsd": 2105059
+        "depthUsd": 2316601,
+        "borrowedUsd": 2087712
       },
       {
         "chain": "BNB Chain",
@@ -717,10 +717,10 @@
         "flags": [
           "lenderIncentive"
         ],
-        "borrow": 1.82,
-        "supply": 1.33,
-        "nominalBorrow": 1.81,
-        "utilization": 81.26,
+        "borrow": 1.96,
+        "supply": 1.57,
+        "nominalBorrow": 1.94,
+        "utilization": 89.3,
         "lltv": 70,
         "fee": 10,
         "marketId": "0xd9c00925089bfdfa28fd1e9ee734da1461d0b1b9bed9647f6e7ec5acb9d20fc6",
@@ -729,12 +729,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9998,
-        "collateralVsBtc": 0.9952,
+        "loanPrice": 0.9995,
+        "collateralVsBtc": 0.9994,
         "phaseIn": 1,
         "weight": 0.0311,
-        "depthUsd": 82572527,
-        "borrowedUsd": 67097535
+        "depthUsd": 82642823,
+        "borrowedUsd": 73803413
       },
       {
         "chain": "BNB Chain",
@@ -748,7 +748,7 @@
         "borrow": 4.21,
         "supply": 3.42,
         "nominalBorrow": 4.13,
-        "utilization": 90.55,
+        "utilization": 90.54,
         "lltv": 86,
         "fee": 10,
         "marketId": "0xae82d976f5470fa4fc7c32b4f01069351874516946de7352cb783381a0e94d14",
@@ -757,12 +757,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9991,
-        "collateralVsBtc": 0.9952,
+        "loanPrice": 0.999,
+        "collateralVsBtc": 0.9994,
         "phaseIn": 1,
-        "weight": 0.0022,
-        "depthUsd": 5775379,
-        "borrowedUsd": 5229492
+        "weight": 0.0021,
+        "depthUsd": 5492333,
+        "borrowedUsd": 4972998
       },
       {
         "chain": "BNB Chain",
@@ -770,10 +770,10 @@
         "collateral": "BTCB",
         "loan": "USDT",
         "group": "USDT",
-        "borrow": 2.94,
+        "borrow": 2.87,
         "supply": 1.68,
-        "nominalBorrow": 2.9,
-        "utilization": 64.07,
+        "nominalBorrow": 2.83,
+        "utilization": 65.5,
         "lltv": 80,
         "fee": 10,
         "marketId": "0x975f4cf3db16812d995f60e19bec91a96108d47429237acc8d208bc0519c5b19",
@@ -782,12 +782,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9989,
-        "collateralVsBtc": 0.9952,
+        "loanPrice": 0.9991,
+        "collateralVsBtc": 0.9994,
         "phaseIn": 1,
         "weight": 0.0005,
-        "depthUsd": 1233287,
-        "borrowedUsd": 790184
+        "depthUsd": 1233324,
+        "borrowedUsd": 807829
       },
       {
         "chain": "Stacks",
@@ -822,7 +822,7 @@
         "borrow": 4.2,
         "supply": 3.76,
         "nominalBorrow": 4.11,
-        "utilization": 89.62,
+        "utilization": 89.67,
         "lltv": 86,
         "fee": 0,
         "marketId": "0xbe50eed784490d6c32f398902b55eb5e1bd5af89e1f554993ad5fea899be090b",
@@ -831,11 +831,11 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9995,
-        "collateralVsBtc": 1.001,
-        "reason": "$0.90M supplied, under the $1M floor",
-        "depthUsd": 895255,
-        "borrowedUsd": 802345
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 1.0011,
+        "reason": "$0.89M supplied, under the $1M floor",
+        "depthUsd": 894809,
+        "borrowedUsd": 802416
       },
       {
         "chain": "Arbitrum",
@@ -843,10 +843,10 @@
         "collateral": "WBTC",
         "loan": "USDT0",
         "group": "USDT",
-        "borrow": 3.6,
-        "supply": 2.8,
-        "nominalBorrow": 3.53,
-        "utilization": 78.05,
+        "borrow": 3.84,
+        "supply": 3.3,
+        "nominalBorrow": 3.77,
+        "utilization": 86.26,
         "lltv": 86,
         "fee": 0,
         "marketId": "0xed06d9e82d7c35ca80d3983194e15462a96202bd875800af18183321f4611868",
@@ -855,28 +855,28 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9986,
-        "collateralVsBtc": 0.9974,
-        "reason": "$0.77M supplied, under the $1M floor",
-        "depthUsd": 770636,
-        "borrowedUsd": 601463
+        "loanPrice": 0.9988,
+        "collateralVsBtc": 1.0013,
+        "reason": "$0.69M supplied, under the $1M floor",
+        "depthUsd": 691027,
+        "borrowedUsd": 596062
       }
     ],
     "continuity": [
       {
         "id": "0x9103c3b4e834476c9a62ea009ba2c884ee42e94e6e314a26f04d312434191836",
         "group": "USDC",
-        "weight": 1691191821
+        "weight": 1707292223
       },
       {
         "id": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
         "group": "USDC",
-        "weight": 265027846
+        "weight": 257383002
       },
       {
         "id": "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49",
         "group": "USDC",
-        "weight": 153051124
+        "weight": 148561513
       },
       {
         "id": "0xc2db905f174e5defcce01d321b09f15f78856a36a21b90cc7e1abbc29225815d",
@@ -886,67 +886,67 @@
       {
         "id": "0x15bb2a6af0c909eed19fb1f2ceeead34ecbdcba626de752c6b09389ee14eec32",
         "group": "RLUSD",
-        "weight": 161998340
+        "weight": 159905580
       },
       {
         "id": "0xe51f9aaad25d0e755429cf77076b3c2d37cb1228ed81f8a5482f2102c220eef5",
         "group": "PYUSD",
-        "weight": 119309620
+        "weight": 119325427
       },
       {
         "id": "0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99",
         "group": "USDT",
-        "weight": 69888958
+        "weight": 69815808
       },
       {
         "id": "0xa128dddc761075df9a9a60689f3a41a989b245aad506352c509c0c3a76a9ec6b",
         "group": "RLUSD",
-        "weight": 38233731
+        "weight": 38235854
       },
       {
         "id": "0x4fe72543c5c95cd6b5f3cb516cd235ba882e2e705fe3424db6f99dfe5811d0d3",
         "group": "USDT",
-        "weight": 49016028
+        "weight": 50980557
       },
       {
         "id": "0xffd010618ed3cb39bb2c5de0e3e58d3d2ec9f52187a180f29723c31756a939bc",
         "group": "RLUSD",
-        "weight": 1150915
+        "weight": 1151002
       },
       {
         "id": "0x3c5a244b778095e1e1b2e44b7c2ecc9bf4fda9cd85cc22740e09205a7a4bf510",
         "group": "USDT",
-        "weight": 3250724
+        "weight": 3196993
       },
       {
         "id": "0xd8a8e6667f58aa9229e8979bd619742b1660ee856c200a93e407dbccb7222323",
         "group": "PYUSD",
-        "weight": 1623989
+        "weight": 1623142
       },
       {
         "id": "0x09dc9e7eb5d8fc54b2bc41d1135fd4e99057a580f680321faeb90c7a21e631c1",
         "group": "USDC",
-        "weight": 1867577
+        "weight": 1813824
       },
       {
         "id": "0xe6392ff19d10454b099d692b58c361ef93e31af34ed1ef78232e07c78fe99169",
         "group": "USDC",
-        "weight": 2330664
+        "weight": 2316601
       },
       {
         "id": "0xd9c00925089bfdfa28fd1e9ee734da1461d0b1b9bed9647f6e7ec5acb9d20fc6",
         "group": "USD1",
-        "weight": 82572527
+        "weight": 82642823
       },
       {
         "id": "0xae82d976f5470fa4fc7c32b4f01069351874516946de7352cb783381a0e94d14",
         "group": "U",
-        "weight": 5775379
+        "weight": 5492333
       },
       {
         "id": "0x975f4cf3db16812d995f60e19bec91a96108d47429237acc8d208bc0519c5b19",
         "group": "USDT",
-        "weight": 1233287
+        "weight": 1233324
       },
       {
         "id": "sp3m2byf7rgf8wkw5fvdnj6wr8d7ar9bhdxakpxze.state-v1",
@@ -956,8 +956,8 @@
     ],
     "termAverages": {
       "d30": {
-        "borrow": 5.39,
-        "supply": 4.72,
+        "borrow": 5.34,
+        "supply": 4.65,
         "methodologyVersions": [
           "1.13.0",
           "1.14.0"
@@ -973,10 +973,10 @@
     "label": "Bitcoin-collateral USDC",
     "kind": "the USDC rate under the SBOR headline (BTC-COLLATERAL-USD), methodology 1.13.0",
     "note": "What it costs to borrow USDC against plain bitcoin: every eligible market lending USDC (or USDCx on Stacks) against cbBTC, WBTC, cirBTC or sBTC, priced by its own interest rate model, read from contract state, weighted by what is supplied times its phase-in. Markets added under methodology 1.13.0 entered at zero weight on 14 October 2026 and reach full weight over 30 days. depthUsd counts every market in full. Withheld when markets that could not be read carried a quarter or more of its weight when last read. Recording began on 25 September 2026.",
-    "borrow": 4.74,
-    "supply": 3.82,
-    "utilization": 80.54,
-    "depthUsd": 2237374329,
+    "borrow": 4.66,
+    "supply": 3.73,
+    "utilization": 80.32,
+    "depthUsd": 2239249478,
     "markets": [
       {
         "chain": "Base",
@@ -984,10 +984,10 @@
         "collateral": "cbBTC",
         "loan": "USDC",
         "group": "USDC",
-        "borrow": 5.04,
-        "supply": 4.18,
-        "nominalBorrow": 4.91,
-        "utilization": 83.26,
+        "borrow": 4.94,
+        "supply": 4.05,
+        "nominalBorrow": 4.82,
+        "utilization": 82.4,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x9103c3b4e834476c9a62ea009ba2c884ee42e94e6e314a26f04d312434191836",
@@ -996,12 +996,12 @@
         "inBtcCollateralUsdcToday": true,
         "eligibleFrom": null,
         "source": "contract",
-        "loanPrice": 0.9999,
-        "collateralVsBtc": 0.9956,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 0.9992,
         "phaseIn": 1,
-        "weight": 0.7983,
-        "depthUsd": 1691191821,
-        "borrowedUsd": 1408098673
+        "weight": 0.8044,
+        "depthUsd": 1707292223,
+        "borrowedUsd": 1406882952
       },
       {
         "chain": "Ethereum",
@@ -1009,10 +1009,10 @@
         "collateral": "cbBTC",
         "loan": "USDC",
         "group": "USDC",
-        "borrow": 3.57,
-        "supply": 2.39,
-        "nominalBorrow": 3.5,
-        "utilization": 67.36,
+        "borrow": 3.52,
+        "supply": 2.42,
+        "nominalBorrow": 3.46,
+        "utilization": 69.3,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
@@ -1021,12 +1021,12 @@
         "inBtcCollateralUsdcToday": true,
         "eligibleFrom": null,
         "source": "contract",
-        "loanPrice": 0.9999,
-        "collateralVsBtc": 0.9956,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 0.9992,
         "phaseIn": 1,
-        "weight": 0.1251,
-        "depthUsd": 265027846,
-        "borrowedUsd": 178516168
+        "weight": 0.1213,
+        "depthUsd": 257383002,
+        "borrowedUsd": 178362126
       },
       {
         "chain": "Ethereum",
@@ -1034,10 +1034,10 @@
         "collateral": "WBTC",
         "loan": "USDC",
         "group": "USDC",
-        "borrow": 3.57,
-        "supply": 2.39,
-        "nominalBorrow": 3.51,
-        "utilization": 67.24,
+        "borrow": 3.52,
+        "supply": 2.42,
+        "nominalBorrow": 3.46,
+        "utilization": 69.21,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49",
@@ -1046,12 +1046,12 @@
         "inBtcCollateralUsdcToday": true,
         "eligibleFrom": null,
         "source": "contract",
-        "loanPrice": 0.9999,
-        "collateralVsBtc": 1.001,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 1.0011,
         "phaseIn": 1,
-        "weight": 0.0722,
-        "depthUsd": 153051124,
-        "borrowedUsd": 102914038
+        "weight": 0.07,
+        "depthUsd": 148561513,
+        "borrowedUsd": 102816858
       },
       {
         "chain": "Arc",
@@ -1062,9 +1062,9 @@
         "flags": [
           "borrowerIncentive"
         ],
-        "borrow": 4.49,
-        "supply": 4.08,
-        "nominalBorrow": 4.39,
+        "borrow": 4.55,
+        "supply": 4.13,
+        "nominalBorrow": 4.45,
         "utilization": 91,
         "lltv": 86,
         "fee": 0,
@@ -1076,8 +1076,8 @@
         "source": "contract",
         "phaseIn": 1,
         "weight": 0,
-        "depthUsd": 118896232,
-        "borrowedUsd": 108195568
+        "depthUsd": 116873250,
+        "borrowedUsd": 106354660
       },
       {
         "chain": "Ethereum",
@@ -1085,10 +1085,10 @@
         "collateral": "WBTC",
         "loan": "USDC",
         "group": "USDC",
-        "borrow": 3.57,
-        "supply": 2.38,
-        "nominalBorrow": 3.51,
-        "utilization": 67.18,
+        "borrow": 3.52,
+        "supply": 2.42,
+        "nominalBorrow": 3.46,
+        "utilization": 69.25,
         "lltv": 86,
         "fee": 0,
         "marketId": "0x09dc9e7eb5d8fc54b2bc41d1135fd4e99057a580f680321faeb90c7a21e631c1",
@@ -1097,12 +1097,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9999,
-        "collateralVsBtc": 1.001,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 1.0011,
         "phaseIn": 1,
         "weight": 0.0009,
-        "depthUsd": 1867577,
-        "borrowedUsd": 1254635
+        "depthUsd": 1813824,
+        "borrowedUsd": 1256013
       },
       {
         "chain": "Arbitrum",
@@ -1110,10 +1110,10 @@
         "collateral": "WBTC",
         "loan": "USDC",
         "group": "USDC",
-        "borrow": 4.57,
-        "supply": 4.12,
-        "nominalBorrow": 4.47,
-        "utilization": 90.32,
+        "borrow": 4.32,
+        "supply": 3.89,
+        "nominalBorrow": 4.23,
+        "utilization": 90.12,
         "lltv": 86,
         "fee": 0,
         "marketId": "0xe6392ff19d10454b099d692b58c361ef93e31af34ed1ef78232e07c78fe99169",
@@ -1122,12 +1122,12 @@
         "inBtcCollateralUsdcToday": false,
         "eligibleFrom": "2026-10-14",
         "source": "contract",
-        "loanPrice": 0.9999,
-        "collateralVsBtc": 0.9974,
+        "loanPrice": 0.9998,
+        "collateralVsBtc": 1.0013,
         "phaseIn": 1,
         "weight": 0.0011,
-        "depthUsd": 2330664,
-        "borrowedUsd": 2105059
+        "depthUsd": 2316601,
+        "borrowedUsd": 2087712
       },
       {
         "chain": "Stacks",
@@ -1161,17 +1161,17 @@
         "asset": "USDC",
         "venue": "Aave V3, Ethereum",
         "comparableTo": "SBOR-USD",
-        "supply": 2.7,
-        "borrow": 3.88,
-        "utilization": 77.8,
-        "depthUsd": 4125756150,
+        "supply": 3.09,
+        "borrow": 4.33,
+        "utilization": 79.76,
+        "depthUsd": 4153163200,
         "depthBasis": "supplied",
         "pool": "aa70268e-4b52-42bf-a116-608b370f9501",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/aa70268e-4b52-42bf-a116-608b370f9501",
         "source": "contract",
-        "nominalBorrow": 3.81,
-        "nominalSupply": 2.67
+        "nominalBorrow": 4.24,
+        "nominalSupply": 3.05
       },
       {
         "asset": "WBTC",
@@ -1179,8 +1179,8 @@
         "comparableTo": "SBOR-BTC",
         "supply": 0,
         "borrow": 0.32,
-        "utilization": 2.28,
-        "depthUsd": 2141602367,
+        "utilization": 2.27,
+        "depthUsd": 2227773120,
         "depthBasis": "supplied",
         "pool": "7e382157-b1bc-406d-b17b-facba43b716e",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0x2260fac5e5542a773aa44fbcfedf7c193bc2c599&marketName=proto_mainnet_v3",
@@ -1195,14 +1195,14 @@
         "comparableTo": "SBOR-BTC",
         "supply": 0,
         "borrow": 0.27,
-        "utilization": 0.34,
-        "depthUsd": 1512524338,
+        "utilization": 0.3,
+        "depthUsd": 1790329515,
         "depthBasis": "supplied",
         "pool": "b1986007-81f3-4150-9565-94d5a4066ce4",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf&marketName=proto_mainnet_v3",
         "dataUrl": "https://defillama.com/yields/pool/b1986007-81f3-4150-9565-94d5a4066ce4",
         "source": "contract",
-        "nominalBorrow": 0.27,
+        "nominalBorrow": 0.26,
         "nominalSupply": 0
       },
       {
@@ -1211,8 +1211,8 @@
         "comparableTo": "SBOR-BTC",
         "supply": 0.01,
         "borrow": 0.63,
-        "utilization": 2.55,
-        "depthUsd": 205297727,
+        "utilization": 2.56,
+        "depthUsd": 211666101,
         "depthBasis": "supplied",
         "pool": "89bc7c4c-d71c-435c-ab28-56c803d51320",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf&marketName=proto_base_v3",
@@ -1225,17 +1225,17 @@
         "asset": "USDC",
         "venue": "Aave V3, Base",
         "comparableTo": "SBOR-USD",
-        "supply": 4.34,
-        "borrow": 5.25,
-        "utilization": 92.21,
-        "depthUsd": 180502798,
+        "supply": 4.44,
+        "borrow": 5.37,
+        "utilization": 92.31,
+        "depthUsd": 180160564,
         "depthBasis": "supplied",
         "pool": "7e0661bf-8cf3-45e6-9424-31916d4c7b84",
         "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0x833589fcd6edb6e08f4c7c32d4f71b54bda02913&marketName=proto_base_v3",
         "dataUrl": "https://defillama.com/yields/pool/7e0661bf-8cf3-45e6-9424-31916d4c7b84",
         "source": "contract",
-        "nominalBorrow": 5.12,
-        "nominalSupply": 4.25
+        "nominalBorrow": 5.23,
+        "nominalSupply": 4.35
       },
       {
         "asset": "UBTC",
@@ -1244,7 +1244,7 @@
         "supply": 1.06,
         "borrow": 2.78,
         "utilization": 47.96,
-        "depthUsd": 6140665,
+        "depthUsd": 6363117,
         "depthBasis": "supplied",
         "pool": "96e6c755-2821-407b-83fb-9f8816bdac54",
         "url": "https://defillama.com/yields/pool/96e6c755-2821-407b-83fb-9f8816bdac54",
@@ -1257,79 +1257,79 @@
         "asset": "USDC",
         "venue": "HyperLend, Hyperliquid L1",
         "comparableTo": "SBOR-USD",
-        "supply": 3.91,
+        "supply": 3.95,
         "borrow": 4.91,
-        "utilization": 88.91,
-        "depthUsd": 47628131,
+        "utilization": 89.62,
+        "depthUsd": 47271253,
         "depthBasis": "supplied",
         "pool": "9d21c8a0-4ea9-4585-81a7-e3d09ab24a45",
         "url": "https://defillama.com/yields/pool/9d21c8a0-4ea9-4585-81a7-e3d09ab24a45",
         "dataUrl": "https://defillama.com/yields/pool/9d21c8a0-4ea9-4585-81a7-e3d09ab24a45",
         "source": "contract",
-        "nominalBorrow": 4.79,
-        "nominalSupply": 3.84
+        "nominalBorrow": 4.8,
+        "nominalSupply": 3.87
       },
       {
         "asset": "cbBTC",
         "venue": "Kamino, Solana",
         "comparableTo": "SBOR-BTC",
         "supply": 0,
-        "borrow": 0.21,
-        "utilization": 1.85,
-        "depthUsd": 42762261,
+        "borrow": 0.2,
+        "utilization": 1.8,
+        "depthUsd": 44319219,
         "depthBasis": "supplied",
         "pool": "ec8af777-6c9e-440a-9a3d-355f556baa04",
         "url": "https://defillama.com/yields/pool/ec8af777-6c9e-440a-9a3d-355f556baa04",
         "dataUrl": "https://defillama.com/yields/pool/ec8af777-6c9e-440a-9a3d-355f556baa04",
         "source": "contract",
-        "nominalBorrow": 0.21,
+        "nominalBorrow": 0.2,
         "nominalSupply": 0
       },
       {
         "asset": "USDC",
         "venue": "Kamino, Solana",
         "comparableTo": "SBOR-USD",
-        "supply": 4.17,
-        "borrow": 5.8,
-        "utilization": 88.51,
-        "depthUsd": 163211944,
+        "supply": 4.14,
+        "borrow": 5.77,
+        "utilization": 88.17,
+        "depthUsd": 162995615,
         "depthBasis": "supplied",
         "pool": "d2141a59-c199-4be7-8d4b-c8223954836b",
         "url": "https://defillama.com/yields/pool/d2141a59-c199-4be7-8d4b-c8223954836b",
         "dataUrl": "https://defillama.com/yields/pool/d2141a59-c199-4be7-8d4b-c8223954836b",
         "source": "contract",
-        "nominalBorrow": 5.63,
-        "nominalSupply": 4.09
+        "nominalBorrow": 5.61,
+        "nominalSupply": 4.06
       }
     ]
   },
   "context": {
     "note": "Context recorded alongside the fixing. None of this enters an index or affects a rate. It is kept because a rate is easier to understand later if you know what the world looked like when it was set.",
     "sofr": {
-      "rate": 3.92,
-      "effectiveDate": "2026-11-23",
+      "rate": 3.94,
+      "effectiveDate": "2026-11-24",
       "percentile1": 3.87,
-      "percentile99": 3.99,
-      "volumeBillions": 3173,
-      "average30day": 3.92534,
-      "average90day": 3.85303,
-      "average180day": 3.76562,
-      "indexValue": 1.26839737,
-      "averagesDate": "2026-11-24",
+      "percentile99": 4.02,
+      "volumeBillions": 3158,
+      "average30day": 3.92601,
+      "average90day": 3.85639,
+      "average180day": 3.76743,
+      "indexValue": 1.26853619,
+      "averagesDate": "2026-11-25",
       "source": "Federal Reserve Bank of New York"
     },
     "prices": {
-      "btcUsd": 58906,
-      "stxUsd": 0.259221,
+      "btcUsd": 60597,
+      "stxUsd": 0.263468,
       "source": "CoinGecko"
     },
     "sbtcSupply": {
-      "sats": 248638161045,
-      "sbtc": 2486.38161045,
+      "sats": 248823696111,
+      "sbtc": 2488.23696111,
       "source": "sbtc-token contract"
     },
     "chainHeight": {
-      "burnBlockHeight": 977487,
+      "burnBlockHeight": 977651,
       "rewardCycle": 148,
       "stackedUstx": 522980982437574,
       "source": "Hiro /v2/pox"
@@ -1337,24 +1337,24 @@
     "npmDownloads": {
       "package": "sbor-mcp",
       "source": "npm registry, api.npmjs.org",
-      "lastDay": 18,
-      "lastWeek": 277,
-      "lastMonth": 895,
+      "lastDay": 26,
+      "lastWeek": 157,
+      "lastMonth": 898,
       "note": "A download is a machine fetching the package. It is a floor on interest, not a count of agents or of people."
     },
     "staking": {
-      "nativeStackingApy": 6.62,
+      "nativeStackingApy": 6.71,
       "stBtcApy": 1.93,
-      "liquidityCostBps": 81,
+      "liquidityCostBps": 82,
       "liquidityCostNote": "Native stacking pays more than the liquid token because the position is locked for the cycle and the issuer takes a commission. The gap is what liquidity costs.",
       "source": "StackingDAO"
     },
     "ststxMarket": {
-      "redemptionStxPerStstx": 1.199852,
-      "marketStxPerStstx": 1.19027,
-      "marketLowSide": 1.189674,
-      "marketHighSide": 1.190865,
-      "discountPercent": -0.8,
+      "redemptionStxPerStstx": 1.200133,
+      "marketStxPerStstx": 1.193368,
+      "marketLowSide": 1.192771,
+      "marketHighSide": 1.193965,
+      "discountPercent": -0.56,
       "quoteSizeStstx": 1000,
       "source": "Market: Bitflow, quoted both ways at the same notional, midpoint. Redemption: StackingDAO's get-stx-per-ststx on data-stx-v2.",
       "note": "Negative discountPercent means stSTX trades below what it redeems for. Context only, never part of an index."
@@ -1366,14 +1366,14 @@
       "note": "stBTC's estimated yield minus the cost of borrowing sBTC (SBOR-BTC's borrow rate): what one turn of an stBTC-against-sBTC loop earns before leverage. A negative carry means the loop loses money. StackingDAO's stBTC figure is an estimate. Context only, never part of an index."
     },
     "stbtcRealized": {
-      "sbtcPerStbtc": 1.00492908,
+      "sbtcPerStbtc": 1.00499354,
       "since": {
         "bitcoinBlock": 967405,
         "date": "2026-09-17",
         "sbtcPerStbtc": 1.00117674
       },
-      "days": 68.9,
-      "realizedApy": 2,
+      "days": 69.9,
+      "realizedApy": 2.01,
       "advertisedApy": 1.93,
       "source": "get-sbtc-per-stbtc on StackingDAO's data-stbtc-v1, against its value at Bitcoin block 967,405, when stBTC's reward stream began.",
       "note": "The bitcoin yield stBTC holders actually earned: growth of the sBTC value of one stBTC, annualized. Rewards earned but not yet released are not counted, so it can lag StackingDAO's own forward-looking figure (advertisedApy). Context only, never part of an index."
