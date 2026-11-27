@@ -1,17 +1,22 @@
 {
-  "fixing": "2026-11-26T08:30:50Z",
-  "comparedWith": "2026-11-25",
+  "fixing": "2026-11-27T08:30:59Z",
+  "comparedWith": "2026-11-26",
   "top": {
     "why": "INVERSION on USDCx: supply Zest V2 1.28% vs borrow Granite 1.15%",
     "chars": 189,
     "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.28%. Borrowing the same asset at Granite costs 1.15%.\n\n+13 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
   },
-  "otherCount": 0,
+  "otherCount": 1,
   "drafts": [
     {
       "why": "INVERSION on USDCx: supply Zest V2 1.28% vs borrow Granite 1.15%",
       "chars": 189,
       "text": "USDCx is inverted across venues.\n\nSupplying at Zest V2 pays 1.28%. Borrowing the same asset at Granite costs 1.15%.\n\n+13 bps, before fees, gas and liquidation risk.\n\nsbor.xyz"
+    },
+    {
+      "why": "Zest V2 sBTC utilization fell back below 80%",
+      "chars": 136,
+      "text": "Zest V2 sBTC is back to 75.00% utilized, down from 81.50%.\n\nBorrow 1.28%, supply 0.85%.\n\nThe squeeze has eased.\n\nsbor.xyz"
     }
   ]
 }
